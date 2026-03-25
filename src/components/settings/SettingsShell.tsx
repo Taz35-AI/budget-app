@@ -49,7 +49,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
           type="button"
           onClick={() => onChange(c)}
           className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0d1629]"
-          style={{ backgroundColor: c, ringColor: value === c ? c : 'transparent' }}
+          style={{ backgroundColor: c, ['--tw-ring-color']: value === c ? c : 'transparent' } as React.CSSProperties}
         >
           {value === c && (
             <svg className="w-3.5 h-3.5 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
