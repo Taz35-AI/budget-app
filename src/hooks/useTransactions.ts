@@ -21,7 +21,7 @@ export function useTransactions() {
   return useQuery<TransactionsData>({
     queryKey: ['transactions'],
     queryFn: fetchTransactions,
-    staleTime: 30_000,
+    staleTime: 0,
   });
 }
 

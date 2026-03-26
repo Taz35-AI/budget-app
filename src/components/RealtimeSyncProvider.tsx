@@ -20,45 +20,33 @@ export function RealtimeSyncProvider({ children }: { children: React.ReactNode }
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-
-      channel = supabase
-        .channel('realtime:transactions')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'transactions',
-            filter: `user_id=eq.${user.id}`,
-          },
-          () => {
-            qc.invalidateQueries({ queryKey: ['transactions'] });
-          },
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'transaction_exceptions' },
-          () => {
-            qc.invalidateQueries({ queryKey: ['transactions'] });
-          },
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'balance_resets',
-            filter: `user_id=eq.${user.id}`,
-          },
-          () => {
-            qc.invalidateQueries({ queryKey: ['balance-reset'] });
-            qc.invalidateQueries({ queryKey: ['transactions'] });
-          },
-        )
-        .subscribe();
-    });
+    // No per-row filters — avoids REPLICA IDENTITY requirement.
+    // The API layer enforces RLS so each client only ever fetches its own data.
+    channel = supabase
+      .channel('realtime:transactions')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transactions' },
+        () => {
+          qc.invalidateQueries({ queryKey: ['transactions'] });
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'transaction_exceptions' },
+        () => {
+          qc.invalidateQueries({ queryKey: ['transactions'] });
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'balance_resets' },
+        () => {
+          qc.invalidateQueries({ queryKey: ['balance-reset'] });
+          qc.invalidateQueries({ queryKey: ['transactions'] });
+        },
+      )
+      .subscribe();
 
     return () => {
       if (channel) supabase.removeChannel(channel);
