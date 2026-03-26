@@ -7,7 +7,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton } from '@/components/layout/NavSidebar';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import type { Frequency, CustomTag, RecurringTemplate } from '@/types';
+import type { Frequency, CustomTag, RecurringTemplate, TagCategory } from '@/types';
 
 // ─── Preset colour palette ────────────────────────────────────────────────────
 
@@ -99,67 +99,188 @@ function AddRowBtn({ label, accentHover, onClick }: { label: string; accentHover
 // ─── Tags section ─────────────────────────────────────────────────────────────
 
 function TagsSection() {
-  const { customTags, addCustomTag, updateCustomTag, deleteCustomTag } = useSettings();
+  const {
+    customTags,
+    hiddenBuiltinTags,
+    addCustomTag,
+    updateCustomTag,
+    deleteCustomTag,
+    overrideBuiltinTag,
+    hideBuiltinTag,
+    unhideBuiltinTag,
+  } = useSettings();
+
   const [showAdd, setShowAdd] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newColor, setNewColor] = useState(PRESET_COLORS[9]);
+  const [newCategory, setNewCategory] = useState<TagCategory>('expense');
+  // editId is either a built-in key (e.g. 'food') or a custom tag UUID
   const [editId, setEditId] = useState<string | null>(null);
+  const [editIsBuiltin, setEditIsBuiltin] = useState(false);
   const [editLabel, setEditLabel] = useState('');
   const [editColor, setEditColor] = useState('');
+  const [editCategory, setEditCategory] = useState<TagCategory>('expense');
 
   const handleAdd = () => {
     if (!newLabel.trim()) return;
-    addCustomTag({ label: newLabel.trim(), color: newColor });
+    addCustomTag({ label: newLabel.trim(), color: newColor, category: newCategory });
     setNewLabel('');
     setNewColor(PRESET_COLORS[9]);
+    setNewCategory('expense');
     setShowAdd(false);
   };
 
-  const startEdit = (tag: CustomTag) => {
-    setEditId(tag.id);
-    setEditLabel(tag.label);
-    setEditColor(tag.color);
+  const startEdit = (id: string, label: string, color: string, category: TagCategory, isBuiltin: boolean) => {
+    setEditId(id);
+    setEditIsBuiltin(isBuiltin);
+    setEditLabel(label);
+    setEditColor(color);
+    setEditCategory(category);
   };
 
   const saveEdit = () => {
     if (!editId || !editLabel.trim()) return;
-    updateCustomTag(editId, { label: editLabel.trim(), color: editColor });
+    if (editIsBuiltin) {
+      overrideBuiltinTag(editId, { label: editLabel.trim(), color: editColor });
+    } else {
+      updateCustomTag(editId, { label: editLabel.trim(), color: editColor, category: editCategory });
+    }
     setEditId(null);
   };
+
+  // Built-in tags enriched with any user overrides
+  const builtinEntries = Object.entries(TAGS).map(([key, defaults]) => {
+    const override = customTags.find((t) => t.id === key);
+    return {
+      key,
+      label: override?.label ?? defaults.label,
+      color: override?.color ?? defaults.color,
+      defaultLabel: defaults.label,
+      defaultColor: defaults.color,
+      isOverridden: !!override,
+      isHidden: hiddenBuiltinTags.includes(key),
+    };
+  });
+
+  // Pure custom tags (not built-in overrides)
+  const pureCustomTags = customTags.filter((t) => !TAGS[t.id]);
+
+  const activeBuiltins = builtinEntries.filter((t) => !t.isHidden);
+  const hiddenBuiltins = builtinEntries.filter((t) => t.isHidden);
 
   return (
     <SettingsCard
       title="Tags & Categories"
-      subtitle="Custom tags appear alongside built-in ones when adding transactions"
+      subtitle="Rename or recolour any tag, hide ones you don't use, and add your own"
       accent="bg-gradient-to-r from-violet-500 to-indigo-500"
     >
-      {/* Built-in */}
+      {/* Built-in tags */}
       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">
-        Built-in (read-only)
+        Built-in
       </p>
-      <div className="flex flex-wrap gap-1.5 mb-5">
-        {Object.entries(TAGS).map(([key, { label, color }]) => (
-          <span key={key} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-white" style={{ backgroundColor: color }}>
-            {label}
-          </span>
+      <div className="flex flex-col gap-2 mb-5">
+        {activeBuiltins.map(({ key, label, color, defaultLabel, defaultColor, isOverridden }) => (
+          <div key={key}>
+            {editId === key && editIsBuiltin ? (
+              <div className="flex flex-col gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
+                <div className="flex gap-2 items-center">
+                  <input
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                    autoFocus
+                    className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-indigo-400"
+                  />
+                  <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
+                    {editLabel || 'Preview'}
+                  </span>
+                </div>
+                <ColorPicker value={editColor} onChange={setEditColor} />
+                <div className="flex gap-2">
+                  <button type="button" onClick={saveEdit} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">Save</button>
+                  {isOverridden && (
+                    <button
+                      type="button"
+                      onClick={() => { deleteCustomTag(key); setEditId(null); }}
+                      className="px-3 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors"
+                      title={`Reset to "${defaultLabel}"`}
+                    >
+                      Reset
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setEditId(null)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group">
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                <span className="flex-1 text-sm font-medium text-slate-700 dark:text-white/80">{label}</span>
+                {isOverridden && (
+                  <span className="text-[9px] font-bold uppercase tracking-wide text-indigo-400 dark:text-indigo-300/70 mr-1">edited</span>
+                )}
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(key, label, color, TAGS[key]?.category ?? 'both', true)}
+                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
+                    title="Edit"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => hideBuiltinTag(key)}
+                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    title="Hide"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
-      {/* Custom */}
-      {customTags.length > 0 && (
+      {/* Custom tags */}
+      {pureCustomTags.length > 0 && (
         <>
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Custom</p>
           <div className="flex flex-col gap-2 mb-4">
-            {customTags.map((tag) => (
+            {pureCustomTags.map((tag) => (
               <div key={tag.id}>
-                {editId === tag.id ? (
+                {editId === tag.id && !editIsBuiltin ? (
                   <div className="flex flex-col gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
-                    <input
-                      value={editLabel}
-                      onChange={(e) => setEditLabel(e.target.value)}
-                      className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-indigo-400"
-                    />
+                    <div className="flex gap-2 items-center">
+                      <input
+                        value={editLabel}
+                        onChange={(e) => setEditLabel(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                        autoFocus
+                        className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-indigo-400"
+                      />
+                      <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
+                        {editLabel || 'Preview'}
+                      </span>
+                    </div>
                     <ColorPicker value={editColor} onChange={setEditColor} />
+                    {/* Category toggle — custom tags only */}
+                    <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+                      {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
+                        <button key={cat} type="button" onClick={() => setEditCategory(cat)}
+                          className={cn('flex-1 h-8 text-xs font-medium transition-all',
+                            editCategory === cat
+                              ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
+                              : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+                          )}>
+                          {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
+                        </button>
+                      ))}
+                    </div>
                     <div className="flex gap-2">
                       <button type="button" onClick={saveEdit} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">Save</button>
                       <button type="button" onClick={() => setEditId(null)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
@@ -169,10 +290,15 @@ function TagsSection() {
                   <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group">
                     <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: tag.color }} />
                     <span className="flex-1 text-sm font-medium text-slate-700 dark:text-white/80">{tag.label}</span>
+                    <span className={cn('text-[9px] font-bold uppercase tracking-wide mr-1',
+                      (tag.category ?? 'expense') === 'income' ? 'text-emerald-400' : (tag.category ?? 'expense') === 'expense' ? 'text-red-400' : 'text-slate-400 dark:text-white/30',
+                    )}>
+                      {(tag.category ?? 'expense') === 'both' ? 'both' : tag.category ?? 'expense'}
+                    </span>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
-                        onClick={() => startEdit(tag)}
+                        onClick={() => startEdit(tag.id, tag.label, tag.color, tag.category ?? 'expense', false)}
                         className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -189,22 +315,58 @@ function TagsSection() {
         </>
       )}
 
+      {/* Hidden built-ins — tap to restore */}
+      {hiddenBuiltins.length > 0 && (
+        <>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">
+            Hidden ({hiddenBuiltins.length})
+          </p>
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {hiddenBuiltins.map(({ key, label, color }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => unhideBuiltinTag(key)}
+                title="Click to restore"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30 hover:border-slate-300 hover:text-slate-500 dark:hover:text-white/50 transition-colors"
+              >
+                <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: color }} />
+                {label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* Add new */}
       {showAdd ? (
         <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
-          <input
-            value={newLabel}
-            onChange={(e) => setNewLabel(e.target.value)}
-            placeholder="Tag name (e.g. Groceries)"
-            autoFocus
-            onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400"
-          />
-          <ColorPicker value={newColor} onChange={setNewColor} />
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-white" style={{ backgroundColor: newColor }}>
+          <div className="flex gap-2 items-center">
+            <input
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Tag name"
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400"
+            />
+            <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: newColor }}>
               {newLabel || 'Preview'}
             </span>
+          </div>
+          <ColorPicker value={newColor} onChange={setNewColor} />
+          {/* Category toggle */}
+          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+            {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
+              <button key={cat} type="button" onClick={() => setNewCategory(cat)}
+                className={cn('flex-1 h-8 text-xs font-medium transition-all',
+                  newCategory === cat
+                    ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
+                    : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+                )}>
+                {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
+              </button>
+            ))}
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">
@@ -319,7 +481,7 @@ function TemplatesSection() {
               {Object.entries(FREQUENCIES).map(([val, label]) => <option key={val} value={val}>{label}</option>)}
             </select>
           )}
-          {/* Tag picker */}
+          {/* Tag picker — filtered to match the template's income/expense */}
           <div className="flex flex-wrap gap-1.5">
             <button type="button" onClick={() => setForm((f) => ({ ...f, tag: '' }))}
               className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
@@ -327,16 +489,18 @@ function TemplatesSection() {
               )}>
               None
             </button>
-            {Object.entries(allTags).map(([key, { label, color }]) => (
-              <button key={key} type="button" onClick={() => setForm((f) => ({ ...f, tag: f.tag === key ? '' : key }))}
-                className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
-                  form.tag === key ? 'text-white border-transparent' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60',
-                )}
-                style={form.tag === key ? { backgroundColor: color } : undefined}>
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-                {label}
-              </button>
-            ))}
+            {Object.entries(allTags)
+              .filter(([, t]) => t.category === form.category || t.category === 'both')
+              .map(([key, { label, color }]) => (
+                <button key={key} type="button" onClick={() => setForm((f) => ({ ...f, tag: f.tag === key ? '' : key }))}
+                  className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                    form.tag === key ? 'text-white border-transparent' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60',
+                  )}
+                  style={form.tag === key ? { backgroundColor: color } : undefined}>
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                  {label}
+                </button>
+              ))}
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold transition-colors">Save template</button>
@@ -406,17 +570,25 @@ function PreferencesSection() {
 // ─── Savings Goals section ────────────────────────────────────────────────────
 
 function GoalsSection() {
-  const { goals, addGoal, updateGoal, deleteGoal } = useSettings();
+  const { goals, allTags, addGoal, updateGoal, deleteGoal } = useSettings();
   const [showAdd, setShowAdd] = useState(false);
-  const [form, setForm] = useState({ name: '', target: '', currentSaved: '', deadline: '' });
+  const [form, setForm] = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
   const [editId, setEditId] = useState<string | null>(null);
   const [editSaved, setEditSaved] = useState('');
+  // which goal is showing the "pick a tag to link" picker
+  const [linkingGoalId, setLinkingGoalId] = useState<string | null>(null);
 
   const handleAdd = () => {
     const target = Number(form.target);
     if (!form.name.trim() || !target || target <= 0) return;
-    addGoal({ name: form.name.trim(), targetAmount: target, currentSaved: Number(form.currentSaved) || 0, deadline: form.deadline || undefined });
-    setForm({ name: '', target: '', currentSaved: '', deadline: '' });
+    addGoal({
+      name: form.name.trim(),
+      targetAmount: target,
+      currentSaved: form.linkedTagId ? 0 : (Number(form.currentSaved) || 0),
+      deadline: form.deadline || undefined,
+      linkedTagId: form.linkedTagId || undefined,
+    });
+    setForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
     setShowAdd(false);
   };
 
@@ -428,7 +600,7 @@ function GoalsSection() {
   return (
     <SettingsCard
       title="Savings Goals"
-      subtitle="Set targets and track progress towards your financial goals"
+      subtitle="Set targets and track progress. Link a tag so transactions auto-update progress."
       accent="bg-gradient-to-r from-emerald-400 to-teal-500"
     >
       {goals.length === 0 && !showAdd && (
@@ -443,6 +615,7 @@ function GoalsSection() {
             const daysLeft = goal.deadline
               ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
               : null;
+            const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
 
             return (
               <div key={goal.id} className="p-4 rounded-xl border border-slate-100 dark:border-white/[0.05] bg-slate-50/50 dark:bg-white/[0.02]">
@@ -463,6 +636,7 @@ function GoalsSection() {
                     </svg>
                   </button>
                 </div>
+
                 {/* Progress bar */}
                 <div className="h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden mb-1.5">
                   <div
@@ -470,11 +644,42 @@ function GoalsSection() {
                     style={{ width: `${pct * 100}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-xs text-slate-500 dark:text-white/40 mb-3">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-white/40 mb-2">
                   <span>{Math.round(pct * 100)}% · {goal.currentSaved.toLocaleString()} / {goal.targetAmount.toLocaleString()}</span>
                   {pct < 1 && <span>{remaining.toLocaleString()} remaining</span>}
                 </div>
-                {editId === goal.id ? (
+
+                {/* Linked tag or manual controls */}
+                {linkingGoalId === goal.id ? (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {Object.entries(allTags).map(([key, { label, color }]) => (
+                      <button key={key} type="button"
+                        onClick={() => { updateGoal(goal.id, { linkedTagId: key, currentSaved: 0 }); setLinkingGoalId(null); }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                        {label}
+                      </button>
+                    ))}
+                    <button type="button" onClick={() => setLinkingGoalId(null)}
+                      className="px-2.5 py-1 rounded-lg text-xs border border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30">
+                      Cancel
+                    </button>
+                  </div>
+                ) : linkedTag ? (
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />
+                      <span className="text-xs text-slate-500 dark:text-white/40">
+                        Auto-tracked via <span className="font-medium text-slate-600 dark:text-white/60">{linkedTag.label}</span>
+                      </span>
+                    </div>
+                    <button type="button"
+                      onClick={() => updateGoal(goal.id, { linkedTagId: undefined })}
+                      className="text-[11px] text-slate-400 dark:text-white/25 hover:text-red-400 transition-colors">
+                      Unlink
+                    </button>
+                  </div>
+                ) : editId === goal.id ? (
                   <div className="flex gap-2">
                     <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                       placeholder="Amount saved so far" autoFocus
@@ -483,10 +688,17 @@ function GoalsSection() {
                     <button type="button" onClick={() => setEditId(null)} className="px-2 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs transition-colors">✕</button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => { setEditId(goal.id); setEditSaved(goal.currentSaved.toString()); }}
-                    className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
-                    Update saved amount
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button type="button" onClick={() => { setEditId(goal.id); setEditSaved(goal.currentSaved.toString()); }}
+                      className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">
+                      Update amount
+                    </button>
+                    <span className="text-slate-300 dark:text-white/10 text-xs">·</span>
+                    <button type="button" onClick={() => { setLinkingGoalId(goal.id); setEditId(null); }}
+                      className="text-xs text-slate-400 dark:text-white/30 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors">
+                      Link to tag
+                    </button>
+                  </div>
                 )}
               </div>
             );
@@ -502,13 +714,44 @@ function GoalsSection() {
           <input type="number" value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
             placeholder="Target amount" min="0"
             className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
-          <input type="number" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
-            placeholder="Already saved (optional)" min="0"
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+          {!form.linkedTagId && (
+            <input type="number" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
+              placeholder="Already saved (optional)" min="0"
+              className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+          )}
           <div>
             <p className="text-xs text-slate-500 dark:text-white/40 mb-1">Deadline (optional)</p>
             <input type="date" value={form.deadline} onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
               className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-emerald-400" />
+          </div>
+          {/* Tag link picker */}
+          <div>
+            <p className="text-xs text-slate-500 dark:text-white/40 mb-1.5">
+              Link to tag — income transactions with this tag will count toward the goal
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <button type="button" onClick={() => setForm((f) => ({ ...f, linkedTagId: '' }))}
+                className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                  !form.linkedTagId
+                    ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 dark:border-white'
+                    : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 bg-white dark:bg-white/5',
+                )}>
+                Manual
+              </button>
+              {Object.entries(allTags).map(([key, { label, color }]) => (
+                <button key={key} type="button"
+                  onClick={() => setForm((f) => ({ ...f, linkedTagId: f.linkedTagId === key ? '' : key }))}
+                  className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                    form.linkedTagId === key
+                      ? 'text-white border-transparent'
+                      : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60',
+                  )}
+                  style={form.linkedTagId === key ? { backgroundColor: color } : undefined}>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors">Add goal</button>
@@ -534,7 +777,7 @@ export function SettingsShell() {
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#050911]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 dark:via-indigo-400/40 to-transparent" />
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between gap-3">
           {/* Hamburger — mobile only */}
           <NavMenuButton />
 
@@ -558,7 +801,7 @@ export function SettingsShell() {
       </header>
 
       {/* Content — 2 columns on lg+ */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
         <TagsSection />
         <TemplatesSection />
         <PreferencesSection />

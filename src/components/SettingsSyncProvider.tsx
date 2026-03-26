@@ -37,8 +37,11 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customTags: state.customTags,
+            hiddenBuiltinTags: state.hiddenBuiltinTags,
             templates: state.templates,
             goals: state.goals,
+            accounts: state.accounts,
+            tagBudgets: state.tagBudgets,
             firstDayOfWeek: state.firstDayOfWeek,
             dateFormat: state.dateFormat,
           }),

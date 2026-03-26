@@ -104,11 +104,13 @@ export interface TransactionFormValues {
 // ─── Settings types ───────────────────────────────────────────────────────────
 
 export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+export type TagCategory = 'income' | 'expense' | 'both';
 
 export interface CustomTag {
-  id: string;       // stored as tag value on transactions
+  id: string;             // stored as tag value on transactions
   label: string;
   color: string;
+  category: TagCategory;  // determines which transaction types this tag appears on
 }
 
 export interface RecurringTemplate {
@@ -126,5 +128,21 @@ export interface SavingsGoal {
   name: string;
   targetAmount: number;
   currentSaved: number;
-  deadline?: string;  // YYYY-MM-DD
+  deadline?: string;     // YYYY-MM-DD
+  linkedTagId?: string;  // when set, progress is computed from matching income transactions
+}
+
+export type AccountType = 'checking' | 'savings' | 'investment' | 'credit';
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  balance: number;
+  note?: string;
+}
+
+export interface TagBudget {
+  tagId: string;
+  monthlyLimit: number;
 }

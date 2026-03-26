@@ -30,15 +30,20 @@ export const FREQUENCIES: Record<Frequency, string> = {
 
 export const SEVEN_YEARS_DAYS = 365 * 7 + 2; // +2 for leap years
 
-export const TAGS: Record<string, { label: string; color: string }> = {
-  food:          { label: 'Food & Drink',   color: '#f97316' },
-  transport:     { label: 'Transport',       color: '#3b82f6' },
-  housing:       { label: 'Housing',         color: '#8b5cf6' },
-  utilities:     { label: 'Utilities',       color: '#eab308' },
-  entertainment: { label: 'Entertainment',   color: '#ec4899' },
-  health:        { label: 'Health',          color: '#ef4444' },
-  shopping:      { label: 'Shopping',        color: '#14b8a6' },
-  salary:        { label: 'Salary',          color: '#22c55e' },
-  savings:       { label: 'Savings',         color: '#6366f1' },
-  other:         { label: 'Other',           color: '#6b7280' },
+export const TAGS: Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both' }> = {
+  // ── Expense ──────────────────────────────────────────────────────────────────
+  food:          { label: 'Food & Drink',   color: '#f97316', category: 'expense' },
+  transport:     { label: 'Transport',       color: '#3b82f6', category: 'expense' },
+  housing:       { label: 'Housing',         color: '#8b5cf6', category: 'expense' },
+  utilities:     { label: 'Utilities',       color: '#eab308', category: 'expense' },
+  entertainment: { label: 'Entertainment',   color: '#ec4899', category: 'expense' },
+  health:        { label: 'Health',          color: '#ef4444', category: 'expense' },
+  shopping:      { label: 'Shopping',        color: '#14b8a6', category: 'expense' },
+  // ── Income ───────────────────────────────────────────────────────────────────
+  salary:        { label: 'Salary',          color: '#22c55e', category: 'income'  },
+  freelance:     { label: 'Freelance',       color: '#10b981', category: 'income'  },
+  investment:    { label: 'Investment',      color: '#6366f1', category: 'income'  },
+  // ── Both ─────────────────────────────────────────────────────────────────────
+  savings:       { label: 'Savings',         color: '#8b5cf6', category: 'both'    },
+  other:         { label: 'Other',           color: '#6b7280', category: 'both'    },
 };

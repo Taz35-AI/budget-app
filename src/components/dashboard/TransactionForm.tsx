@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,9 +45,10 @@ interface Props {
   onCancel: () => void;
   isLoading?: boolean;
   symbol: string;
+  lockType?: boolean;
 }
 
-export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol }: Props) {
+export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType }: Props) {
   const {
     register,
     handleSubmit,
@@ -73,6 +75,17 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
   const tag = watch('tag');
 
   const { allTags, templates } = useSettings();
+
+  // Clear tag when switching income/expense if the current tag no longer applies
+  const prevCategory = React.useRef(category);
+  React.useEffect(() => {
+    if (prevCategory.current === category) return;
+    prevCategory.current = category;
+    if (tag && allTags[tag]) {
+      const tagCat = allTags[tag].category;
+      if (tagCat !== 'both' && tagCat !== category) setValue('tag', '');
+    }
+  }, [category, tag, allTags, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -124,21 +137,25 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         ))}
       </div>
 
-      {/* Type toggle */}
-      <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
-        {(['one_off', 'recurring'] as const).map((t) => (
-          <label
-            key={t}
-            className={cn(
-              'flex-1 flex items-center justify-center h-10 text-sm font-medium cursor-pointer transition-all',
-              type === t ? 'bg-slate-900 text-white' : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
-            )}
-          >
-            <input type="radio" value={t} {...register('type')} className="sr-only" />
-            {t === 'one_off' ? 'One-off' : 'Recurring'}
-          </label>
-        ))}
-      </div>
+      {/* Type toggle — hidden when editing (type cannot change after creation) */}
+      {lockType ? (
+        <input type="hidden" {...register('type')} />
+      ) : (
+        <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+          {(['one_off', 'recurring'] as const).map((t) => (
+            <label
+              key={t}
+              className={cn(
+                'flex-1 flex items-center justify-center h-10 text-sm font-medium cursor-pointer transition-all',
+                type === t ? 'bg-slate-900 text-white' : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+              )}
+            >
+              <input type="radio" value={t} {...register('type')} className="sr-only" />
+              {t === 'one_off' ? 'One-off' : 'Recurring'}
+            </label>
+          ))}
+        </div>
+      )}
 
       <Input
         id="name"
@@ -160,30 +177,32 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         {...register('amount')}
       />
 
-      {/* Tag picker */}
+      {/* Tag picker — filtered to match the selected income/expense */}
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
         <div className="flex flex-wrap gap-1.5">
-          {Object.entries(allTags).map(([key, { label, color }]) => {
-            const isSelected = tag === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setValue('tag', isSelected ? '' : key)}
-                className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
-                  isSelected
-                    ? 'text-white border-transparent'
-                    : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/10',
-                )}
-                style={isSelected ? { backgroundColor: color } : undefined}
-              >
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                {label}
-              </button>
-            );
-          })}
+          {Object.entries(allTags)
+            .filter(([, t]) => t.category === category || t.category === 'both')
+            .map(([key, { label, color }]) => {
+              const isSelected = tag === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setValue('tag', isSelected ? '' : key)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
+                    isSelected
+                      ? 'text-white border-transparent'
+                      : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/10',
+                  )}
+                  style={isSelected ? { backgroundColor: color } : undefined}
+                >
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                  {label}
+                </button>
+              );
+            })}
         </div>
       </div>
 
@@ -199,13 +218,8 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
 
       {type === 'recurring' && (
         <>
-          <Input
-            id="start_date"
-            label="Start date"
-            type="date"
-            error={errors.start_date?.message}
-            {...register('start_date')}
-          />
+          {/* start_date is silently set to the clicked day — no need to show it */}
+          <input type="hidden" {...register('start_date')} />
           <Input
             id="end_date"
             label="End date (optional)"

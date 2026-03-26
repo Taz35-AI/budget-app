@@ -7,7 +7,8 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
-import { FREQUENCIES, TAGS } from '@/lib/constants';
+import { FREQUENCIES } from '@/lib/constants';
+import { useSettings } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
 import type { EditMode } from '@/hooks/useTransactions';
 import type { DayTransaction } from '@/types';
@@ -72,7 +73,10 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
   const editMode = watch('editMode');
   const tag = watch('tag');
+  const category = watch('category');
   const canEditSeries = editMode === 'all_future' || editMode === 'all';
+
+  const { allTags } = useSettings();
 
   const displayDate = format(new Date(occurrenceDate + 'T12:00:00'), 'd MMM yyyy');
 
@@ -173,31 +177,33 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         </div>
       </div>
 
-      {/* Tag — only editable when changing entire series */}
+      {/* Tag — only editable when changing entire series, filtered by income/expense */}
       {editMode === 'all' && (
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
           <div className="flex flex-wrap gap-1.5">
-            {Object.entries(TAGS).map(([key, { label, color }]) => {
-              const isSelected = tag === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setValue('tag', isSelected ? '' : key)}
-                  className={cn(
-                    'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
-                    isSelected
-                      ? 'text-white border-transparent'
-                      : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20',
-                  )}
-                  style={isSelected ? { backgroundColor: color } : undefined}
-                >
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                  {label}
-                </button>
-              );
-            })}
+            {Object.entries(allTags)
+              .filter(([, t]) => t.category === category || t.category === 'both')
+              .map(([key, { label, color }]) => {
+                const isSelected = tag === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setValue('tag', isSelected ? '' : key)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
+                      isSelected
+                        ? 'text-white border-transparent'
+                        : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20',
+                    )}
+                    style={isSelected ? { backgroundColor: color } : undefined}
+                  >
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                    {label}
+                  </button>
+                );
+              })}
           </div>
         </div>
       )}

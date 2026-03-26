@@ -3,6 +3,15 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Brand tokens ──────────────────────────────────────────────────────────── */
+:root {
+  --brand-navy:   #154265;
+  --brand-green:  #1ECB6C;
+  --brand-lime:   #9FEA86;
+  --brand-gold:   #F7D56E;
+  --brand-silver: #D1E3EE;
+}
+
 @keyframes pulse-slow {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(1.03); }
@@ -12,7 +21,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   FullCalendar — Premium fintech overrides (light-first)
+   FullCalendar — brand-aligned fintech overrides
    ═══════════════════════════════════════════════════════════════ */
 
 .fc .fc-toolbar.fc-header-toolbar {
@@ -23,37 +32,63 @@
 .fc .fc-toolbar-title {
   font-size: 1.125rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--brand-navy);
   letter-spacing: -0.035em;
 }
 
 .fc .fc-button-primary {
   background-color: white !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #475569 !important;
+  border: 1px solid var(--brand-silver) !important;
+  color: var(--brand-navy) !important;
   border-radius: 0.75rem !important;
   padding: 0.375rem 0.875rem !important;
   font-size: 0.8125rem !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 3px rgba(21,66,101,0.08) !important;
   transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
 .fc .fc-button-primary:hover {
-  background-color: #f1f5f9 !important;
-  border-color: #c7d2e0 !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+  background-color: #f0f7ff !important;
+  border-color: var(--brand-navy) !important;
+  box-shadow: 0 2px 6px rgba(21,66,101,0.12) !important;
 }
 
 .fc .fc-button-primary:focus {
-  outline: 2px solid #6366f1 !important;
+  outline: 2px solid var(--brand-green) !important;
   outline-offset: 2px !important;
 }
 
 .fc .fc-button-primary:not(:disabled):active {
-  background-color: #e8edf5 !important;
+  background-color: var(--brand-silver) !important;
   transform: scale(0.95);
   box-shadow: none !important;
+}
+
+/* Today button — distinct emerald style */
+.fc .fc-today-button {
+  background-color: var(--brand-green) !important;
+  border-color: var(--brand-green) !important;
+  color: #040d1a !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 6px rgba(30,203,108,0.3) !important;
+}
+.fc .fc-today-button:not(:disabled):hover {
+  background-color: var(--brand-lime) !important;
+  border-color: var(--brand-lime) !important;
+  box-shadow: 0 2px 10px rgba(30,203,108,0.4) !important;
+}
+.fc .fc-today-button:disabled {
+  background-color: var(--brand-silver) !important;
+  border-color: transparent !important;
+  color: rgba(21,66,101,0.35) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: default !important;
+}
+.dark .fc .fc-today-button:disabled {
+  background-color: rgba(21,66,101,0.2) !important;
+  color: rgba(209,227,238,0.25) !important;
 }
 
 /* Day-of-week headers */
@@ -67,7 +102,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: rgba(21, 66, 101, 0.7);
   padding: 0;
   text-decoration: none !important;
 }
@@ -92,14 +127,24 @@
 .fc .fc-daygrid-day {
   border: none !important;
   background: transparent !important;
+  height: 88px !important;
+  max-height: 88px !important;
+  overflow: hidden !important;
+}
+
+/* Lock row height so a busy cell can't push the whole row taller */
+.fc .fc-daygrid-body table tbody tr {
+  height: 88px !important;
+  max-height: 88px !important;
 }
 
 .fc .fc-daygrid-day-frame {
-  height: 110px;
+  height: 88px !important;
+  max-height: 88px !important;
   min-height: 0 !important;
   padding: 2px !important;
-  border-radius: 0.875rem;
-  overflow: hidden;
+  border-radius: 0.75rem;
+  overflow: hidden !important;
   display: flex;
   flex-direction: column;
   transition: transform 0.1s ease;
@@ -107,6 +152,8 @@
 
 .fc .fc-daygrid-day-top {
   flex: 1;
+  min-height: 0 !important;
+  overflow: hidden !important;
   padding: 0 !important;
   align-items: stretch;
 }
@@ -114,23 +161,17 @@
 .fc .fc-daygrid-day-number {
   width: 100%;
   height: 100%;
+  min-height: 0 !important;
+  overflow: hidden !important;
   padding: 0 !important;
   display: block;
   text-decoration: none !important;
   color: inherit;
 }
 
-.fc .fc-daygrid-day-events {
-  display: none;
-}
-
-.fc .fc-daygrid-day-bg {
-  display: none;
-}
-
-.fc .fc-daygrid-more-link {
-  display: none;
-}
+.fc .fc-daygrid-day-events { display: none; }
+.fc .fc-daygrid-day-bg { display: none; }
+.fc .fc-daygrid-more-link { display: none; }
 
 .fc .fc-day-today {
   background: transparent !important;
@@ -150,29 +191,30 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .dark .fc .fc-toolbar-title {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .dark .fc .fc-button-primary {
-  background-color: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.55) !important;
+  background-color: rgba(21, 66, 101, 0.35) !important;
+  border: 1px solid rgba(30, 203, 108, 0.18) !important;
+  color: rgba(255, 255, 255, 0.65) !important;
   box-shadow: none !important;
 }
 
 .dark .fc .fc-button-primary:hover {
-  background-color: rgba(255, 255, 255, 0.11) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  background-color: rgba(30, 203, 108, 0.12) !important;
+  border-color: rgba(30, 203, 108, 0.4) !important;
+  color: #1ECB6C !important;
 }
 
 .dark .fc .fc-button-primary:focus {
-  outline: 2px solid rgba(99, 102, 241, 0.6) !important;
+  outline: 2px solid rgba(30, 203, 108, 0.6) !important;
 }
 
 .dark .fc .fc-col-header-cell-cushion {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(30, 203, 108, 0.65);
 }
+
 
 /* ═══════════════════════════════════════════════════════════════
    Mobile overrides
@@ -180,9 +222,21 @@
 
 @media (max-width: 640px) {
   .fc .fc-daygrid-day-frame {
-    height: 90px;
+    height: 64px !important;
+    max-height: 64px !important;
     min-height: 0 !important;
-    border-radius: 0.625rem;
+    border-radius: 0.5rem;
+    overflow: hidden !important;
+  }
+
+  .fc .fc-daygrid-day {
+    height: 64px !important;
+    max-height: 64px !important;
+  }
+
+  .fc .fc-daygrid-body table tbody tr {
+    height: 64px !important;
+    max-height: 64px !important;
   }
 
   .fc .fc-toolbar-title {
@@ -191,7 +245,7 @@
   }
 
   .fc table {
-    border-spacing: 2px !important;
+    border-spacing: 1.5px !important;
   }
 }
 
@@ -201,37 +255,29 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  scrollbar-color: rgba(21,66,101,0.15) transparent;
 }
 
 .dark * {
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  scrollbar-color: rgba(30,203,108,0.15) transparent;
 }
 
-*::-webkit-scrollbar {
-  width: 4px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+*::-webkit-scrollbar { width: 4px; }
+*::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(21,66,101,0.15);
   border-radius: 2px;
 }
 
 .dark *::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(30,203,108,0.15);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    Global base
    ═══════════════════════════════════════════════════════════════ */
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
