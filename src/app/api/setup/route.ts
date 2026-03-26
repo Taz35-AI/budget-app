@@ -3,10 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { DUMMY_USER_ID } from '@/lib/constants';
 
 /**
- * Diagnostic + seed endpoint.
- * Visit GET /api/setup in the browser to see what's wrong and seed data.
+ * Diagnostic + seed endpoint — dev only.
+ * Blocked in production to avoid accidental data exposure.
  */
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not available in production.' }, { status: 403 });
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

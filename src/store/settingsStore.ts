@@ -9,6 +9,7 @@ interface SettingsState {
   firstDayOfWeek: 0 | 1;
   dateFormat: DateFormat;
   // Actions
+  _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
   addCustomTag: (tag: Omit<CustomTag, 'id'>) => void;
   updateCustomTag: (id: string, patch: Partial<Omit<CustomTag, 'id'>>) => void;
   deleteCustomTag: (id: string) => void;
@@ -29,6 +30,8 @@ export const useSettingsStore = create<SettingsState>()(
       goals: [],
       firstDayOfWeek: 1,
       dateFormat: 'DD/MM/YYYY',
+
+      _hydrate: (data) => set((s) => ({ ...s, ...data })),
 
       addCustomTag: (tag) =>
         set((s) => ({ customTags: [...s.customTags, { ...tag, id: crypto.randomUUID() }] })),
