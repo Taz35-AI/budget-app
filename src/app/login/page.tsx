@@ -158,6 +158,12 @@ export default function LoginPage() {
             </Link>
           </p>
         )}
+
+        <p className="text-center text-xs text-white/20 mt-6">
+          <Link href="/terms" className="hover:text-white/40 transition-colors">Terms</Link>
+          {' · '}
+          <Link href="/privacy" className="hover:text-white/40 transition-colors">Privacy</Link>
+        </p>
       </div>
     </div>
   );

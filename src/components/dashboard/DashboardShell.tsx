@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useBalances } from '@/hooks/useBalances';
 import { useCurrency } from '@/hooks/useCurrency';
-import { useCreateTransaction } from '@/hooks/useTransactions';
+import { useCreateTransaction, useTransactions } from '@/hooks/useTransactions';
 import { CalendarView } from './CalendarView';
 import { DayBottomSheet } from './DayBottomSheet';
 import { TransactionList } from './TransactionList';
@@ -21,6 +21,7 @@ import { LogoutButton } from './LogoutButton';
 import { HeaderOverflowMenu } from './HeaderOverflowMenu';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
+import { OnboardingBanner } from './OnboardingBanner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -95,6 +96,8 @@ function StatCard({ label, value, accent, progress, bar }: {
 
 export function DashboardShell() {
   const { balances, dayTransactions, isLoading } = useBalances();
+  const { data: txData } = useTransactions();
+  const isEmpty = !isLoading && (txData?.transactions.length ?? 0) === 0;
   const { currency, setCurrency, formatAmount, symbol } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -112,6 +115,11 @@ export function DashboardShell() {
   const handleClose = useCallback(() => { setSelectedDate(null); setIsAdding(false); }, []);
   const handleAddNew = useCallback(() => setIsAdding(true), []);
   const handleCancelAdd = useCallback(() => setIsAdding(false), []);
+  const handleOnboardingAdd = useCallback(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    setSelectedDate(today);
+    setIsAdding(true);
+  }, []);
 
   const selectedBalance = selectedDate ? (balances.get(selectedDate) ?? 0) : 0;
   const selectedTransactions: DayTransaction[] = selectedDate ? (dayTransactions.get(selectedDate) ?? []) : [];
@@ -191,6 +199,9 @@ export function DashboardShell() {
               accent={monthNet > 0 ? 'green' : monthNet < 0 ? 'red' : 'default'}
             />
           </div>
+
+          {/* Onboarding — shown only when there are no transactions */}
+          {isEmpty && <OnboardingBanner onAddTransaction={handleOnboardingAdd} />}
 
           {/* Calendar */}
           {isLoading && balances.size === 0 ? (
