@@ -17,6 +17,7 @@ interface Props {
   onAddNew: () => void;
   onCancelAdd: () => void;
   onClose: () => void;
+  showTip?: boolean;
 }
 
 export function DayPanel({
@@ -29,6 +30,7 @@ export function DayPanel({
   onAddNew,
   onCancelAdd,
   onClose,
+  showTip,
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const create = useCreateTransaction();
@@ -116,6 +118,7 @@ export function DayPanel({
                 formatAmount={formatAmount}
                 symbol={symbol}
                 onAddNew={onAddNew}
+                showTip={showTip}
               />
             )
           )}

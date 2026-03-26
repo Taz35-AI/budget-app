@@ -3,6 +3,14 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    FullCalendar — Premium fintech overrides (light-first)
    ═══════════════════════════════════════════════════════════════ */

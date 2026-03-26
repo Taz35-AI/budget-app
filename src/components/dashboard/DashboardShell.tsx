@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useBalances } from '@/hooks/useBalances';
@@ -21,7 +21,7 @@ import { LogoutButton } from './LogoutButton';
 import { HeaderOverflowMenu } from './HeaderOverflowMenu';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
-import { OnboardingBanner } from './OnboardingBanner';
+import { OnboardingTip } from './OnboardingTip';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -98,6 +98,29 @@ export function DashboardShell() {
   const { balances, dayTransactions, isLoading } = useBalances();
   const { data: txData } = useTransactions();
   const isEmpty = !isLoading && (txData?.transactions.length ?? 0) === 0;
+
+  // Onboarding tour: step 0 = tap a day, step 1 = tap add button
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 'done'>(() => {
+    try { return localStorage.getItem('bt_onboarding') === 'done' ? 'done' : 0; } catch { return 0; }
+  });
+
+  // Advance 0 → 1 when a day is selected
+  useEffect(() => {
+    if (isEmpty && selectedDate && onboardingStep === 0) setOnboardingStep(1);
+  }, [isEmpty, selectedDate, onboardingStep]);
+
+  // Reset back to 0 if day panel closes before adding
+  useEffect(() => {
+    if (!selectedDate && onboardingStep === 1) setOnboardingStep(0);
+  }, [selectedDate, onboardingStep]);
+
+  // Mark done when a transaction is created
+  useEffect(() => {
+    if (!isEmpty && onboardingStep !== 'done') {
+      setOnboardingStep('done');
+      try { localStorage.setItem('bt_onboarding', 'done'); } catch {}
+    }
+  }, [isEmpty, onboardingStep]);
   const { currency, setCurrency, formatAmount, symbol } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -200,9 +223,6 @@ export function DashboardShell() {
             />
           </div>
 
-          {/* Onboarding — shown only when there are no transactions */}
-          {isEmpty && <OnboardingBanner onAddTransaction={handleOnboardingAdd} />}
-
           {/* Calendar */}
           {isLoading && balances.size === 0 ? (
             <div className="animate-pulse rounded-3xl bg-white dark:bg-[#0d1629] p-5 space-y-3">
@@ -214,19 +234,29 @@ export function DashboardShell() {
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl overflow-hidden
-              bg-white border border-slate-100 shadow-[0_2px_24px_rgba(0,0,0,0.06)]
-              dark:bg-[#0d1629] dark:border-white/[0.05] dark:shadow-[0_4px_40px_rgba(0,0,0,0.5)]">
-              <CalendarView
-                balances={balances}
-                dayTransactions={dayTransactions}
-                selectedDate={selectedDate}
-                onDateClick={handleDateClick}
-                formatAmount={formatAmount}
-                isLoading={isLoading}
-                onMonthChange={setVisibleMonth}
-                firstDayOfWeek={firstDayOfWeek}
-              />
+            <div className="relative">
+              <div className="rounded-3xl overflow-hidden
+                bg-white border border-slate-100 shadow-[0_2px_24px_rgba(0,0,0,0.06)]
+                dark:bg-[#0d1629] dark:border-white/[0.05] dark:shadow-[0_4px_40px_rgba(0,0,0,0.5)]">
+                <CalendarView
+                  balances={balances}
+                  dayTransactions={dayTransactions}
+                  selectedDate={selectedDate}
+                  onDateClick={handleDateClick}
+                  formatAmount={formatAmount}
+                  isLoading={isLoading}
+                  onMonthChange={setVisibleMonth}
+                  firstDayOfWeek={firstDayOfWeek}
+                />
+              </div>
+              {/* Step 0 tip — tap a day */}
+              {isEmpty && onboardingStep === 0 && (
+                <div className="absolute inset-x-0 top-[4.5rem] flex justify-center pointer-events-none z-10">
+                  <OnboardingTip arrow="top">
+                    Tap any day on the calendar to open it
+                  </OnboardingTip>
+                </div>
+              )}
             </div>
           )}
 
@@ -298,6 +328,7 @@ export function DashboardShell() {
                     formatAmount={formatAmount}
                     symbol={symbol}
                     onAddNew={handleAddNew}
+                    showTip={isEmpty && onboardingStep === 1}
                   />
                 )}
               </div>
@@ -321,6 +352,7 @@ export function DashboardShell() {
         onAddNew={handleAddNew}
         onCancelAdd={handleCancelAdd}
         onClose={handleClose}
+        showTip={isEmpty && onboardingStep === 1}
       />
     </div>
     </AppLayout>

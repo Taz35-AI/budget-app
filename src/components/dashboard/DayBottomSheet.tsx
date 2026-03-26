@@ -17,6 +17,7 @@ interface Props {
   onAddNew: () => void;
   onCancelAdd: () => void;
   onClose: () => void;
+  showTip?: boolean;
 }
 
 export function DayBottomSheet({
@@ -29,6 +30,7 @@ export function DayBottomSheet({
   onAddNew,
   onCancelAdd,
   onClose,
+  showTip,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -155,6 +157,7 @@ export function DayBottomSheet({
                 formatAmount={formatAmount}
                 symbol={symbol}
                 onAddNew={onAddNew}
+                showTip={showTip}
               />
             )
           )}

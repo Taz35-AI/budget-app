@@ -11,6 +11,7 @@ import type { EditMode, DeleteMode } from '@/hooks/useTransactions';
 import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
+import { OnboardingTip } from './OnboardingTip';
 import type { DayTransaction, TransactionFormValues } from '@/types';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
   formatAmount: (n: number) => string;
   symbol: string;
   onAddNew: () => void;
+  showTip?: boolean;
 }
 
 type ActiveAction =
@@ -27,7 +29,7 @@ type ActiveAction =
   | { type: 'delete'; txId: string }
   | null;
 
-export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew }: Props) {
+export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip }: Props) {
   const [active, setActive] = useState<ActiveAction>(null);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<'all' | 'income' | 'expense'>('all');
@@ -330,6 +332,11 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
       {/* Add button */}
       <div className="pt-4 mt-auto border-t border-slate-100 dark:border-white/[0.08]">
+        {showTip && (
+          <OnboardingTip arrow="bottom" className="mb-3">
+            Tap here to add your first transaction
+          </OnboardingTip>
+        )}
         <Button onClick={onAddNew} className="w-full" size="lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
