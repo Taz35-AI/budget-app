@@ -22,6 +22,7 @@ import { HeaderOverflowMenu } from './HeaderOverflowMenu';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
 import { OnboardingTip } from './OnboardingTip';
+import { TourSpotlight } from './TourSpotlight';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -99,28 +100,6 @@ export function DashboardShell() {
   const { data: txData } = useTransactions();
   const isEmpty = !isLoading && (txData?.transactions.length ?? 0) === 0;
 
-  // Onboarding tour: step 0 = tap a day, step 1 = tap add button
-  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 'done'>(() => {
-    try { return localStorage.getItem('bt_onboarding') === 'done' ? 'done' : 0; } catch { return 0; }
-  });
-
-  // Advance 0 → 1 when a day is selected
-  useEffect(() => {
-    if (isEmpty && selectedDate && onboardingStep === 0) setOnboardingStep(1);
-  }, [isEmpty, selectedDate, onboardingStep]);
-
-  // Reset back to 0 if day panel closes before adding
-  useEffect(() => {
-    if (!selectedDate && onboardingStep === 1) setOnboardingStep(0);
-  }, [selectedDate, onboardingStep]);
-
-  // Mark done when a transaction is created
-  useEffect(() => {
-    if (!isEmpty && onboardingStep !== 'done') {
-      setOnboardingStep('done');
-      try { localStorage.setItem('bt_onboarding', 'done'); } catch {}
-    }
-  }, [isEmpty, onboardingStep]);
   const { currency, setCurrency, formatAmount, symbol } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -133,6 +112,42 @@ export function DashboardShell() {
   const { limit: budgetLimit, setLimit: setBudgetLimit } = useBudgetLimit(visibleMonth);
   const { firstDayOfWeek } = useSettings();
   const budgetProgress = budgetLimit ? monthExpense / budgetLimit : undefined;
+
+  // Onboarding tour: 0=tap day, 1=tap add, 2-5=spotlight tour, done=finished
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4 | 5 | 'done'>(() => {
+    try { return localStorage.getItem('bt_onboarding') === 'done' ? 'done' : 0; } catch { return 0; }
+  });
+
+  const advanceTour = useCallback(() => {
+    setOnboardingStep((s) => {
+      if (s === 2) return 3;
+      if (s === 3) return 4;
+      if (s === 4) return 5;
+      return s;
+    });
+  }, []);
+
+  const finishTour = useCallback(() => {
+    setOnboardingStep('done');
+    try { localStorage.setItem('bt_onboarding', 'done'); } catch {}
+  }, []);
+
+  // Advance 0 → 1 when a day is selected
+  useEffect(() => {
+    if (isEmpty && selectedDate && onboardingStep === 0) setOnboardingStep(1);
+  }, [isEmpty, selectedDate, onboardingStep]);
+
+  // Reset back to 0 if day panel closes before adding
+  useEffect(() => {
+    if (!selectedDate && onboardingStep === 1) setOnboardingStep(0);
+  }, [selectedDate, onboardingStep]);
+
+  // Transition step 1 → spotlight tour when first transaction is saved
+  useEffect(() => {
+    if (!isEmpty && onboardingStep === 1) {
+      setOnboardingStep(2);
+    }
+  }, [isEmpty, onboardingStep]);
 
   const handleDateClick = useCallback((date: string) => { setSelectedDate(date); setIsAdding(false); }, []);
   const handleClose = useCallback(() => { setSelectedDate(null); setIsAdding(false); }, []);
@@ -174,8 +189,8 @@ export function DashboardShell() {
             {isLoading && (
               <div className="w-4 h-4 rounded-full border-2 border-indigo-200 dark:border-indigo-500/30 border-t-indigo-500 dark:border-t-indigo-400 animate-spin" />
             )}
-            <BudgetLimitButton limit={budgetLimit} monthExpense={monthExpense} formatAmount={formatAmount} symbol={symbol} onSetLimit={setBudgetLimit} />
-            <AdjustBalanceButton todayBalance={todayBalance} formatAmount={formatAmount} symbol={symbol} />
+            <div id="tour-budget"><BudgetLimitButton limit={budgetLimit} monthExpense={monthExpense} formatAmount={formatAmount} symbol={symbol} onSetLimit={setBudgetLimit} /></div>
+            <div id="tour-adjust"><AdjustBalanceButton todayBalance={todayBalance} formatAmount={formatAmount} symbol={symbol} /></div>
             <div className="hidden sm:flex items-center gap-1.5">
               <ExportButton />
               <ResetAllButton />
@@ -195,7 +210,7 @@ export function DashboardShell() {
         <div className="flex-1 min-w-0 flex flex-col gap-4">
 
           {/* Stats row */}
-          <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          <div id="tour-stats" className="grid grid-cols-4 gap-2 sm:gap-3">
             <StatCard
               bar="bg-gradient-to-r from-violet-500 to-indigo-500"
               label="Balance Today"
@@ -340,6 +355,11 @@ export function DashboardShell() {
           )}
         </aside>
       </div>
+
+      {/* Spotlight tour — steps 2-5 */}
+      {typeof onboardingStep === 'number' && onboardingStep >= 2 && (
+        <TourSpotlight step={onboardingStep as 2 | 3 | 4 | 5} onNext={advanceTour} onDone={finishTour} />
+      )}
 
       {/* Mobile bottom sheet */}
       <DayBottomSheet
