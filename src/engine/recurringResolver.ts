@@ -142,3 +142,100 @@ function clampDay(day: number, year: number, month: number): number {
   const lastDay = new Date(year, month, 0).getDate(); // day 0 = last day of prev month
   return Math.min(day, lastDay);
 }
+
+// ─── Recurrence count helpers ────────────────────────────────────────────────
+
+/**
+ * Computes the end_date (YYYY-MM-DD) for the Nth (last) occurrence.
+ *
+ * The 1st occurrence fires on startDate; the Nth fires on startDate + (N-1) intervals.
+ * recurrences must be ≥ 1.
+ */
+export function computeEndDateFromRecurrences(
+  startDate: string,
+  frequency: Frequency,
+  recurrences: number,
+): string {
+  if (recurrences <= 1) return startDate;
+  const n = recurrences - 1; // number of intervals to advance
+  const start = parseDate(startDate);
+
+  switch (frequency) {
+    case 'daily':
+      return addDaysToStr(startDate, n);
+    case 'weekly':
+      return addDaysToStr(startDate, n * 7);
+    case 'biweekly':
+      return addDaysToStr(startDate, n * 14);
+    case 'monthly':
+    case 'quarterly':
+    case 'semiannual':
+    case 'annual': {
+      const intervalMonths =
+        frequency === 'monthly'    ? 1  :
+        frequency === 'quarterly'  ? 3  :
+        frequency === 'semiannual' ? 6  : 12;
+      const totalMonths = n * intervalMonths;
+      let endMonth = start.month + totalMonths;
+      let endYear  = start.year;
+      while (endMonth > 12) { endMonth -= 12; endYear++; }
+      const endDay = clampDay(start.day, endYear, endMonth);
+      return (
+        `${String(endYear).padStart(4, '0')}-` +
+        `${String(endMonth).padStart(2, '0')}-` +
+        `${String(endDay).padStart(2, '0')}`
+      );
+    }
+    default:
+      return startDate;
+  }
+}
+
+/**
+ * Back-computes the number of occurrences implied by a known end_date.
+ *
+ * Returns undefined when end_date doesn't land on an exact occurrence boundary
+ * (e.g. the end_date was set manually to an arbitrary date).
+ */
+export function computeRecurrencesFromEndDate(
+  startDate: string,
+  frequency: Frequency,
+  endDate: string,
+): number | undefined {
+  if (endDate < startDate) return undefined;
+  if (endDate === startDate) return 1;
+
+  const start = parseDate(startDate);
+  const end   = parseDate(endDate);
+
+  switch (frequency) {
+    case 'daily': {
+      const d = daysBetween(start, end);
+      return d + 1;
+    }
+    case 'weekly': {
+      const d = daysBetween(start, end);
+      return d % 7 === 0 ? d / 7 + 1 : undefined;
+    }
+    case 'biweekly': {
+      const d = daysBetween(start, end);
+      return d % 14 === 0 ? d / 14 + 1 : undefined;
+    }
+    case 'monthly':
+    case 'quarterly':
+    case 'semiannual':
+    case 'annual': {
+      const intervalMonths =
+        frequency === 'monthly'    ? 1  :
+        frequency === 'quarterly'  ? 3  :
+        frequency === 'semiannual' ? 6  : 12;
+      const totalMonths = (end.year - start.year) * 12 + (end.month - start.month);
+      if (totalMonths < 0 || totalMonths % intervalMonths !== 0) return undefined;
+      const expectedDay = clampDay(start.day, end.year, end.month);
+      if (end.day !== expectedDay) return undefined;
+      return totalMonths / intervalMonths + 1;
+    }
+    default:
+      return undefined;
+  }
+}

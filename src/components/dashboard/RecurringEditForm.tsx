@@ -9,9 +9,10 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
+import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/engine/recurringResolver';
 import { cn } from '@/lib/utils';
 import type { EditMode } from '@/hooks/useTransactions';
-import type { DayTransaction } from '@/types';
+import type { DayTransaction, Frequency } from '@/types';
 
 const schema = z.object({
   editMode: z.enum(['this_only', 'all_future', 'all']),
@@ -20,15 +21,29 @@ const schema = z.object({
   category: z.enum(['income', 'expense']),
   tag: z.string().optional(),
   frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
-  end_date: z.string().optional(),
+  recurrences: z.string().optional().refine(
+    (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
+    'Must be a whole number ≥ 1',
+  ),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormFields = z.infer<typeof schema>;
+
+// What the parent receives — end_date is computed from recurrences before calling onSubmit
+type SubmitValues = {
+  editMode: EditMode;
+  name: string;
+  amount: string;
+  category: 'income' | 'expense';
+  tag?: string;
+  frequency?: Frequency;
+  end_date?: string;
+};
 
 interface Props {
   tx: DayTransaction;
   occurrenceDate: string;   // the specific date this occurrence fired
-  onSubmit: (values: FormValues & { editMode: EditMode }) => void;
+  onSubmit: (values: SubmitValues) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -52,13 +67,21 @@ const SCOPE_OPTIONS = [
 ] as const;
 
 export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLoading }: Props) {
+  // Back-compute recurrences from an existing end_date.
+  // For display/default purposes we always measure from the series' original start_date.
+  const initialRecurrences = (() => {
+    if (!tx.end_date || !tx.start_date || !tx.frequency) return '';
+    const n = computeRecurrencesFromEndDate(tx.start_date, tx.frequency, tx.end_date);
+    return n != null ? String(n) : '';
+  })();
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<FormFields>({
     resolver: zodResolver(schema),
     defaultValues: {
       editMode: 'all_future',
@@ -67,21 +90,50 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       category: tx.category,
       tag: tx.tag ?? '',
       frequency: tx.frequency ?? 'monthly',
-      end_date: tx.end_date ?? '',
+      recurrences: initialRecurrences,
     },
   });
 
   const editMode = watch('editMode');
   const tag = watch('tag');
   const category = watch('category');
+  const frequency = watch('frequency');
+  const recurrences = watch('recurrences');
   const canEditSeries = editMode === 'all_future' || editMode === 'all';
 
   const { allTags } = useSettings();
 
   const displayDate = format(new Date(occurrenceDate + 'T12:00:00'), 'd MMM yyyy');
 
+  // Live preview: for all_future, count from the current occurrence;
+  // for all, count from the series start date.
+  const previewBase = editMode === 'all' ? tx.start_date : occurrenceDate;
+  const computedEndDate = (() => {
+    if (!recurrences || !frequency || !previewBase) return null;
+    const n = parseInt(recurrences, 10);
+    if (!Number.isFinite(n) || n < 1) return null;
+    return computeEndDateFromRecurrences(previewBase, frequency as Frequency, n);
+  })();
+
   return (
-    <form onSubmit={handleSubmit((v) => onSubmit({ ...v, editMode: v.editMode as EditMode }))} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit((v) => {
+        // Determine the base date for end_date computation:
+        // - "all" → series starts from tx.start_date
+        // - "all_future" / "this_only" → starts from the current occurrence
+        const base = v.editMode === 'all' ? tx.start_date : occurrenceDate;
+        let end_date: string | undefined;
+        if (v.recurrences && v.frequency && base) {
+          const n = parseInt(v.recurrences, 10);
+          if (Number.isFinite(n) && n >= 1) {
+            end_date = computeEndDateFromRecurrences(base, v.frequency as Frequency, n);
+          }
+        }
+        const { recurrences: _rec, ...rest } = v;
+        onSubmit({ ...rest, editMode: rest.editMode as EditMode, end_date });
+      })}
+      className="flex flex-col gap-4"
+    >
 
       {/* Occurrence label */}
       <div className="rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-4 py-3">
@@ -208,7 +260,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         </div>
       )}
 
-      {/* Frequency + end date only for series-level edits */}
+      {/* Frequency + recurrences only for series-level edits */}
       {canEditSeries && (
         <>
           <Select
@@ -217,13 +269,23 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
             options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
             {...register('frequency')}
           />
-          <Input
-            id="end_date"
-            label="End date (optional)"
-            type="date"
-            error={errors.end_date?.message}
-            {...register('end_date')}
-          />
+          <div className="flex flex-col gap-1">
+            <Input
+              id="recurrences"
+              label="Number of occurrences (optional)"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="e.g. 12  — leave blank to repeat forever"
+              error={errors.recurrences?.message}
+              {...register('recurrences')}
+            />
+            {computedEndDate && (
+              <p className="text-xs text-slate-400 dark:text-white/40 pl-1">
+                Last occurrence: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
+              </p>
+            )}
+          </div>
         </>
       )}
 

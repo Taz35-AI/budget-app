@@ -4,12 +4,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { format } from 'date-fns';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
-import type { TransactionFormValues, Transaction } from '@/types';
+import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/engine/recurringResolver';
+import type { TransactionFormValues, Transaction, Frequency } from '@/types';
 import { cn } from '@/lib/utils';
 
 const schema = z
@@ -21,10 +23,13 @@ const schema = z
     tag: z.string().optional(),
     date: z.string().optional(),
     start_date: z.string().optional(),
-    end_date: z.string().optional(),
     frequency: z
       .enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'])
       .optional(),
+    recurrences: z.string().optional().refine(
+      (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
+      'Must be a whole number ≥ 1',
+    ),
   })
   .superRefine((data, ctx) => {
     if (data.type === 'one_off' && !data.date) {
@@ -49,30 +54,52 @@ interface Props {
 }
 
 export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType }: Props) {
+  // Back-compute recurrences from an existing end_date so the field pre-fills on edit
+  const initialRecurrences = (() => {
+    if (!initialValues?.end_date || !initialValues?.start_date || !initialValues?.frequency) return '';
+    const n = computeRecurrencesFromEndDate(
+      initialValues.start_date,
+      initialValues.frequency as Frequency,
+      initialValues.end_date,
+    );
+    return n != null ? String(n) : '';
+  })();
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-  } = useForm<TransactionFormValues>({
+  } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       name: initialValues?.name ?? '',
       amount: initialValues?.amount?.toString() ?? '',
-      category: initialValues?.category ?? 'expense',
-      type: initialValues?.type ?? 'one_off',
+      category: (initialValues?.category ?? 'expense') as 'income' | 'expense',
+      type: (initialValues?.type ?? 'one_off') as 'recurring' | 'one_off',
       tag: initialValues?.tag ?? '',
       date: initialValues?.date ?? defaultDate ?? '',
       start_date: initialValues?.start_date ?? defaultDate ?? '',
-      end_date: initialValues?.end_date ?? '',
-      frequency: initialValues?.frequency ?? 'monthly',
+      frequency: (initialValues?.frequency ?? 'monthly') as Frequency,
+      recurrences: initialRecurrences,
     },
   });
 
   const type = watch('type');
   const category = watch('category');
   const tag = watch('tag');
+  const frequency = watch('frequency');
+  const recurrences = watch('recurrences');
+  const start_date = watch('start_date');
+
+  // Live preview: compute the end date from recurrences
+  const computedEndDate = React.useMemo(() => {
+    if (!recurrences || !frequency || !start_date) return null;
+    const n = parseInt(recurrences, 10);
+    if (!Number.isFinite(n) || n < 1) return null;
+    return computeEndDateFromRecurrences(start_date, frequency as Frequency, n);
+  }, [recurrences, frequency, start_date]);
 
   const { allTags, templates } = useSettings();
 
@@ -88,7 +115,21 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
   }, [category, tag, allTags, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit((vals) => {
+        // Convert recurrences → end_date before handing off to the parent
+        const { recurrences: rec, ...rest } = vals;
+        let end_date: string | undefined;
+        if (rec && rest.frequency && rest.start_date) {
+          const n = parseInt(rec, 10);
+          if (Number.isFinite(n) && n >= 1) {
+            end_date = computeEndDateFromRecurrences(rest.start_date, rest.frequency as Frequency, n);
+          }
+        }
+        onSubmit({ ...rest, end_date } as TransactionFormValues);
+      })}
+      className="flex flex-col gap-4"
+    >
       {/* Template chips */}
       {templates.length > 0 && (
         <div className="flex flex-col gap-1.5">
@@ -220,13 +261,6 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         <>
           {/* start_date is silently set to the clicked day — no need to show it */}
           <input type="hidden" {...register('start_date')} />
-          <Input
-            id="end_date"
-            label="End date (optional)"
-            type="date"
-            error={errors.end_date?.message}
-            {...register('end_date')}
-          />
           <Select
             id="frequency"
             label="Frequency"
@@ -234,6 +268,23 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
             options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
             {...register('frequency')}
           />
+          <div className="flex flex-col gap-1">
+            <Input
+              id="recurrences"
+              label="Number of occurrences (optional)"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="e.g. 12  — leave blank to repeat forever"
+              error={errors.recurrences?.message}
+              {...register('recurrences')}
+            />
+            {computedEndDate && (
+              <p className="text-xs text-slate-400 dark:text-white/40 pl-1">
+                Last occurrence: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
+              </p>
+            )}
+          </div>
         </>
       )}
 
