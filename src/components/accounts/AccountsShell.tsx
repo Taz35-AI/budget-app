@@ -106,7 +106,7 @@ function AccountCard({
     <div className="bg-white dark:bg-[#122928] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(22,48,47,0.06)] dark:shadow-none">
       {/* Account header */}
       <div className={cn(
-        'px-4 py-3.5 flex items-center justify-between gap-3',
+        'px-3 py-2.5 flex items-center justify-between gap-2',
         'border-b border-slate-100 dark:border-white/[0.06]',
         'bg-gradient-to-r',
         isPositive
@@ -138,50 +138,49 @@ function AccountCard({
       </div>
 
       {/* Monthly breakdown */}
-      <div className="px-4 pb-3 pt-3">
-        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2.5">Monthly projection</p>
+      <div className="px-3 pb-2 pt-2.5">
+        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1.5">Monthly projection</p>
 
         <div className="flex flex-col gap-0">
           {/* Header row */}
-          <div className="grid grid-cols-4 gap-2 mb-1 px-1">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/25">Month</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-brand-positive/70 text-right">In</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-brand-danger/70 text-right">Out</p>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/25 text-right">Balance</p>
+          <div className="grid grid-cols-4 gap-1 mb-0.5 px-1">
+            <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/25">Mo</p>
+            <p className="text-[8px] font-bold uppercase tracking-wider text-brand-positive/70 text-right">In</p>
+            <p className="text-[8px] font-bold uppercase tracking-wider text-brand-danger/70 text-right">Out</p>
+            <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/25 text-right">Bal</p>
           </div>
 
           {monthlySummaries.map(({ month, income, expense, endBalance }, i) => {
-            const net = income - expense;
             const isCurrentMonth = i === 0;
             return (
               <div
                 key={i}
                 className={cn(
-                  'grid grid-cols-4 gap-2 px-1 py-1.5 rounded-lg transition-colors',
+                  'grid grid-cols-4 gap-1 px-1 py-1 rounded-md transition-colors',
                   isCurrentMonth
                     ? 'bg-brand-primary/[0.05] dark:bg-brand-primary/[0.07]'
                     : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]',
                 )}
               >
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   {isCurrentMonth && (
                     <div className="w-1 h-1 rounded-full bg-brand-primary flex-shrink-0" />
                   )}
                   <p className={cn(
-                    'text-xs font-semibold truncate',
+                    'text-[10px] font-semibold truncate',
                     isCurrentMonth ? 'text-brand-primary' : 'text-slate-600 dark:text-white/60',
                   )}>
                     {format(month, 'MMM')}
                   </p>
                 </div>
-                <p className="text-xs font-semibold tabular-nums text-brand-positive text-right">
+                <p className="text-[10px] font-semibold tabular-nums text-brand-positive text-right">
                   {income > 0 ? `+${formatAmount(income)}` : '—'}
                 </p>
-                <p className="text-xs font-semibold tabular-nums text-brand-danger text-right">
+                <p className="text-[10px] font-semibold tabular-nums text-brand-danger text-right">
                   {expense > 0 ? `−${formatAmount(expense)}` : '—'}
                 </p>
                 <p className={cn(
-                  'text-xs font-bold tabular-nums text-right',
+                  'text-[10px] font-bold tabular-nums text-right',
                   endBalance > 0 ? 'text-slate-700 dark:text-white/80' : 'text-brand-danger',
                 )}>
                   {formatAmount(endBalance)}
@@ -276,9 +275,13 @@ export function AccountsShell() {
           )}
 
           {/* Account cards */}
-          {!isLoading && summaries.map((summary) => (
-            <AccountCard key={summary.account.id} summary={summary} formatAmount={formatAmount} />
-          ))}
+          {!isLoading && summaries.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+              {summaries.map((summary) => (
+                <AccountCard key={summary.account.id} summary={summary} formatAmount={formatAmount} />
+              ))}
+            </div>
+          )}
 
         </div>
       </div>
