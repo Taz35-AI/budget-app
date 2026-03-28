@@ -106,7 +106,7 @@ export function BudgetsShell() {
           </div>
         </header>
 
-        <div className="px-4 sm:px-6 py-6 flex flex-col gap-5 max-w-2xl">
+        <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-5">
           {/* Month overview */}
           <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">{currentMonthLabel}</p>

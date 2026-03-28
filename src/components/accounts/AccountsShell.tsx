@@ -218,7 +218,7 @@ export function AccountsShell() {
           </div>
         </header>
 
-        <div className="px-4 sm:px-6 py-4 sm:py-6 max-w-2xl flex flex-col gap-4">
+        <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
 
           {/* Total balance hero */}
           <div className={cn(
