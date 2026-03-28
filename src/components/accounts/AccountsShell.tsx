@@ -36,7 +36,7 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayStr = format(today, 'yyyy-MM-dd');
-    const toDate = format(endOfMonth(addMonths(today, 3)), 'yyyy-MM-dd');
+    const toDate = format(endOfMonth(addMonths(today, 11)), 'yyyy-MM-dd');
 
     return accounts.map((acct) => {
       const acctTxs = txData.transactions.filter((t) => t.account_id === acct.id);
@@ -59,7 +59,7 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
       const todayBalance = balances.get(todayStr) ?? 0;
 
       // Current month + next 3 months
-      const monthlySummaries: MonthSummary[] = Array.from({ length: 4 }, (_, i) => {
+      const monthlySummaries: MonthSummary[] = Array.from({ length: 12 }, (_, i) => {
         const month = addMonths(today, i);
         const start = format(startOfMonth(month), 'yyyy-MM-dd');
         const end = format(endOfMonth(month), 'yyyy-MM-dd');
