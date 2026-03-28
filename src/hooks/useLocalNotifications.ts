@@ -11,6 +11,7 @@ import {
   scheduleWeeklyDigest,
   scheduleBudgetWarning,
   cancelAllScheduledNotifications,
+  cancelIds,
 } from '@/lib/notificationScheduler';
 import type { NotifPermission } from '@/lib/notificationScheduler';
 import type { Transaction } from '@/types';
@@ -25,7 +26,6 @@ export function useLocalNotifications({ transactions, monthExpense, budgetLimit 
   const notif = useSettingsStore((s) => s.notificationSettings);
   const [permissionState, setPermissionState] = useState<NotifPermission | 'unknown'>('unknown');
 
-  // Track the last budget-warning percentage to avoid re-firing on every re-render
   const lastWarnedPct = useRef<number>(0);
 
   // Check permission on mount
@@ -33,46 +33,33 @@ export function useLocalNotifications({ transactions, monthExpense, budgetLimit 
     checkNotificationPermission().then(setPermissionState);
   }, []);
 
-  // Re-schedule everything whenever relevant settings or data change
+  // Re-schedule all toggle-able notifications when settings or data change
   useEffect(() => {
     if (permissionState !== 'granted') return;
 
     async function reschedule() {
-      // Daily reminder
       if (notif.dailyReminder) {
         await scheduleDailyReminder(notif.dailyHour, notif.dailyMinute);
       } else {
-        const { LocalNotifications } = await import('@capacitor/local-notifications')
-          .catch(() => ({ LocalNotifications: null }));
-        LocalNotifications?.cancel({ notifications: [{ id: 1 }] });
+        await cancelIds([1]);
       }
 
-      // Bill reminders
       if (notif.billReminders) {
         await scheduleBillReminders(transactions);
       } else {
-        const { LocalNotifications } = await import('@capacitor/local-notifications')
-          .catch(() => ({ LocalNotifications: null }));
-        const ids = Array.from({ length: 100 }, (_, i) => ({ id: 100 + i }));
-        LocalNotifications?.cancel({ notifications: ids });
+        await cancelIds(Array.from({ length: 100 }, (_, i) => 100 + i));
       }
 
-      // Monthly recap
       if (notif.monthlyRecap) {
         await scheduleMonthlyRecap();
       } else {
-        const { LocalNotifications } = await import('@capacitor/local-notifications')
-          .catch(() => ({ LocalNotifications: null }));
-        LocalNotifications?.cancel({ notifications: [{ id: 2 }] });
+        await cancelIds([2]);
       }
 
-      // Weekly digest
       if (notif.weeklyDigest) {
         await scheduleWeeklyDigest();
       } else {
-        const { LocalNotifications } = await import('@capacitor/local-notifications')
-          .catch(() => ({ LocalNotifications: null }));
-        LocalNotifications?.cancel({ notifications: [{ id: 3 }] });
+        await cancelIds([3]);
       }
     }
 
@@ -82,10 +69,11 @@ export function useLocalNotifications({ transactions, monthExpense, budgetLimit 
     permissionState,
     notif.dailyReminder, notif.dailyHour, notif.dailyMinute,
     notif.billReminders, notif.monthlyRecap, notif.weeklyDigest,
+    // transactions reference changes when data refreshes — intentional
     transactions,
   ]);
 
-  // Budget warning — fires when crossing 85% threshold, once per month
+  // Budget warning — fires once when crossing 85%, resets each month
   useEffect(() => {
     if (permissionState !== 'granted') return;
     if (!notif.budgetWarnings) return;
@@ -93,12 +81,10 @@ export function useLocalNotifications({ transactions, monthExpense, budgetLimit 
 
     const pct = (monthExpense / budgetLimit) * 100;
     if (pct >= 85 && lastWarnedPct.current < 85) {
-      const now = new Date();
-      const monthName = now.toLocaleString('default', { month: 'long' });
+      const monthName = new Date().toLocaleString('default', { month: 'long' });
       scheduleBudgetWarning(monthName, pct);
     }
-    // Reset when a new month starts (pct drops back near 0)
-    if (pct < 10) lastWarnedPct.current = 0;
+    if (pct < 10) lastWarnedPct.current = 0; // new month reset
     else lastWarnedPct.current = pct;
   }, [permissionState, notif.budgetWarnings, monthExpense, budgetLimit]);
 

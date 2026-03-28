@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     // Points the native shell to the live production site.
     // Remove this block (and run `npx next build && npx next export`)
     // only if you later convert the app to a fully static export.
-    url: 'https://budget-app.com',
+    url: 'https://budget-app-19qy.vercel.app',
     cleartext: false,
   },
   ios: {

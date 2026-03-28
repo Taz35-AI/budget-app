@@ -10,7 +10,8 @@
     "cap:sync": "npx cap sync",
     "cap:android": "npx cap open android",
     "cap:ios": "npx cap open ios",
-    "cap:icons": "npx capacitor-assets generate"
+    "cap:icons": "npx capacitor-assets generate",
+    "test": "vitest run"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
@@ -45,6 +46,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.2"
   }
 }

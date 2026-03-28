@@ -1,27 +1,32 @@
 /**
  * notificationScheduler.ts
  *
- * Pure scheduling helpers — all Capacitor calls are dynamically imported so this
- * module is safe to import on web (where @capacitor/local-notifications is a no-op).
+ * Pure scheduling helpers.
+ * - `Capacitor` is imported statically — safe, handles SSR by returning false.
+ * - `LocalNotifications` is imported dynamically to avoid module-level browser
+ *   API calls during Next.js SSR.
+ * - Every public function starts with `Capacitor.isNativePlatform()` guard so
+ *   on web (browser / Vercel preview) all calls are silent no-ops.
  *
  * Stable notification IDs:
  *   1   — daily spending reminder
  *   2   — monthly recap
  *   3   — weekly digest
  *   4   — budget limit warning
- *   100–199 — bill-due-tomorrow reminders (one slot per recurring transaction)
+ *   100–199 — bill-due-tomorrow reminders (one per recurring transaction)
  */
 
+import { Capacitor } from '@capacitor/core';
 import type { Transaction } from '@/types';
 import { firesOnDate } from '@/engine/recurringResolver';
 
 // ─── ID constants ────────────────────────────────────────────────────────────
 
-const ID_DAILY    = 1;
-const ID_MONTHLY  = 2;
-const ID_WEEKLY   = 3;
-const ID_BUDGET   = 4;
-const ID_BILL_BASE = 100; // IDs 100-199
+const ID_DAILY     = 1;
+const ID_MONTHLY   = 2;
+const ID_WEEKLY    = 3;
+const ID_BUDGET    = 4;
+const ID_BILL_BASE = 100;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -56,6 +61,7 @@ function normalisePermission(raw: string): NotifPermission {
 }
 
 export async function requestNotificationPermission(): Promise<NotifPermission> {
+  if (!Capacitor.isNativePlatform()) return 'denied';
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
     const { display } = await LocalNotifications.requestPermissions();
@@ -66,6 +72,7 @@ export async function requestNotificationPermission(): Promise<NotifPermission> 
 }
 
 export async function checkNotificationPermission(): Promise<NotifPermission> {
+  if (!Capacitor.isNativePlatform()) return 'denied';
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
     const { display } = await LocalNotifications.checkPermissions();
@@ -77,47 +84,42 @@ export async function checkNotificationPermission(): Promise<NotifPermission> {
 
 // ─── Cancel helpers ──────────────────────────────────────────────────────────
 
-async function cancelIds(ids: number[]) {
+export async function cancelIds(ids: number[]) {
   if (!ids.length) return;
+  if (!Capacitor.isNativePlatform()) return;
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    await LocalNotifications.cancel({
-      notifications: ids.map((id) => ({ id })),
-    });
-  } catch { /* web / no permission */ }
+    await LocalNotifications.cancel({ notifications: ids.map((id) => ({ id })) });
+  } catch { /* ignore */ }
 }
 
 export async function cancelAllScheduledNotifications() {
-  const allIds = [
+  await cancelIds([
     ID_DAILY, ID_MONTHLY, ID_WEEKLY, ID_BUDGET,
     ...Array.from({ length: 100 }, (_, i) => ID_BILL_BASE + i),
-  ];
-  await cancelIds(allIds);
+  ]);
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Date helpers ─────────────────────────────────────────────────────────────
 
-/** Returns a YYYY-MM-DD string for today offset by `days` */
 function dateStr(offsetDays = 0): string {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
   return d.toISOString().split('T')[0];
 }
 
-function atHourMinute(hour: number, minute: number, offsetDays = 0): Date {
+/** Returns a Date at the given hour:minute, bumped to tomorrow if already past. */
+function atHourMinute(hour: number, minute: number): Date {
   const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
   d.setHours(hour, minute, 0, 0);
-  // If this time is already past today, push to tomorrow
-  if (offsetDays === 0 && d <= new Date()) {
-    d.setDate(d.getDate() + 1);
-  }
+  if (d <= new Date()) d.setDate(d.getDate() + 1);
   return d;
 }
 
 // ─── Schedulers ──────────────────────────────────────────────────────────────
 
 export async function scheduleDailyReminder(hour: number, minute: number) {
+  if (!Capacitor.isNativePlatform()) return;
   await cancelIds([ID_DAILY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
@@ -131,20 +133,16 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
           repeats: true,
           allowWhileIdle: true,
         },
-        smallIcon: 'ic_stat_icon_config_sample',
-        iconColor: '#1DB8AD',
       }],
     });
-  } catch { /* web */ }
+  } catch { /* web / bridge unavailable */ }
 }
 
 export async function scheduleBillReminders(transactions: Transaction[]) {
-  // Cancel previous bill slots
+  if (!Capacitor.isNativePlatform()) return;
   await cancelIds(Array.from({ length: 100 }, (_, i) => ID_BILL_BASE + i));
 
   const tomorrow = dateStr(1);
-
-  // Find recurring transactions that fire tomorrow and haven't ended
   const dueTomorrow = transactions.filter((t) => {
     if (t.type !== 'recurring') return false;
     if (!t.start_date || !t.frequency) return false;
@@ -162,27 +160,22 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
         title: 'Bill due tomorrow',
         body:  `Your ${t.name} payment is due tomorrow`,
         schedule: {
-          at: atHourMinute(9, 0, 0),   // Today at 9am (or next 9am if already past)
+          at: atHourMinute(9, 0),
           allowWhileIdle: true,
         },
-        smallIcon: 'ic_stat_icon_config_sample',
-        iconColor: '#1DB8AD',
       })),
     });
-  } catch { /* web */ }
+  } catch { /* web / bridge unavailable */ }
 }
 
 export async function scheduleMonthlyRecap() {
+  if (!Capacitor.isNativePlatform()) return;
   await cancelIds([ID_MONTHLY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
     const now = new Date();
-    // Fire on the 1st of next month at 9am
     const target = new Date(now.getFullYear(), now.getMonth() + 1, 1, 9, 0, 0);
-    const monthName = target.toLocaleString('default', { month: 'long' });
-    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-      .toLocaleString('default', { month: 'long' });
-
+    const prevMonth = now.toLocaleString('default', { month: 'long' });
     await LocalNotifications.schedule({
       notifications: [{
         id:    ID_MONTHLY,
@@ -193,53 +186,38 @@ export async function scheduleMonthlyRecap() {
           repeats: false,
           allowWhileIdle: true,
         },
-        smallIcon: 'ic_stat_icon_config_sample',
-        iconColor: '#1DB8AD',
       }],
     });
-    void monthName; // used above for context
-  } catch { /* web */ }
+  } catch { /* web / bridge unavailable */ }
 }
 
 export async function scheduleWeeklyDigest() {
+  if (!Capacitor.isNativePlatform()) return;
   await cancelIds([ID_WEEKLY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    // Next Monday at 9am
-    const now = new Date();
-    const daysUntilMonday = (8 - now.getDay()) % 7 || 7; // always future Monday
-    const target = new Date(now);
-    target.setDate(now.getDate() + daysUntilMonday);
-    target.setHours(9, 0, 0, 0);
-
     await LocalNotifications.schedule({
       notifications: [{
         id:    ID_WEEKLY,
         title: 'Weekly digest',
-        body:  'Your week in Budget App — tap to see your spending and upcoming bills',
+        body:  'Your week in Budget App — tap to see spending and upcoming bills',
         schedule: {
           on: { weekday: 2, hour: 9, minute: 0 }, // Monday = 2
           repeats: true,
           allowWhileIdle: true,
         },
-        smallIcon: 'ic_stat_icon_config_sample',
-        iconColor: '#1DB8AD',
       }],
     });
-    void target;
-  } catch { /* web */ }
+  } catch { /* web / bridge unavailable */ }
 }
 
-export async function scheduleBudgetWarning(
-  monthName: string,
-  pct: number, // e.g. 87 for 87%
-) {
-  await cancelIds([ID_BUDGET]);
+export async function scheduleBudgetWarning(monthName: string, pct: number) {
+  if (!Capacitor.isNativePlatform()) return;
   if (pct < 85) return;
+  await cancelIds([ID_BUDGET]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    const fireAt = new Date();
-    fireAt.setMinutes(fireAt.getMinutes() + 2); // fire 2 min from now
+    const fireAt = new Date(Date.now() + 2 * 60_000); // 2 min from now
     await LocalNotifications.schedule({
       notifications: [{
         id:    ID_BUDGET,
@@ -249,9 +227,7 @@ export async function scheduleBudgetWarning(
           at: fireAt,
           allowWhileIdle: true,
         },
-        smallIcon: 'ic_stat_icon_config_sample',
-        iconColor: '#ef4444',
       }],
     });
-  } catch { /* web */ }
+  } catch { /* web / bridge unavailable */ }
 }

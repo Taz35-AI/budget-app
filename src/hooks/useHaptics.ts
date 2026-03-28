@@ -1,62 +1,62 @@
 'use client';
 
 import { useCallback } from 'react';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Capacitor } from '@capacitor/core';
 import { useSettingsStore } from '@/store/settingsStore';
 
-type ImpactStyle = 'light' | 'medium' | 'heavy';
+type ImpactStyleKey = 'light' | 'medium' | 'heavy';
+
+const IMPACT_MAP = {
+  light:  ImpactStyle.Light,
+  medium: ImpactStyle.Medium,
+  heavy:  ImpactStyle.Heavy,
+} as const;
+
+const NOTIF_MAP = {
+  success: NotificationType.Success,
+  warning: NotificationType.Warning,
+  error:   NotificationType.Error,
+} as const;
 
 /**
- * Returns haptic feedback functions that fire only when:
- *  - Running inside Capacitor (native iOS / Android)
- *  - The user has haptics enabled in settings
+ * Wraps Capacitor Haptics.
+ * - Silent no-op on web / browser (Capacitor.isNativePlatform() === false)
+ * - Respects the user's hapticsEnabled setting
  *
- * On web / browser the functions are silent no-ops so it's safe to call everywhere.
+ * All functions accept an optional `forceEnabled` boolean so callers can
+ * bypass the store check when they know haptics should fire (e.g. right after
+ * toggling the setting on before the store update propagates).
  */
 export function useHaptics() {
   const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
 
   const impact = useCallback(
-    async (style: ImpactStyle = 'medium') => {
-      if (!hapticsEnabled) return;
-      // Dynamically import so the bundle doesn't break on web where Capacitor isn't available
-      try {
-        const { Haptics, ImpactStyle: IS } = await import('@capacitor/haptics');
-        const styleMap = { light: IS.Light, medium: IS.Medium, heavy: IS.Heavy };
-        await Haptics.impact({ style: styleMap[style] });
-      } catch {
-        // Not running in Capacitor native shell — silently ignore
-      }
+    (style: ImpactStyleKey = 'medium', forceEnabled?: boolean) => {
+      if (!(forceEnabled ?? hapticsEnabled)) return;
+      if (!Capacitor.isNativePlatform()) return;
+      Haptics.impact({ style: IMPACT_MAP[style] }).catch(() => {});
     },
     [hapticsEnabled],
   );
 
   const notification = useCallback(
-    async (type: 'success' | 'warning' | 'error' = 'success') => {
-      if (!hapticsEnabled) return;
-      try {
-        const { Haptics, NotificationType } = await import('@capacitor/haptics');
-        const typeMap = {
-          success: NotificationType.Success,
-          warning: NotificationType.Warning,
-          error: NotificationType.Error,
-        };
-        await Haptics.notification({ type: typeMap[type] });
-      } catch {
-        // Silently ignore on web
-      }
+    (type: keyof typeof NOTIF_MAP = 'success', forceEnabled?: boolean) => {
+      if (!(forceEnabled ?? hapticsEnabled)) return;
+      if (!Capacitor.isNativePlatform()) return;
+      Haptics.notification({ type: NOTIF_MAP[type] }).catch(() => {});
     },
     [hapticsEnabled],
   );
 
-  const selection = useCallback(async () => {
-    if (!hapticsEnabled) return;
-    try {
-      const { Haptics } = await import('@capacitor/haptics');
-      await Haptics.selectionChanged();
-    } catch {
-      // Silently ignore on web
-    }
-  }, [hapticsEnabled]);
+  const selection = useCallback(
+    (forceEnabled?: boolean) => {
+      if (!(forceEnabled ?? hapticsEnabled)) return;
+      if (!Capacitor.isNativePlatform()) return;
+      Haptics.selectionChanged().catch(() => {});
+    },
+    [hapticsEnabled],
+  );
 
   return { impact, notification, selection };
 }

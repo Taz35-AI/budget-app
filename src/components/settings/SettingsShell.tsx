@@ -581,7 +581,9 @@ function PreferencesSection() {
             onClick={() => {
               const next = !hapticsEnabled;
               setHapticsEnabled(next);
-              if (next) impact('light');
+              // Pass forceEnabled=true so the haptic fires even though the store
+              // hasn't propagated yet — lets the user feel confirmation when turning it on
+              if (next) impact('light', true);
             }}
             className={cn(
               'relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200',
