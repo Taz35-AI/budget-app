@@ -136,8 +136,20 @@ export function useUpdateTransaction() {
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(QK, ctx.prev);
     },
+    onSuccess: (data, { id }) => {
+      // If the server returned the updated transaction row, replace it in cache
+      if (!data?.transaction) return;
+      const current = qc.getQueryData<TransactionsData>(QK);
+      if (!current) return;
+      qc.setQueryData<TransactionsData>(QK, {
+        ...current,
+        transactions: current.transactions.map((t) =>
+          t.id === id ? { ...t, ...data.transaction } : t,
+        ),
+      });
+    },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: QK, refetchType: 'none' });
+      qc.invalidateQueries({ queryKey: QK });
     },
   });
 }
