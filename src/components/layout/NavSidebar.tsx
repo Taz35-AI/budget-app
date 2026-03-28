@@ -167,7 +167,7 @@ export function NavSidebar() {
       {/* ── Desktop sidebar (always visible, left-fixed) ────────────── */}
       {/* Force dark class so sidebar always renders with dark styles */}
       <aside className="dark hidden lg:flex flex-col fixed left-0 top-0 h-full w-[230px] z-30
-        bg-brand-text
+        bg-[#1e3a38]
         border-r border-white/[0.06]
         shadow-[2px_0_24px_rgba(12,31,30,0.35)]">
         <SidebarContent />
@@ -186,7 +186,7 @@ export function NavSidebar() {
       <div
         className={cn(
           'dark fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
-          'bg-brand-text',
+          'bg-[#1e3a38]',
           'shadow-[4px_0_32px_rgba(12,31,30,0.6)]',
           'transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -218,7 +218,7 @@ function MobileBottomNav() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 z-30
-      bg-brand-card/97 dark:bg-[#122928]/97
+      bg-brand-card/97 dark:bg-[#1e3a38]/97
       backdrop-blur-xl
       border-t border-black/[0.07] dark:border-brand-primary/[0.15]
       shadow-[0_-2px_16px_rgba(22,48,47,0.08)]
@@ -278,9 +278,9 @@ export function MobileLogo() {
       <Image
         src="/budget-tool.png"
         alt="Budget App"
-        width={180}
-        height={72}
-        className="h-9 w-auto"
+        width={360}
+        height={144}
+        className="h-[72px] w-auto"
         priority
       />
     </div>

@@ -102,7 +102,7 @@ export function DashboardShell() {
   );
   const { limit: budgetLimit, setLimit: setBudgetLimit } = useBudgetLimit(visibleMonth);
   const { firstDayOfWeek } = useSettings();
-  const { notification } = useHaptics();
+  const { impact, notification } = useHaptics();
   useLocalNotifications({
     transactions: txData?.transactions ?? [],
     monthExpense,
@@ -160,9 +160,9 @@ export function DashboardShell() {
     }
   }, [isEmpty, onboardingStep]);
 
-  const handleDateClick = useCallback((date: string) => { setSelectedDate(date); setIsAdding(false); }, []);
+  const handleDateClick = useCallback((date: string) => { impact('light'); setSelectedDate(date); setIsAdding(false); }, [impact]);
   const handleClose = useCallback(() => { setSelectedDate(null); setIsAdding(false); }, []);
-  const handleAddNew = useCallback(() => setIsAdding(true), []);
+  const handleAddNew = useCallback(() => { impact('medium'); setIsAdding(true); }, [impact]);
   const handleCancelAdd = useCallback(() => setIsAdding(false), []);
   const handleOnboardingAdd = useCallback(() => {
     const today = format(new Date(), 'yyyy-MM-dd');
