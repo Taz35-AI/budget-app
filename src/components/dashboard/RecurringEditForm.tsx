@@ -203,7 +203,10 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
         <div className="flex flex-col gap-1">
           <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Type</p>
-          <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 h-7">
+          <div className={cn(
+            'flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 h-7',
+            editMode === 'this_only' && 'pointer-events-none opacity-50',
+          )}>
             {(['income', 'expense'] as const).map((cat) => (
               <label
                 key={cat}
@@ -219,6 +222,9 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
               </label>
             ))}
           </div>
+          {editMode === 'this_only' && (
+            <p className="text-[8px] text-slate-400 dark:text-white/30 pl-0.5 leading-tight">Can&apos;t change for one occurrence</p>
+          )}
         </div>
       </div>
 

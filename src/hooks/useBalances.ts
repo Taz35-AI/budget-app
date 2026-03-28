@@ -109,7 +109,8 @@ function txEqual(a: Transaction, b: Transaction): boolean {
     a.end_date === b.end_date &&
     a.frequency === b.frequency &&
     a.name === b.name &&
-    a.tag === b.tag
+    a.tag === b.tag &&
+    a.account_id === b.account_id
   );
 }
 

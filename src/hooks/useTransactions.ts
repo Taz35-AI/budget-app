@@ -147,14 +147,21 @@ export function useUpdateTransaction() {
             t.id === id ? { ...t, ...data.transaction } : t,
           ),
         });
-      } else if (values.account_id !== undefined) {
-        // all_future / this_only — only account_id was updated on the row
-        qc.setQueryData<TransactionsData>(QK, {
-          ...current,
-          transactions: current.transactions.map((t) =>
-            t.id === id ? { ...t, account_id: values.account_id ?? null } : t,
-          ),
-        });
+      } else {
+        // all_future / this_only — row-level fields updated but no transaction returned.
+        // Patch only the fields that were actually sent so the cache reflects DB truth.
+        const rowPatch: Record<string, unknown> = {};
+        if (values.account_id !== undefined) rowPatch.account_id = values.account_id ?? null;
+        if (values.category   !== undefined) rowPatch.category   = values.category;
+        if (values.frequency  !== undefined) rowPatch.frequency  = values.frequency ?? null;
+        if (Object.keys(rowPatch).length > 0) {
+          qc.setQueryData<TransactionsData>(QK, {
+            ...current,
+            transactions: current.transactions.map((t) =>
+              t.id === id ? { ...t, ...rowPatch } : t,
+            ),
+          });
+        }
       }
     },
     onSettled: () => {
@@ -206,10 +213,19 @@ export function useDeleteTransaction() {
             exceptions: [...prev.exceptions, optimisticException],
           });
         } else if (deleteMode === 'all_future' && effectiveFrom) {
-          // Remove the transaction; server will re-create truncated version
+          // The server inserts a deletion exception at effectiveFrom (it does NOT
+          // delete the row). Add the same exception optimistically so the UI
+          // immediately hides occurrences from that date forward without a flash.
+          const optimisticException: TransactionException = {
+            id: `optimistic-exc-${Date.now()}`,
+            transaction_id: id,
+            effective_from: effectiveFrom,
+            is_deleted: true,
+            created_at: new Date().toISOString(),
+          };
           qc.setQueryData<TransactionsData>(QK, {
             ...prev,
-            transactions: prev.transactions.filter((t) => t.id !== id),
+            exceptions: [...prev.exceptions, optimisticException],
           });
         }
       }

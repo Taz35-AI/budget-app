@@ -125,9 +125,22 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'effectiveFrom is required for recurring edits' }, { status: 400 });
     }
 
-    // account_id is stored on the transaction row, not in exceptions.
-    // Persist it here for all_future / this_only so the change is not lost.
-    if ('account_id' in updates) {
+    // category, frequency, account_id live on the transaction row — exceptions
+    // can't store them. Persist any that changed directly on the row now, before
+    // writing the exception, so the change is never silently discarded.
+    //
+    // all_future: all three fields are meaningful to update (the series changes).
+    // this_only:  category/frequency would change every occurrence so we skip
+    //             them; only account_id (which already row-scoped) is persisted.
+    if (editMode === 'all_future') {
+      const rowFields: Record<string, unknown> = {};
+      if ('account_id' in updates) rowFields.account_id = updates.account_id;
+      if ('category'   in updates) rowFields.category   = updates.category;
+      if ('frequency'  in updates) rowFields.frequency  = updates.frequency;
+      if (Object.keys(rowFields).length > 0) {
+        await supabase.from('transactions').update(rowFields).eq('id', id).eq('user_id', userId);
+      }
+    } else if (editMode === 'this_only' && 'account_id' in updates) {
       await supabase
         .from('transactions')
         .update({ account_id: updates.account_id as string | null })
