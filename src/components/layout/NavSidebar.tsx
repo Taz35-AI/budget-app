@@ -280,7 +280,7 @@ export function MobileLogo() {
         alt="Budget App"
         width={360}
         height={144}
-        className="h-[72px] w-auto"
+        className="h-[65px] w-auto"
         priority
       />
     </div>

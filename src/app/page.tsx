@@ -152,7 +152,7 @@ export default function LandingPage() {
         <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0C1F1E]/95 backdrop-blur-sm">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link href="/" className="flex-shrink-0">
-              <Image src="/budget-tool.png" alt="Budget App" width={130} height={52} className="h-8 w-auto" priority />
+              <Image src="/budget-tool.png" alt="Budget App" width={260} height={104} className="h-16 w-auto" priority />
             </Link>
             <nav className="flex items-center gap-2">
               <Link href="/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-1.5">
