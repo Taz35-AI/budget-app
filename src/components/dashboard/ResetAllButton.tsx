@@ -25,7 +25,7 @@ export function ResetAllButton() {
     return (
       <button
         onClick={() => setStep('confirm1')}
-        className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-red-100 dark:hover:bg-red-500/20 text-slate-500 dark:text-white/50 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium transition-all border border-slate-200 dark:border-white/10 hover:border-red-300 dark:hover:border-red-500/30"
+        className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-brand-danger/6 dark:bg-brand-danger/10 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 text-brand-danger/70 dark:text-brand-danger/80 hover:text-brand-danger text-sm font-medium transition-all border border-brand-danger/15 dark:border-brand-danger/20 hover:border-brand-danger/30"
         title="Reset all data"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -46,7 +46,7 @@ export function ResetAllButton() {
         >
           Yes
         </button>
-        <button onClick={() => setStep('idle')} className="text-slate-400 dark:text-white/50 hover:text-slate-700 dark:hover:text-white transition-colors">
+        <button onClick={() => setStep('idle')} className="text-brand-text/30 dark:text-white/30 hover:text-brand-text dark:hover:text-white transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -68,7 +68,7 @@ export function ResetAllButton() {
       >
         {mutation.isPending ? 'Deleting…' : 'CONFIRM DELETE'}
       </button>
-      <button onClick={() => setStep('idle')} className="text-slate-400 dark:text-white/50 hover:text-slate-700 dark:hover:text-white transition-colors">
+      <button onClick={() => setStep('idle')} className="text-brand-text/30 dark:text-white/30 hover:text-brand-text dark:hover:text-white transition-colors">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>

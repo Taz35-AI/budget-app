@@ -34,7 +34,7 @@ export default function SignupPage() {
 
   if (sent) {
     return (
-      <div className="min-h-screen bg-[#0c0f1a] flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-[#0C1F1E] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-sm text-center">
           <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -54,14 +54,11 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0f1a] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0C1F1E] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl overflow-hidden">
-            <Image src="/budget-tool.png" alt="BudgetTool" width={48} height={48} className="w-full h-full object-cover" priority />
-          </div>
-          <h1 className="text-xl font-bold text-white tracking-tight">BudgetTool</h1>
+        <div className="flex flex-col items-center gap-4 mb-8">
+          <Image src="/budget-tool.png" alt="BudgetTool" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-white/40">Create your account</p>
         </div>
 

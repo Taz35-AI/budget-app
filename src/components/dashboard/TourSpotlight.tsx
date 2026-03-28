@@ -141,9 +141,9 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
         {rect && (
           <div className="ml-4 mb-[-1px] w-0 h-0
             border-l-[7px] border-r-[7px] border-b-[8px]
-            border-l-transparent border-r-transparent border-b-[#1a2235]" />
+            border-l-transparent border-r-transparent border-b-[#122928]" />
         )}
-        <div className="rounded-2xl bg-[#1a2235] border border-white/10 shadow-2xl p-4 flex flex-col gap-3">
+        <div className="rounded-2xl bg-[#122928] border border-white/10 shadow-2xl p-4 flex flex-col gap-3">
           {/* Header */}
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">{stepLabel}</span>

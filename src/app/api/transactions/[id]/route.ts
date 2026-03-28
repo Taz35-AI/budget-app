@@ -30,7 +30,9 @@ function priorEffectiveException(
   date: string,
 ): ExceptionRow | null {
   const before = exceptions
-    .filter((e) => e.effective_from < date)   // strictly before, not equal
+    // strictly before, not equal; exclude deletions — they only affect their own
+    // occurrence and must not propagate is_deleted into a restore exception
+    .filter((e) => e.effective_from < date && !e.is_deleted)
     .sort((a, b) => b.effective_from.localeCompare(a.effective_from));
   return before[0] ?? null;
 }
@@ -187,21 +189,26 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         effectiveFrom,
       );
 
-      await supabase
+      const { error: restoreError } = await supabase
         .from('transaction_exceptions')
         .upsert(
           {
             transaction_id: id,
             effective_from: nextDate,
-            // Explicitly carry forward the prior values so the restore
+            // Carry forward the prior non-deleted values so the restore
             // lands on exactly what was in effect before this edit
             name: prior?.name ?? null,
             amount: prior?.amount ?? null,
             end_date: prior?.end_date ?? null,
-            is_deleted: prior?.is_deleted ?? false,
+            is_deleted: false,
           },
           { onConflict: 'transaction_id,effective_from' },
         );
+
+      if (restoreError) {
+        console.error('[PATCH] this_only restore error:', restoreError.message);
+        return NextResponse.json({ error: restoreError.message }, { status: 500 });
+      }
 
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }
@@ -304,7 +311,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         effectiveFrom,
       );
 
-      await supabase
+      const { error: restoreError } = await supabase
         .from('transaction_exceptions')
         .upsert(
           {
@@ -313,10 +320,15 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
             name: prior?.name ?? null,
             amount: prior?.amount ?? null,
             end_date: prior?.end_date ?? null,
-            is_deleted: prior?.is_deleted ?? false,
+            is_deleted: false,
           },
           { onConflict: 'transaction_id,effective_from' },
         );
+
+      if (restoreError) {
+        console.error('[DELETE] this_only restore error:', restoreError.message);
+        return NextResponse.json({ error: restoreError.message }, { status: 500 });
+      }
 
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }

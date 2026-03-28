@@ -94,9 +94,9 @@ export function CalendarView({
         initialView="dayGridMonth"
         firstDay={firstDayOfWeek}
         headerToolbar={{
-          left: 'prev',
+          left: 'prev,next',
           center: 'title',
-          right: 'next',
+          right: 'today',
         }}
         height="auto"
         dateClick={handleDateClick}

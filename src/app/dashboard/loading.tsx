@@ -1,6 +1,6 @@
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-[#0c0f1a] flex flex-col animate-pulse">
+    <div className="min-h-screen bg-[#0C1F1E] flex flex-col animate-pulse">
       {/* Top nav skeleton */}
       <div className="h-14 border-b border-white/[0.06] flex items-center px-4 gap-3 shrink-0">
         <div className="w-7 h-7 rounded-lg bg-white/[0.06]" />

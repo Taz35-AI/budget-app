@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="antialiased bg-slate-50 dark:bg-[#0c0f1a] text-slate-900 dark:text-white">
+      <body className="antialiased bg-brand-bg dark:bg-[#0C1F1E] text-brand-text dark:text-white">
         <Providers>{children}</Providers>
       </body>
     </html>

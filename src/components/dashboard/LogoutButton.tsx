@@ -16,13 +16,14 @@ export function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="flex items-center justify-center w-9 h-9 rounded-xl transition-all border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-700 dark:hover:text-white/70"
+      className="flex items-center gap-1.5 h-9 px-3 rounded-xl transition-all border border-brand-danger/15 dark:border-brand-danger/20 bg-brand-danger/6 dark:bg-brand-danger/10 text-brand-danger/70 dark:text-brand-danger/80 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 hover:text-brand-danger text-sm font-medium"
       title="Sign out"
       aria-label="Sign out"
     >
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
       </svg>
+      <span>Sign out</span>
     </button>
   );
 }

@@ -12,13 +12,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={id} className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label htmlFor={id} className="text-sm font-medium text-brand-text/80 dark:text-white/70">
             {label}
           </label>
         )}
         <div className="relative">
           {prefix && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500 dark:text-slate-400 pointer-events-none">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-brand-text/40 dark:text-white/30 pointer-events-none">
               {prefix}
             </span>
           )}
@@ -27,18 +27,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={id}
             className={cn(
               'w-full h-10 rounded-xl border px-3 text-sm transition-all',
-              'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400',
-              'dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-white/30',
-              'focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/30 focus:border-transparent',
+              'border-brand-primary/15 bg-white text-brand-text placeholder:text-brand-text/30',
+              'dark:border-brand-primary/20 dark:bg-[#122928] dark:text-white dark:placeholder:text-white/25',
+              'focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/50',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               prefix && 'pl-7',
-              error && 'border-red-400 focus:ring-red-400',
+              error && 'border-brand-danger/50 focus:ring-brand-danger/30 focus:border-brand-danger/60',
               className,
             )}
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
+        {error && <p className="text-xs text-brand-danger dark:text-brand-danger/90">{error}</p>}
       </div>
     );
   },

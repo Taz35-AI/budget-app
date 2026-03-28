@@ -3,13 +3,37 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
-/* ─── Brand tokens ──────────────────────────────────────────────────────────── */
+/* ─── Brand tokens (edit here to retheme the entire app) ────────────────────── */
 :root {
-  --brand-navy:   #154265;
-  --brand-green:  #1ECB6C;
-  --brand-lime:   #9FEA86;
-  --brand-gold:   #F7D56E;
-  --brand-silver: #D1E3EE;
+  --brand-primary:   #3B7A78;   /* logo, primary buttons, active tabs         */
+  --brand-secondary: #2F5D8A;   /* secondary buttons, links, charts            */
+  --brand-positive:  #5FAF6B;   /* positive money, saved, completed            */
+  --brand-danger:    #C65A5A;   /* overspending, danger                        */
+  --brand-bg:        #F7FAF9;   /* page background                             */
+  --brand-card:      #FFFFFF;   /* card backgrounds                            */
+  --brand-text:      #16302F;   /* primary text                                */
+
+  /* Dark mode variants */
+  --brand-dark-bg:   #0C1F1E;
+  --brand-dark-card: #122928;
+
+  /* Legacy aliases — keeps FullCalendar CSS overrides working without edits */
+  --brand-navy:   var(--brand-text);
+  --brand-green:  var(--brand-primary);
+  --brand-lime:   var(--brand-positive);
+  --brand-gold:   var(--brand-secondary);
+  --brand-silver: rgba(59, 122, 120, 0.18);
+}
+
+/* ─── Tailwind v4 theme tokens ───────────────────────────────────────────────── */
+@theme inline {
+  --color-brand-primary:   var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-positive:  var(--brand-positive);
+  --color-brand-danger:    var(--brand-danger);
+  --color-brand-bg:        var(--brand-bg);
+  --color-brand-card:      var(--brand-card);
+  --color-brand-text:      var(--brand-text);
 }
 
 @keyframes pulse-slow {
@@ -44,14 +68,14 @@
   padding: 0.375rem 0.875rem !important;
   font-size: 0.8125rem !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(21,66,101,0.08) !important;
+  box-shadow: 0 1px 3px rgba(22,48,47,0.08) !important;
   transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
 .fc .fc-button-primary:hover {
   background-color: #f0f7ff !important;
   border-color: var(--brand-navy) !important;
-  box-shadow: 0 2px 6px rgba(21,66,101,0.12) !important;
+  box-shadow: 0 2px 6px rgba(22,48,47,0.12) !important;
 }
 
 .fc .fc-button-primary:focus {
@@ -69,25 +93,25 @@
 .fc .fc-today-button {
   background-color: var(--brand-green) !important;
   border-color: var(--brand-green) !important;
-  color: #040d1a !important;
+  color: #0C1F1E !important;
   font-weight: 700 !important;
-  box-shadow: 0 1px 6px rgba(30,203,108,0.3) !important;
+  box-shadow: 0 1px 6px rgba(59,122,120,0.3) !important;
 }
 .fc .fc-today-button:not(:disabled):hover {
   background-color: var(--brand-lime) !important;
   border-color: var(--brand-lime) !important;
-  box-shadow: 0 2px 10px rgba(30,203,108,0.4) !important;
+  box-shadow: 0 2px 10px rgba(59,122,120,0.4) !important;
 }
 .fc .fc-today-button:disabled {
   background-color: var(--brand-silver) !important;
   border-color: transparent !important;
-  color: rgba(21,66,101,0.35) !important;
+  color: rgba(22,48,47,0.35) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   cursor: default !important;
 }
 .dark .fc .fc-today-button:disabled {
-  background-color: rgba(21,66,101,0.2) !important;
+  background-color: rgba(22,48,47,0.2) !important;
   color: rgba(209,227,238,0.25) !important;
 }
 
@@ -98,12 +122,12 @@
 }
 
 .fc .fc-col-header-cell-cushion {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.65rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(21, 66, 101, 0.7);
-  padding: 0;
+  letter-spacing: 0.12em;
+  color: rgba(22, 48, 47, 0.4);
+  padding: 0.25rem 0;
   text-decoration: none !important;
 }
 
@@ -120,34 +144,34 @@
 
 .fc table {
   border-collapse: separate !important;
-  border-spacing: 3px !important;
+  border-spacing: 4px !important;
 }
 
-/* Day cells */
+/* Day cells — taller so they're closer to square */
 .fc .fc-daygrid-day {
   border: none !important;
   background: transparent !important;
-  height: 88px !important;
-  max-height: 88px !important;
+  height: 96px !important;
+  max-height: 96px !important;
   overflow: hidden !important;
 }
 
 /* Lock row height so a busy cell can't push the whole row taller */
 .fc .fc-daygrid-body table tbody tr {
-  height: 88px !important;
-  max-height: 88px !important;
+  height: 96px !important;
+  max-height: 96px !important;
 }
 
 .fc .fc-daygrid-day-frame {
-  height: 88px !important;
-  max-height: 88px !important;
+  height: 96px !important;
+  max-height: 96px !important;
   min-height: 0 !important;
-  padding: 2px !important;
-  border-radius: 0.75rem;
+  padding: 0 !important;
+  border-radius: 0.875rem;
   overflow: hidden !important;
   display: flex;
   flex-direction: column;
-  transition: transform 0.1s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .fc .fc-daygrid-day-top {
@@ -195,24 +219,24 @@
 }
 
 .dark .fc .fc-button-primary {
-  background-color: rgba(21, 66, 101, 0.35) !important;
-  border: 1px solid rgba(30, 203, 108, 0.18) !important;
+  background-color: rgba(59, 122, 120, 0.25) !important;
+  border: 1px solid rgba(59, 122, 120, 0.25) !important;
   color: rgba(255, 255, 255, 0.65) !important;
   box-shadow: none !important;
 }
 
 .dark .fc .fc-button-primary:hover {
-  background-color: rgba(30, 203, 108, 0.12) !important;
-  border-color: rgba(30, 203, 108, 0.4) !important;
-  color: #1ECB6C !important;
+  background-color: rgba(59, 122, 120, 0.12) !important;
+  border-color: rgba(59, 122, 120, 0.5) !important;
+  color: #3B7A78 !important;
 }
 
 .dark .fc .fc-button-primary:focus {
-  outline: 2px solid rgba(30, 203, 108, 0.6) !important;
+  outline: 2px solid rgba(59, 122, 120, 0.6) !important;
 }
 
 .dark .fc .fc-col-header-cell-cushion {
-  color: rgba(30, 203, 108, 0.65);
+  color: rgba(59, 122, 120, 0.7);
 }
 
 
@@ -221,22 +245,26 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 640px) {
+  .fc table {
+    border-spacing: 2px !important;
+  }
+
   .fc .fc-daygrid-day-frame {
-    height: 64px !important;
-    max-height: 64px !important;
+    height: 68px !important;
+    max-height: 68px !important;
     min-height: 0 !important;
-    border-radius: 0.5rem;
+    border-radius: 0.625rem;
     overflow: hidden !important;
   }
 
   .fc .fc-daygrid-day {
-    height: 64px !important;
-    max-height: 64px !important;
+    height: 68px !important;
+    max-height: 68px !important;
   }
 
   .fc .fc-daygrid-body table tbody tr {
-    height: 64px !important;
-    max-height: 64px !important;
+    height: 68px !important;
+    max-height: 68px !important;
   }
 
   .fc .fc-toolbar-title {
@@ -255,22 +283,22 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(21,66,101,0.15) transparent;
+  scrollbar-color: rgba(59,122,120,0.12) transparent;
 }
 
 .dark * {
-  scrollbar-color: rgba(30,203,108,0.15) transparent;
+  scrollbar-color: rgba(59,122,120,0.15) transparent;
 }
 
 *::-webkit-scrollbar { width: 4px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(21,66,101,0.15);
+  background-color: rgba(59,122,120,0.12);
   border-radius: 2px;
 }
 
 .dark *::-webkit-scrollbar-thumb {
-  background-color: rgba(30,203,108,0.15);
+  background-color: rgba(59,122,120,0.15);
 }
 
 /* ═══════════════════════════════════════════════════════════════

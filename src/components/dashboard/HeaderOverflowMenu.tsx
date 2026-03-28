@@ -41,7 +41,7 @@ export function HeaderOverflowMenu({ currency, onCurrencyChange }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#1a2235] border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden min-w-[220px]">
+        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#122928] border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden min-w-[220px]">
           {/* Theme row */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/[0.06]">
             <span className="text-sm text-slate-600 dark:text-white/60 font-medium">Theme</span>
