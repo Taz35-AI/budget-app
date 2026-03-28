@@ -125,6 +125,16 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'effectiveFrom is required for recurring edits' }, { status: 400 });
     }
 
+    // account_id is stored on the transaction row, not in exceptions.
+    // Persist it here for all_future / this_only so the change is not lost.
+    if ('account_id' in updates) {
+      await supabase
+        .from('transactions')
+        .update({ account_id: updates.account_id as string | null })
+        .eq('id', id)
+        .eq('user_id', userId);
+    }
+
     // ── Edit from this date forward ───────────────────────────────────────
     // Clear all exceptions at/after effectiveFrom so that the new exception
     // is the sole authority from that point — no prior exceptions can override.

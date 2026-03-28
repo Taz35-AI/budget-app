@@ -136,17 +136,26 @@ export function useUpdateTransaction() {
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) qc.setQueryData(QK, ctx.prev);
     },
-    onSuccess: (data, { id }) => {
-      // If the server returned the updated transaction row, replace it in cache
-      if (!data?.transaction) return;
+    onSuccess: (data, { id, values }) => {
       const current = qc.getQueryData<TransactionsData>(QK);
       if (!current) return;
-      qc.setQueryData<TransactionsData>(QK, {
-        ...current,
-        transactions: current.transactions.map((t) =>
-          t.id === id ? { ...t, ...data.transaction } : t,
-        ),
-      });
+      if (data?.transaction) {
+        // one_off or editMode=all — full row returned
+        qc.setQueryData<TransactionsData>(QK, {
+          ...current,
+          transactions: current.transactions.map((t) =>
+            t.id === id ? { ...t, ...data.transaction } : t,
+          ),
+        });
+      } else if (values.account_id !== undefined) {
+        // all_future / this_only — only account_id was updated on the row
+        qc.setQueryData<TransactionsData>(QK, {
+          ...current,
+          transactions: current.transactions.map((t) =>
+            t.id === id ? { ...t, account_id: values.account_id ?? null } : t,
+          ),
+        });
+      }
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: QK });
