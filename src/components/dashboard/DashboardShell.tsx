@@ -18,6 +18,8 @@ import { BudgetLimitButton } from './BudgetLimitButton';
 import { CurrencySelector } from './CurrencySelector';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
+import { useHaptics } from '@/hooks/useHaptics';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -100,6 +102,12 @@ export function DashboardShell() {
   );
   const { limit: budgetLimit, setLimit: setBudgetLimit } = useBudgetLimit(visibleMonth);
   const { firstDayOfWeek } = useSettings();
+  const { notification } = useHaptics();
+  useLocalNotifications({
+    transactions: txData?.transactions ?? [],
+    monthExpense,
+    budgetLimit: budgetLimit ?? null,
+  });
   const budgetProgress = budgetLimit ? monthExpense / budgetLimit : undefined;
   const clampedBudgetPct = budgetProgress !== undefined ? Math.min(budgetProgress, 1) * 100 : undefined;
   const budgetDanger = budgetProgress !== undefined && budgetProgress >= 0.85;
@@ -472,7 +480,12 @@ export function DashboardShell() {
                       isLoading={create.isPending}
                       onSubmit={(values: TransactionFormValues) => {
                         create.reset();
-                        create.mutate(values, { onSuccess: handleCancelAdd });
+                        create.mutate(values, {
+                          onSuccess: () => {
+                            notification('success');
+                            handleCancelAdd();
+                          },
+                        });
                       }}
                     />
                   </>

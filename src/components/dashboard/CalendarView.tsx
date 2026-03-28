@@ -10,6 +10,7 @@ import type { DateClickArg } from '@fullcalendar/interaction';
 import type { DayCellContentArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
 import { DayCellContent } from './DayCellContent';
 import { cn } from '@/lib/utils';
+import { useHaptics } from '@/hooks/useHaptics';
 import type { DayTransaction, BudgetAccount } from '@/types';
 
 export interface CalendarNavHandle {
@@ -47,6 +48,7 @@ export function CalendarView({
   onAccountChange,
   calendarNavRef,
 }: Props) {
+  const { selection } = useHaptics();
   const calendarRef = useRef<InstanceType<typeof FullCalendar>>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -131,7 +133,7 @@ export function CalendarView({
         {showTabs && (
           <div className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0">
             <button
-              onClick={() => onAccountChange?.('combined')}
+              onClick={() => { selection(); onAccountChange?.('combined'); }}
               className={cn(
                 'flex-shrink-0 h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
                 activeAccountId === 'combined'
@@ -144,7 +146,7 @@ export function CalendarView({
             {accounts!.map((acct) => (
               <button
                 key={acct.id}
-                onClick={() => onAccountChange?.(acct.id)}
+                onClick={() => { selection(); onAccountChange?.(acct.id); }}
                 className={cn(
                   'flex-shrink-0 h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
                   activeAccountId === acct.id

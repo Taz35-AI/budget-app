@@ -1,8 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSettings } from '@/hooks/useSettings';
+import { useHaptics } from '@/hooks/useHaptics';
+import { useCallback } from 'react';
+import {
+  requestNotificationPermission,
+  checkNotificationPermission,
+} from '@/lib/notificationScheduler';
+import type { NotifPermission } from '@/lib/notificationScheduler';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
@@ -514,7 +521,8 @@ function TemplatesSection() {
 // ─── Preferences section ──────────────────────────────────────────────────────
 
 function PreferencesSection() {
-  const { firstDayOfWeek, dateFormat, setFirstDayOfWeek, setDateFormat } = useSettings();
+  const { firstDayOfWeek, dateFormat, hapticsEnabled, setFirstDayOfWeek, setDateFormat, setHapticsEnabled } = useSettings();
+  const { impact } = useHaptics();
 
   return (
     <SettingsCard
@@ -558,6 +566,37 @@ function PreferencesSection() {
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
             <option value="YYYY-MM-DD">YYYY-MM-DD</option>
           </select>
+        </div>
+
+        {/* Haptic feedback */}
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Haptic feedback</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Vibration on taps and actions (iOS / Android)</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={hapticsEnabled}
+            onClick={() => {
+              const next = !hapticsEnabled;
+              setHapticsEnabled(next);
+              if (next) impact('light');
+            }}
+            className={cn(
+              'relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200',
+              hapticsEnabled
+                ? 'bg-brand-primary'
+                : 'bg-slate-200 dark:bg-white/10',
+            )}
+          >
+            <span
+              className={cn(
+                'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200',
+                hapticsEnabled ? 'translate-x-5' : 'translate-x-0',
+              )}
+            />
+          </button>
         </div>
       </div>
     </SettingsCard>
@@ -936,6 +975,133 @@ function AccountsSection() {
   );
 }
 
+// ─── Notifications section ───────────────────────────────────────────────────
+
+function NotificationsSection() {
+  const { notificationSettings, setNotificationSettings } = useSettings();
+  const { impact } = useHaptics();
+  const [permState, setPermState] = useState<NotifPermission | 'unknown'>('unknown');
+  const [checking, setChecking] = useState(false);
+
+  // Check permission on mount
+  useEffect(() => {
+    checkNotificationPermission().then(setPermState);
+  }, []);
+
+  const handleRequestPermission = useCallback(async () => {
+    setChecking(true);
+    const state = await requestNotificationPermission();
+    setPermState(state);
+    setChecking(false);
+  }, []);
+
+  function toggle(key: keyof typeof notificationSettings) {
+    if (typeof notificationSettings[key] !== 'boolean') return;
+    impact('light');
+    setNotificationSettings({ [key]: !notificationSettings[key] });
+  }
+
+  const rows: { key: keyof typeof notificationSettings; label: string; desc: string }[] = [
+    { key: 'dailyReminder',  label: 'Daily spending reminder', desc: "Reminds you to log today's transactions" },
+    { key: 'billReminders',  label: 'Bill due tomorrow',        desc: 'Alert the day before a recurring payment is due' },
+    { key: 'monthlyRecap',   label: 'Monthly recap',            desc: 'Summary notification on the 1st of each month' },
+    { key: 'weeklyDigest',   label: 'Weekly digest',            desc: 'Every Monday — upcoming bills and last week at a glance' },
+    { key: 'budgetWarnings', label: 'Budget limit warnings',    desc: 'Alert when you hit 85% of your monthly spending limit' },
+  ];
+
+  return (
+    <SettingsCard
+      title="Notifications"
+      subtitle="Push alerts on iOS and Android"
+      accent="bg-gradient-to-r from-sky-400 to-blue-500"
+    >
+      <div className="flex flex-col gap-5 mt-1">
+
+        {/* Permission status */}
+        {permState !== 'granted' && (
+          <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200/60 dark:border-sky-400/15">
+            <div>
+              <p className="text-sm font-semibold text-sky-700 dark:text-sky-300">
+                {permState === 'denied' ? 'Notifications blocked' : 'Permission required'}
+              </p>
+              <p className="text-xs text-sky-600/70 dark:text-sky-300/60 mt-0.5">
+                {permState === 'denied'
+                  ? 'Enable in your device Settings to receive alerts'
+                  : 'Tap below to allow Budget App to send notifications'}
+              </p>
+            </div>
+            {permState !== 'denied' && (
+              <button
+                type="button"
+                onClick={handleRequestPermission}
+                disabled={checking}
+                className="flex-shrink-0 h-8 px-3 rounded-lg bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition-colors disabled:opacity-50"
+              >
+                {checking ? '…' : 'Allow'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Toggle rows */}
+        {rows.map(({ key, label, desc }) => (
+          <div key={key} className="flex items-center justify-between gap-4">
+            <div>
+              <p className={cn('text-sm font-semibold', permState !== 'granted' ? 'text-slate-400 dark:text-white/30' : 'text-slate-700 dark:text-white/80')}>
+                {label}
+              </p>
+              <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{desc}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={!!notificationSettings[key as keyof typeof notificationSettings]}
+              disabled={permState !== 'granted'}
+              onClick={() => toggle(key)}
+              className={cn(
+                'relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200',
+                permState !== 'granted' ? 'opacity-40 cursor-not-allowed' : '',
+                notificationSettings[key as keyof typeof notificationSettings]
+                  ? 'bg-brand-primary'
+                  : 'bg-slate-200 dark:bg-white/10',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200',
+                  notificationSettings[key as keyof typeof notificationSettings] ? 'translate-x-5' : 'translate-x-0',
+                )}
+              />
+            </button>
+          </div>
+        ))}
+
+        {/* Daily reminder time picker — only shown when daily reminder is on */}
+        {notificationSettings.dailyReminder && permState === 'granted' && (
+          <div className="flex items-center justify-between gap-4 pl-1 border-l-2 border-brand-primary/30">
+            <div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Reminder time</p>
+              <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">What time to send the daily reminder</p>
+            </div>
+            <input
+              type="time"
+              value={`${String(notificationSettings.dailyHour).padStart(2, '0')}:${String(notificationSettings.dailyMinute).padStart(2, '0')}`}
+              onChange={(e) => {
+                const [h, m] = e.target.value.split(':').map(Number);
+                if (!isNaN(h) && !isNaN(m)) {
+                  setNotificationSettings({ dailyHour: h, dailyMinute: m });
+                }
+              }}
+              className="h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-sky-400 flex-shrink-0"
+            />
+          </div>
+        )}
+
+      </div>
+    </SettingsCard>
+  );
+}
+
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function SettingsShell() {
@@ -976,6 +1142,7 @@ export function SettingsShell() {
         <TagsSection />
         <TemplatesSection />
         <PreferencesSection />
+        <NotificationsSection />
         <GoalsSection />
       </div>
     </div>

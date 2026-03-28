@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TAGS } from '@/lib/constants';
 import type { CustomTag, RecurringTemplate, SavingsGoal, DateFormat, Account, TagBudget } from '@/types';
+import { DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationScheduler';
+import type { NotificationSettings } from '@/lib/notificationScheduler';
 
 interface SettingsState {
   customTags: CustomTag[];
@@ -12,6 +14,8 @@ interface SettingsState {
   tagBudgets: TagBudget[];
   firstDayOfWeek: 0 | 1;
   dateFormat: DateFormat;
+  hapticsEnabled: boolean;
+  notificationSettings: NotificationSettings;
   // Actions
   _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
   addCustomTag: (tag: Omit<CustomTag, 'id'>) => void;
@@ -31,6 +35,8 @@ interface SettingsState {
   setTagBudget: (tagId: string, monthlyLimit: number | null) => void;
   setFirstDayOfWeek: (day: 0 | 1) => void;
   setDateFormat: (fmt: DateFormat) => void;
+  setHapticsEnabled: (enabled: boolean) => void;
+  setNotificationSettings: (patch: Partial<NotificationSettings>) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -44,6 +50,8 @@ export const useSettingsStore = create<SettingsState>()(
       tagBudgets: [],
       firstDayOfWeek: 1,
       dateFormat: 'DD/MM/YYYY',
+      hapticsEnabled: true,
+      notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
 
       _hydrate: (data) => set((s) => ({ ...s, ...data })),
 
@@ -104,6 +112,9 @@ export const useSettingsStore = create<SettingsState>()(
 
       setFirstDayOfWeek: (day) => set({ firstDayOfWeek: day }),
       setDateFormat: (fmt) => set({ dateFormat: fmt }),
+      setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
+      setNotificationSettings: (patch) =>
+        set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
     }),
     { name: 'budgettool_settings' },
   ),
