@@ -78,9 +78,9 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
     <div className="flex flex-col h-full">
 
       {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-5 pb-4 border-b border-white/[0.07] flex-shrink-0">
-        <Link href="/dashboard" onClick={onLinkClick} className="block w-full">
-          <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={200} height={200} className="w-full h-auto object-contain" priority />
+      <div className="flex items-center justify-center px-4 pt-4 pb-3 border-b border-white/[0.07] flex-shrink-0">
+        <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
+          <Image src="/budget-tool.png" alt="BudgetTool" width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
       </div>
 
@@ -185,7 +185,7 @@ export function NavSidebar() {
       {/* ── Mobile: slim left drawer ─────────────────────────────────── */}
       <div
         className={cn(
-          'dark fixed inset-y-0 left-0 z-50 w-72 flex flex-col lg:hidden',
+          'dark fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
           'bg-brand-text',
           'shadow-[4px_0_32px_rgba(12,31,30,0.6)]',
           'transition-transform duration-300 ease-out',
@@ -276,11 +276,11 @@ export function MobileLogo() {
   return (
     <div className="lg:hidden flex-shrink-0 pointer-events-none">
       <Image
-        src="/budget-tool.png?v=2"
+        src="/budget-tool.png"
         alt="BudgetTool"
         width={180}
         height={72}
-        className="h-12 w-auto"
+        className="h-9 w-auto"
         priority
       />
     </div>
