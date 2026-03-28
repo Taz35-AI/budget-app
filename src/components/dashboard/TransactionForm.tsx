@@ -208,15 +208,6 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       )}
 
       <Input
-        id="name"
-        label="Description"
-        placeholder="e.g. Monthly salary"
-        error={errors.name?.message}
-        className={compact ? 'h-7 text-[11px]' : undefined}
-        {...register('name')}
-      />
-
-      <Input
         id="amount"
         label="Amount"
         type="number"
@@ -227,6 +218,15 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         error={errors.amount?.message}
         className={compact ? 'h-7 text-[11px]' : undefined}
         {...register('amount')}
+      />
+
+      <Input
+        id="name"
+        label="Description"
+        placeholder="e.g. Monthly salary"
+        error={errors.name?.message}
+        className={compact ? 'h-7 text-[11px]' : undefined}
+        {...register('name')}
       />
 
       {/* Tag picker */}
