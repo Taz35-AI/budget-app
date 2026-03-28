@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { format } from 'date-fns';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUserId } from '@/lib/auth';
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const body = await req.json().catch(() => ({}));
+    const accountId: string | null = body.accountId ?? null;
 
     const supabase = createAdminClient();
     const resetDate = format(new Date(), 'yyyy-MM-dd');
@@ -18,10 +21,16 @@ export async function POST() {
       .eq('user_id', userId)
       .gte('date', resetDate);
 
-    // Insert reset marker
+    // Insert reset marker (per-account or global)
+    const insertPayload: Record<string, unknown> = {
+      user_id: userId,
+      reset_date: resetDate,
+      account_id: accountId,
+    };
+
     const { data, error } = await supabase
       .from('balance_resets')
-      .insert({ user_id: userId, reset_date: resetDate })
+      .insert(insertPayload)
       .select()
       .single();
 
@@ -34,19 +43,27 @@ export async function POST() {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const accountId = req.nextUrl.searchParams.get('accountId');
+
     const supabase = createAdminClient();
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('balance_resets')
       .select('*')
       .eq('user_id', userId)
       .order('reset_date', { ascending: false })
       .limit(1);
+
+    if (accountId) {
+      query = query.eq('account_id', accountId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const userId = await getAuthUserId();
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { desiredBalance, currentBalance } = await req.json();
+    const { desiredBalance, currentBalance, accountId } = await req.json();
 
     const delta = Number(desiredBalance) - Number(currentBalance);
     if (Math.abs(delta) < 0.01) {
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
       .from('transactions')
       .insert({
         user_id: userId,
+        account_id: accountId || null,
         name: 'Balance Adjustment',
         amount: Math.abs(delta),
         category: delta > 0 ? 'income' : 'expense',

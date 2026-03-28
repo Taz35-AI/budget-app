@@ -12,7 +12,7 @@ import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
 import { OnboardingTip } from './OnboardingTip';
-import type { DayTransaction, TransactionFormValues } from '@/types';
+import type { BudgetAccount, DayTransaction, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string;
@@ -22,6 +22,7 @@ interface Props {
   symbol: string;
   onAddNew: () => void;
   showTip?: boolean;
+  accounts?: BudgetAccount[];
 }
 
 type ActiveAction =
@@ -29,7 +30,7 @@ type ActiveAction =
   | { type: 'delete'; txId: string }
   | null;
 
-export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip }: Props) {
+export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip, accounts }: Props) {
   const [active, setActive] = useState<ActiveAction>(null);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<'all' | 'income' | 'expense'>('all');
@@ -40,6 +41,8 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
   const isPositive = balance > 0;
   const isNegative = balance < 0;
   const clearActive = () => setActive(null);
+  const showAccountBadge = (accounts?.length ?? 0) >= 2;
+  const accountMap = new Map((accounts ?? []).map((a) => [a.id, a.name]));
 
   const filtered = transactions.filter((tx) => {
     if (filterCat !== 'all' && tx.category !== filterCat) return false;
@@ -51,7 +54,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
     <div className="flex flex-col h-full">
       {/* Balance summary */}
       <div className={cn(
-        'relative rounded-2xl p-4 mb-4 overflow-hidden',
+        'relative rounded-xl p-2.5 mb-2.5 overflow-hidden',
         isPositive && 'bg-gradient-to-br from-emerald-50 to-teal-50/60 dark:from-emerald-950/30 dark:to-teal-950/10 border border-emerald-100 dark:border-emerald-900/30',
         isNegative && 'bg-gradient-to-br from-red-50 to-rose-50/60 dark:from-red-950/30 dark:to-rose-950/10 border border-red-100 dark:border-red-900/30',
         !isPositive && !isNegative && 'bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.08]',
@@ -62,11 +65,11 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
           isNegative && 'bg-gradient-to-r from-red-400 to-rose-400',
           !isPositive && !isNegative && 'bg-gradient-to-r from-slate-300 to-slate-200 dark:from-white/10 dark:to-white/5',
         )} />
-        <p className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest mb-1.5 mt-0.5">
+        <p className="text-[9px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest mb-1 mt-0.5">
           Balance · {format(new Date(date + 'T12:00:00'), 'd MMM yyyy')}
         </p>
         <p className={cn(
-          'text-3xl font-extrabold tracking-tight tabular-nums',
+          'text-xl font-extrabold tracking-tight tabular-nums',
           isPositive && 'text-emerald-600 dark:text-emerald-400',
           isNegative && 'text-red-600 dark:text-red-400',
           !isPositive && !isNegative && 'text-slate-600 dark:text-slate-400',
@@ -178,6 +181,9 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                   <li key={tx.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4">
                     <TransactionForm
                       symbol={symbol}
+                      lockType
+                      compact
+                      defaultDate={date}
                       initialValues={{
                         id: tx.transaction_id,
                         name: tx.name,
@@ -244,7 +250,6 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                       <Button
                         size="sm"
                         variant="danger"
-                        loading={del.isPending}
                         onClick={() =>
                           del.mutate(
                             { id: tx.transaction_id, deleteMode: 'all' },
@@ -280,7 +285,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-800 dark:text-white/90 truncate">{tx.name}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {tx.type === 'recurring' && tx.frequency && (
                         <p className="text-xs text-slate-400 dark:text-white/40">{FREQUENCIES[tx.frequency]}</p>
                       )}
@@ -290,6 +295,11 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                           style={{ backgroundColor: allTags[tx.tag].color }}
                         >
                           {allTags[tx.tag].label}
+                        </span>
+                      )}
+                      {showAccountBadge && tx.account_id && accountMap.has(tx.account_id) && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary dark:text-brand-primary/80 border border-brand-primary/15 dark:border-brand-primary/20">
+                          {accountMap.get(tx.account_id)}
                         </span>
                       )}
                     </div>
@@ -330,8 +340,8 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
         )}
       </div>
 
-      {/* Add button */}
-      <div className="pt-4 mt-auto border-t border-slate-100 dark:border-white/[0.08]">
+      {/* Add button — hidden while editing or deleting */}
+      <div className={cn('pt-4 mt-auto border-t border-slate-100 dark:border-white/[0.08]', active && 'hidden')}>
         {showTip && (
           <OnboardingTip arrow="bottom" className="mb-3">
             Tap here to add your first transaction

@@ -118,9 +118,6 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
   return (
     <form
       onSubmit={handleSubmit((v) => {
-        // Determine the base date for end_date computation:
-        // - "all" → series starts from tx.start_date
-        // - "all_future" / "this_only" → starts from the current occurrence
         const base = v.editMode === 'all' ? tx.start_date : occurrenceDate;
         let end_date: string | undefined;
         if (v.recurrences && v.frequency && base) {
@@ -132,52 +129,47 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         const { recurrences: _rec, ...rest } = v;
         onSubmit({ ...rest, editMode: rest.editMode as EditMode, end_date });
       })}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-1.5"
     >
 
       {/* Occurrence label */}
-      <div className="rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-4 py-3">
-        <p className="text-xs text-slate-500 dark:text-white/40 font-medium uppercase tracking-wider mb-0.5">Editing occurrence on</p>
-        <p className="text-sm font-semibold text-slate-800 dark:text-white">{displayDate}</p>
+      <div className="rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2.5 py-1.5 flex items-center gap-3">
+        <div>
+          <p className="text-[9px] text-slate-400 dark:text-white/35 font-medium uppercase tracking-wider">Editing</p>
+          <p className="text-[11px] font-semibold text-slate-800 dark:text-white leading-tight">{displayDate}</p>
+        </div>
         {tx.frequency && (
-          <p className="text-xs text-slate-400 dark:text-white/40 mt-0.5">
-            {FREQUENCIES[tx.frequency]} · {tx.category === 'income' ? 'Income' : 'Expense'}
+          <p className="text-[9px] text-slate-400 dark:text-white/35 ml-auto">
+            {FREQUENCIES[tx.frequency]}
           </p>
         )}
       </div>
 
       {/* Scope selector */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">What do you want to change?</p>
+      <div className="flex flex-col gap-1">
+        <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">What do you want to change?</p>
         {SCOPE_OPTIONS.map((opt) => (
           <label
             key={opt.value}
             className={cn(
-              'flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all',
+              'flex items-start gap-2 p-1.5 rounded-lg border cursor-pointer transition-all',
               editMode === opt.value
                 ? 'border-slate-900 bg-slate-900 text-white'
                 : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/20',
             )}
           >
-            <input
-              type="radio"
-              value={opt.value}
-              {...register('editMode')}
-              className="sr-only"
-            />
+            <input type="radio" value={opt.value} {...register('editMode')} className="sr-only" />
             <div className={cn(
-              'w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center',
+              'w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center',
               editMode === opt.value ? 'border-white' : 'border-slate-300',
             )}>
-              {editMode === opt.value && (
-                <div className="w-2 h-2 rounded-full bg-white" />
-              )}
+              {editMode === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
             </div>
             <div>
-              <p className={cn('text-sm font-medium', editMode === opt.value ? 'text-white' : 'text-slate-800 dark:text-white/90')}>
+              <p className={cn('text-[11px] font-medium leading-tight', editMode === opt.value ? 'text-white' : 'text-slate-800 dark:text-white/90')}>
                 {opt.label}
               </p>
-              <p className={cn('text-xs mt-0.5', editMode === opt.value ? 'text-slate-300' : 'text-slate-400')}>
+              <p className={cn('text-[9px] mt-0.5', editMode === opt.value ? 'text-slate-300' : 'text-slate-400')}>
                 {opt.description}
               </p>
             </div>
@@ -193,10 +185,11 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         id="name"
         label="Description"
         error={errors.name?.message}
+        className="h-8 text-xs"
         {...register('name')}
       />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         <Input
           id="amount"
           label="Amount"
@@ -204,18 +197,18 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
           step="0.01"
           min="0.01"
           error={errors.amount?.message}
+          className="h-7 text-[11px]"
           {...register('amount')}
         />
 
-        {/* Category toggle — compact */}
-        <div className="flex flex-col gap-1.5">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Type</p>
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 h-10">
+        <div className="flex flex-col gap-1">
+          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Type</p>
+          <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 h-7">
             {(['income', 'expense'] as const).map((cat) => (
               <label
                 key={cat}
                 className={cn(
-                  'flex-1 flex items-center justify-center text-xs font-medium cursor-pointer transition-all',
+                  'flex-1 flex items-center justify-center text-[10px] font-medium cursor-pointer transition-all',
                   watch('category') === cat
                     ? cat === 'income' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
                     : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
@@ -229,11 +222,10 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         </div>
       </div>
 
-      {/* Tag — only editable when changing entire series, filtered by income/expense */}
       {editMode === 'all' && (
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col gap-1">
+          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
+          <div className="flex flex-wrap gap-1">
             {Object.entries(allTags)
               .filter(([, t]) => t.category === category || t.category === 'both')
               .map(([key, { label, color }]) => {
@@ -244,14 +236,14 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
                     type="button"
                     onClick={() => setValue('tag', isSelected ? '' : key)}
                     className={cn(
-                      'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
+                      'flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-medium transition-all border',
                       isSelected
                         ? 'text-white border-transparent'
                         : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20',
                     )}
                     style={isSelected ? { backgroundColor: color } : undefined}
                   >
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                     {label}
                   </button>
                 );
@@ -260,7 +252,6 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         </div>
       )}
 
-      {/* Frequency + recurrences only for series-level edits */}
       {canEditSeries && (
         <>
           <Select
@@ -269,32 +260,32 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
             options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
             {...register('frequency')}
           />
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             <Input
               id="recurrences"
-              label="Number of occurrences (optional)"
+              label="Occurrences (optional)"
               type="number"
               min="1"
               step="1"
-              placeholder="e.g. 12  — leave blank to repeat forever"
+              placeholder="Leave blank to repeat forever"
               error={errors.recurrences?.message}
+              className="h-7 text-[11px]"
               {...register('recurrences')}
             />
             {computedEndDate && (
-              <p className="text-xs text-slate-400 dark:text-white/40 pl-1">
-                Last occurrence: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
+              <p className="text-[10px] text-slate-400 dark:text-white/40 pl-1">
+                Last: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
               </p>
             )}
           </div>
         </>
       )}
 
-      {/* Actions */}
       <div className="flex gap-2 pt-1">
-        <Button type="submit" loading={isLoading} className="flex-1">
+        <Button type="submit" size="sm" loading={isLoading} className="flex-1">
           Save changes
         </Button>
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
       </div>

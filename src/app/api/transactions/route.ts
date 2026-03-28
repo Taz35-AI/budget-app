@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     const payload = {
       user_id: userId,
+      account_id: body.account_id || null,
       name: body.name,
       amount: Number(body.amount),
       category: body.category,

@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { getAuthUserId } from '@/lib/auth';
+
+/**
+ * GET /api/accounts
+ * Returns the user's accounts. Auto-creates a default "Main Account" if none exist,
+ * and backfills any un-assigned transactions to it.
+ */
+export async function GET() {
+  try {
+    const userId = await getAuthUserId();
+    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const supabase = createAdminClient();
+
+    let { data: accounts, error } = await supabase
+      .from('budget_accounts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('[GET /api/accounts]', error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Auto-create a default account if the user has none
+    if (!accounts || accounts.length === 0) {
+      const { data: created, error: createErr } = await supabase
+        .from('budget_accounts')
+        .insert({ user_id: userId, name: 'Main Account' })
+        .select()
+        .single();
+
+      if (createErr) {
+        console.error('[GET /api/accounts] auto-create error:', createErr.message);
+        return NextResponse.json({ error: createErr.message }, { status: 500 });
+      }
+
+      accounts = [created];
+
+      // Backfill any existing transactions that have no account_id
+      await supabase
+        .from('transactions')
+        .update({ account_id: created.id })
+        .eq('user_id', userId)
+        .is('account_id', null);
+
+      // Backfill balance_resets too
+      await supabase
+        .from('balance_resets')
+        .update({ account_id: created.id })
+        .eq('user_id', userId)
+        .is('account_id', null);
+    }
+
+    return NextResponse.json({ accounts });
+  } catch (err) {
+    console.error('[GET /api/accounts] unexpected:', err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/accounts
+ * Body: { name: string }
+ * Creates a new account. Max 5 per user.
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const userId = await getAuthUserId();
+    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const supabase = createAdminClient();
+    const body = await req.json();
+    const name = (body.name ?? '').trim();
+    if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+
+    // Enforce max 5 accounts
+    const { count } = await supabase
+      .from('budget_accounts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    if ((count ?? 0) >= 5) {
+      return NextResponse.json({ error: 'Maximum of 5 accounts allowed' }, { status: 400 });
+    }
+
+    const { data, error } = await supabase
+      .from('budget_accounts')
+      .insert({ user_id: userId, name })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[POST /api/accounts]', error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ account: data }, { status: 201 });
+  } catch (err) {
+    console.error('[POST /api/accounts] unexpected:', err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}

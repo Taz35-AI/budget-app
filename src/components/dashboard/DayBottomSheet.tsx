@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useCreateTransaction } from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
-import type { DayTransaction, TransactionFormValues } from '@/types';
+import type { BudgetAccount, DayTransaction, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string | null;
@@ -18,6 +18,8 @@ interface Props {
   onCancelAdd: () => void;
   onClose: () => void;
   showTip?: boolean;
+  accountId?: string;
+  accounts?: BudgetAccount[];
 }
 
 export function DayBottomSheet({
@@ -31,11 +33,25 @@ export function DayBottomSheet({
   onCancelAdd,
   onClose,
   showTip,
+  accountId,
+  accounts,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentDragY = useRef<number>(0);
-  const create = useCreateTransaction();
+
+  // Which account new transactions go to — defaults to the active tab's account,
+  // or the first account if on the Combined tab.
+  const defaultAccountId = accountId ?? accounts?.[0]?.id;
+  const [formAccountId, setFormAccountId] = useState<string | undefined>(defaultAccountId);
+
+  // Re-sync when the active tab changes or the sheet re-opens for adding
+  useEffect(() => {
+    setFormAccountId(accountId ?? accounts?.[0]?.id);
+  }, [accountId, accounts, isAdding]);
+
+  const create = useCreateTransaction(formAccountId);
+  const showAccountPicker = (accounts?.length ?? 0) >= 2;
   const isOpen = date !== null;
 
   useEffect(() => {
@@ -139,16 +155,39 @@ export function DayBottomSheet({
         <div className="flex-1 overflow-y-auto px-5 pb-8 overscroll-contain">
           {date && (
             isAdding ? (
-              <TransactionForm
-                defaultDate={date}
-                symbol={symbol}
-                onCancel={onCancelAdd}
-                isLoading={create.isPending}
-                onSubmit={(values: TransactionFormValues) => {
-                  create.reset();
-                  create.mutate(values, { onSuccess: onCancelAdd });
-                }}
-              />
+              <>
+                {/* Account picker — only when 2+ accounts */}
+                {showAccountPicker && (
+                  <div className="flex gap-1.5 flex-wrap mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.07]">
+                    <p className="w-full text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">Add to account</p>
+                    {accounts!.map((acct) => (
+                      <button
+                        key={acct.id}
+                        type="button"
+                        onClick={() => setFormAccountId(acct.id)}
+                        className={cn(
+                          'h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
+                          formAccountId === acct.id
+                            ? 'bg-brand-primary text-white border-brand-primary'
+                            : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                        )}
+                      >
+                        {acct.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <TransactionForm
+                  defaultDate={date}
+                  symbol={symbol}
+                  onCancel={onCancelAdd}
+                  isLoading={create.isPending}
+                  onSubmit={(values: TransactionFormValues) => {
+                    create.reset();
+                    create.mutate(values, { onSuccess: onCancelAdd });
+                  }}
+                />
+              </>
             ) : (
               <TransactionList
                 date={date}
@@ -158,6 +197,7 @@ export function DayBottomSheet({
                 symbol={symbol}
                 onAddNew={onAddNew}
                 showTip={showTip}
+                accounts={accounts}
               />
             )
           )}

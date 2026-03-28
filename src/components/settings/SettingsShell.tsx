@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSettings } from '@/hooks/useSettings';
+import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { NavMenuButton } from '@/components/layout/NavSidebar';
+import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import type { Frequency, CustomTag, RecurringTemplate, TagCategory } from '@/types';
@@ -178,70 +179,59 @@ function TagsSection() {
       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">
         Built-in
       </p>
-      <div className="flex flex-col gap-2 mb-5">
-        {activeBuiltins.map(({ key, label, color, defaultLabel, defaultColor, isOverridden }) => (
-          <div key={key}>
-            {editId === key && editIsBuiltin ? (
-              <div className="flex flex-col gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
-                <div className="flex gap-2 items-center">
-                  <input
-                    value={editLabel}
-                    onChange={(e) => setEditLabel(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                    autoFocus
-                    className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-indigo-400"
-                  />
-                  <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
-                    {editLabel || 'Preview'}
-                  </span>
-                </div>
-                <ColorPicker value={editColor} onChange={setEditColor} />
-                <div className="flex gap-2">
-                  <button type="button" onClick={saveEdit} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">Save</button>
-                  {isOverridden && (
-                    <button
-                      type="button"
-                      onClick={() => { deleteCustomTag(key); setEditId(null); }}
-                      className="px-3 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 transition-colors"
-                      title={`Reset to "${defaultLabel}"`}
-                    >
-                      Reset
-                    </button>
-                  )}
-                  <button type="button" onClick={() => setEditId(null)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group">
-                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                <span className="flex-1 text-sm font-medium text-slate-700 dark:text-white/80">{label}</span>
-                {isOverridden && (
-                  <span className="text-[9px] font-bold uppercase tracking-wide text-indigo-400 dark:text-indigo-300/70 mr-1">edited</span>
-                )}
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={() => startEdit(key, label, color, TAGS[key]?.category ?? 'both', true)}
-                    className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
-                    title="Edit"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => hideBuiltinTag(key)}
-                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                    title="Hide"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+
+      {/* Edit form — full width, shown above grid when active */}
+      {editId && editIsBuiltin && (() => {
+        const entry = activeBuiltins.find((t) => t.key === editId);
+        if (!entry) return null;
+        return (
+          <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
+            <div className="flex gap-2 items-center">
+              <input
+                value={editLabel}
+                onChange={(e) => setEditLabel(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                autoFocus
+                className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400"
+              />
+              <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
+                {editLabel || 'Preview'}
+              </span>
+            </div>
+            <ColorPicker value={editColor} onChange={setEditColor} />
+            <div className="flex gap-1.5">
+              <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">Save</button>
+              {entry.isOverridden && (
+                <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 hover:text-red-500 transition-colors">Reset</button>
+              )}
+              <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">Cancel</button>
+            </div>
+          </div>
+        );
+      })()}
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mb-4">
+        {activeBuiltins.map(({ key, label, color, isOverridden }) => (
+          <div
+            key={key}
+            className={cn(
+              'flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-colors group',
+              editId === key && editIsBuiltin
+                ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/15'
+                : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
             )}
+          >
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+            <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{label}</span>
+            {isOverridden && <span className="text-[8px] font-bold text-indigo-400 flex-shrink-0">•</span>}
+            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity">
+              <button type="button" onClick={() => startEdit(key, label, color, TAGS[key]?.category ?? 'both', true)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              </button>
+              <button type="button" onClick={() => hideBuiltinTag(key)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" /></svg>
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -250,65 +240,72 @@ function TagsSection() {
       {pureCustomTags.length > 0 && (
         <>
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Custom</p>
-          <div className="flex flex-col gap-2 mb-4">
+
+          {/* Edit form — full width */}
+          {editId && !editIsBuiltin && (() => {
+            const tag = pureCustomTags.find((t) => t.id === editId);
+            if (!tag) return null;
+            return (
+              <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
+                <div className="flex gap-2 items-center">
+                  <input
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                    autoFocus
+                    className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400"
+                  />
+                  <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
+                    {editLabel || 'Preview'}
+                  </span>
+                </div>
+                <ColorPicker value={editColor} onChange={setEditColor} />
+                <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
+                  {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
+                    <button key={cat} type="button" onClick={() => setEditCategory(cat)}
+                      className={cn('flex-1 h-7 text-[10px] font-medium transition-all',
+                        editCategory === cat
+                          ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
+                          : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+                      )}>
+                      {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-1.5">
+                  <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">Save</button>
+                  <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">Cancel</button>
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mb-4">
             {pureCustomTags.map((tag) => (
-              <div key={tag.id}>
-                {editId === tag.id && !editIsBuiltin ? (
-                  <div className="flex flex-col gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
-                    <div className="flex gap-2 items-center">
-                      <input
-                        value={editLabel}
-                        onChange={(e) => setEditLabel(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                        autoFocus
-                        className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-indigo-400"
-                      />
-                      <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
-                        {editLabel || 'Preview'}
-                      </span>
-                    </div>
-                    <ColorPicker value={editColor} onChange={setEditColor} />
-                    {/* Category toggle — custom tags only */}
-                    <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
-                      {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
-                        <button key={cat} type="button" onClick={() => setEditCategory(cat)}
-                          className={cn('flex-1 h-8 text-xs font-medium transition-all',
-                            editCategory === cat
-                              ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
-                              : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
-                          )}>
-                          {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <button type="button" onClick={saveEdit} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">Save</button>
-                      <button type="button" onClick={() => setEditId(null)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group">
-                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: tag.color }} />
-                    <span className="flex-1 text-sm font-medium text-slate-700 dark:text-white/80">{tag.label}</span>
-                    <span className={cn('text-[9px] font-bold uppercase tracking-wide mr-1',
-                      (tag.category ?? 'expense') === 'income' ? 'text-emerald-400' : (tag.category ?? 'expense') === 'expense' ? 'text-red-400' : 'text-slate-400 dark:text-white/30',
-                    )}>
-                      {(tag.category ?? 'expense') === 'both' ? 'both' : tag.category ?? 'expense'}
-                    </span>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(tag.id, tag.label, tag.color, tag.category ?? 'expense', false)}
-                        className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <TrashBtn onClick={() => deleteCustomTag(tag.id)} />
-                    </div>
-                  </div>
+              <div
+                key={tag.id}
+                className={cn(
+                  'flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-colors group',
+                  editId === tag.id && !editIsBuiltin
+                    ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/15'
+                    : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
                 )}
+              >
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tag.color }} />
+                <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{tag.label}</span>
+                <span className={cn('text-[8px] font-bold flex-shrink-0',
+                  (tag.category ?? 'expense') === 'income' ? 'text-emerald-400' : (tag.category ?? 'expense') === 'expense' ? 'text-red-400' : 'text-slate-400',
+                )}>
+                  {(tag.category ?? 'expense') === 'both' ? '±' : (tag.category ?? 'expense') === 'income' ? '+' : '−'}
+                </span>
+                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity">
+                  <button type="button" onClick={() => startEdit(tag.id, tag.label, tag.color, tag.category ?? 'expense', false)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                  </button>
+                  <button type="button" onClick={() => deleteCustomTag(tag.id)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -765,24 +762,197 @@ function GoalsSection() {
   );
 }
 
+// ─── Accounts section ─────────────────────────────────────────────────────────
+
+function AccountsSection() {
+  const { data: accounts, isLoading } = useAccounts();
+  const createAccount = useCreateAccount();
+  const updateAccount = useUpdateAccount();
+  const deleteAccount = useDeleteAccount();
+
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  const startEdit = (id: string, name: string) => {
+    setEditId(id);
+    setEditName(name);
+    setError('');
+  };
+
+  const saveEdit = () => {
+    if (!editId || !editName.trim()) return;
+    updateAccount.mutate({ id: editId, name: editName.trim() }, {
+      onSuccess: () => { setEditId(null); setError(''); },
+      onError: (e: Error) => setError(e.message),
+    });
+  };
+
+  const handleAdd = () => {
+    if (!newName.trim()) return;
+    createAccount.mutate(newName.trim(), {
+      onSuccess: () => { setNewName(''); setShowAdd(false); setError(''); },
+      onError: (e: Error) => setError(e.message),
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    deleteAccount.mutate(id, {
+      onSuccess: () => { setDeleteConfirmId(null); setError(''); },
+      onError: (e: Error) => { setError(e.message); setDeleteConfirmId(null); },
+    });
+  };
+
+  return (
+    <SettingsCard
+      title="Accounts"
+      subtitle="Manage up to 5 accounts. Each gets its own calendar and running balance."
+      accent="bg-gradient-to-r from-cyan-500 to-teal-500"
+    >
+      {isLoading && (
+        <div className="flex flex-col gap-2 mb-3">
+          {[1, 2].map((i) => <div key={i} className="h-10 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse" />)}
+        </div>
+      )}
+
+      {error && (
+        <p className="text-xs text-red-500 mb-2">{error}</p>
+      )}
+
+      <div className="flex flex-col gap-2 mb-3">
+        {accounts?.map((acct) => (
+          <div key={acct.id} className="group flex items-center gap-2 p-2.5 rounded-xl border border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02]">
+            {editId === acct.id ? (
+              <>
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') setEditId(null); }}
+                  autoFocus
+                  className="flex-1 min-w-0 h-8 px-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400"
+                />
+                <button
+                  type="button"
+                  onClick={saveEdit}
+                  disabled={updateAccount.isPending}
+                  className="h-8 px-3 rounded-lg bg-teal-500 text-white text-xs font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditId(null)}
+                  className="h-8 px-2 rounded-lg text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white text-xs transition-all"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : deleteConfirmId === acct.id ? (
+              <>
+                <p className="flex-1 text-xs font-medium text-red-600 dark:text-red-400">Delete "{acct.name}" and all its transactions?</p>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(acct.id)}
+                  disabled={deleteAccount.isPending}
+                  className="h-7 px-2.5 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-all disabled:opacity-50"
+                >
+                  {deleteAccount.isPending ? '…' : 'Delete'}
+                </button>
+                <button type="button" onClick={() => setDeleteConfirmId(null)} className="text-slate-400 dark:text-white/40 hover:text-slate-600 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0" />
+                <span className="flex-1 text-sm font-medium text-slate-800 dark:text-white/90 truncate">{acct.name}</span>
+                {/* Edit button */}
+                <button
+                  type="button"
+                  onClick={() => startEdit(acct.id, acct.name)}
+                  className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                  title="Rename"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                {/* Delete button — only show if more than 1 account */}
+                {(accounts?.length ?? 0) > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmId(acct.id)}
+                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                    title="Delete account"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {showAdd ? (
+        <div className="flex gap-2">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') { setShowAdd(false); setNewName(''); } }}
+            placeholder="Account name"
+            autoFocus
+            className="flex-1 min-w-0 h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400 placeholder:text-slate-400 dark:placeholder:text-white/30"
+          />
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={createAccount.isPending || !newName.trim()}
+            className="h-9 px-4 rounded-xl bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
+          >
+            {createAccount.isPending ? '…' : 'Add'}
+          </button>
+          <button type="button" onClick={() => { setShowAdd(false); setNewName(''); }} className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
+            Cancel
+          </button>
+        </div>
+      ) : (accounts?.length ?? 0) < 5 ? (
+        <AddRowBtn
+          label="Add account"
+          accentHover="hover:border-teal-400/60 hover:text-teal-600 dark:hover:text-teal-400"
+          onClick={() => { setShowAdd(true); setError(''); }}
+        />
+      ) : (
+        <p className="text-xs text-slate-400 dark:text-white/30 text-center">Maximum of 5 accounts reached</p>
+      )}
+    </SettingsCard>
+  );
+}
+
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function SettingsShell() {
   return (
     <AppLayout>
-    <div className="min-h-screen bg-[#edf1f9] dark:bg-[#050911]">
+    <div className="min-h-screen bg-[#F7FAF9] dark:bg-[#0C1F1E]">
       {/* Ambient glow */}
       <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-indigo-100/60 via-violet-50/20 to-transparent dark:from-indigo-950/25 dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#050911]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
+      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 dark:via-indigo-400/40 to-transparent" />
-        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
           {/* Hamburger — mobile only */}
           <NavMenuButton />
+          <MobileLogo />
 
-          {/* Page title — mobile only */}
-          <h1 className="lg:hidden text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">Settings</h1>
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Settings</h1>
@@ -790,7 +960,7 @@ export function SettingsShell() {
           {/* Back button — mobile only (desktop uses sidebar) */}
           <Link
             href="/dashboard"
-            className="lg:hidden flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all"
+            className="lg:hidden ml-auto flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -802,6 +972,7 @@ export function SettingsShell() {
 
       {/* Content — 2 columns on lg+ */}
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <AccountsSection />
         <TagsSection />
         <TemplatesSection />
         <PreferencesSection />

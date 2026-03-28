@@ -27,6 +27,7 @@ export type CurrencyCode =
 export interface Transaction {
   id: string;
   user_id: string;
+  account_id?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;
@@ -71,6 +72,7 @@ export interface DailyBalanceCache {
 export interface DayTransaction {
   id: string;
   transaction_id: string;
+  account_id?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;
@@ -140,6 +142,15 @@ export interface Account {
   type: AccountType;
   balance: number;
   note?: string;
+}
+
+// Supabase-backed account for multi-account dashboard support
+export interface BudgetAccount {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TagBudget {

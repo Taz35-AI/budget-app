@@ -51,9 +51,10 @@ interface Props {
   isLoading?: boolean;
   symbol: string;
   lockType?: boolean;
+  compact?: boolean;
 }
 
-export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType }: Props) {
+export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact }: Props) {
   // Back-compute recurrences from an existing end_date so the field pre-fills on edit
   const initialRecurrences = (() => {
     if (!initialValues?.end_date || !initialValues?.start_date || !initialValues?.frequency) return '';
@@ -128,12 +129,12 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         }
         onSubmit({ ...rest, end_date } as TransactionFormValues);
       })}
-      className="flex flex-col gap-4"
+      className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-4')}
     >
       {/* Template chips */}
       {templates.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30">Quick fill</p>
+        <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
+          <p className={cn('font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25', compact ? 'text-[9px]' : 'text-[10px]')}>Quick fill</p>
           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
             {templates.map((tpl) => (
               <button
@@ -147,10 +148,13 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
                   setValue('tag', tpl.tag ?? '');
                   if (tpl.frequency) setValue('frequency', tpl.frequency);
                 }}
-                className="flex-shrink-0 flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-xs font-medium text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all"
+                className={cn(
+                  'flex-shrink-0 flex items-center gap-1 rounded-lg border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all',
+                  compact ? 'h-6 px-2 text-[10px]' : 'h-7 px-2.5 text-xs',
+                )}
               >
                 {tpl.tag && allTags[tpl.tag] && (
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: allTags[tpl.tag].color }} />
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: allTags[tpl.tag].color }} />
                 )}
                 {tpl.name}
               </button>
@@ -158,18 +162,20 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
           </div>
         </div>
       )}
+
       {/* Category toggle */}
-      <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+      <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
         {(['income', 'expense'] as const).map((cat) => (
           <label
             key={cat}
             className={cn(
-              'flex-1 flex items-center justify-center h-10 text-sm font-medium cursor-pointer transition-all',
+              'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+              compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
               category === cat
                 ? cat === 'income'
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-red-500 text-white'
-                : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+                  ? 'bg-brand-positive text-white shadow-inner'
+                  : 'bg-brand-danger text-white shadow-inner'
+                : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
             )}
           >
             <input type="radio" value={cat} {...register('category')} className="sr-only" />
@@ -182,13 +188,16 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       {lockType ? (
         <input type="hidden" {...register('type')} />
       ) : (
-        <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+        <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
           {(['one_off', 'recurring'] as const).map((t) => (
             <label
               key={t}
               className={cn(
-                'flex-1 flex items-center justify-center h-10 text-sm font-medium cursor-pointer transition-all',
-                type === t ? 'bg-slate-900 text-white' : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
+                'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
+                type === t
+                  ? 'bg-brand-primary text-white shadow-inner'
+                  : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
               )}
             >
               <input type="radio" value={t} {...register('type')} className="sr-only" />
@@ -203,6 +212,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         label="Description"
         placeholder="e.g. Monthly salary"
         error={errors.name?.message}
+        className={compact ? 'h-7 text-[11px]' : undefined}
         {...register('name')}
       />
 
@@ -215,13 +225,14 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         placeholder="0.00"
         prefix={symbol}
         error={errors.amount?.message}
+        className={compact ? 'h-7 text-[11px]' : undefined}
         {...register('amount')}
       />
 
-      {/* Tag picker — filtered to match the selected income/expense */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
-        <div className="flex flex-wrap gap-1.5">
+      {/* Tag picker */}
+      <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-2')}>
+        <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>Category (optional)</p>
+        <div className={cn('flex flex-wrap', compact ? 'gap-1' : 'gap-1.5')}>
           {Object.entries(allTags)
             .filter(([, t]) => t.category === category || t.category === 'both')
             .map(([key, { label, color }]) => {
@@ -232,14 +243,15 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
                   type="button"
                   onClick={() => setValue('tag', isSelected ? '' : key)}
                   className={cn(
-                    'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all border',
+                    'flex items-center gap-1 rounded-lg font-medium transition-all border',
+                    compact ? 'px-1.5 py-0.5 text-[9px]' : 'px-2.5 py-1 text-xs',
                     isSelected
-                      ? 'text-white border-transparent'
-                      : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/10',
+                      ? 'text-white border-transparent shadow-sm'
+                      : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/65 dark:text-white/55 hover:border-brand-primary/30 dark:hover:border-brand-primary/30 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
                   )}
                   style={isSelected ? { backgroundColor: color } : undefined}
                 >
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                   {label}
                 </button>
               );
@@ -253,13 +265,13 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
           label="Date"
           type="date"
           error={errors.date?.message}
+          className={compact ? 'h-7 text-[11px]' : undefined}
           {...register('date')}
         />
       )}
 
       {type === 'recurring' && (
         <>
-          {/* start_date is silently set to the clicked day — no need to show it */}
           <input type="hidden" {...register('start_date')} />
           <Select
             id="frequency"
@@ -277,10 +289,11 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
               step="1"
               placeholder="e.g. 12  — leave blank to repeat forever"
               error={errors.recurrences?.message}
+              className={compact ? 'h-7 text-[11px]' : undefined}
               {...register('recurrences')}
             />
             {computedEndDate && (
-              <p className="text-xs text-slate-400 dark:text-white/40 pl-1">
+              <p className={cn('text-brand-text/40 dark:text-white/35 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
                 Last occurrence: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
               </p>
             )}
@@ -288,11 +301,11 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         </>
       )}
 
-      <div className="flex gap-2 pt-2">
-        <Button type="submit" loading={isLoading} className="flex-1">
+      <div className={cn('flex gap-2', compact ? 'pt-1' : 'pt-2')}>
+        <Button type="submit" size={compact ? 'sm' : 'md'} loading={isLoading} className="flex-1">
           {initialValues ? 'Save changes' : 'Add transaction'}
         </Button>
-        <Button type="button" variant="ghost" onClick={onCancel}>
+        <Button type="button" size={compact ? 'sm' : 'md'} variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
       </div>

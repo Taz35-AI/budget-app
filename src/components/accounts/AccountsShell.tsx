@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useCurrency } from '@/hooks/useCurrency';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { NavMenuButton } from '@/components/layout/NavSidebar';
+import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
@@ -113,15 +113,16 @@ export function AccountsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#edf1f9] dark:bg-[#050911]">
+      <div className="min-h-screen bg-[#F7FAF9] dark:bg-[#0C1F1E]">
         {/* Ambient glow */}
         <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-blue-100/50 via-indigo-50/20 to-transparent dark:from-blue-950/20 dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#050911]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
+        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
           <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
-            <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Accounts</h1>
+            <MobileLogo />
+            <h1 className="hidden lg:block text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Accounts</h1>
             <div className="ml-auto">
               <Button size="sm" onClick={openAdd}>
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -135,7 +136,7 @@ export function AccountsShell() {
 
         <div className="px-4 sm:px-6 py-6 flex flex-col gap-5 max-w-2xl">
           {/* Net worth card */}
-          <div className="bg-gradient-to-br from-[#154265] to-[#0f3050] rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-br from-[#16302F] to-[#0f3050] rounded-2xl p-6 text-white">
             <p className="text-xs font-bold uppercase tracking-widest text-white/50 mb-1">Net Worth</p>
             <p className={cn('text-4xl font-extrabold tracking-tight', netWorth < 0 ? 'text-red-300' : 'text-white')}>
               {formatAmount(netWorth)}

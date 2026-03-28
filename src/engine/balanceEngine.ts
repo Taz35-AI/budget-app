@@ -20,6 +20,8 @@ export interface ComputeOptions {
   fromDate?: string;
   /** Compute up to this date (default: today + 7 years) */
   toDate?: string;
+  /** Seed the running balance instead of starting from 0 (used by applyDelta) */
+  initialBalance?: number;
 }
 
 /**
@@ -68,7 +70,7 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
   const balances = new Map<string, number>();
   const dayTransactions = new Map<string, DayTransaction[]>();
 
-  let runningBalance = 0;
+  let runningBalance = options.initialBalance ?? 0;
   let cursor = new Date(startDate);
 
   while (cursor <= endDate) {
@@ -91,6 +93,7 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
         txsToday.push({
           id: `${tx.id}_${dateStr}`,
           transaction_id: tx.id,
+          account_id: tx.account_id ?? null,
           name: tx.name,
           amount: tx.amount,
           category: tx.category,
@@ -119,12 +122,13 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
       const sign = resolved.category === 'income' ? 1 : -1;
       dayNet += sign * resolved.amount;
 
-      // Check if this day uses an exception override
-      const hasException = excList.some((e) => e.effective_from <= dateStr);
+      // Check if this day uses a non-deleted exception override
+      const hasException = excList.some((e) => e.effective_from <= dateStr && !e.is_deleted);
 
       txsToday.push({
         id: `${tx.id}_${dateStr}`,
         transaction_id: tx.id,
+        account_id: tx.account_id ?? null,
         name: resolved.name,
         amount: resolved.amount,
         category: resolved.category,
@@ -144,6 +148,64 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
     }
 
     cursor = addDays(cursor, 1);
+  }
+
+  return { balances, dayTransactions };
+}
+
+/**
+ * Incrementally recomputes balances from `fromDate` forward, reusing the
+ * existing Maps for all dates before that point.
+ *
+ * Instead of iterating from the very first transaction, we:
+ *   1. Copy all existing entries for dates < fromDate (O(k) copy, no computation)
+ *   2. Seed the running balance from the entry at fromDate-1
+ *   3. Run the loop only from fromDate → toDate
+ *
+ * This is O(toDate - fromDate) rather than O(toDate - firstEverTransaction).
+ */
+export function applyDelta(prev: BalanceMap, options: ComputeOptions & { fromDate: string }): BalanceMap {
+  const { fromDate } = options;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const toDate = options.toDate ?? format(addDays(today, SEVEN_YEARS_DAYS), 'yyyy-MM-dd');
+
+  // ── 1. Copy existing entries that are before the affected range ──────────
+  const balances = new Map<string, number>();
+  const dayTransactions = new Map<string, DayTransaction[]>();
+
+  for (const [date, balance] of prev.balances) {
+    if (date < fromDate) balances.set(date, balance);
+  }
+  for (const [date, txs] of prev.dayTransactions) {
+    if (date < fromDate) dayTransactions.set(date, txs);
+  }
+
+  // ── 2. Seed running balance from the day before fromDate ─────────────────
+  const prevDay = format(addDays(new Date(fromDate + 'T12:00:00'), -1), 'yyyy-MM-dd');
+  const initialBalance = balances.get(prevDay) ?? 0;
+
+  // ── 3. Run the loop from fromDate onward ──────────────────────────────────
+  const delta = computeBalances({
+    ...options,
+    fromDate,
+    toDate,
+    initialBalance,
+  });
+
+  // ── 4. Merge: delta entries override anything from fromDate onward ────────
+  for (const [date, balance] of delta.balances) {
+    balances.set(date, balance);
+  }
+  for (const [date, txs] of delta.dayTransactions) {
+    dayTransactions.set(date, txs);
+  }
+  // Remove stale dayTransaction entries that no longer exist in the recomputed range
+  for (const [date] of prev.dayTransactions) {
+    if (date >= fromDate && !delta.dayTransactions.has(date)) {
+      dayTransactions.delete(date);
+    }
   }
 
   return { balances, dayTransactions };
