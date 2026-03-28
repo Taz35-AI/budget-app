@@ -28,21 +28,35 @@ interface TagDropdownProps {
 
 function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
   const ref = React.useRef<HTMLDivElement>(null);
+  const searchRef = React.useRef<HTMLInputElement>(null);
 
   // Close on outside click
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const filteredTags = Object.entries(allTags).filter(
+  // Focus search input when dropdown opens
+  React.useEffect(() => {
+    if (open) setTimeout(() => searchRef.current?.focus(), 50);
+    else setSearch('');
+  }, [open]);
+
+  const allForCategory = Object.entries(allTags).filter(
     ([, t]) => t.category === category || t.category === 'both',
   );
+  const filteredTags = search
+    ? allForCategory.filter(([, t]) => t.label.toLowerCase().includes(search.toLowerCase()))
+    : allForCategory;
   const selectedTag = selected ? allTags[selected] : null;
 
   return (
@@ -89,7 +103,31 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
       {/* Dropdown panel */}
       {open && (
         <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] shadow-lg overflow-hidden">
-          <ul className="max-h-44 overflow-y-auto divide-y divide-brand-primary/[0.06] dark:divide-white/[0.04]">
+          {/* Search input */}
+          <div className="px-2.5 py-2 border-b border-brand-primary/[0.06] dark:border-white/[0.04]">
+            <div className="relative">
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-brand-text/30 dark:text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                ref={searchRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search…"
+                className={cn(
+                  'w-full pl-7 pr-2 rounded-lg bg-brand-primary/5 dark:bg-white/5 border border-transparent focus:border-brand-primary/25 text-brand-text dark:text-white/90 placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none',
+                  compact ? 'h-6 text-[10px]' : 'h-7 text-xs',
+                )}
+              />
+            </div>
+          </div>
+          <ul className="max-h-40 overflow-y-auto divide-y divide-brand-primary/[0.06] dark:divide-white/[0.04]">
+            {filteredTags.length === 0 && (
+              <li className={cn('px-3 text-brand-text/35 dark:text-white/30 italic', compact ? 'py-2 text-[10px]' : 'py-2.5 text-xs')}>
+                No categories match
+              </li>
+            )}
             {filteredTags.map(([key, { label, color }]) => {
               const isSelected = selected === key;
               return (

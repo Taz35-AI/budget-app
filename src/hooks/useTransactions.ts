@@ -80,11 +80,14 @@ export function useCreateTransaction(accountId?: string) {
       });
     },
     onError: (_err, _vars, ctx) => {
+      // TypeError = network failure. Keep the optimistic entry — useOfflineCreate
+      // will queue it for sync when connectivity returns.
+      if (_err instanceof TypeError) return;
       if (ctx?.prev) qc.setQueryData(QK, ctx.prev);
     },
-    onSettled: () => {
-      // Mark stale so next focus/navigation re-fetches, but don't re-fetch now
-      // (avoids the visible flash caused by a second computeBalances run)
+    onSettled: (_data, err) => {
+      // Don't invalidate on network errors — the optimistic entry stays until synced
+      if (err instanceof TypeError) return;
       qc.invalidateQueries({ queryKey: QK, refetchType: 'none' });
     },
   });

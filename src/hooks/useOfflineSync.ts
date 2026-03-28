@@ -3,9 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useOfflineQueueStore } from '@/store/offlineQueueStore';
-import type { TransactionsData } from '@/hooks/useTransactions';
-
-const QK = ['transactions'] as const;
 
 export function useOfflineSync() {
   const [isOnline, setIsOnline] = useState(() =>
@@ -21,6 +18,7 @@ export function useOfflineSync() {
     drainingRef.current = true;
     setIsSyncing(true);
 
+    let syncedAny = false;
     for (const item of [...pending]) {
       try {
         const res = await fetch('/api/transactions', {
@@ -28,24 +26,17 @@ export function useOfflineSync() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...item.values, account_id: item.accountId ?? null }),
         });
-        if (!res.ok) break; // still having issues, stop draining
-        const saved = await res.json();
-
-        // Replace optimistic entry in cache with real data
-        qc.setQueryData<TransactionsData>(QK, (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            transactions: old.transactions.map((t) =>
-              t.id === item.optimisticId ? { ...t, ...saved } : t,
-            ),
-          };
-        });
-
+        if (!res.ok) break; // server error — retry later
         dequeue(item.queueId);
+        syncedAny = true;
       } catch {
-        break; // network error — stop and retry next time we come online
+        break; // network still down — stop draining
       }
+    }
+
+    if (syncedAny) {
+      // Refetch so optimistic entries are replaced with real server data
+      await qc.invalidateQueries({ queryKey: ['transactions'] });
     }
 
     setIsSyncing(false);
@@ -67,7 +58,7 @@ export function useOfflineSync() {
     };
   }, [drain]);
 
-  // Attempt drain on mount in case we queued items before a page reload
+  // Attempt drain on mount in case items were queued before a page reload
   useEffect(() => {
     if (isOnline && pending.length > 0) drain();
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -231,7 +231,7 @@ function TagsSection() {
             <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
             <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{label}</span>
             {isOverridden && <span className="text-[8px] font-bold text-indigo-400 flex-shrink-0">•</span>}
-            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity">
+            <div className="flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 transition-opacity">
               <button type="button" onClick={() => startEdit(key, label, color, TAGS[key]?.category ?? 'both', true)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </button>
@@ -305,7 +305,7 @@ function TagsSection() {
                 )}>
                   {(tag.category ?? 'expense') === 'both' ? '±' : (tag.category ?? 'expense') === 'income' ? '+' : '−'}
                 </span>
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity">
+                <div className="flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 transition-opacity">
                   <button type="button" onClick={() => startEdit(tag.id, tag.label, tag.color, tag.category ?? 'expense', false)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   </button>
