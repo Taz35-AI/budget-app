@@ -15,6 +15,118 @@ import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/
 import type { TransactionFormValues, Transaction, Frequency } from '@/types';
 import { cn } from '@/lib/utils';
 
+// ─── Tag dropdown ─────────────────────────────────────────────────────────────
+
+interface TagDropdownProps {
+  allTags: Record<string, { label: string; color: string; category: string }>;
+  category: 'income' | 'expense';
+  selected: string;
+  onSelect: (key: string) => void;
+  error?: string;
+  compact?: boolean;
+}
+
+function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const filteredTags = Object.entries(allTags).filter(
+    ([, t]) => t.category === category || t.category === 'both',
+  );
+  const selectedTag = selected ? allTags[selected] : null;
+
+  return (
+    <div ref={ref} className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
+      <div className="flex items-center justify-between">
+        <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
+          Category
+        </p>
+        {error && (
+          <p className={cn('text-brand-danger', compact ? 'text-[9px]' : 'text-xs')}>{error}</p>
+        )}
+      </div>
+
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          'w-full flex items-center gap-2 rounded-xl border transition-all',
+          compact ? 'h-7 px-2.5 text-[11px]' : 'h-10 px-3 text-sm',
+          error
+            ? 'border-brand-danger/40 bg-red-50 dark:bg-red-900/10'
+            : open
+            ? 'border-brand-primary/40 bg-brand-primary/5 dark:bg-brand-primary/10'
+            : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928]',
+        )}
+      >
+        {selectedTag ? (
+          <>
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: selectedTag.color }} />
+            <span className="flex-1 text-left font-medium text-brand-text dark:text-white/90 truncate">{selectedTag.label}</span>
+          </>
+        ) : (
+          <span className="flex-1 text-left text-brand-text/40 dark:text-white/35">Select category…</span>
+        )}
+        <svg
+          className={cn('w-3.5 h-3.5 text-brand-text/30 dark:text-white/25 flex-shrink-0 transition-transform', open && 'rotate-180')}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] shadow-lg overflow-hidden">
+          <ul className="max-h-44 overflow-y-auto divide-y divide-brand-primary/[0.06] dark:divide-white/[0.04]">
+            {filteredTags.map(([key, { label, color }]) => {
+              const isSelected = selected === key;
+              return (
+                <li key={key}>
+                  <button
+                    type="button"
+                    onClick={() => { onSelect(key); setOpen(false); }}
+                    className={cn(
+                      'w-full flex items-center gap-2.5 px-3 transition-colors',
+                      compact ? 'h-8 text-[11px]' : 'h-9 text-sm',
+                      isSelected
+                        ? 'bg-brand-primary/8 dark:bg-brand-primary/12'
+                        : 'hover:bg-brand-primary/5 dark:hover:bg-brand-primary/8',
+                    )}
+                  >
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                    <span className={cn('flex-1 text-left truncate', isSelected ? 'font-semibold text-brand-primary' : 'font-medium text-brand-text/80 dark:text-white/75')}>
+                      {label}
+                    </span>
+                    {isSelected && (
+                      <svg className="w-3.5 h-3.5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Schema ───────────────────────────────────────────────────────────────────
+
 const schema = z
   .object({
     name: z.string().min(1, 'Name is required'),
@@ -278,40 +390,15 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         )}
       </div>
 
-      {/* Tag picker */}
-      <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-2')}>
-        <div className="flex items-center justify-between">
-          <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>Category</p>
-          {errors.tag?.message && (
-            <p className={cn('text-brand-danger', compact ? 'text-[9px]' : 'text-xs')}>{errors.tag.message}</p>
-          )}
-        </div>
-        <div className={cn('flex flex-wrap', compact ? 'gap-1' : 'gap-1.5')}>
-          {Object.entries(allTags)
-            .filter(([, t]) => t.category === category || t.category === 'both')
-            .map(([key, { label, color }]) => {
-              const isSelected = tag === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setValue('tag', key)}
-                  className={cn(
-                    'flex items-center gap-1 rounded-lg font-medium transition-all border',
-                    compact ? 'px-1.5 py-0.5 text-[9px]' : 'px-2.5 py-1 text-xs',
-                    isSelected
-                      ? 'text-white border-transparent shadow-sm'
-                      : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/65 dark:text-white/55 hover:border-brand-primary/30 dark:hover:border-brand-primary/30 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
-                  )}
-                  style={isSelected ? { backgroundColor: color } : undefined}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                  {label}
-                </button>
-              );
-            })}
-        </div>
-      </div>
+      {/* Tag picker — scrollable dropdown */}
+      <TagDropdown
+        allTags={allTags}
+        category={category}
+        selected={tag ?? ''}
+        onSelect={(key) => setValue('tag', key)}
+        error={errors.tag?.message}
+        compact={compact}
+      />
 
       {type === 'one_off' && (
         <Input

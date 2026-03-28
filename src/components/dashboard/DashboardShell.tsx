@@ -3,11 +3,10 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth, addDays } from 'date-fns';
-import { useQueryClient } from '@tanstack/react-query';
 import { useBalances } from '@/hooks/useBalances';
 import { useCurrency } from '@/hooks/useCurrency';
-import { useCreateTransaction, useTransactions } from '@/hooks/useTransactions';
-import type { TransactionsData } from '@/hooks/useTransactions';
+import { useTransactions } from '@/hooks/useTransactions';
+import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { useAccounts } from '@/hooks/useAccounts';
 import { CalendarView } from './CalendarView';
 import type { CalendarNavHandle } from './CalendarView';
@@ -23,7 +22,6 @@ import { useSettings } from '@/hooks/useSettings';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
-import { useOfflineQueueStore } from '@/store/offlineQueueStore';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -99,7 +97,7 @@ export function DashboardShell() {
     setDesktopFormAccountId(activeAccountId !== 'combined' ? activeAccountId : accounts?.[0]?.id);
   }, [activeAccountId, accounts, isAdding]);
 
-  const create = useCreateTransaction(desktopFormAccountId);
+  const create = useOfflineCreate(desktopFormAccountId);
 
   const { todayBalance, monthIncome, monthExpense, monthNet } = useMonthStats(
     balances, dayTransactions, visibleMonth,
@@ -108,8 +106,6 @@ export function DashboardShell() {
   const { firstDayOfWeek } = useSettings();
   const { impact, notification } = useHaptics();
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
-  const enqueue = useOfflineQueueStore((s) => s.enqueue);
-  const qc = useQueryClient();
   useLocalNotifications({
     transactions: txData?.transactions ?? [],
     monthExpense,
@@ -499,44 +495,7 @@ export function DashboardShell() {
                       onCancel={handleCancelAdd}
                       isLoading={create.isPending}
                       onSubmit={(values: TransactionFormValues) => {
-                        if (!navigator.onLine) {
-                          const optimisticId = `optimistic-${Date.now()}`;
-                          // Add to React Query cache immediately so UI updates
-                          qc.setQueryData<TransactionsData>(['transactions'], (old) => {
-                            if (!old) return old;
-                            return {
-                              ...old,
-                              transactions: [...old.transactions, {
-                                id: optimisticId,
-                                user_id: '',
-                                account_id: desktopFormAccountId ?? null,
-                                name: values.name,
-                                amount: Number(values.amount),
-                                category: values.category,
-                                type: values.type ?? 'one_off',
-                                date: values.date ?? null,
-                                start_date: values.start_date ?? null,
-                                frequency: values.frequency ?? null,
-                                end_date: values.end_date ?? null,
-                                tag: values.tag ?? null,
-                                created_at: new Date().toISOString(),
-                                updated_at: new Date().toISOString(),
-                              }],
-                            };
-                          });
-                          enqueue({
-                            queueId: `q-${Date.now()}-${Math.random()}`,
-                            values,
-                            accountId: desktopFormAccountId ?? null,
-                            optimisticId,
-                            queuedAt: new Date().toISOString(),
-                          });
-                          notification('success');
-                          handleCancelAdd();
-                          return;
-                        }
-                        create.reset();
-                        create.mutate(values, {
+                        create.submit(values, {
                           onSuccess: () => {
                             notification('success');
                             handleCancelAdd();

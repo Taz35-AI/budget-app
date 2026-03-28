@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
-import { useCreateTransaction } from '@/hooks/useTransactions';
+import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { cn } from '@/lib/utils';
 import type { BudgetAccount, DayTransaction, TransactionFormValues } from '@/types';
 
@@ -50,7 +50,7 @@ export function DayBottomSheet({
     setFormAccountId(accountId ?? accounts?.[0]?.id);
   }, [accountId, accounts, isAdding]);
 
-  const create = useCreateTransaction(formAccountId);
+  const create = useOfflineCreate(formAccountId);
   const showAccountPicker = (accounts?.length ?? 0) >= 2;
   const isOpen = date !== null;
 
@@ -183,8 +183,7 @@ export function DayBottomSheet({
                   onCancel={onCancelAdd}
                   isLoading={create.isPending}
                   onSubmit={(values: TransactionFormValues) => {
-                    create.reset();
-                    create.mutate(values, { onSuccess: onCancelAdd });
+                    create.submit(values, { onSuccess: onCancelAdd });
                   }}
                 />
               </>
