@@ -107,7 +107,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           date: (updates.date as string) || original.date,
           start_date: (updates.start_date as string) || original.start_date,
           end_date: (updates.end_date as string) || null,
-          frequency: (updates.frequency as string) || original.frequency,\n          account_id: 'account_id' in updates ? (updates.account_id as string | null) : original.account_id,
+          frequency: (updates.frequency as string) || original.frequency,
+          account_id: 'account_id' in updates ? (updates.account_id as string | null) : original.account_id,
         })
         .eq('id', id)
         .select()
