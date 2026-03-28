@@ -5,7 +5,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 
 export function ResetAllButton() {
-  const [step, setStep] = useState<'idle' | 'confirm1' | 'confirm2'>('idle');
+  const [open, setOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const qc = useQueryClient();
 
   const mutation = useMutation({
@@ -17,14 +18,17 @@ export function ResetAllButton() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions'] });
       qc.invalidateQueries({ queryKey: ['balance-reset'] });
-      setStep('idle');
+      setOpen(false);
+      setConfirmed(false);
     },
   });
 
-  if (step === 'idle') {
-    return (
+  const handleClose = () => { setOpen(false); setConfirmed(false); };
+
+  return (
+    <>
       <button
-        onClick={() => setStep('confirm1')}
+        onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-brand-danger/6 dark:bg-brand-danger/10 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 text-brand-danger/70 dark:text-brand-danger/80 hover:text-brand-danger text-sm font-medium transition-all border border-brand-danger/15 dark:border-brand-danger/20 hover:border-brand-danger/30"
         title="Reset all data"
       >
@@ -33,46 +37,66 @@ export function ResetAllButton() {
         </svg>
         <span className="hidden sm:inline">Reset All</span>
       </button>
-    );
-  }
 
-  if (step === 'confirm1') {
-    return (
-      <div className="flex items-center gap-2 bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 rounded-xl px-3 py-1.5">
-        <span className="text-red-600 dark:text-red-400 text-xs font-medium">Delete all data?</span>
-        <button
-          onClick={() => setStep('confirm2')}
-          className="h-6 px-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-all"
-        >
-          Yes
-        </button>
-        <button onClick={() => setStep('idle')} className="text-brand-text/30 dark:text-white/30 hover:text-brand-text dark:hover:text-white transition-colors">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    );
-  }
+      {open && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
+          <div
+            className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#122928] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Reset All Data</p>
+                <p className="text-xs text-slate-400 dark:text-white/40 mt-0.5">This will permanently delete all transactions and resets.</p>
+              </div>
+              <button onClick={handleClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white/70 hover:bg-slate-100 dark:hover:bg-white/8 transition-all flex-shrink-0">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-  return (
-    <div className="flex items-center gap-2 bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-500/40 rounded-xl px-3 py-1.5">
-      <span className="text-red-600 dark:text-red-300 text-xs font-semibold">⚠ Cannot be undone</span>
-      <button
-        onClick={() => mutation.mutate()}
-        disabled={mutation.isPending}
-        className={cn(
-          'h-6 px-2 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-all',
-          mutation.isPending && 'opacity-60',
-        )}
-      >
-        {mutation.isPending ? 'Deleting…' : 'CONFIRM DELETE'}
-      </button>
-      <button onClick={() => setStep('idle')} className="text-brand-text/30 dark:text-white/30 hover:text-brand-text dark:hover:text-white transition-colors">
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+            {!confirmed ? (
+              <div className="flex gap-2 mt-3">
+                <button onClick={handleClose} className="flex-1 h-9 rounded-xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold border border-slate-200 dark:border-white/10 transition-all">
+                  Cancel
+                </button>
+                <button
+                  onClick={() => setConfirmed(true)}
+                  className="flex-1 h-9 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all"
+                >
+                  Delete all
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 mb-3">
+                  <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <p className="text-xs font-semibold text-red-700 dark:text-red-400">Cannot be undone. Are you sure?</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={handleClose} className="flex-1 h-9 rounded-xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold border border-slate-200 dark:border-white/10 transition-all">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => mutation.mutate()}
+                    disabled={mutation.isPending}
+                    className={cn(
+                      'flex-1 h-9 rounded-xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-all',
+                      mutation.isPending && 'opacity-60',
+                    )}
+                  >
+                    {mutation.isPending ? 'Deleting…' : 'Yes, delete all'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
+    </>
   );
 }

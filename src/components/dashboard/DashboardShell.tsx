@@ -307,33 +307,33 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
-              <div className="px-4 pt-4 pb-3 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">Balance Today</span>
+              <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
+                <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1">Balance Today</span>
                 <span className={cn(
-                  'text-[1.75rem] font-black tabular-nums leading-none tracking-tight block',
+                  'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
               </div>
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
-                <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">{format(visibleMonth, 'MMM')} Inc</span>
-                  <span className="text-base font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
+                <div className="flex-1 px-2.5 py-2 min-w-0">
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Inc</span>
+                  <span className="text-sm font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
                 </div>
-                <div className="flex-1 px-3 py-2.5 min-w-0 relative">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">{format(visibleMonth, 'MMM')} Exp</span>
-                  <span className="text-base font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
+                <div className="flex-1 px-2.5 py-2 min-w-0 relative">
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Exp</span>
+                  <span className="text-sm font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
                   {clampedBudgetPct !== undefined && (
                     <div className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-primary/8">
                       <div className={cn('h-full', budgetDanger ? 'bg-brand-danger' : 'bg-brand-positive')} style={{ width: `${clampedBudgetPct}%` }} />
                     </div>
                   )}
                 </div>
-                <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">{format(visibleMonth, 'MMM')} Net</span>
+                <div className="flex-1 px-2.5 py-2 min-w-0">
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Net</span>
                   <span className={cn(
-                    'text-base font-black tabular-nums truncate block',
+                    'text-sm font-black tabular-nums truncate block',
                     monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                   )}>
                     {(monthNet >= 0 ? '+' : '') + formatAmount(monthNet)}

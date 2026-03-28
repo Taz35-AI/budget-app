@@ -875,7 +875,7 @@ function AccountsSection() {
                 <button
                   type="button"
                   onClick={() => startEdit(acct.id, acct.name)}
-                  className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                  className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
                   title="Rename"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -887,7 +887,7 @@ function AccountsSection() {
                   <button
                     type="button"
                     onClick={() => setDeleteConfirmId(acct.id)}
-                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                    className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all flex-shrink-0"
                     title="Delete account"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
