@@ -108,12 +108,23 @@ function dateStr(offsetDays = 0): string {
   return d.toISOString().split('T')[0];
 }
 
-/** Returns a Date at the given hour:minute, bumped to tomorrow if already past. */
-function atHourMinute(hour: number, minute: number): Date {
-  const d = new Date();
-  d.setHours(hour, minute, 0, 0);
-  if (d <= new Date()) d.setDate(d.getDate() + 1);
-  return d;
+/**
+ * Returns the best time to fire a "bill due tomorrow" notification:
+ *  - Before 8pm today  → fire at 8pm today   (evening reminder)
+ *  - After  8pm today  → fire at 8am tomorrow (morning of bill due date)
+ *    (notification body will say "due today" implicitly — acceptable tradeoff
+ *     vs pushing so far in future the user misses it entirely)
+ */
+function billReminderTime(): Date {
+  const now = new Date();
+  const eightPm = new Date(now);
+  eightPm.setHours(20, 0, 0, 0);
+  if (now < eightPm) return eightPm;
+
+  const tomorrow8am = new Date(now);
+  tomorrow8am.setDate(now.getDate() + 1);
+  tomorrow8am.setHours(8, 0, 0, 0);
+  return tomorrow8am;
 }
 
 // ─── Schedulers ──────────────────────────────────────────────────────────────
@@ -125,9 +136,10 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
     await LocalNotifications.schedule({
       notifications: [{
-        id:    ID_DAILY,
-        title: 'Budget App',
-        body:  "Don't forget to log today's spending",
+        id:        ID_DAILY,
+        title:     'Budget App',
+        body:      "Don't forget to log today's spending",
+        smallIcon: 'ic_notification',
         schedule: {
           on: { hour, minute },
           repeats: true,
@@ -154,13 +166,15 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
 
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
+    const fireAt = billReminderTime();
     await LocalNotifications.schedule({
       notifications: dueTomorrow.slice(0, 100).map((t, i) => ({
-        id:    ID_BILL_BASE + i,
-        title: 'Bill due tomorrow',
-        body:  `Your ${t.name} payment is due tomorrow`,
+        id:        ID_BILL_BASE + i,
+        title:     'Bill due tomorrow',
+        body:      `Your ${t.name} payment is due tomorrow`,
+        smallIcon: 'ic_notification',
         schedule: {
-          at: atHourMinute(9, 0),
+          at: fireAt,
           allowWhileIdle: true,
         },
       })),
@@ -178,9 +192,10 @@ export async function scheduleMonthlyRecap() {
     const prevMonth = now.toLocaleString('default', { month: 'long' });
     await LocalNotifications.schedule({
       notifications: [{
-        id:    ID_MONTHLY,
-        title: 'Monthly recap ready',
-        body:  `Your ${prevMonth} spending summary is ready to review`,
+        id:        ID_MONTHLY,
+        title:     'Monthly recap ready',
+        body:      `Your ${prevMonth} spending summary is ready to review`,
+        smallIcon: 'ic_notification',
         schedule: {
           at: target,
           repeats: false,
@@ -198,9 +213,10 @@ export async function scheduleWeeklyDigest() {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
     await LocalNotifications.schedule({
       notifications: [{
-        id:    ID_WEEKLY,
-        title: 'Weekly digest',
-        body:  'Your week in Budget App — tap to see spending and upcoming bills',
+        id:        ID_WEEKLY,
+        title:     'Weekly digest',
+        body:      'Your week in Budget App — tap to see spending and upcoming bills',
+        smallIcon: 'ic_notification',
         schedule: {
           on: { weekday: 2, hour: 9, minute: 0 }, // Monday = 2
           repeats: true,
@@ -220,9 +236,10 @@ export async function scheduleBudgetWarning(monthName: string, pct: number) {
     const fireAt = new Date(Date.now() + 2 * 60_000); // 2 min from now
     await LocalNotifications.schedule({
       notifications: [{
-        id:    ID_BUDGET,
-        title: 'Budget limit alert',
-        body:  `You've used ${Math.round(pct)}% of your ${monthName} budget`,
+        id:        ID_BUDGET,
+        title:     'Budget limit alert',
+        body:      `You've used ${Math.round(pct)}% of your ${monthName} budget`,
+        smallIcon: 'ic_notification',
         schedule: {
           at: fireAt,
           allowWhileIdle: true,

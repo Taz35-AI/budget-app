@@ -8,7 +8,7 @@
  *   - Edge cases: ended transactions, one-off transactions, missing fields
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { firesOnDate } from '@/engine/recurringResolver';
 import type { Transaction } from '@/types';
 
@@ -102,6 +102,50 @@ describe('bill reminder filter (getDueTomorrow)', () => {
 
   it('returns empty array when no transactions are passed', () => {
     expect(getDueTomorrow([], '2026-04-15')).toHaveLength(0);
+  });
+});
+
+// ─── billReminderTime logic ───────────────────────────────────────────────────
+
+/** Mirror of billReminderTime() from notificationScheduler for unit testing */
+function billReminderTime(now: Date): Date {
+  const eightPm = new Date(now);
+  eightPm.setHours(20, 0, 0, 0);
+  if (now < eightPm) return eightPm;
+
+  const tomorrow8am = new Date(now);
+  tomorrow8am.setDate(now.getDate() + 1);
+  tomorrow8am.setHours(8, 0, 0, 0);
+  return tomorrow8am;
+}
+
+describe('billReminderTime', () => {
+  it('returns 8pm today when it is morning', () => {
+    const now = new Date('2026-03-28T09:00:00');
+    const result = billReminderTime(now);
+    expect(result.getHours()).toBe(20);
+    expect(result.getDate()).toBe(28);
+  });
+
+  it('returns 8pm today when it is afternoon', () => {
+    const now = new Date('2026-03-28T15:30:00');
+    const result = billReminderTime(now);
+    expect(result.getHours()).toBe(20);
+    expect(result.getDate()).toBe(28);
+  });
+
+  it('returns 8am tomorrow when it is past 8pm', () => {
+    const now = new Date('2026-03-28T21:00:00');
+    const result = billReminderTime(now);
+    expect(result.getHours()).toBe(8);
+    expect(result.getDate()).toBe(29);
+  });
+
+  it('returns 8am tomorrow on midnight edge', () => {
+    const now = new Date('2026-03-28T23:59:59');
+    const result = billReminderTime(now);
+    expect(result.getHours()).toBe(8);
+    expect(result.getDate()).toBe(29);
   });
 });
 
