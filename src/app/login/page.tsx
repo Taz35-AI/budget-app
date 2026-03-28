@@ -75,7 +75,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/budget-tool.png" alt="Budget App" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-white/40">
             {mode === 'login' ? 'Sign in to your account' : 'Reset your password'}
           </p>
@@ -156,10 +156,10 @@ export default function LoginPage() {
           </p>
         )}
 
-        <p className="text-center text-xs text-white/20 mt-6">
-          <Link href="/terms" className="hover:text-white/40 transition-colors">Terms</Link>
+        <p className="text-center text-xs text-white/40 mt-6">
+          <Link href="/terms" className="hover:text-white/70 underline transition-colors">Terms</Link>
           {' · '}
-          <Link href="/privacy" className="hover:text-white/40 transition-colors">Privacy</Link>
+          <Link href="/privacy" className="hover:text-white/70 underline transition-colors">Privacy</Link>
         </p>
       </div>
     </div>

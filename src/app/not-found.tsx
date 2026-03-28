@@ -7,8 +7,8 @@ export default function NotFound() {
       {/* Logo — hero element */}
       <div className="w-36 h-36 rounded-[2.5rem] overflow-hidden shadow-[0_0_80px_rgba(99,102,241,0.25)] mb-8">
         <Image
-          src="/budget-tool.png?v=2"
-          alt="BudgetTool"
+          src="/budget-tool.png"
+          alt="Budget App"
           width={144}
           height={144}
           className="w-full h-full object-cover"

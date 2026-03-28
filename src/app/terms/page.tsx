@@ -3,7 +3,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — BudgetTool',
+  title: 'Terms of Service — Budget App',
 };
 
 export default function TermsPage() {
@@ -13,10 +13,10 @@ export default function TermsPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={36} height={36} className="w-full h-full object-cover" />
+            <Image src="/budget-tool.png" alt="Budget App" width={36} height={36} className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">BudgetTool</p>
+            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Budget App</p>
             <h1 className="text-xl font-bold text-white leading-none">Terms of Service</h1>
           </div>
         </div>
@@ -26,12 +26,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p>By creating an account or using BudgetTool, you agree to these Terms of Service. If you do not agree, please do not use the service.</p>
+            <p>By creating an account or using Budget App, you agree to these Terms of Service. If you do not agree, please do not use the service.</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">2. Description of Service</h2>
-            <p>BudgetTool is a personal finance dashboard that lets you track income and expenses, view projected balances, and plan your finances. The service is provided as-is for personal, non-commercial use.</p>
+            <p>Budget App is a personal finance dashboard that lets you track income and expenses, view projected balances, and plan your finances. The service is provided as-is for personal, non-commercial use.</p>
           </section>
 
           <section>
@@ -41,7 +41,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">4. Your Data</h2>
-            <p>You own all financial data you enter into BudgetTool. We do not sell, share, or monetise your data. You can delete your account and all associated data at any time by contacting us.</p>
+            <p>You own all financial data you enter into Budget App. We do not sell, share, or monetise your data. You can delete your account and all associated data at any time by contacting us.</p>
           </section>
 
           <section>
@@ -51,12 +51,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">6. Disclaimer of Warranties</h2>
-            <p>BudgetTool is provided &quot;as is&quot; without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that balance projections will be accurate. This tool is for personal planning purposes only and does not constitute financial advice.</p>
+            <p>Budget App is provided &quot;as is&quot; without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that balance projections will be accurate. This tool is for personal planning purposes only and does not constitute financial advice.</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">7. Limitation of Liability</h2>
-            <p>To the fullest extent permitted by law, BudgetTool and its creators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
+            <p>To the fullest extent permitted by law, Budget App and its creators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
           </section>
 
           <section>

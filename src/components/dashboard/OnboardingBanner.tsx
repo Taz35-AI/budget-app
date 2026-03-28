@@ -37,7 +37,7 @@ export function OnboardingBanner({ onAddTransaction }: Props) {
       </div>
 
       <div>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">Welcome to BudgetTool</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">Welcome to Budget App</h2>
         <p className="text-sm text-slate-500 dark:text-white/40 max-w-xs">
           Your calendar is empty. Add your first transaction to start tracking your finances.
         </p>

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — BudgetTool',
+  title: 'Privacy Policy — Budget App',
 };
 
 export default function PrivacyPage() {
@@ -13,10 +13,10 @@ export default function PrivacyPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={36} height={36} className="w-full h-full object-cover" />
+            <Image src="/budget-tool.png" alt="Budget App" width={36} height={36} className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">BudgetTool</p>
+            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Budget App</p>
             <h1 className="text-xl font-bold text-white leading-none">Privacy Policy</h1>
           </div>
         </div>
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">2. How We Use Your Data</h2>
-            <p>Your data is used solely to provide and improve BudgetTool. We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
+            <p>Your data is used solely to provide and improve Budget App. We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
           </section>
 
           <section>
