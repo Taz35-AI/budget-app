@@ -44,6 +44,14 @@
   animation: pulse-slow 2s ease-in-out infinite;
 }
 
+@keyframes swipeHintBlink {
+  0%   { opacity: 0.85 }
+  49%  { opacity: 0 }
+  50%  { opacity: 0.85 }
+  99%  { opacity: 0 }
+  100% { opacity: 0 }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    FullCalendar — brand-aligned fintech overrides
    ═══════════════════════════════════════════════════════════════ */

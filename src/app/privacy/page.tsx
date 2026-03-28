@@ -3,14 +3,14 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Budget App',
+  title: 'Privacy Policy | Budget App',
+  description: 'Read the Budget App privacy policy. We collect only what is necessary, never sell your data, and store everything securely.',
 };
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#0C1F1E] px-4 py-16">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
             <Image src="/budget-tool.png" alt="Budget App" width={36} height={36} className="w-full h-full object-cover" />
@@ -28,9 +28,9 @@ export default function PrivacyPage() {
             <h2 className="text-base font-semibold text-white mb-3">1. What We Collect</h2>
             <p className="mb-2">We collect only what is necessary to provide the service:</p>
             <ul className="list-disc list-inside flex flex-col gap-1.5 ml-1">
-              <li><span className="text-white/80">Email address</span> — used for authentication and password resets.</li>
-              <li><span className="text-white/80">Financial data you enter</span> — transaction names, amounts, categories, dates, and any tags or goals you create.</li>
-              <li><span className="text-white/80">App preferences</span> — currency, theme, date format, and week start day.</li>
+              <li><span className="text-white/80">Email address</span>, used for authentication and password resets.</li>
+              <li><span className="text-white/80">Financial data you enter</span>, including transaction names, amounts, categories, dates, and any tags or goals you create.</li>
+              <li><span className="text-white/80">App preferences</span>, such as currency, theme, date format, and week start day.</li>
             </ul>
           </section>
 
@@ -43,8 +43,8 @@ export default function PrivacyPage() {
             <h2 className="text-base font-semibold text-white mb-3">3. Where Your Data Is Stored</h2>
             <p className="mb-2">Your data is stored securely using the following infrastructure:</p>
             <ul className="list-disc list-inside flex flex-col gap-1.5 ml-1">
-              <li><span className="text-white/80">Supabase</span> — database and authentication, hosted on AWS in the EU region.</li>
-              <li><span className="text-white/80">Vercel</span> — application hosting and edge functions.</li>
+              <li><span className="text-white/80">Supabase</span>, database and authentication hosted on AWS in the EU region.</li>
+              <li><span className="text-white/80">Vercel</span>, application hosting and edge functions.</li>
             </ul>
             <p className="mt-2">All data is encrypted in transit (TLS) and at rest.</p>
           </section>
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">5. Cookies and Local Storage</h2>
-            <p>We use browser cookies solely for authentication session management (via Supabase). We also use localStorage to store your theme preference for instant page loads. No tracking or advertising cookies are used.</p>
+            <p>We use browser cookies solely for authentication session management via Supabase. We also use localStorage to store your theme preference for instant page loads. No tracking or advertising cookies are used.</p>
           </section>
 
           <section>

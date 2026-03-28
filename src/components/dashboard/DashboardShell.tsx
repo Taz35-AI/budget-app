@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth, addDays } from 'date-fns';
 import { useBalances } from '@/hooks/useBalances';
@@ -8,6 +8,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { useCreateTransaction, useTransactions } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { CalendarView } from './CalendarView';
+import type { CalendarNavHandle } from './CalendarView';
 import { DayBottomSheet } from './DayBottomSheet';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
@@ -65,7 +66,7 @@ export function DashboardShell() {
     }
   }, [accounts, activeAccountId]);
 
-  const showTabs = (accounts?.length ?? 0) >= 2;
+  const calendarNavRef = useRef<CalendarNavHandle | null>(null);
 
   // ── Balances & transactions ──────────────────────────────────────────────────
   const { balances, dayTransactions, isLoading } = useBalances(activeAccountId);
@@ -204,40 +205,6 @@ export function DashboardShell() {
         </div>
       </header>
 
-      {/* ── Account tab bar (only when 2+ accounts) ──────────────────── */}
-      {showTabs && (
-        <div className="sticky top-[48px] sm:top-[56px] z-10 bg-[#F7FAF9]/95 dark:bg-[#0C1F1E]/95 backdrop-blur-xl border-b border-[#B2CFCE]/50 dark:border-white/[0.06] px-3 sm:px-5">
-          <div className="flex gap-1 overflow-x-auto scrollbar-none py-1.5">
-            {/* Combined tab */}
-            <button
-              onClick={() => setActiveAccountId('combined')}
-              className={cn(
-                'flex-shrink-0 h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
-                activeAccountId === 'combined'
-                  ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                  : 'bg-white dark:bg-white/5 text-brand-text/60 dark:text-white/50 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30 dark:hover:border-white/20',
-              )}
-            >
-              Combined
-            </button>
-            {accounts?.map((acct) => (
-              <button
-                key={acct.id}
-                onClick={() => setActiveAccountId(acct.id)}
-                className={cn(
-                  'flex-shrink-0 h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
-                  activeAccountId === acct.id
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                    : 'bg-white dark:bg-white/5 text-brand-text/60 dark:text-white/50 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30 dark:hover:border-white/20',
-                )}
-              >
-                {acct.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* ── Two-column layout ────────────────────────────────────────── */}
       <div className="flex gap-4 px-3 sm:px-5 py-3 sm:py-4 items-start">
 
@@ -253,7 +220,15 @@ export function DashboardShell() {
 
               {/* Balance Today — hero, wider */}
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">Balance Today</span>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">Balance Today</span>
+                  <button
+                    onClick={() => calendarNavRef.current?.today()}
+                    className="text-[9px] font-semibold text-brand-primary/60 hover:text-brand-primary transition-colors px-1.5 py-0.5 rounded-md hover:bg-brand-primary/8 dark:hover:bg-brand-primary/10"
+                  >
+                    Today
+                  </button>
+                </div>
                 <span className={cn(
                   'text-[1.75rem] font-black tabular-nums leading-none tracking-tight truncate block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
@@ -308,7 +283,15 @@ export function DashboardShell() {
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
               <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
-                <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1">Balance Today</span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">Balance Today</span>
+                  <button
+                    onClick={() => calendarNavRef.current?.today()}
+                    className="text-[9px] font-semibold text-brand-primary/60 hover:text-brand-primary transition-colors"
+                  >
+                    Today
+                  </button>
+                </div>
                 <span className={cn(
                   'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
@@ -392,6 +375,10 @@ export function DashboardShell() {
                   isLoading={isLoading}
                   onMonthChange={setVisibleMonth}
                   firstDayOfWeek={firstDayOfWeek}
+                  accounts={accounts}
+                  activeAccountId={activeAccountId}
+                  onAccountChange={setActiveAccountId}
+                  calendarNavRef={calendarNavRef}
                 />
               </div>
               {/* Step 0 tip — tap a day */}
@@ -416,7 +403,7 @@ export function DashboardShell() {
         {/* Right panel — desktop */}
         <aside className={cn(
           'hidden lg:flex flex-col w-[340px] xl:w-[400px] 2xl:w-[460px] flex-shrink-0',
-          'sticky top-[56px] max-h-[calc(100vh-56px-16px)]',
+          'sticky top-[56px] max-h-[calc(100vh-56px-16px)] self-start',
           'rounded-3xl overflow-hidden',
           'bg-white border border-[#B2CFCE]/60 shadow-[0_2px_20px_rgba(22,48,47,0.08)]',
           'dark:bg-[#122928] dark:border-[#3B7A78]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]',

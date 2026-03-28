@@ -3,14 +3,14 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — Budget App',
+  title: 'Terms of Service | Budget App',
+  description: 'Read the Budget App terms of service. Personal finance tracking for non-commercial personal use.',
 };
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#0C1F1E] px-4 py-16">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
             <Image src="/budget-tool.png" alt="Budget App" width={36} height={36} className="w-full h-full object-cover" />
@@ -46,12 +46,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">5. Acceptable Use</h2>
-            <p>You agree not to misuse the service — including attempting to access other users&apos; data, reverse engineer the application, or use it for any unlawful purpose.</p>
+            <p>You agree not to misuse the service, including attempting to access other users&apos; data, reverse engineering the application, or using it for any unlawful purpose.</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">6. Disclaimer of Warranties</h2>
-            <p>Budget App is provided &quot;as is&quot; without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that balance projections will be accurate. This tool is for personal planning purposes only and does not constitute financial advice.</p>
+            <p>Budget App is provided &quot;as is&quot; without warranties of any kind. We do not guarantee that the service will be uninterrupted or error-free, or that balance projections will be accurate. This tool is for personal planning purposes only and does not constitute financial advice.</p>
           </section>
 
           <section>
