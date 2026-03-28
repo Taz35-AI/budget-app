@@ -3,9 +3,11 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import { useQueryClient } from '@tanstack/react-query';
 import { useBalances } from '@/hooks/useBalances';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useCreateTransaction, useTransactions } from '@/hooks/useTransactions';
+import type { TransactionsData } from '@/hooks/useTransactions';
 import { useAccounts } from '@/hooks/useAccounts';
 import { CalendarView } from './CalendarView';
 import type { CalendarNavHandle } from './CalendarView';
@@ -20,6 +22,8 @@ import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+import { useOfflineQueueStore } from '@/store/offlineQueueStore';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -103,6 +107,9 @@ export function DashboardShell() {
   const { limit: budgetLimit, setLimit: setBudgetLimit } = useBudgetLimit(visibleMonth);
   const { firstDayOfWeek } = useSettings();
   const { impact, notification } = useHaptics();
+  const { isOnline, isSyncing, pendingCount } = useOfflineSync();
+  const enqueue = useOfflineQueueStore((s) => s.enqueue);
+  const qc = useQueryClient();
   useLocalNotifications({
     transactions: txData?.transactions ?? [],
     monthExpense,
@@ -203,6 +210,19 @@ export function DashboardShell() {
 
           {/* Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
+            {/* Offline / syncing badge */}
+            {!isOnline && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-semibold border border-amber-200 dark:border-amber-700/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+                Offline{pendingCount > 0 ? ` · ${pendingCount}` : ''}
+              </span>
+            )}
+            {isOnline && isSyncing && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary text-[10px] font-semibold border border-brand-primary/20">
+                <span className="w-3 h-3 rounded-full border border-brand-primary/30 border-t-brand-primary animate-spin flex-shrink-0" />
+                Syncing
+              </span>
+            )}
             {isLoading && (
               <div className="w-4 h-4 rounded-full border-2 border-brand-primary/20 border-t-brand-primary animate-spin" />
             )}
@@ -479,6 +499,42 @@ export function DashboardShell() {
                       onCancel={handleCancelAdd}
                       isLoading={create.isPending}
                       onSubmit={(values: TransactionFormValues) => {
+                        if (!navigator.onLine) {
+                          const optimisticId = `optimistic-${Date.now()}`;
+                          // Add to React Query cache immediately so UI updates
+                          qc.setQueryData<TransactionsData>(['transactions'], (old) => {
+                            if (!old) return old;
+                            return {
+                              ...old,
+                              transactions: [...old.transactions, {
+                                id: optimisticId,
+                                user_id: '',
+                                account_id: desktopFormAccountId ?? null,
+                                name: values.name,
+                                amount: Number(values.amount),
+                                category: values.category,
+                                type: values.type ?? 'one_off',
+                                date: values.date ?? null,
+                                start_date: values.start_date ?? null,
+                                frequency: values.frequency ?? null,
+                                end_date: values.end_date ?? null,
+                                tag: values.tag ?? null,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString(),
+                              }],
+                            };
+                          });
+                          enqueue({
+                            queueId: `q-${Date.now()}-${Math.random()}`,
+                            values,
+                            accountId: desktopFormAccountId ?? null,
+                            optimisticId,
+                            queuedAt: new Date().toISOString(),
+                          });
+                          notification('success');
+                          handleCancelAdd();
+                          return;
+                        }
                         create.reset();
                         create.mutate(values, {
                           onSuccess: () => {

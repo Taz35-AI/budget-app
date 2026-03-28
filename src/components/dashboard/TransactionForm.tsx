@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
+import { useTransactions } from '@/hooks/useTransactions';
 import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/engine/recurringResolver';
 import type { TransactionFormValues, Transaction, Frequency } from '@/types';
 import { cn } from '@/lib/utils';
@@ -20,7 +21,7 @@ const schema = z
     amount: z.string().min(1, 'Amount is required').refine((v) => Number(v) > 0, 'Must be > 0'),
     category: z.enum(['income', 'expense']),
     type: z.enum(['recurring', 'one_off']),
-    tag: z.string().optional(),
+    tag: z.string().min(1, 'Please select a category'),
     date: z.string().optional(),
     start_date: z.string().optional(),
     frequency: z
@@ -90,9 +91,28 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
   const type = watch('type');
   const category = watch('category');
   const tag = watch('tag');
+  const nameValue = watch('name');
   const frequency = watch('frequency');
   const recurrences = watch('recurrences');
   const start_date = watch('start_date');
+
+  // Smart name suggestions
+  const { data: txData } = useTransactions();
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const suggestions = React.useMemo(() => {
+    if (!nameValue || nameValue.length < 2 || !txData?.transactions) return [];
+    const lower = nameValue.toLowerCase();
+    const seen = new Set<string>();
+    return txData.transactions
+      .filter((t) => {
+        const key = `${t.name}|${t.category}|${t.tag ?? ''}`;
+        if (!t.name.toLowerCase().includes(lower) || t.name.toLowerCase() === lower) return false;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 5);
+  }, [nameValue, txData?.transactions]);
 
   // Live preview: compute the end date from recurrences
   const computedEndDate = React.useMemo(() => {
@@ -220,18 +240,52 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         {...register('amount')}
       />
 
-      <Input
-        id="name"
-        label="Description"
-        placeholder="e.g. Monthly salary"
-        error={errors.name?.message}
-        className={compact ? 'h-7 text-[11px]' : undefined}
-        {...register('name')}
-      />
+      <div className="relative">
+        <Input
+          id="name"
+          label="Description"
+          placeholder="e.g. Monthly salary"
+          error={errors.name?.message}
+          className={compact ? 'h-7 text-[11px]' : undefined}
+          {...register('name')}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          autoComplete="off"
+        />
+        {showSuggestions && suggestions.length > 0 && (
+          <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] shadow-lg overflow-hidden">
+            {suggestions.map((t) => (
+              <li key={`${t.id}`}>
+                <button
+                  type="button"
+                  onMouseDown={() => {
+                    setValue('name', t.name);
+                    setValue('amount', String(t.amount));
+                    setValue('category', t.category as 'income' | 'expense');
+                    if (t.tag) setValue('tag', t.tag);
+                    setShowSuggestions(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10 transition-colors"
+                >
+                  <span className="flex-1 text-sm text-brand-text dark:text-white/80 truncate">{t.name}</span>
+                  <span className={cn('text-xs font-semibold flex-shrink-0', t.category === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400')}>
+                    {t.category === 'income' ? '+' : '−'}{t.amount}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {/* Tag picker */}
       <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-2')}>
-        <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>Category (optional)</p>
+        <div className="flex items-center justify-between">
+          <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>Category</p>
+          {errors.tag?.message && (
+            <p className={cn('text-brand-danger', compact ? 'text-[9px]' : 'text-xs')}>{errors.tag.message}</p>
+          )}
+        </div>
         <div className={cn('flex flex-wrap', compact ? 'gap-1' : 'gap-1.5')}>
           {Object.entries(allTags)
             .filter(([, t]) => t.category === category || t.category === 'both')
@@ -241,7 +295,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
                 <button
                   key={key}
                   type="button"
-                  onClick={() => setValue('tag', isSelected ? '' : key)}
+                  onClick={() => setValue('tag', key)}
                   className={cn(
                     'flex items-center gap-1 rounded-lg font-medium transition-all border',
                     compact ? 'px-1.5 py-0.5 text-[9px]' : 'px-2.5 py-1 text-xs',

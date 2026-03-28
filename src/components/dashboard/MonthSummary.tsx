@@ -521,10 +521,11 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                 // If a tag is linked, compute saved amount from one-off expense transactions with that tag.
                 // Savings are modelled as expenses — money leaving your spending balance into a pot.
                 // Recurring transactions are excluded — we can't reliably sum their occurrences from the raw row.
+                const linkedTxs = goal.linkedTagId
+                  ? rawTransactions.filter((tx) => tx.type === 'one_off' && tx.category === 'expense' && tx.tag === goal.linkedTagId)
+                  : [];
                 const savedAmount = goal.linkedTagId
-                  ? rawTransactions
-                      .filter((tx) => tx.type === 'one_off' && tx.category === 'expense' && tx.tag === goal.linkedTagId)
-                      .reduce((sum, tx) => sum + Number(tx.amount), 0)
+                  ? linkedTxs.reduce((sum, tx) => sum + Number(tx.amount), 0)
                   : goal.currentSaved;
 
                 const pct = goal.targetAmount > 0 ? Math.min(savedAmount / goal.targetAmount, 1) : 0;
@@ -532,6 +533,20 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                 const daysLeft = goal.deadline
                   ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
                   : null;
+
+                // Savings rate countdown (only for linked-tag goals without a deadline)
+                let savingsCountdown: string | null = null;
+                if (goal.linkedTagId && !goal.deadline && savedAmount < goal.targetAmount && linkedTxs.length >= 2) {
+                  const dates = linkedTxs.map((tx) => new Date(tx.date ?? tx.created_at).getTime()).sort((a, b) => a - b);
+                  const daysSinceFirst = Math.max(1, (Date.now() - dates[0]) / 86_400_000);
+                  const dailyRate = savedAmount / daysSinceFirst;
+                  if (dailyRate > 0) {
+                    const daysToGoal = Math.ceil((goal.targetAmount - savedAmount) / dailyRate);
+                    savingsCountdown = daysToGoal > 60
+                      ? `~${Math.ceil(daysToGoal / 30)}mo to goal`
+                      : `~${daysToGoal}d to goal`;
+                  }
+                }
                 return (
                   <div key={goal.id} className="flex flex-col gap-1.5 px-3 py-2.5 rounded-xl bg-[#F7FAF9] dark:bg-[#16302F]/10 border border-[#B2CFCE]/50 dark:border-[#3B7A78]/[0.07]">
                     <div className="flex items-center justify-between gap-2">
@@ -562,6 +577,8 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                         <span className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35">
                           {daysLeft > 0 ? `${daysLeft}d left` : 'Overdue'}
                         </span>
+                      ) : savingsCountdown ? (
+                        <span className="text-[11px] text-[#3B7A78] dark:text-[#3B7A78]/70 font-medium">{savingsCountdown}</span>
                       ) : linkedTag ? (
                         <span className="text-[10px] text-[#16302F]/30 dark:text-[#B2CFCE]/25 italic">auto</span>
                       ) : null}

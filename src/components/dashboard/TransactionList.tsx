@@ -83,8 +83,8 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
         </p>
       </div>
 
-      {/* Search + filter */}
-      {transactions.length > 0 && (
+      {/* Search + filter — hidden while editing or deleting */}
+      {transactions.length > 0 && !active && (
         <div className="flex flex-col gap-2 mb-3">
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -146,7 +146,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
           </div>
         ) : (
           <ul className="flex flex-col gap-2">
-            {filtered.map((tx) => {
+            {filtered.filter((tx) => active === null || tx.transaction_id === active.txId).map((tx) => {
               const isEditing = active?.type === 'edit' && active.txId === tx.transaction_id;
               const isDeleting = active?.type === 'delete' && active.txId === tx.transaction_id;
 
