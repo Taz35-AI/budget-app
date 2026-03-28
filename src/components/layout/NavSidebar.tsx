@@ -80,7 +80,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       {/* Logo */}
       <div className="flex items-center justify-center px-4 pt-5 pb-4 border-b border-white/[0.07] flex-shrink-0">
         <Link href="/dashboard" onClick={onLinkClick} className="block w-full">
-          <Image src="/budget-tool.png" alt="BudgetTool" width={200} height={200} className="w-full h-auto object-contain" priority />
+          <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
       </div>
 
@@ -276,7 +276,7 @@ export function MobileLogo() {
   return (
     <div className="lg:hidden flex-shrink-0 pointer-events-none">
       <Image
-        src="/budget-tool.png"
+        src="/budget-tool.png?v=2"
         alt="BudgetTool"
         width={180}
         height={72}

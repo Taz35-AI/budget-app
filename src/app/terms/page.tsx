@@ -13,7 +13,7 @@ export default function TermsPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-10">
           <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png" alt="BudgetTool" width={36} height={36} className="w-full h-full object-cover" />
+            <Image src="/budget-tool.png?v=2" alt="BudgetTool" width={36} height={36} className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">BudgetTool</p>

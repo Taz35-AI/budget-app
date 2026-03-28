@@ -101,6 +101,7 @@ export interface TransactionFormValues {
   start_date?: string;
   end_date?: string;
   frequency?: Frequency;
+  account_id?: string | null;
 }
 
 // ─── Settings types ───────────────────────────────────────────────────────────

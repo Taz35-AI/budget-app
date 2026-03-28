@@ -32,6 +32,7 @@ type ActiveAction =
 
 export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip, accounts }: Props) {
   const [active, setActive] = useState<ActiveAction>(null);
+  const [editAccountId, setEditAccountId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<'all' | 'income' | 'expense'>('all');
   const update = useUpdateTransaction();
@@ -40,7 +41,11 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
   const isPositive = balance > 0;
   const isNegative = balance < 0;
-  const clearActive = () => setActive(null);
+  const clearActive = () => { setActive(null); setEditAccountId(null); };
+  const startEdit = (tx: DayTransaction) => {
+    setActive({ type: 'edit', txId: tx.transaction_id });
+    setEditAccountId(tx.account_id ?? null);
+  };
   const showAccountBadge = (accounts?.length ?? 0) >= 2;
   const accountMap = new Map((accounts ?? []).map((a) => [a.id, a.name]));
 
@@ -150,6 +155,23 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                 if (tx.type === 'recurring') {
                   return (
                     <li key={tx.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4">
+                      {(accounts?.length ?? 0) >= 2 && (
+                        <div className="mb-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {accounts!.map((acct) => (
+                              <button key={acct.id} type="button" onClick={() => setEditAccountId(acct.id)}
+                                className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
+                                  editAccountId === acct.id
+                                    ? 'bg-brand-primary text-white border-brand-primary'
+                                    : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                                )}>
+                                {acct.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <RecurringEditForm
                         tx={tx}
                         occurrenceDate={date}
@@ -161,7 +183,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                               id: tx.transaction_id,
                               editMode: editMode as EditMode,
                               effectiveFrom: date,
-                              values: { name, amount, category, frequency, end_date },
+                              values: { name, amount, category, frequency, end_date, account_id: editAccountId },
                             },
                             { onSuccess: clearActive },
                           );
@@ -179,6 +201,23 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                 // One-off edit
                 return (
                   <li key={tx.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4">
+                    {(accounts?.length ?? 0) >= 2 && (
+                      <div className="mb-3">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {accounts!.map((acct) => (
+                            <button key={acct.id} type="button" onClick={() => setEditAccountId(acct.id)}
+                              className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
+                                editAccountId === acct.id
+                                  ? 'bg-brand-primary text-white border-brand-primary'
+                                  : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                              )}>
+                              {acct.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <TransactionForm
                       symbol={symbol}
                       lockType
@@ -196,7 +235,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                       isLoading={update.isPending}
                       onSubmit={(values: TransactionFormValues) => {
                         update.mutate(
-                          { id: tx.transaction_id, editMode: 'all', values },
+                          { id: tx.transaction_id, editMode: 'all', values: { ...values, account_id: editAccountId } },
                           { onSuccess: clearActive },
                         );
                       }}
@@ -315,7 +354,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                   {/* Actions — always visible on mobile, hover on desktop */}
                   <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button
-                      onClick={() => setActive({ type: 'edit', txId: tx.transaction_id })}
+                      onClick={() => startEdit(tx)}
                       className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
                       aria-label="Edit"
                     >

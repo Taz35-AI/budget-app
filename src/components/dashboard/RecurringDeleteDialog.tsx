@@ -13,19 +13,19 @@ const SCOPE_OPTIONS = [
     value: 'this_only' as DeleteMode,
     label: 'This occurrence only',
     description: 'Only removed on this date. Continues before and after.',
-    color: 'amber',
+    danger: false,
   },
   {
     value: 'all_future' as DeleteMode,
     label: 'This and all future',
     description: 'Removed from this date onwards. Past occurrences kept.',
-    color: 'orange',
+    danger: false,
   },
   {
     value: 'all' as DeleteMode,
     label: 'Entire series',
     description: 'All occurrences deleted permanently — including past.',
-    color: 'red',
+    danger: true,
   },
 ] as const;
 
@@ -44,11 +44,11 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3">
-        <p className="text-xs text-red-500 font-medium uppercase tracking-wider mb-0.5">Deleting</p>
-        <p className="text-sm font-semibold text-slate-800">{tx.name}</p>
+      <div className="rounded-xl bg-brand-danger/8 dark:bg-brand-danger/12 border border-brand-danger/20 dark:border-brand-danger/25 px-4 py-3">
+        <p className="text-xs text-brand-danger font-medium uppercase tracking-wider mb-0.5">Deleting</p>
+        <p className="text-sm font-semibold text-slate-800 dark:text-white">{tx.name}</p>
         {tx.frequency && (
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
             {FREQUENCIES[tx.frequency]} · occurrence on {displayDate}
           </p>
         )}
@@ -56,7 +56,7 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
 
       {/* Scope options */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-700">What do you want to delete?</p>
+        <p className="text-sm font-medium text-slate-700 dark:text-white/80">What do you want to delete?</p>
         {SCOPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -65,17 +65,15 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
             className={cn(
               'flex items-start gap-3 p-3 rounded-xl border text-left transition-all w-full',
               selected === opt.value
-                ? opt.color === 'red'
-                  ? 'border-red-500 bg-red-500 text-white'
-                  : opt.color === 'orange'
-                  ? 'border-orange-500 bg-orange-500 text-white'
-                  : 'border-amber-500 bg-amber-500 text-white'
-                : 'border-slate-200 bg-white hover:border-slate-300',
+                ? opt.danger
+                  ? 'border-brand-danger bg-brand-danger text-white'
+                  : 'border-brand-primary bg-brand-primary text-white'
+                : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/20',
             )}
           >
             <div className={cn(
               'w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center',
-              selected === opt.value ? 'border-white' : 'border-slate-300',
+              selected === opt.value ? 'border-white' : 'border-slate-300 dark:border-white/30',
             )}>
               {selected === opt.value && (
                 <div className="w-2 h-2 rounded-full bg-white" />
@@ -84,13 +82,13 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
             <div>
               <p className={cn(
                 'text-sm font-medium',
-                selected === opt.value ? 'text-white' : 'text-slate-800',
+                selected === opt.value ? 'text-white' : 'text-slate-800 dark:text-white/90',
               )}>
                 {opt.label}
               </p>
               <p className={cn(
                 'text-xs mt-0.5',
-                selected === opt.value ? 'text-white/70' : 'text-slate-400',
+                selected === opt.value ? 'text-white/70' : 'text-slate-400 dark:text-white/40',
               )}>
                 {opt.description}
               </p>

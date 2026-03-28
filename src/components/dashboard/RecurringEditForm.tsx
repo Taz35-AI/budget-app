@@ -154,8 +154,8 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
             className={cn(
               'flex items-start gap-2 p-1.5 rounded-lg border cursor-pointer transition-all',
               editMode === opt.value
-                ? 'border-slate-900 bg-slate-900 text-white'
-                : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/20',
+                ? 'border-brand-primary bg-brand-primary text-white'
+                : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-brand-primary/30 dark:hover:border-white/20',
             )}
           >
             <input type="radio" value={opt.value} {...register('editMode')} className="sr-only" />
@@ -210,7 +210,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
                 className={cn(
                   'flex-1 flex items-center justify-center text-[10px] font-medium cursor-pointer transition-all',
                   watch('category') === cat
-                    ? cat === 'income' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+                    ? cat === 'income' ? 'bg-brand-positive text-white' : 'bg-brand-danger text-white'
                     : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
                 )}
               >
