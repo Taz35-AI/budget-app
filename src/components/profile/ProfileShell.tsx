@@ -140,7 +140,7 @@ export function ProfileShell() {
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Profile header ──────────────────────────────────────────── */}
-        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-6 flex items-center gap-5">
+        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-6 flex flex-col items-center text-center gap-4 sm:flex-row sm:items-center sm:text-left sm:gap-5">
           <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/30 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={displayName} width={64} height={64} className="w-full h-full object-cover" unoptimized />
@@ -151,7 +151,7 @@ export function ProfileShell() {
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-black text-slate-800 dark:text-white truncate">{displayName}</h1>
             <p className="text-sm text-slate-400 dark:text-white/40 truncate">{email}</p>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 flex-wrap">
               <span className="text-xs text-slate-400 dark:text-white/30">Member since {memberSince}</span>
               <span className={cn(
                 'text-[10px] font-bold px-2 py-0.5 rounded-full',
