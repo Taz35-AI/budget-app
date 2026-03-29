@@ -37,10 +37,10 @@ function SettingsCard({ title, subtitle, accent, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl overflow-hidden bg-white border border-slate-100 shadow-[0_2px_24px_rgba(0,0,0,0.06)] dark:bg-[#0d1629] dark:border-white/[0.05] dark:shadow-[0_4px_40px_rgba(0,0,0,0.5)]">
+    <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#122928] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
       <div className={cn('h-[3px] w-full', accent)} />
       <div className="px-6 pt-5 pb-3">
-        <h2 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">{title}</h2>
+        <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{title}</h2>
         {subtitle && <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{subtitle}</p>}
       </div>
       <div className="px-6 pb-6">{children}</div>
@@ -1318,11 +1318,11 @@ export function SettingsShell() {
     <AppLayout>
     <div className="min-h-screen bg-[#F7FAF9] dark:bg-[#0C1F1E]">
       {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-indigo-100/60 via-violet-50/20 to-transparent dark:from-indigo-950/25 dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
+      <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-brand-primary/[0.06] via-brand-primary/[0.02] to-transparent dark:from-brand-primary/[0.08] dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 dark:via-indigo-400/40 to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/40 dark:via-brand-primary/30 to-transparent" />
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
           {/* Hamburger — mobile only */}
           <NavMenuButton />

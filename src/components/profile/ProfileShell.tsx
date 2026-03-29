@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useCurrency } from '@/hooks/useCurrency';
 import { cn } from '@/lib/utils';
@@ -18,9 +19,9 @@ function formatDate(iso: string) {
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="flex flex-col gap-1 bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30">{label}</p>
-      <p className="text-2xl font-black text-slate-800 dark:text-white leading-none">{value}</p>
+    <div className="flex flex-col gap-1 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-4">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-text/40 dark:text-white/30">{label}</p>
+      <p className="text-2xl font-black text-brand-text dark:text-white leading-none">{value}</p>
       {sub && <p className="text-xs text-slate-400 dark:text-white/30 mt-0.5">{sub}</p>}
     </div>
   );
@@ -116,21 +117,30 @@ export function ProfileShell() {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto px-4 py-8 sm:px-6">
+      {/* Page header */}
+      <header className="sticky top-0 lg:top-14 z-20 bg-brand-bg/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-brand-primary/[0.08] dark:border-white/[0.05]">
+        <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
+          <NavMenuButton />
+          <MobileLogo />
+          <div className="hidden lg:flex items-center gap-2">
+            <h1 className="text-xl font-extrabold text-brand-text dark:text-white tracking-tight">Profile</h1>
+          </div>
+          <button
+            onClick={() => router.back()}
+            className="lg:hidden ml-auto flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        </div>
+      </header>
 
-        {/* Back link */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/60 transition-colors mb-6"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back
-        </button>
+      <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Profile header ──────────────────────────────────────────── */}
-        <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-6 flex items-center gap-5 mb-4">
+        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-6 flex items-center gap-5">
           <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/30 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={displayName} width={64} height={64} className="w-full h-full object-cover" unoptimized />
@@ -156,7 +166,7 @@ export function ProfileShell() {
         </div>
 
         {/* ── Stats ───────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="lg:col-span-2 grid grid-cols-3 gap-3">
           <StatCard label="Transactions" value={String(transactions.length)} />
           <StatCard label="All-time income" value={formatAmount(totalIncome, { compact: true })} />
           <StatCard label="All-time expenses" value={formatAmount(totalExpenses, { compact: true })} />
@@ -164,7 +174,7 @@ export function ProfileShell() {
 
         {/* ── Recent transactions ─────────────────────────────────────── */}
         {recentTx.length > 0 && (
-          <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 mb-4">
+          <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">Recent entries</p>
             <div className="flex flex-col divide-y divide-slate-50 dark:divide-white/[0.04]">
               {recentTx.map((tx) => (
@@ -186,7 +196,7 @@ export function ProfileShell() {
         )}
 
         {/* ── Security ────────────────────────────────────────────────── */}
-        <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 mb-4">
+        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-4">Security</p>
 
           {!showPwForm && (
@@ -244,7 +254,7 @@ export function ProfileShell() {
         </div>
 
         {/* ── Danger zone ─────────────────────────────────────────────── */}
-        <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-red-100 dark:border-red-500/20 p-5">
+        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-red-200 dark:border-red-500/20 shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
           <p className="text-[10px] font-bold uppercase tracking-widest text-red-400 mb-4">Danger zone</p>
 
           {deleteStep === 'idle' && (
