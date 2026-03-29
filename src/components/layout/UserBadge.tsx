@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
@@ -29,7 +30,7 @@ export function UserBadge() {
     .toUpperCase() || '?';
 
   return (
-    <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.06]">
+    <Link href="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.06] hover:bg-white/[0.09] transition-colors">
       {/* Avatar */}
       <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/40 flex items-center justify-center">
         {avatarUrl ? (
@@ -46,6 +47,6 @@ export function UserBadge() {
           <span className="text-[10px] text-white/30 truncate leading-tight">{email}</span>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
