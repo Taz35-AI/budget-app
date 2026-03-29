@@ -17,16 +17,6 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="flex flex-col gap-1 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-4">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-text/40 dark:text-white/30">{label}</p>
-      <p className="text-2xl font-black text-brand-text dark:text-white leading-none">{value}</p>
-      {sub && <p className="text-xs text-slate-400 dark:text-white/30 mt-0.5">{sub}</p>}
-    </div>
-  );
-}
-
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function ProfileShell() {
@@ -75,8 +65,6 @@ export function ProfileShell() {
   const memberSince = user.created_at ? formatDate(user.created_at) : '—';
 
   const transactions = txData?.transactions ?? [];
-  const totalIncome = transactions.filter(t => t.category === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalExpenses = transactions.filter(t => t.category === 'expense').reduce((s, t) => s + t.amount, 0);
 
   const recentTx = [...transactions]
     .sort((a, b) => {
@@ -140,7 +128,7 @@ export function ProfileShell() {
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Profile header ──────────────────────────────────────────── */}
-        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-8 flex flex-col items-center text-center gap-4">
+        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-6 flex flex-row items-center gap-5">
           <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/30 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={displayName} width={64} height={64} className="w-full h-full object-cover" unoptimized />
@@ -148,10 +136,10 @@ export function ProfileShell() {
               <span className="text-xl font-black text-slate-600 dark:text-white/70">{initials}</span>
             )}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="text-xl font-black text-slate-800 dark:text-white truncate">{displayName}</h1>
             <p className="text-sm text-slate-400 dark:text-white/40 truncate">{email}</p>
-            <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="text-xs text-slate-400 dark:text-white/30">Member since {memberSince}</span>
               <span className={cn(
                 'text-[10px] font-bold px-2 py-0.5 rounded-full',
@@ -163,13 +151,6 @@ export function ProfileShell() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* ── Stats ───────────────────────────────────────────────────── */}
-        <div className="lg:col-span-2 grid grid-cols-3 gap-3">
-          <StatCard label="Transactions" value={String(transactions.length)} />
-          <StatCard label="All-time income" value={formatAmount(totalIncome, { compact: true })} />
-          <StatCard label="All-time expenses" value={formatAmount(totalExpenses, { compact: true })} />
         </div>
 
         {/* ── Recent transactions ─────────────────────────────────────── */}
