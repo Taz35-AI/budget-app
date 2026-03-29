@@ -41,12 +41,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">3. Where Your Data Is Stored</h2>
-            <p className="mb-2">Your data is stored securely using the following infrastructure:</p>
-            <ul className="list-disc list-inside flex flex-col gap-1.5 ml-1">
-              <li><span className="text-white/80">Supabase</span>, database and authentication hosted on AWS in the EU region.</li>
-              <li><span className="text-white/80">Vercel</span>, application hosting and edge functions.</li>
-            </ul>
-            <p className="mt-2">All data is encrypted in transit (TLS) and at rest.</p>
+            <p>Your data is stored on secure cloud infrastructure hosted in the EU region. All data is encrypted in transit (TLS) and at rest.</p>
           </section>
 
           <section>
@@ -56,7 +51,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">5. Cookies and Local Storage</h2>
-            <p>We use browser cookies solely for authentication session management via Supabase. We also use localStorage to store your theme preference for instant page loads. No tracking or advertising cookies are used.</p>
+            <p>We use browser cookies solely for authentication session management. We also use localStorage to store your theme preference for instant page loads. No tracking or advertising cookies are used.</p>
           </section>
 
           <section>
