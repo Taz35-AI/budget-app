@@ -122,6 +122,6 @@ export const useSettingsStore = create<SettingsState>()(
         set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
       setLanguage: (lang) => set({ language: lang }),
     }),
-    { name: 'budgettool_settings' },
+    { name: 'budgetapp_settings' },
   ),
 );

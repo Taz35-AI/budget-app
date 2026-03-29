@@ -23,7 +23,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
-    const saved = localStorage.getItem('budgettool_theme') as Theme | null;
+    const saved = localStorage.getItem('budgetapp_theme') as Theme | null;
     const initial = saved ?? 'dark';
     setTheme(initial);
     document.documentElement.classList.toggle('dark', initial === 'dark');
@@ -32,7 +32,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     setTheme((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('budgettool_theme', next);
+      localStorage.setItem('budgetapp_theme', next);
       document.documentElement.classList.toggle('dark', next === 'dark');
       return next;
     });

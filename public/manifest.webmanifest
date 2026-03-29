@@ -1,5 +1,11 @@
 {
+  "name": "Budget App",
+  "short_name": "Budget App",
+  "description": "Personal finance tracker with 7-year balance forecast",
+  "start_url": "/",
+  "display": "standalone",
   "background_color": "#0C1F1E",
+  "theme_color": "#3B7A78",
   "icons": [
     {
       "src": "../icons/icon-48.webp",

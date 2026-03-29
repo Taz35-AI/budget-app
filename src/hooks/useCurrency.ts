@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { CurrencyCode } from '@/types';
 import { CURRENCIES } from '@/lib/constants';
 
-const STORAGE_KEY = 'budgettool_currency';
+const STORAGE_KEY = 'budgetapp_currency';
 
 export function useCurrency() {
   const [currency, setCurrencyState] = useState<CurrencyCode>('GBP');
