@@ -34,9 +34,13 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     setError('');
     setLoading(true);
+    // In Capacitor the WebView runs on localhost — always redirect to the live URL
+    const redirectTo = window.location.hostname === 'localhost'
+      ? 'https://budget-app-19qy.vercel.app/auth/callback'
+      : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${location.origin}/auth/callback` },
+      options: { redirectTo },
     });
     if (error) {
       setError(error.message);

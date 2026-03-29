@@ -1031,12 +1031,38 @@ function BackupSection() {
     try {
       const res = await fetch('/api/backup');
       if (!res.ok) throw new Error('Download failed');
-      const blob = await res.blob();
+      const text = await res.text();
       const today = new Date().toISOString().slice(0, 10);
+      const filename = `budget-backup-${today}.json`;
+
+      // Capacitor native (Android/iOS)
+      if (typeof window !== 'undefined') {
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.isNativePlatform()) {
+          const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+          const { Share } = await import('@capacitor/share');
+          const writeResult = await Filesystem.writeFile({
+            path: filename,
+            data: text,
+            directory: Directory.Cache,
+            encoding: Encoding.UTF8,
+          });
+          await Share.share({
+            title: 'Budget Backup',
+            url: writeResult.uri,
+            dialogTitle: 'Save your backup',
+          }).catch(() => {/* dismissed */});
+          setDownloadState('idle');
+          return;
+        }
+      }
+
+      // Web fallback
+      const blob = new Blob([text], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `budget-backup-${today}.json`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -16,9 +16,12 @@ export default function SignupPage() {
   const handleGoogle = async () => {
     setError('');
     setLoading(true);
+    const redirectTo = window.location.hostname === 'localhost'
+      ? 'https://budget-app-19qy.vercel.app/auth/callback'
+      : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${location.origin}/auth/callback` },
+      options: { redirectTo },
     });
     if (error) {
       setError(error.message);

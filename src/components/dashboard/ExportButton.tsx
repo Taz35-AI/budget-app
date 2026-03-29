@@ -54,18 +54,15 @@ export function ExportButton() {
             encoding: Encoding.UTF8,
           });
 
-          console.log('[Export] file written:', writeResult.uri);
           await Share.share({
             title: 'Budget Transactions Export',
             url: writeResult.uri,
             dialogTitle: 'Save or share your export',
-          });
-          console.log('[Export] share done');
+          }).catch(() => {/* user dismissed share sheet */});
           return;
         }
       } catch (err) {
         console.error('[Export] error:', err);
-        alert('Export error: ' + (err instanceof Error ? err.message : String(err)));
         return;
       }
     }
@@ -75,9 +72,7 @@ export function ExportButton() {
 
     // Mobile web: Web Share API
     if (typeof navigator.share === 'function') {
-      navigator.share({ files: [file], title: 'Budget Transactions Export' }).catch((err) => {
-        if (err?.name !== 'AbortError') triggerDownload(blob, filename);
-      });
+      navigator.share({ files: [file], title: 'Budget Transactions Export' }).catch(() => {/* dismissed */});
       return;
     }
 
@@ -95,7 +90,7 @@ export function ExportButton() {
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
       </svg>
-      <span className="hidden sm:inline">Export</span>
+      <span>Export</span>
     </button>
   );
 }
