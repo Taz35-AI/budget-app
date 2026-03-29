@@ -30,10 +30,32 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
 
+  // ── Preview password gate ──────────────────────────────────────────────────
+  const previewPassword = process.env.PREVIEW_PASSWORD;
+  const isGateExempt =
+    pathname.startsWith('/preview') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api/preview-auth') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    pathname.startsWith('/icons');
+
+  if (previewPassword && !isGateExempt) {
+    const cookie = request.cookies.get('preview_access');
+    if (cookie?.value !== previewPassword) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/preview';
+      url.searchParams.set('from', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // ── Auth guard ─────────────────────────────────────────────────────────────
   const isPublicPath =
     pathname.startsWith('/login') ||
     pathname.startsWith('/signup') ||
-    pathname.startsWith('/auth/');
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/preview');
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
