@@ -100,9 +100,10 @@ export function ProfileShell() {
 
   const handleSetPasswordEmail = async () => {
     setPwStatus('loading');
-    const redirectTo = window.location.hostname === 'localhost'
-      ? 'https://budget-app-19qy.vercel.app/auth/callback?next=/profile'
-      : `${window.location.origin}/auth/callback?next=/profile`;
+    const base = window.location.hostname === 'localhost'
+      ? 'https://budget-app-19qy.vercel.app'
+      : window.location.origin;
+    const redirectTo = `${base}/reset-password`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) { setPwError(error.message); setPwStatus('error'); }
     else { setPwStatus('success'); }
