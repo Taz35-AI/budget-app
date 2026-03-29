@@ -98,17 +98,6 @@ export function ProfileShell() {
     else { setPwStatus('success'); setNewPw(''); setConfirmPw(''); setTimeout(() => { setPwStatus('idle'); setShowPwForm(false); }, 2000); }
   };
 
-  const handleSetPasswordEmail = async () => {
-    setPwStatus('loading');
-    const base = window.location.hostname === 'localhost'
-      ? 'https://budget-app-19qy.vercel.app'
-      : window.location.origin;
-    const redirectTo = `${base}/reset-password`;
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
-    if (error) { setPwError(error.message); setPwStatus('error'); }
-    else { setPwStatus('success'); }
-  };
-
   const handleDeleteAccount = async () => {
     if (deleteInput !== email) { setDeleteError('Email does not match'); return; }
     setDeleteStep('deleting');
@@ -200,37 +189,21 @@ export function ProfileShell() {
         <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 mb-4">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-4">Security</p>
 
-          {isGoogle && !showPwForm && (
+          {!showPwForm && (
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Set a password</p>
-                <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Allows you to also sign in with email + password</p>
-              </div>
-              {pwStatus === 'success' ? (
-                <span className="text-xs font-semibold text-emerald-500">Email sent ✓</span>
-              ) : (
-                <button
-                  onClick={handleSetPasswordEmail}
-                  disabled={pwStatus === 'loading'}
-                  className="h-8 px-4 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-white/70 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/10 transition-colors disabled:opacity-50"
-                >
-                  {pwStatus === 'loading' ? 'Sending…' : 'Send reset email'}
-                </button>
-              )}
-            </div>
-          )}
-
-          {!isGoogle && !showPwForm && (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Change password</p>
-                <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Update your login password</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-white/80">
+                  {isGoogle ? 'Set a password' : 'Change password'}
+                </p>
+                <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
+                  {isGoogle ? 'Add a password so you can also sign in with email' : 'Update your login password'}
+                </p>
               </div>
               <button
                 onClick={() => setShowPwForm(true)}
                 className="h-8 px-4 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-white/70 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
               >
-                Change
+                {isGoogle ? 'Set password' : 'Change'}
               </button>
             </div>
           )}
