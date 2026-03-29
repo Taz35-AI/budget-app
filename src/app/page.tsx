@@ -209,7 +209,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Common questions</h2>
           </div>
 
-          <div className="flex flex-col divide-y divide-white/[0.07]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-0">
             {[
               { q: 'Is Budget App really free?', a: 'Yes, completely free during beta. Sign up now and keep free access forever. We may introduce a paid plan for new users in the future, but early users are never charged.' },
               { q: 'Do I need to connect my bank account?', a: 'No. Budget App never connects to your bank. You enter transactions manually, keeping your banking credentials completely private.' },
@@ -218,7 +218,7 @@ export default function LandingPage() {
               { q: 'What currencies and languages are supported?', a: 'Budget App supports multiple currencies and is available in English, Romanian and Spanish. More languages coming.' },
               { q: 'Is my data safe?', a: 'All data is encrypted in transit and at rest. We never sell or share your data with anyone.' },
             ].map((faq) => (
-              <div key={faq.q} className="py-6">
+              <div key={faq.q} className="py-6 border-b border-white/[0.07]">
                 <h3 className="text-white font-semibold mb-2">{faq.q}</h3>
                 <p className="text-white/50 text-sm leading-relaxed">{faq.a}</p>
               </div>
