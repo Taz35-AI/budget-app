@@ -52,6 +52,7 @@ export async function proxy(request: NextRequest) {
 
   // ── Auth guard ─────────────────────────────────────────────────────────────
   const isPublicPath =
+    pathname === '/' ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/signup') ||
     pathname.startsWith('/auth/') ||
