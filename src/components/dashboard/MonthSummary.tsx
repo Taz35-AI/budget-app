@@ -63,6 +63,7 @@ const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
   const t = useTranslations('monthSummary');
+  const tc = useTranslations('common');
   const tMonths = useTranslations('months');
   const tTags = useTranslations('tags');
   const { allTags, goals } = useSettings();
@@ -418,7 +419,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                     tx.category === 'income' ? 'bg-[#3B7A78]' : 'bg-red-400',
                   )} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name}</p>
+                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35 mt-0.5 leading-tight">
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
@@ -452,7 +453,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                 <div key={tx.id} className={ROW_CLASS}>
                   <div className="w-[3px] self-stretch rounded-full bg-red-400 flex-shrink-0 min-h-[1.5rem]" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name}</p>
+                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     {tx.tag && allTags[tx.tag] && (
                       <span
                         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold text-white mt-0.5"
@@ -491,7 +492,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                     tx.category === 'income' ? 'bg-[#3B7A78]' : 'bg-[#16302F]/40 dark:bg-[#B2CFCE]/30',
                   )} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name}</p>
+                    <p className="text-sm text-[#16302F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     {tx.frequency && (
                       <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35 mt-0.5 leading-tight">{FREQUENCIES[tx.frequency]}</p>
                     )}

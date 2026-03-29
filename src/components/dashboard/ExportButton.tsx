@@ -3,10 +3,22 @@
 import { useTransactions } from '@/hooks/useTransactions';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export function ExportButton() {
   const { data } = useTransactions();
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    console.log('[Export] clicked, tx count:', data?.transactions?.length ?? 0);
     if (!data?.transactions.length) return;
 
     const headers = ['Date', 'Name', 'Amount', 'Category', 'Tag', 'Type', 'Frequency', 'End Date'];
@@ -23,15 +35,54 @@ export function ExportButton() {
     ]);
 
     const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const filename = `transactions_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    // Capacitor native (Android / iOS) — write to cache then share via native sheet
+    if (typeof window !== 'undefined') {
+      try {
+        const { Capacitor } = await import('@capacitor/core');
+        console.log('[Export] isNativePlatform:', Capacitor.isNativePlatform());
+        if (Capacitor.isNativePlatform()) {
+          const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
+          const { Share } = await import('@capacitor/share');
+          console.log('[Export] plugins loaded, writing file...');
+
+          const writeResult = await Filesystem.writeFile({
+            path: filename,
+            data: csv,
+            directory: Directory.Cache,
+            encoding: Encoding.UTF8,
+          });
+
+          console.log('[Export] file written:', writeResult.uri);
+          await Share.share({
+            title: 'Budget Transactions Export',
+            url: writeResult.uri,
+            dialogTitle: 'Save or share your export',
+          });
+          console.log('[Export] share done');
+          return;
+        }
+      } catch (err) {
+        console.error('[Export] error:', err);
+        alert('Export error: ' + (err instanceof Error ? err.message : String(err)));
+        return;
+      }
+    }
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `transactions_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const file = new File([blob], filename, { type: 'text/csv' });
+
+    // Mobile web: Web Share API
+    if (typeof navigator.share === 'function') {
+      navigator.share({ files: [file], title: 'Budget Transactions Export' }).catch((err) => {
+        if (err?.name !== 'AbortError') triggerDownload(blob, filename);
+      });
+      return;
+    }
+
+    // Desktop: anchor download
+    triggerDownload(blob, filename);
   };
 
   return (

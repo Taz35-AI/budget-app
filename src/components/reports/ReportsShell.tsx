@@ -44,6 +44,7 @@ interface MonthData {
 
 export function ReportsShell() {
   const t = useTranslations('reports');
+  const tc = useTranslations('common');
   const tMonths = useTranslations('months');
   const tTags = useTranslations('tags');
   const MONTH_LABELS = tMonths.raw('short') as string[];
@@ -549,7 +550,7 @@ export function ReportsShell() {
                     <div key={i} className="flex items-center gap-3 py-2.5 border-b border-brand-primary/[0.06] last:border-0">
                       <span className="text-[10px] font-black text-brand-text/18 dark:text-white/12 w-4 text-right flex-shrink-0 tabular-nums">{i + 1}</span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-brand-text/80 dark:text-white/72 truncate block leading-tight">{tx.name}</span>
+                        <span className="text-sm font-semibold text-brand-text/80 dark:text-white/72 truncate block leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</span>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className="text-[10px] text-brand-text/28 dark:text-white/22">{tx.date}</span>
                           {tagInfo && (
@@ -557,7 +558,7 @@ export function ReportsShell() {
                               className="text-[9px] font-bold px-1.5 py-[2px] rounded-full"
                               style={{ backgroundColor: `${tagInfo.color}22`, color: tagInfo.color }}
                             >
-                              {tagInfo.label}
+                              {tx.tag && TAGS[tx.tag] ? tTags(tx.tag as never) : tagInfo.label}
                             </span>
                           )}
                         </div>

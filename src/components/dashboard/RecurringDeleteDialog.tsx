@@ -49,7 +49,7 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
       {/* Header */}
       <div className="rounded-xl bg-brand-danger/8 dark:bg-brand-danger/12 border border-brand-danger/20 dark:border-brand-danger/25 px-4 py-3">
         <p className="text-xs text-brand-danger font-medium uppercase tracking-wider mb-0.5">{t('deleteTitle')}</p>
-        <p className="text-sm font-semibold text-slate-800 dark:text-white">{tx.name}</p>
+        <p className="text-sm font-semibold text-slate-800 dark:text-white">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
         {tx.frequency && (
           <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
             {t('occurrenceOn', { frequency: FREQUENCIES[tx.frequency], date: displayDate })}

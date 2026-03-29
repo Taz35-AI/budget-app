@@ -20,7 +20,8 @@
     "all": "Toate",
     "required": "Obligatoriu",
     "mustBePositive": "Trebuie să fie > 0",
-    "mustBeWholeNumber": "Trebuie să fie un număr întreg ≥ 1"
+    "mustBeWholeNumber": "Trebuie să fie un număr întreg ≥ 1",
+    "balanceAdjustment": "Ajustare sold"
   },
   "nav": {
     "dashboard": "Panou",

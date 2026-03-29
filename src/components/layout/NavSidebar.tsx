@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
 import { ExportButton } from '@/components/dashboard/ExportButton';
 import { ResetAllButton } from '@/components/dashboard/ResetAllButton';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
+import { UserBadge } from '@/components/layout/UserBadge';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,11 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Utility section */}
       <div className="flex-shrink-0 px-2.5 pb-4 pt-3 border-t border-white/[0.07] space-y-1.5">
+        {/* Logged-in user */}
+        <div className="px-1 mb-3">
+          <UserBadge />
+        </div>
+
         <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">{t('options')}</p>
 
         {/* Theme toggle */}

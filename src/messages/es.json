@@ -20,7 +20,8 @@
     "all": "Todos",
     "required": "Obligatorio",
     "mustBePositive": "Debe ser > 0",
-    "mustBeWholeNumber": "Debe ser un número entero ≥ 1"
+    "mustBeWholeNumber": "Debe ser un número entero ≥ 1",
+    "balanceAdjustment": "Ajuste de saldo"
   },
   "nav": {
     "dashboard": "Panel",

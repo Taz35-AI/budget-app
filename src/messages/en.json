@@ -20,7 +20,8 @@
     "all": "All",
     "required": "Required",
     "mustBePositive": "Must be > 0",
-    "mustBeWholeNumber": "Must be a whole number ≥ 1"
+    "mustBeWholeNumber": "Must be a whole number ≥ 1",
+    "balanceAdjustment": "Balance Adjustment"
   },
   "nav": {
     "dashboard": "Dashboard",

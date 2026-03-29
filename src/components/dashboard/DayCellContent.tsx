@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { format, isToday } from 'date-fns';
 import type { DayTransaction } from '@/types';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function DayCellContent({ date, balance, transactions, formatAmount, isSelected, isSearchMatch }: Props) {
+  const tc = useTranslations('common');
   const today = isToday(date);
   const hasBalance = balance !== undefined;
   const isPositive = hasBalance && balance! > 0;
@@ -82,7 +84,7 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
                 tx.category === 'income' ? 'bg-brand-positive' : 'bg-brand-danger',
               )} />
               <span className="text-[8px] leading-snug text-brand-text/55 dark:text-white/30 truncate">
-                {tx.name}
+                {tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}
               </span>
             </div>
           ))}
