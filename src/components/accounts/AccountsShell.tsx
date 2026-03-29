@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { format, addMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -101,6 +102,9 @@ function AccountCard({
 }) {
   const { account, todayBalance, monthlySummaries } = summary;
   const isPositive = todayBalance >= 0;
+  const t = useTranslations('accounts');
+  const tMonths = useTranslations('months');
+  const shortMonths = tMonths.raw('short') as string[];
 
   return (
     <div className="bg-white dark:bg-[#122928] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(22,48,47,0.06)] dark:shadow-none">
@@ -124,7 +128,7 @@ function AccountCard({
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{account.name}</p>
-            <p className="text-[10px] text-slate-400 dark:text-white/35">Balance today</p>
+            <p className="text-[10px] text-slate-400 dark:text-white/35">{t('todayBalance')}</p>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
@@ -139,7 +143,7 @@ function AccountCard({
 
       {/* Monthly breakdown */}
       <div className="px-3 pb-2 pt-2.5">
-        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1.5">Monthly projection</p>
+        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-1.5">{t('monthlyProjection')}</p>
 
         <div className="flex flex-col gap-0">
           {/* Header row */}
@@ -170,7 +174,7 @@ function AccountCard({
                     'text-[10px] font-semibold truncate',
                     isCurrentMonth ? 'text-brand-primary' : 'text-slate-600 dark:text-white/60',
                   )}>
-                    {format(month, 'MMM')}
+                    {shortMonths[month.getMonth()]}
                   </p>
                 </div>
                 <p className="text-[10px] font-semibold tabular-nums text-brand-positive text-right">
@@ -199,6 +203,8 @@ function AccountCard({
 export function AccountsShell() {
   const { summaries, isLoading } = useAccountSummaries();
   const { formatAmount } = useCurrency();
+  const t = useTranslations('accounts');
+  const tc = useTranslations('common');
 
   const totalBalance = summaries.reduce((sum, s) => sum + s.todayBalance, 0);
 
@@ -210,10 +216,10 @@ export function AccountsShell() {
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
           <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-teal-500/40 to-transparent" />
-          <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+          <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
-            <h1 className="hidden lg:block text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Accounts</h1>
+            <h1 className="hidden lg:block text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('title')}</h1>
           </div>
         </header>
 
@@ -225,14 +231,14 @@ export function AccountsShell() {
             'bg-gradient-to-br from-[#16302F] via-[#1a3d3b] to-[#0f2928]',
             'shadow-[0_4px_24px_rgba(22,48,47,0.3)]',
           )}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">Total balance</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{t('totalBalance')}</p>
             <p className={cn('text-3xl sm:text-4xl font-black tracking-tight tabular-nums', totalBalance < 0 ? 'text-red-300' : 'text-white')}>
               {formatAmount(totalBalance)}
             </p>
             <p className="text-xs text-white/35 mt-1.5">
               {summaries.length === 0
-                ? 'No accounts yet — add one in Settings'
-                : `Across ${summaries.length} account${summaries.length !== 1 ? 's' : ''}`}
+                ? t('noAccounts')
+                : t('acrossAccounts', { count: summaries.length })}
             </p>
           </div>
 
@@ -269,7 +275,7 @@ export function AccountsShell() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-slate-600 dark:text-white/60">No accounts yet</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-white/60">{t('noAccounts')}</p>
               <p className="text-xs text-slate-400 dark:text-white/30">Add accounts in Settings to see your balance breakdown here</p>
             </div>
           )}

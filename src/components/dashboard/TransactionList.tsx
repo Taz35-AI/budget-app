@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { TransactionForm } from './TransactionForm';
 import { RecurringEditForm } from './RecurringEditForm';
 import { RecurringDeleteDialog } from './RecurringDeleteDialog';
 import { useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions';
 import type { EditMode, DeleteMode } from '@/hooks/useTransactions';
-import { FREQUENCIES } from '@/lib/constants';
+import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
 import { OnboardingTip } from './OnboardingTip';
@@ -31,6 +32,10 @@ type ActiveAction =
   | null;
 
 export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip, accounts }: Props) {
+  const t = useTranslations('transactions');
+  const tc = useTranslations('common');
+  const td = useTranslations('dashboard');
+  const tTags = useTranslations('tags');
   const [active, setActive] = useState<ActiveAction>(null);
   const [editAccountId, setEditAccountId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -71,7 +76,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
           !isPositive && !isNegative && 'bg-gradient-to-r from-slate-300 to-slate-200 dark:from-white/10 dark:to-white/5',
         )} />
         <p className="text-[9px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest mb-1 mt-0.5">
-          Balance · {format(new Date(date + 'T12:00:00'), 'd MMM yyyy')}
+          {t('balance', { date: format(new Date(date + 'T12:00:00'), 'd MMM yyyy') })}
         </p>
         <p className={cn(
           'text-xl font-extrabold tracking-tight tabular-nums',
@@ -94,7 +99,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search transactions…"
+              placeholder={td('searchPlaceholder')}
               className="w-full h-8 pl-8 pr-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 outline-none focus:border-slate-400 dark:focus:border-white/30 transition-colors"
             />
             {search && (
@@ -121,7 +126,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
                 )}
               >
-                {cat === 'all' ? 'All' : cat === 'income' ? '+ Income' : '− Expense'}
+                {cat === 'all' ? tc('all') : cat === 'income' ? t('filterIncome') : t('filterExpense')}
               </button>
             ))}
           </div>
@@ -137,12 +142,12 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-slate-400 dark:text-white/25">No transactions on this day</p>
-            <p className="text-xs text-slate-300 dark:text-white/15 mt-0.5">Tap below to add one</p>
+            <p className="text-sm font-medium text-slate-400 dark:text-white/25">{t('noTransactions')}</p>
+            <p className="text-xs text-slate-300 dark:text-white/15 mt-0.5">{t('tapToAdd')}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-sm text-slate-400 dark:text-white/30">No matching transactions</p>
+            <p className="text-sm text-slate-400 dark:text-white/30">{t('noMatching')}</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2">
@@ -177,13 +182,13 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         occurrenceDate={date}
                         onCancel={clearActive}
                         isLoading={update.isPending}
-                        onSubmit={({ editMode, name, amount, category, frequency, end_date }) => {
+                        onSubmit={({ editMode, name, amount, category, frequency, end_date, newDate }) => {
                           update.mutate(
                             {
                               id: tx.transaction_id,
                               editMode: editMode as EditMode,
                               effectiveFrom: date,
-                              values: { name, amount, category, frequency, end_date, account_id: editAccountId },
+                              values: { name, amount, category, frequency, end_date, account_id: editAccountId, newDate },
                             },
                             { onSuccess: clearActive },
                           );
@@ -283,7 +288,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                 return (
                   <li key={tx.id} className="rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-900/20 p-4">
                     <p className="text-sm text-slate-700 dark:text-white/80 mb-3">
-                      Delete &quot;{tx.name}&quot;?
+                      {t('deleteTitle', { name: tx.name })}
                     </p>
                     <div className="flex gap-2">
                       <Button
@@ -296,10 +301,10 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                           )
                         }
                       >
-                        Delete
+                        {tc('delete')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={clearActive}>
-                        Cancel
+                        {tc('cancel')}
                       </Button>
                     </div>
                     {del.isError && (
@@ -333,7 +338,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                           className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium text-white"
                           style={{ backgroundColor: allTags[tx.tag].color }}
                         >
-                          {allTags[tx.tag].label}
+                          {TAGS[tx.tag] ? tTags(tx.tag as never) : allTags[tx.tag].label}
                         </span>
                       )}
                       {showAccountBadge && tx.account_id && accountMap.has(tx.account_id) && (
@@ -356,7 +361,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     <button
                       onClick={() => startEdit(tx)}
                       className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
-                      aria-label="Edit"
+                      aria-label={t('editAriaLabel')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -365,7 +370,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     <button
                       onClick={() => setActive({ type: 'delete', txId: tx.transaction_id })}
                       className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                      aria-label="Delete"
+                      aria-label={t('deleteAriaLabel')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -383,14 +388,14 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
       <div className={cn('pt-4 mt-auto border-t border-slate-100 dark:border-white/[0.08]', active && 'hidden')}>
         {showTip && (
           <OnboardingTip arrow="bottom" className="mb-3">
-            Tap here to add your first transaction
+            {t('tapToAddFirst')}
           </OnboardingTip>
         )}
         <Button onClick={onAddNew} className="w-full" size="lg">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          Add transaction
+          {t('addTransaction')}
         </Button>
       </div>
     </div>

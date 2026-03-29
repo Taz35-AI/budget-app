@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,7 +9,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
-import { FREQUENCIES } from '@/lib/constants';
+import { FREQUENCIES, TAGS } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { useTransactions } from '@/hooks/useTransactions';
 import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/engine/recurringResolver';
@@ -27,6 +28,8 @@ interface TagDropdownProps {
 }
 
 function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
+  const t = useTranslations('transactionForm');
+  const tTags = useTranslations('tags');
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const ref = React.useRef<HTMLDivElement>(null);
@@ -52,10 +55,13 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
   }, [open]);
 
   const allForCategory = Object.entries(allTags).filter(
-    ([, t]) => t.category === category || t.category === 'both',
+    ([, tag]) => tag.category === category || tag.category === 'both',
   );
   const filteredTags = search
-    ? allForCategory.filter(([, t]) => t.label.toLowerCase().includes(search.toLowerCase()))
+    ? allForCategory.filter(([key, tag]) => {
+        const displayLabel = TAGS[key] ? tTags(key as never) : tag.label;
+        return displayLabel.toLowerCase().includes(search.toLowerCase());
+      })
     : allForCategory;
   const selectedTag = selected ? allTags[selected] : null;
 
@@ -63,7 +69,7 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
     <div ref={ref} className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
       <div className="flex items-center justify-between">
         <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
-          Category
+          {t('category')}
         </p>
         {error && (
           <p className={cn('text-brand-danger', compact ? 'text-[9px]' : 'text-xs')}>{error}</p>
@@ -87,10 +93,10 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
         {selectedTag ? (
           <>
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: selectedTag.color }} />
-            <span className="flex-1 text-left font-medium text-brand-text dark:text-white/90 truncate">{selectedTag.label}</span>
+            <span className="flex-1 text-left font-medium text-brand-text dark:text-white/90 truncate">{selected && TAGS[selected] ? tTags(selected as never) : selectedTag.label}</span>
           </>
         ) : (
-          <span className="flex-1 text-left text-brand-text/40 dark:text-white/35">Select category…</span>
+          <span className="flex-1 text-left text-brand-text/40 dark:text-white/35">{t('selectCategory')}</span>
         )}
         <svg
           className={cn('w-3.5 h-3.5 text-brand-text/30 dark:text-white/25 flex-shrink-0 transition-transform', open && 'rotate-180')}
@@ -114,7 +120,7 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search…"
+                placeholder={t('searchPlaceholder')}
                 className={cn(
                   'w-full pl-7 pr-2 rounded-lg bg-brand-primary/5 dark:bg-white/5 border border-transparent focus:border-brand-primary/25 text-brand-text dark:text-white/90 placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none',
                   compact ? 'h-6 text-[10px]' : 'h-7 text-xs',
@@ -125,7 +131,7 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
           <ul className="max-h-40 overflow-y-auto divide-y divide-brand-primary/[0.06] dark:divide-white/[0.04]">
             {filteredTags.length === 0 && (
               <li className={cn('px-3 text-brand-text/35 dark:text-white/30 italic', compact ? 'py-2 text-[10px]' : 'py-2.5 text-xs')}>
-                No categories match
+                {t('noCategoriesMatch')}
               </li>
             )}
             {filteredTags.map(([key, { label, color }]) => {
@@ -145,7 +151,7 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
                   >
                     <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                     <span className={cn('flex-1 text-left truncate', isSelected ? 'font-semibold text-brand-primary' : 'font-medium text-brand-text/80 dark:text-white/75')}>
-                      {label}
+                      {TAGS[key] ? tTags(key as never) : label}
                     </span>
                     {isSelected && (
                       <svg className="w-3.5 h-3.5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -165,34 +171,36 @@ function TagDropdown({ allTags, category, selected, onSelect, error, compact }: 
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
-const schema = z
-  .object({
-    name: z.string().min(1, 'Name is required'),
-    amount: z.string().min(1, 'Amount is required').refine((v) => Number(v) > 0, 'Must be > 0'),
-    category: z.enum(['income', 'expense']),
-    type: z.enum(['recurring', 'one_off']),
-    tag: z.string().min(1, 'Please select a category'),
-    date: z.string().optional(),
-    start_date: z.string().optional(),
-    frequency: z
-      .enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'])
-      .optional(),
-    recurrences: z.string().optional().refine(
-      (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
-      'Must be a whole number ≥ 1',
-    ),
-  })
-  .superRefine((data, ctx) => {
-    if (data.type === 'one_off' && !data.date) {
-      ctx.addIssue({ code: 'custom', path: ['date'], message: 'Date is required' });
-    }
-    if (data.type === 'recurring' && !data.start_date) {
-      ctx.addIssue({ code: 'custom', path: ['start_date'], message: 'Start date is required' });
-    }
-    if (data.type === 'recurring' && !data.frequency) {
-      ctx.addIssue({ code: 'custom', path: ['frequency'], message: 'Frequency is required' });
-    }
-  });
+function buildSchema(t: (key: string) => string, tc: (key: string) => string) {
+  return z
+    .object({
+      name: z.string().min(1, t('nameRequired')),
+      amount: z.string().min(1, t('amountRequired')).refine((v) => Number(v) > 0, tc('mustBePositive')),
+      category: z.enum(['income', 'expense']),
+      type: z.enum(['recurring', 'one_off']),
+      tag: z.string().min(1, t('categoryRequired')),
+      date: z.string().optional(),
+      start_date: z.string().optional(),
+      frequency: z
+        .enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'])
+        .optional(),
+      recurrences: z.string().optional().refine(
+        (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
+        tc('mustBeWholeNumber'),
+      ),
+    })
+    .superRefine((data, ctx) => {
+      if (data.type === 'one_off' && !data.date) {
+        ctx.addIssue({ code: 'custom', path: ['date'], message: t('dateRequired') });
+      }
+      if (data.type === 'recurring' && !data.start_date) {
+        ctx.addIssue({ code: 'custom', path: ['start_date'], message: t('startDateRequired') });
+      }
+      if (data.type === 'recurring' && !data.frequency) {
+        ctx.addIssue({ code: 'custom', path: ['frequency'], message: t('frequencyRequired') });
+      }
+    });
+}
 
 interface Props {
   defaultDate?: string;
@@ -206,6 +214,10 @@ interface Props {
 }
 
 export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact }: Props) {
+  const t = useTranslations('transactionForm');
+  const tc = useTranslations('common');
+  const tt = useTranslations('transactions');
+
   // Back-compute recurrences from an existing end_date so the field pre-fills on edit
   const initialRecurrences = (() => {
     if (!initialValues?.end_date || !initialValues?.start_date || !initialValues?.frequency) return '';
@@ -216,6 +228,8 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
     );
     return n != null ? String(n) : '';
   })();
+
+  const schema = React.useMemo(() => buildSchema(t, tc), [t, tc]);
 
   const {
     register,
@@ -304,7 +318,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       {/* Template chips */}
       {templates.length > 0 && (
         <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
-          <p className={cn('font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25', compact ? 'text-[9px]' : 'text-[10px]')}>Quick fill</p>
+          <p className={cn('font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25', compact ? 'text-[9px]' : 'text-[10px]')}>{t('quickFill')}</p>
           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
             {templates.map((tpl) => (
               <button
@@ -349,7 +363,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
             )}
           >
             <input type="radio" value={cat} {...register('category')} className="sr-only" />
-            {cat === 'income' ? '+ Income' : '− Expense'}
+            {cat === 'income' ? t('income') : t('expense')}
           </label>
         ))}
       </div>
@@ -359,19 +373,19 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         <input type="hidden" {...register('type')} />
       ) : (
         <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
-          {(['one_off', 'recurring'] as const).map((t) => (
+          {(['one_off', 'recurring'] as const).map((txType) => (
             <label
-              key={t}
+              key={txType}
               className={cn(
                 'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
                 compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-                type === t
+                type === txType
                   ? 'bg-brand-primary text-white shadow-inner'
                   : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
               )}
             >
-              <input type="radio" value={t} {...register('type')} className="sr-only" />
-              {t === 'one_off' ? 'One-off' : 'Recurring'}
+              <input type="radio" value={txType} {...register('type')} className="sr-only" />
+              {txType === 'one_off' ? t('oneOff') : t('recurring')}
             </label>
           ))}
         </div>
@@ -379,11 +393,11 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
 
       <Input
         id="amount"
-        label="Amount"
+        label={t('amount')}
         type="number"
         step="0.01"
         min="0"
-        placeholder="0.00"
+        placeholder={t('amountPlaceholder')}
         prefix={symbol}
         error={errors.amount?.message}
         className={compact ? 'h-7 text-[11px]' : undefined}
@@ -393,8 +407,8 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       <div className="relative">
         <Input
           id="name"
-          label="Description"
-          placeholder="e.g. Monthly salary"
+          label={t('description')}
+          placeholder={t('descriptionPlaceholder')}
           error={errors.name?.message}
           className={compact ? 'h-7 text-[11px]' : undefined}
           {...register('name')}
@@ -441,7 +455,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       {type === 'one_off' && (
         <Input
           id="date"
-          label="Date"
+          label={t('date')}
           type="date"
           error={errors.date?.message}
           className={compact ? 'h-7 text-[11px]' : undefined}
@@ -454,7 +468,7 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
           <input type="hidden" {...register('start_date')} />
           <Select
             id="frequency"
-            label="Frequency"
+            label={t('frequency')}
             error={errors.frequency?.message}
             options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
             {...register('frequency')}
@@ -462,18 +476,18 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
           <div className="flex flex-col gap-1">
             <Input
               id="recurrences"
-              label="Number of occurrences (optional)"
+              label={t('occurrences')}
               type="number"
               min="1"
               step="1"
-              placeholder="e.g. 12  — leave blank to repeat forever"
+              placeholder={t('occurrencesPlaceholder')}
               error={errors.recurrences?.message}
               className={compact ? 'h-7 text-[11px]' : undefined}
               {...register('recurrences')}
             />
             {computedEndDate && (
               <p className={cn('text-brand-text/40 dark:text-white/35 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
-                Last occurrence: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
+                {t('lastOccurrence', { date: format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy') })}
               </p>
             )}
           </div>
@@ -482,10 +496,10 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
 
       <div className={cn('flex gap-2', compact ? 'pt-1' : 'pt-2')}>
         <Button type="submit" size={compact ? 'sm' : 'md'} loading={isLoading} className="flex-1">
-          {initialValues ? 'Save changes' : 'Add transaction'}
+          {initialValues ? tt('saveChanges') : tt('addTransaction')}
         </Button>
         <Button type="button" size={compact ? 'sm' : 'md'} variant="ghost" onClick={onCancel}>
-          Cancel
+          {tc('cancel')}
         </Button>
       </div>
     </form>

@@ -1,7 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
+import { TAGS } from '@/lib/constants';
 import { useBalances } from '@/hooks/useBalances';
 import { useSettings } from '@/hooks/useSettings';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -17,9 +19,14 @@ export function BudgetsShell() {
   const { allTags, tagBudgets } = useSettings();
   const { setTagBudget } = useSettingsStore();
   const { formatAmount, symbol } = useCurrency();
+  const t = useTranslations('budgets');
+  const tc = useTranslations('common');
+  const tMonths = useTranslations('months');
+  const tTags = useTranslations('tags');
 
   const currentMonth = format(new Date(), 'yyyy-MM');
-  const currentMonthLabel = format(new Date(), 'MMMM yyyy');
+  const _now = new Date();
+  const currentMonthLabel = `${(tMonths.raw('long') as string[])[_now.getMonth()]} ${_now.getFullYear()}`;
 
   const [addingForTag, setAddingForTag] = useState<string | null>(null);
   const [budgetInput, setBudgetInput] = useState('');
@@ -46,7 +53,7 @@ export function BudgetsShell() {
     const tag = allTags[b.tagId];
     return {
       tagId: b.tagId,
-      label: tag?.label ?? b.tagId,
+      label: TAGS[b.tagId] ? tTags(b.tagId as never) : (tag?.label ?? b.tagId),
       color: tag?.color ?? '#6b7280',
       monthlyLimit: b.monthlyLimit,
       spent,
@@ -59,7 +66,7 @@ export function BudgetsShell() {
     .filter(([tagId]) => !tagBudgets.some((b) => b.tagId === tagId))
     .map(([tagId, amount]) => ({
       tagId,
-      label: tagId === '__untagged__' ? 'Untagged' : (allTags[tagId]?.label ?? tagId),
+      label: tagId === '__untagged__' ? tTags('untagged') : (TAGS[tagId] ? tTags(tagId as never) : (allTags[tagId]?.label ?? tagId)),
       color: tagId === '__untagged__' ? '#6b7280' : (allTags[tagId]?.color ?? '#6b7280'),
       amount,
     }))
@@ -72,7 +79,7 @@ export function BudgetsShell() {
 
   function handleSaveBudget(tagId: string) {
     const val = parseFloat(budgetInput);
-    if (isNaN(val) || val <= 0) { setBudgetError('Enter an amount greater than 0'); return; }
+    if (isNaN(val) || val <= 0) { setBudgetError(t('amountError')); return; }
     setTagBudget(tagId, val);
     setAddingForTag(null);
     setBudgetInput('');
@@ -87,11 +94,11 @@ export function BudgetsShell() {
 
         {/* Header */}
         <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
-          <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+          <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
             <div className="hidden lg:block">
-              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Budgets</h1>
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('title')}</h1>
             </div>
             {availableForBudget.length > 0 && (
               <div className="ml-auto">
@@ -99,7 +106,7 @@ export function BudgetsShell() {
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  Set budget
+                  {t('addBudget')}
                 </Button>
               </div>
             )}
@@ -115,7 +122,7 @@ export function BudgetsShell() {
                 <p className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   {formatAmount(totalMonthlyExpense, { compact: true })}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-white/40 mt-0.5">spent this month</p>
+                <p className="text-xs text-slate-500 dark:text-white/40 mt-0.5">{t('spentThisMonth')}</p>
               </div>
               {tagBudgets.length > 0 && (() => {
                 const totalBudget = tagBudgets.reduce((s, b) => s + b.monthlyLimit, 0);
@@ -125,7 +132,7 @@ export function BudgetsShell() {
                   <div className="text-right">
                     <p className={cn('text-xl font-bold', over ? 'text-red-500' : 'text-emerald-500')}>
                       {formatAmount(Math.abs(remaining), { compact: true })}
-                      <span className="text-xs font-medium text-slate-400 dark:text-white/30 ml-1">{over ? 'over' : 'left'}</span>
+                      <span className="text-xs font-medium text-slate-400 dark:text-white/30 ml-1">{over ? t('over') : t('left')}</span>
                     </p>
                     <p className="text-xs text-slate-400 dark:text-white/30">of {formatAmount(totalBudget, { compact: true })} budgeted</p>
                   </div>
@@ -146,11 +153,11 @@ export function BudgetsShell() {
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 bg-white dark:bg-white/5 transition-all"
                   >
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }} />
-                    {tag.label}
+                    {TAGS[id] ? tTags(id as never) : tag.label}
                   </button>
                 ))}
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setAddingForTag(null)}>Cancel</Button>
+              <Button variant="ghost" size="sm" onClick={() => setAddingForTag(null)}>{tc('cancel')}</Button>
             </div>
           )}
 
@@ -160,23 +167,23 @@ export function BudgetsShell() {
               <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 flex flex-col gap-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tag?.color ?? '#6b7280' }} />
-                  <p className="text-sm font-bold text-slate-800 dark:text-white">Monthly limit for {tag?.label ?? addingForTag}</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-white">{t('budgetFor', { tag: TAGS[addingForTag] ? tTags(addingForTag as never) : (tag?.label ?? addingForTag) })}</p>
                 </div>
                 <Input
                   id="budget-input"
-                  label="Monthly limit"
+                  label={t('monthlyLimit')}
                   type="number"
                   step="0.01"
                   min="0.01"
                   prefix={symbol}
-                  placeholder="0.00"
+                  placeholder={t('amountPlaceholder')}
                   defaultValue={tagBudgets.find((b) => b.tagId === addingForTag)?.monthlyLimit?.toString() ?? ''}
                   onChange={(e) => { setBudgetInput(e.target.value); setBudgetError(''); }}
                 />
                 {budgetError && <p className="text-xs text-red-500">{budgetError}</p>}
                 <div className="flex gap-2">
-                  <Button className="flex-1" onClick={() => handleSaveBudget(addingForTag)}>Save</Button>
-                  <Button variant="ghost" onClick={() => { setAddingForTag(null); setBudgetInput(''); setBudgetError(''); }}>Cancel</Button>
+                  <Button className="flex-1" onClick={() => handleSaveBudget(addingForTag)}>{tc('set')}</Button>
+                  <Button variant="ghost" onClick={() => { setAddingForTag(null); setBudgetInput(''); setBudgetError(''); }}>{tc('cancel')}</Button>
                 </div>
               </div>
             );
@@ -194,7 +201,7 @@ export function BudgetsShell() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-slate-600 dark:text-white/60">No budgets set yet</p>
+              <p className="text-sm font-semibold text-slate-600 dark:text-white/60">{t('noBudgetYet')}</p>
               <p className="text-xs text-slate-400 dark:text-white/30">Set monthly limits for your spending categories</p>
             </div>
           ) : (
@@ -202,7 +209,7 @@ export function BudgetsShell() {
               {/* Budgeted categories */}
               {budgetedTags.length > 0 && (
                 <div className="flex flex-col gap-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 px-1">Tracked categories</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 px-1">{t('trackedCategories')}</p>
                   {budgetedTags.map((b) => (
                     <div key={b.tagId} className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-4">
                       <div className="flex items-center justify-between mb-2">
@@ -275,7 +282,7 @@ export function BudgetsShell() {
                             onClick={() => { setAddingForTag(item.tagId); setBudgetInput(''); setBudgetError(''); }}
                             className="text-[10px] font-bold text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/60 underline transition-colors"
                           >
-                            Set limit
+                            {tc('set')}
                           </button>
                         )}
                       </div>

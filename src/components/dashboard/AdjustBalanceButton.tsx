@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accountId }: Props) {
+  const t = useTranslations('adjustBalance');
+  const tc = useTranslations('common');
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
@@ -29,14 +32,14 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
   const mutation = useMutation({
     mutationFn: async () => {
       const desired = parseFloat(value);
-      if (isNaN(desired)) throw new Error('Invalid amount');
+      if (isNaN(desired)) throw new Error(t('invalidAmount'));
       const res = await fetch('/api/adjust-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ desiredBalance: desired, currentBalance: todayBalance, accountId: accountId ?? null }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Failed');
+      if (!res.ok) throw new Error(data.error ?? t('failed'));
       return data;
     },
     onSuccess: () => {
@@ -58,7 +61,7 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        <span className="hidden sm:inline">Adjust Balance</span>
+        <span className="hidden sm:inline">{t('buttonLabel')}</span>
       </button>
 
       {open && (
@@ -69,8 +72,8 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
           >
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">Adjust Balance</p>
-                <p className="text-xs text-slate-400 dark:text-white/40">Now: {formatAmount(todayBalance)}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">{t('title')}</p>
+                <p className="text-xs text-slate-400 dark:text-white/40">{t('now', { amount: formatAmount(todayBalance) })}</p>
               </div>
               <button onClick={() => setOpen(false)} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white/70 hover:bg-slate-100 dark:hover:bg-white/8 transition-all">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -102,14 +105,14 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
 
             <div className="flex gap-2 mt-3">
               <button onClick={() => setOpen(false)} className="flex-1 h-9 rounded-xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold transition-all border border-slate-200 dark:border-white/10">
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={() => mutation.mutate()}
                 disabled={mutation.isPending || !hasDelta}
                 className="flex-1 h-9 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold disabled:opacity-40 transition-all"
               >
-                {mutation.isPending ? '…' : 'Set'}
+                {mutation.isPending ? tc('loading') : tc('set')}
               </button>
             </div>
           </div>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,20 +16,23 @@ import { cn } from '@/lib/utils';
 import type { EditMode } from '@/hooks/useTransactions';
 import type { DayTransaction, Frequency } from '@/types';
 
-const schema = z.object({
-  editMode: z.enum(['this_only', 'all_future', 'all']),
-  name: z.string().min(1, 'Required'),
-  amount: z.string().min(1, 'Required').refine((v) => Number(v) > 0, 'Must be > 0'),
-  category: z.enum(['income', 'expense']),
-  tag: z.string().optional(),
-  frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
-  recurrences: z.string().optional().refine(
-    (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
-    'Must be a whole number ≥ 1',
-  ),
-});
+function buildSchema(tc: (key: string) => string) {
+  return z.object({
+    editMode: z.enum(['this_only', 'all_future', 'all']),
+    name: z.string().min(1, tc('required')),
+    amount: z.string().min(1, tc('required')).refine((v) => Number(v) > 0, tc('mustBePositive')),
+    category: z.enum(['income', 'expense']),
+    tag: z.string().optional(),
+    frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
+    recurrences: z.string().optional().refine(
+      (v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 1),
+      tc('mustBeWholeNumber'),
+    ),
+    newDate: z.string().optional(),
+  });
+}
 
-type FormFields = z.infer<typeof schema>;
+type FormFields = z.infer<ReturnType<typeof buildSchema>>;
 
 // What the parent receives — end_date is computed from recurrences before calling onSubmit
 type SubmitValues = {
@@ -38,6 +43,7 @@ type SubmitValues = {
   tag?: string;
   frequency?: Frequency;
   end_date?: string;
+  newDate?: string;
 };
 
 interface Props {
@@ -48,25 +54,33 @@ interface Props {
   isLoading?: boolean;
 }
 
-const SCOPE_OPTIONS = [
-  {
-    value: 'this_only',
-    label: 'This occurrence only',
-    description: 'Only this date changes. Before and after stay the same.',
-  },
-  {
-    value: 'all_future',
-    label: 'This and all future',
-    description: 'From this date forward. Past occurrences are unchanged.',
-  },
-  {
-    value: 'all',
-    label: 'Entire series',
-    description: 'Every occurrence — past and future — is updated.',
-  },
-] as const;
 
 export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLoading }: Props) {
+  const t = useTranslations('recurring');
+  const tc = useTranslations('common');
+  const tt = useTranslations('transactions');
+  const tf = useTranslations('transactionForm');
+
+  const SCOPE_OPTIONS = [
+    {
+      value: 'this_only' as const,
+      label: t('justThisOne'),
+      description: t('justThisOneDesc'),
+    },
+    {
+      value: 'all_future' as const,
+      label: t('thisAndAllFuture'),
+      description: t('thisAndAllFutureDesc'),
+    },
+    {
+      value: 'all' as const,
+      label: t('allOccurrences'),
+      description: t('allOccurrencesDesc'),
+    },
+  ];
+
+  const schema = useMemo(() => buildSchema(tc), [tc]);
+
   // Back-compute recurrences from an existing end_date.
   // For display/default purposes we always measure from the series' original start_date.
   const initialRecurrences = (() => {
@@ -91,6 +105,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       tag: tx.tag ?? '',
       frequency: tx.frequency ?? 'monthly',
       recurrences: initialRecurrences,
+      newDate: occurrenceDate,
     },
   });
 
@@ -126,8 +141,10 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
             end_date = computeEndDateFromRecurrences(base, v.frequency as Frequency, n);
           }
         }
-        const { recurrences: _rec, ...rest } = v;
-        onSubmit({ ...rest, editMode: rest.editMode as EditMode, end_date });
+        const { recurrences: _rec, newDate, ...rest } = v;
+        // Only include newDate if the user actually changed it from the default
+        const changedDate = newDate && newDate !== occurrenceDate ? newDate : undefined;
+        onSubmit({ ...rest, editMode: rest.editMode as EditMode, end_date, newDate: changedDate });
       })}
       className="flex flex-col gap-1.5"
     >
@@ -135,7 +152,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       {/* Occurrence label */}
       <div className="rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2.5 py-1.5 flex items-center gap-3">
         <div>
-          <p className="text-[9px] text-slate-400 dark:text-white/35 font-medium uppercase tracking-wider">Editing</p>
+          <p className="text-[9px] text-slate-400 dark:text-white/35 font-medium uppercase tracking-wider">{t('editTitle')}</p>
           <p className="text-[11px] font-semibold text-slate-800 dark:text-white leading-tight">{displayDate}</p>
         </div>
         {tx.frequency && (
@@ -147,7 +164,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
       {/* Scope selector */}
       <div className="flex flex-col gap-1">
-        <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">What do you want to change?</p>
+        <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{t('deleteQuestion')}</p>
         {SCOPE_OPTIONS.map((opt) => (
           <label
             key={opt.value}
@@ -180,10 +197,21 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       {/* Divider */}
       <div className="border-t border-slate-100 dark:border-white/[0.08]" />
 
+      {/* Date field — visible for all modes except 'all' (which changes start_date via separate field) */}
+      {editMode !== 'all' && (
+        <Input
+          id="newDate"
+          type="date"
+          label={editMode === 'this_only' ? t('moveToDate') : t('newStartDate')}
+          className="h-7 text-[11px]"
+          {...register('newDate')}
+        />
+      )}
+
       {/* Fields */}
       <Input
         id="name"
-        label="Description"
+        label={tf('description')}
         error={errors.name?.message}
         className="h-8 text-xs"
         {...register('name')}
@@ -192,7 +220,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       <div className="grid grid-cols-2 gap-2">
         <Input
           id="amount"
-          label="Amount"
+          label={tf('amount')}
           type="number"
           step="0.01"
           min="0.01"
@@ -202,7 +230,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         />
 
         <div className="flex flex-col gap-1">
-          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Type</p>
+          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{tf('type')}</p>
           <div className={cn(
             'flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 h-7',
             editMode === 'this_only' && 'pointer-events-none opacity-50',
@@ -230,7 +258,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
       {editMode === 'all' && (
         <div className="flex flex-col gap-1">
-          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">Category (optional)</p>
+          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{tf('category')}</p>
           <div className="flex flex-wrap gap-1">
             {Object.entries(allTags)
               .filter(([, t]) => t.category === category || t.category === 'both')
@@ -262,25 +290,25 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         <>
           <Select
             id="frequency"
-            label="Frequency"
+            label={tf('frequency')}
             options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
             {...register('frequency')}
           />
           <div className="flex flex-col gap-0.5">
             <Input
               id="recurrences"
-              label="Occurrences (optional)"
+              label={tf('occurrences')}
               type="number"
               min="1"
               step="1"
-              placeholder="Leave blank to repeat forever"
+              placeholder={tf('occurrencesPlaceholder')}
               error={errors.recurrences?.message}
               className="h-7 text-[11px]"
               {...register('recurrences')}
             />
             {computedEndDate && (
               <p className="text-[10px] text-slate-400 dark:text-white/40 pl-1">
-                Last: {format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy')}
+                {tf('lastOccurrence', { date: format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy') })}
               </p>
             )}
           </div>
@@ -289,10 +317,10 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
       <div className="flex gap-2 pt-1">
         <Button type="submit" size="sm" loading={isLoading} className="flex-1">
-          Save changes
+          {tt('saveChanges')}
         </Button>
         <Button type="button" size="sm" variant="ghost" onClick={onCancel}>
-          Cancel
+          {tc('cancel')}
         </Button>
       </div>
     </form>

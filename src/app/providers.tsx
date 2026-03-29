@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, createContext, useContext, useEffect } from 'react';
 import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
+import { I18nProvider } from '@/providers/I18nProvider';
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
 
@@ -62,9 +63,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RealtimeSyncProvider>
-          <SettingsSyncProvider>{children}</SettingsSyncProvider>
-        </RealtimeSyncProvider>
+        <I18nProvider>
+          <RealtimeSyncProvider>
+            <SettingsSyncProvider>{children}</SettingsSyncProvider>
+          </RealtimeSyncProvider>
+        </I18nProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

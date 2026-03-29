@@ -2,32 +2,12 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/Button';
 import { FREQUENCIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import type { DeleteMode } from '@/hooks/useTransactions';
 import type { DayTransaction } from '@/types';
-
-const SCOPE_OPTIONS = [
-  {
-    value: 'this_only' as DeleteMode,
-    label: 'This occurrence only',
-    description: 'Only removed on this date. Continues before and after.',
-    danger: false,
-  },
-  {
-    value: 'all_future' as DeleteMode,
-    label: 'This and all future',
-    description: 'Removed from this date onwards. Past occurrences kept.',
-    danger: false,
-  },
-  {
-    value: 'all' as DeleteMode,
-    label: 'Entire series',
-    description: 'All occurrences deleted permanently — including past.',
-    danger: true,
-  },
-] as const;
 
 interface Props {
   tx: DayTransaction;
@@ -38,25 +18,48 @@ interface Props {
 }
 
 export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel, isLoading }: Props) {
+  const t = useTranslations('recurring');
+  const tc = useTranslations('common');
   const [selected, setSelected] = useState<DeleteMode>('all_future');
   const displayDate = format(new Date(occurrenceDate + 'T12:00:00'), 'd MMM yyyy');
+
+  const SCOPE_OPTIONS = [
+    {
+      value: 'this_only' as DeleteMode,
+      label: t('justThisOne'),
+      description: t('justThisOneDeleteDesc'),
+      danger: false,
+    },
+    {
+      value: 'all_future' as DeleteMode,
+      label: t('thisAndAllFuture'),
+      description: t('thisAndAllFutureDeleteDesc'),
+      danger: false,
+    },
+    {
+      value: 'all' as DeleteMode,
+      label: t('allOccurrences'),
+      description: t('allOccurrencesDeleteDesc'),
+      danger: true,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="rounded-xl bg-brand-danger/8 dark:bg-brand-danger/12 border border-brand-danger/20 dark:border-brand-danger/25 px-4 py-3">
-        <p className="text-xs text-brand-danger font-medium uppercase tracking-wider mb-0.5">Deleting</p>
+        <p className="text-xs text-brand-danger font-medium uppercase tracking-wider mb-0.5">{t('deleteTitle')}</p>
         <p className="text-sm font-semibold text-slate-800 dark:text-white">{tx.name}</p>
         {tx.frequency && (
           <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
-            {FREQUENCIES[tx.frequency]} · occurrence on {displayDate}
+            {t('occurrenceOn', { frequency: FREQUENCIES[tx.frequency], date: displayDate })}
           </p>
         )}
       </div>
 
       {/* Scope options */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-700 dark:text-white/80">What do you want to delete?</p>
+        <p className="text-sm font-medium text-slate-700 dark:text-white/80">{t('deleteQuestion')}</p>
         {SCOPE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -105,10 +108,10 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
           onClick={() => onConfirm(selected)}
           className="flex-1"
         >
-          Delete
+          {tc('delete')}
         </Button>
         <Button variant="ghost" onClick={onCancel}>
-          Cancel
+          {tc('cancel')}
         </Button>
       </div>
     </div>

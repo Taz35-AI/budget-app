@@ -28,6 +28,7 @@ export interface Transaction {
   id: string;
   user_id: string;
   account_id?: string | null;
+  parent_id?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;
@@ -73,6 +74,7 @@ export interface DayTransaction {
   id: string;
   transaction_id: string;
   account_id?: string | null;
+  parent_id?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;
@@ -102,6 +104,8 @@ export interface TransactionFormValues {
   end_date?: string;
   frequency?: Frequency;
   account_id?: string | null;
+  // Used only for recurring date-change edits (all_future split / this_only move)
+  newDate?: string;
 }
 
 // ─── Settings types ───────────────────────────────────────────────────────────

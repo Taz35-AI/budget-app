@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { TAGS } from '@/lib/constants';
 import { useBalances } from '@/hooks/useBalances';
 import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -8,8 +10,6 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const MONTH_FULL   = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // Max bar height in px — leaves room for net indicator above + label below
 const BAR_MAX_H = 128;
@@ -43,6 +43,12 @@ interface MonthData {
 }
 
 export function ReportsShell() {
+  const t = useTranslations('reports');
+  const tMonths = useTranslations('months');
+  const tTags = useTranslations('tags');
+  const MONTH_LABELS = tMonths.raw('short') as string[];
+  const MONTH_FULL = tMonths.raw('long') as string[];
+
   const { dayTransactions, balances, isLoading } = useBalances();
   const { allTags } = useSettings();
   const { formatAmount } = useCurrency();
@@ -51,6 +57,7 @@ export function ReportsShell() {
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(new Date().getMonth());
   const [hoveredTag,       setHoveredTag]       = useState<string | null>(null);
+  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual'>('overview');
 
   // ── Monthly aggregates ──────────────────────────────────────────────────────
   const yearlyData = useMemo<MonthData[]>(() => {
@@ -113,10 +120,10 @@ export function ReportsShell() {
       .sort((a, b) => b[1] - a[1])
       .map(([k, amt]) => ({
         key: k, amount: amt,
-        label: k === '__untagged__' ? 'Untagged' : (allTags[k]?.label ?? k),
+        label: k === '__untagged__' ? tTags('untagged') : (TAGS[k] ? tTags(k as never) : (allTags[k]?.label ?? k)),
         color: k === '__untagged__' ? '#6b7280' : (allTags[k]?.color ?? '#6b7280'),
       })),
-    [selected.tags, allTags],
+    [selected.tags, allTags, tTags],
   );
   const maxTagAmt = tagBreakdown[0]?.amount ?? 1;
 
@@ -130,10 +137,10 @@ export function ReportsShell() {
       .sort((a, b) => b[1] - a[1])
       .map(([k, amt]) => ({
         key: k, amount: amt,
-        label: k === '__untagged__' ? 'Untagged' : (allTags[k]?.label ?? k),
+        label: k === '__untagged__' ? tTags('untagged') : (TAGS[k] ? tTags(k as never) : (allTags[k]?.label ?? k)),
         color: k === '__untagged__' ? '#6b7280' : (allTags[k]?.color ?? '#6b7280'),
       }));
-  }, [yearlyData, allTags]);
+  }, [yearlyData, allTags, tTags]);
   const maxAnnualTagAmt = annualTags[0]?.amount ?? 1;
 
   // Donut segments for annual spending — start at top (-90°), gap 2° between slices.
@@ -181,10 +188,10 @@ export function ReportsShell() {
           shadow-[0_1px_0_rgba(22,48,47,0.06),0_4px_16px_rgba(22,48,47,0.04)]
           dark:shadow-[0_1px_0_rgba(59,122,120,0.06)]">
           <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#3B7A78]/40 to-transparent" />
-          <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+          <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
-            <h1 className="text-xl font-extrabold text-[#16302F] dark:text-white tracking-tight hidden lg:block">Reports</h1>
+            <h1 className="text-xl font-extrabold text-[#16302F] dark:text-white tracking-tight hidden lg:block">{t('title')}</h1>
             <div className="flex items-center gap-1.5 ml-auto">
               <button
                 onClick={() => setSelectedYear((y) => y - 1)}
@@ -208,7 +215,59 @@ export function ReportsShell() {
           </div>
         </header>
 
-        <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
+        {/* ── Mobile tab strip + month selector ───────────────────────── */}
+        <div className="sm:hidden sticky top-16 z-10 bg-[#F7FAF9]/95 dark:bg-[#0C1F1E]/95 backdrop-blur-xl border-b border-brand-primary/[0.08] dark:border-white/[0.05]">
+          {/* Tabs */}
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none px-3 pt-2 pb-1.5">
+            {([
+              { id: 'overview',     label: t('tabOverview')      },
+              { id: 'month',        label: t('tabMonth')         },
+              { id: 'transactions', label: t('tabTransactions')  },
+              { id: 'annual',       label: t('tabAnnual')        },
+            ] as const).map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  'flex-shrink-0 h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
+                  activeTab === id
+                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
+                    : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {/* Month selector — shown on non-overview tabs */}
+          <div className={cn(
+            'flex items-center justify-between px-4 pb-2 pt-1',
+            activeTab === 'overview' && 'invisible pointer-events-none',
+          )}>
+            <button
+              onClick={() => setSelectedMonthIdx((m) => (m > 0 ? m - 1 : 11))}
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-brand-primary/20 text-brand-primary/60 hover:bg-brand-primary/8 transition-all active:scale-95"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <span className="text-sm font-bold text-brand-text dark:text-white">
+              {MONTH_FULL[selectedMonthIdx]} {selectedYear}
+            </span>
+            <button
+              onClick={() => setSelectedMonthIdx((m) => (m < 11 ? m + 1 : 0))}
+              className="w-7 h-7 flex items-center justify-center rounded-lg border border-brand-primary/20 text-brand-primary/60 hover:bg-brand-primary/8 transition-all active:scale-95"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* ── Content area — fixed-height scrollable on mobile, normal on desktop ── */}
+        <div className="h-[calc(100dvh-4rem-6.5rem)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
           <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
@@ -216,7 +275,7 @@ export function ReportsShell() {
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
                 <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">
-                  {yearTotals.net >= 0 ? `Saved in ${selectedYear}` : `Deficit in ${selectedYear}`}
+                  {yearTotals.net >= 0 ? t('savedIn', { year: selectedYear }) : t('deficitIn', { year: selectedYear })}
                 </span>
                 <span className={cn('text-[1.75rem] font-black tabular-nums leading-none tracking-tight truncate block',
                   yearTotals.net >= 0 ? 'text-brand-positive' : 'text-brand-danger')}>
@@ -224,15 +283,15 @@ export function ReportsShell() {
                 </span>
               </div>
               <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{selectedYear} Income</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('yearIncome', { year: selectedYear })}</span>
                 <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-positive truncate block">{formatAmount(yearTotals.income)}</span>
               </div>
               <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{selectedYear} Expenses</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('yearExpenses', { year: selectedYear })}</span>
                 <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-danger truncate block">{formatAmount(yearTotals.expense)}</span>
               </div>
               <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">Savings Rate</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('savingsRate')}</span>
                 <span className={cn('text-xl font-black tabular-nums leading-none tracking-tight truncate block',
                   (yearTotals.rate ?? 0) >= 0 ? 'text-brand-positive' : 'text-brand-danger')}>
                   {yearTotals.rate !== null ? `${yearTotals.rate}%` : '—'}
@@ -243,7 +302,7 @@ export function ReportsShell() {
             <div className="sm:hidden">
               <div className="px-4 pt-4 pb-3 border-b border-brand-primary/[0.08]">
                 <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">
-                  {yearTotals.net >= 0 ? `Saved in ${selectedYear}` : `Deficit ${selectedYear}`}
+                  {yearTotals.net >= 0 ? t('savedIn', { year: selectedYear }) : t('deficit', { year: selectedYear })}
                 </span>
                 <span className={cn('text-[1.75rem] font-black tabular-nums leading-none tracking-tight block',
                   yearTotals.net >= 0 ? 'text-brand-positive' : 'text-brand-danger')}>
@@ -252,11 +311,11 @@ export function ReportsShell() {
               </div>
               <div className="flex divide-x divide-brand-primary/[0.08]">
                 <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">Income</span>
+                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">{t('incomeLabel')}</span>
                   <span className="text-base font-black tabular-nums text-brand-positive truncate block">{formatAmount(yearTotals.income)}</span>
                 </div>
                 <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">Expenses</span>
+                  <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-text/25 dark:text-white/16 block mb-1">{t('expensesLabel')}</span>
                   <span className="text-base font-black tabular-nums text-brand-danger truncate block">{formatAmount(yearTotals.expense)}</span>
                 </div>
                 <div className="flex-1 px-3 py-2.5 min-w-0">
@@ -271,17 +330,18 @@ export function ReportsShell() {
           </div>
 
           {/* ── Monthly bar chart ─────────────────────────────────────── */}
+          <div className={cn(activeTab !== 'overview' && 'hidden sm:block')}>
           <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">Monthly Overview — tap a month</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{t('monthlyOverview')}</p>
               <div className="flex gap-3">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-sm bg-brand-positive/70" />
-                  <span className="text-[10px] font-semibold text-brand-text/35 dark:text-white/25">Income</span>
+                  <span className="text-[10px] font-semibold text-brand-text/35 dark:text-white/25">{t('incomeLabel')}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-sm bg-brand-danger/70" />
-                  <span className="text-[10px] font-semibold text-brand-text/35 dark:text-white/25">Expenses</span>
+                  <span className="text-[10px] font-semibold text-brand-text/35 dark:text-white/25">{t('expensesLabel')}</span>
                 </div>
               </div>
             </div>
@@ -328,8 +388,10 @@ export function ReportsShell() {
               </div>
             )}
           </div>
+          </div>
 
           {/* ── Selected month deep dive + tag breakdown ──────────────── */}
+          <div className={cn(activeTab !== 'month' && 'hidden sm:block')}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
             {/* Month detail */}
@@ -338,7 +400,7 @@ export function ReportsShell() {
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06] border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex-[1.4] px-4 py-3 min-w-0">
                   <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1">
-                    {MONTH_FULL[selectedMonthIdx]} Net
+                    {t('monthNet', { month: MONTH_FULL[selectedMonthIdx] })}
                   </span>
                   <span className={cn('text-2xl font-black tabular-nums leading-none',
                     netMonth >= 0 ? 'text-brand-positive' : 'text-brand-danger')}>
@@ -346,7 +408,7 @@ export function ReportsShell() {
                   </span>
                 </div>
                 <div className="flex-1 px-4 py-3 min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1">Savings Rate</span>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1">{t('savingsRate')}</span>
                   <span className={cn('text-2xl font-black tabular-nums leading-none',
                     savingsRate !== null && savingsRate >= 20 ? 'text-brand-positive' :
                     savingsRate !== null && savingsRate < 0  ? 'text-brand-danger' :
@@ -359,21 +421,21 @@ export function ReportsShell() {
               <div className="px-4 py-3.5 flex flex-col gap-2.5">
                 {/* Income / Expense rows */}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-brand-text/45 dark:text-white/35">Total Income</span>
+                  <span className="text-xs font-semibold text-brand-text/45 dark:text-white/35">{t('totalIncome')}</span>
                   <span className="text-sm font-bold text-brand-positive tabular-nums">{formatAmount(selected.income)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-brand-text/45 dark:text-white/35">Total Expenses</span>
+                  <span className="text-xs font-semibold text-brand-text/45 dark:text-white/35">{t('totalExpenses')}</span>
                   <span className="text-sm font-bold text-brand-danger tabular-nums">{formatAmount(selected.expense)}</span>
                 </div>
 
                 {/* Recurring vs discretionary */}
                 {selected.expense > 0 && (
                   <div className="pt-2.5 border-t border-brand-primary/[0.07]">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/22 dark:text-white/14 mb-2">Expense breakdown</p>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/22 dark:text-white/14 mb-2">{t('expenseBreakdown')}</p>
                     {[
-                      { label: 'Recurring', amount: selected.recurringExpense, color: 'bg-brand-danger/55' },
-                      { label: 'Discretionary', amount: selected.oneOffExpense, color: 'bg-brand-secondary/50' },
+                      { label: t('recurringExpense'), amount: selected.recurringExpense, color: 'bg-brand-danger/55' },
+                      { label: t('discretionary'), amount: selected.oneOffExpense, color: 'bg-brand-secondary/50' },
                     ].map(({ label, amount, color }) => {
                       const pct = selected.expense > 0 ? Math.round((amount / selected.expense) * 100) : 0;
                       return (
@@ -398,12 +460,12 @@ export function ReportsShell() {
                 {prevMonth && (prevMonth.income > 0 || prevMonth.expense > 0) && (
                   <div className="pt-2.5 border-t border-brand-primary/[0.07]">
                     <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/22 dark:text-white/14 mb-2">
-                      vs {MONTH_LABELS[selectedMonthIdx - 1]}
+                      {t('vsPrevMonth', { month: MONTH_LABELS[selectedMonthIdx - 1] })}
                     </p>
                     {([
-                      { label: 'Income',   curr: selected.income,  prev: prevMonth.income,  higherIsBetter: true  },
-                      { label: 'Expenses', curr: selected.expense, prev: prevMonth.expense, higherIsBetter: false },
-                    ] as const).map(({ label, curr, prev, higherIsBetter }) => {
+                      { label: t('incomeLabel'),   curr: selected.income,  prev: prevMonth.income,  higherIsBetter: true  },
+                      { label: t('expensesLabel'), curr: selected.expense, prev: prevMonth.expense, higherIsBetter: false },
+                    ] as { label: string; curr: number; prev: number; higherIsBetter: boolean }[]).map(({ label, curr, prev, higherIsBetter }) => {
                       const diff = curr - prev;
                       const pct  = prev > 0 ? Math.round((diff / prev) * 100) : null;
                       const good = pct !== null && (higherIsBetter ? diff > 0 : diff < 0);
@@ -427,12 +489,12 @@ export function ReportsShell() {
                 {/* Footer: tx count + closing balance */}
                 <div className="pt-2 border-t border-brand-primary/[0.07] flex items-center justify-between">
                   <span className="text-[10px] text-brand-text/30 dark:text-white/22">
-                    {selected.txCount} transaction{selected.txCount !== 1 ? 's' : ''}
+                    {t('txCountLabel', { count: selected.txCount })}
                   </span>
                   {selected.endBalance !== null && (
                     <span className={cn('text-[10px] font-bold tabular-nums',
                       selected.endBalance >= 0 ? 'text-brand-positive/80' : 'text-brand-danger/80')}>
-                      Closing balance: {formatAmount(selected.endBalance)}
+                      {t('closingBalance', { amount: formatAmount(selected.endBalance) })}
                     </span>
                   )}
                 </div>
@@ -442,10 +504,10 @@ export function ReportsShell() {
             {/* Tag breakdown — selected month */}
             <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3.5">
-                {MONTH_LABELS[selectedMonthIdx]} Spending by Category
+                {t('monthSpendingByCategory', { month: MONTH_LABELS[selectedMonthIdx] })}
               </p>
               {tagBreakdown.length === 0 ? (
-                <p className="text-sm text-brand-text/28 dark:text-white/22 text-center py-10">No expenses this month</p>
+                <p className="text-sm text-brand-text/28 dark:text-white/22 text-center py-10">{t('noExpensesThisMonth')}</p>
               ) : (
                 <div className="flex flex-col gap-3">
                   {tagBreakdown.map(({ key, amount, label, color }) => {
@@ -471,12 +533,14 @@ export function ReportsShell() {
               )}
             </div>
           </div>
+          </div>
 
           {/* ── Top transactions this month ──────────────────────────── */}
           {topTx.length > 0 && (
+          <div className={cn(activeTab !== 'transactions' && 'hidden sm:block')}>
             <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-1">
-                Top Transactions — {MONTH_FULL[selectedMonthIdx]} {selectedYear}
+                {t('topTransactions', { month: MONTH_FULL[selectedMonthIdx], year: selectedYear })}
               </p>
               <div className="flex flex-col">
                 {topTx.map((tx, i) => {
@@ -507,14 +571,16 @@ export function ReportsShell() {
                 })}
               </div>
             </div>
+          </div>
           )}
 
           {/* ── Annual spending — donut + category bars ──────────────── */}
           {annualTags.length > 0 && (
+          <div className={cn(activeTab !== 'annual' && 'hidden sm:block')}>
             <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">
-                  Annual Spending by Category — {selectedYear}
+                  {t('annualSpending', { year: selectedYear })}
                 </p>
               </div>
 
@@ -557,7 +623,7 @@ export function ReportsShell() {
                     })() : (
                       <>
                         <text x={CX} y={CY - 5} textAnchor="middle" style={{ fontSize: 9, fontWeight: 700, fontFamily: 'inherit', fill: 'currentColor', opacity: 0.28 }}>
-                          TOTAL SPENT
+                          {t('totalSpent')}
                         </text>
                         <text x={CX} y={CY + 10} textAnchor="middle" style={{ fontSize: 11, fontWeight: 900, fontFamily: 'inherit', fill: 'currentColor', opacity: 0.75 }}>
                           {formatAmount(yearTotals.expense)}
@@ -599,13 +665,15 @@ export function ReportsShell() {
                 </div>
               </div>
             </div>
+          </div>
           )}
 
           {/* ── Savings rate trend ───────────────────────────────────── */}
           {hasSomeData && (
+          <div className={cn(activeTab !== 'annual' && 'hidden sm:block')}>
             <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-4">
-                Savings Rate by Month — {selectedYear}
+                {t('savingsRateByMonth', { year: selectedYear })}
               </p>
               <div className="flex gap-1.5 sm:gap-2 items-end" style={{ height: '72px' }}>
                 {yearlyData.map((m, idx) => {
@@ -640,6 +708,7 @@ export function ReportsShell() {
                 })}
               </div>
             </div>
+          </div>
           )}
 
         </div>

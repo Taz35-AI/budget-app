@@ -9,6 +9,7 @@ import { format, addDays } from 'date-fns';
 import type { DateClickArg } from '@fullcalendar/interaction';
 import type { DayCellContentArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
 import { DayCellContent } from './DayCellContent';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
 import type { DayTransaction, BudgetAccount } from '@/types';
@@ -32,6 +33,10 @@ interface Props {
   onAccountChange?: (id: string) => void;
   // Exposed handle so parent can imperatively call today()
   calendarNavRef?: React.MutableRefObject<CalendarNavHandle | null>;
+  // Height passed to FullCalendar — use '100%' when parent has a defined height
+  calendarHeight?: string | number;
+  // Dates that match the active search query — highlighted amber on the calendar
+  matchingDates?: Set<string>;
 }
 
 export function CalendarView({
@@ -47,14 +52,18 @@ export function CalendarView({
   activeAccountId,
   onAccountChange,
   calendarNavRef,
+  calendarHeight = 'auto',
+  matchingDates,
 }: Props) {
   const { selection } = useHaptics();
+  const tMonths = useTranslations('months');
+  const longMonths = tMonths.raw('long') as string[];
   const calendarRef = useRef<InstanceType<typeof FullCalendar>>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const lastReportedMonth = useRef<string | null>(null);
 
-  const [monthTitle, setMonthTitle] = useState(() => format(new Date(), 'MMMM yyyy'));
+  const [monthTitle, setMonthTitle] = useState(() => { const n = new Date(); return `${longMonths[n.getMonth()]} ${n.getFullYear()}`; });
   const [showSwipeHint, setShowSwipeHint] = useState(false);
 
   // Navigate to today on mount
@@ -120,18 +129,24 @@ export function CalendarView({
   return (
     <div
       className={cn(
-        'calendar-wrapper w-full transition-opacity duration-300',
+        'calendar-wrapper w-full h-full flex flex-col transition-opacity duration-300',
         isLoading && 'opacity-60 pointer-events-none',
       )}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       {/* ── Custom toolbar: account tabs (left) + month name (right) ── */}
-      <div className="flex items-center gap-2 px-3 pt-3 pb-2 border-b border-[#B2CFCE]/40 dark:border-white/[0.06]">
+      <div className="flex items-center gap-2 px-3 pt-5 pb-4 border-b border-[#B2CFCE]/40 dark:border-white/[0.06]">
 
-        {/* Account tabs — left, scrollable */}
+        {/* Account tabs — left, scrollable.
+            Stop touch events propagating to the outer swipe-month listener. */}
         {showTabs && (
-          <div className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0">
+          <div
+            className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0"
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => { selection(); onAccountChange?.('combined'); }}
               className={cn(
@@ -187,14 +202,14 @@ export function CalendarView({
       </div>
 
       {/* ── Calendar grid ────────────────────────────────────────────── */}
-      <div className="relative">
+      <div className="relative flex-1 min-h-0">
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           firstDay={firstDayOfWeek}
           headerToolbar={false}
-          height="auto"
+          height={calendarHeight}
           dateClick={handleDateClick}
           validRange={{ end: maxDate }}
           dayCellContent={(args: DayCellContentArg) => {
@@ -208,6 +223,7 @@ export function CalendarView({
                 transactions={txs}
                 formatAmount={formatAmount}
                 isSelected={selectedDate === dateStr}
+                isSearchMatch={matchingDates ? matchingDates.has(dateStr) : false}
               />
             );
           }}
@@ -215,7 +231,7 @@ export function CalendarView({
           eventContent={(_args: EventContentArg) => null}
           datesSet={(args: DatesSetArg) => {
             const monthKey = format(args.view.currentStart, 'yyyy-MM');
-            setMonthTitle(format(args.view.currentStart, 'MMMM yyyy'));
+            setMonthTitle(`${longMonths[args.view.currentStart.getMonth()]} ${args.view.currentStart.getFullYear()}`);
             if (onMonthChange && monthKey !== lastReportedMonth.current) {
               lastReportedMonth.current = monthKey;
               onMonthChange(args.view.currentStart);

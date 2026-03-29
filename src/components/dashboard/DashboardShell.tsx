@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { format, startOfMonth, endOfMonth, addDays } from 'date-fns';
 import { useBalances } from '@/hooks/useBalances';
@@ -19,6 +20,7 @@ import { BudgetLimitButton } from './BudgetLimitButton';
 import { CurrencySelector } from './CurrencySelector';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
+import { TAGS } from '@/lib/constants';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
@@ -58,6 +60,14 @@ function useMonthStats(
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function DashboardShell() {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
+  const tt = useTranslations('transactions');
+  const tf = useTranslations('transactionForm');
+  const tMonths = useTranslations('months');
+  const tTags = useTranslations('tags');
+  const shortMonths = tMonths.raw('short') as string[];
+
   // ── Accounts ────────────────────────────────────────────────────────────────
   const { data: accounts } = useAccounts();
   const [activeAccountId, setActiveAccountId] = useState<string>('combined');
@@ -87,6 +97,61 @@ export function DashboardShell() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(new Date());
+  const [showMobileStats, setShowMobileStats] = useState(false);
+
+  const { firstDayOfWeek, allTags } = useSettings();
+
+  // ── Search ──────────────────────────────────────────────────────────────────
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [searchAmountMin, setSearchAmountMin] = useState('');
+  const [searchAmountMax, setSearchAmountMax] = useState('');
+  const [showAmountFilter, setShowAmountFilter] = useState(false);
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    setSearchText('');
+    setSearchAmountMin('');
+    setSearchAmountMax('');
+    setShowAmountFilter(false);
+  }, []);
+
+  // Compute which calendar dates have transactions matching the active query.
+  // Runs across ALL loaded dayTransactions so highlights persist on month navigation.
+  const matchingDates = useMemo(() => {
+    const hasText = searchText.trim().length > 0;
+    const hasMin = searchAmountMin !== '';
+    const hasMax = searchAmountMax !== '';
+    if (!hasText && !hasMin && !hasMax) return undefined;
+
+    const result = new Set<string>();
+    dayTransactions.forEach((txs, date) => {
+      for (const tx of txs) {
+        let ok = true;
+        if (hasText) {
+          const q = searchText.toLowerCase();
+          const nameMatch = tx.name.toLowerCase().includes(q);
+          const tagLabel = tx.tag ? (TAGS[tx.tag] ? tTags(tx.tag as never) : (allTags[tx.tag]?.label ?? '')) : '';
+          const tagMatch = tagLabel.toLowerCase().includes(q);
+          if (!nameMatch && !tagMatch) ok = false;
+        }
+        if (ok && hasMin && tx.amount < Number(searchAmountMin)) ok = false;
+        if (ok && hasMax && tx.amount > Number(searchAmountMax)) ok = false;
+        if (ok) { result.add(date); break; }
+      }
+    });
+    return result;
+  }, [dayTransactions, searchText, searchAmountMin, searchAmountMax, allTags, tTags]);
+
+  // On mobile, FullCalendar uses height="100%" so it fills the flex-1 container.
+  // On desktop it uses "auto" (content-sized). Switch on resize.
+  const [calendarHeight, setCalendarHeight] = useState<'auto' | '100%'>('auto');
+  useEffect(() => {
+    const update = () => setCalendarHeight(window.innerWidth < 640 ? '100%' : 'auto');
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   // Which account new transactions go to in the desktop panel
   const defaultCreateAccountId = activeAccountId !== 'combined' ? activeAccountId : (accounts?.[0]?.id);
@@ -103,7 +168,6 @@ export function DashboardShell() {
     balances, dayTransactions, visibleMonth,
   );
   const { limit: budgetLimit, setLimit: setBudgetLimit } = useBudgetLimit(visibleMonth);
-  const { firstDayOfWeek } = useSettings();
   const { impact, notification } = useHaptics();
   const { isOnline, isSyncing, pendingCount } = useOfflineSync();
   useLocalNotifications({
@@ -193,7 +257,7 @@ export function DashboardShell() {
         {/* Accent line */}
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#3B7A78]/40 to-transparent" />
 
-        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+        <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
 
           {/* Hamburger — mobile only */}
           <NavMenuButton />
@@ -201,7 +265,7 @@ export function DashboardShell() {
 
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-xl font-extrabold text-[#16302F] dark:text-white tracking-tight">Dashboard</h1>
+            <h1 className="text-xl font-extrabold text-[#16302F] dark:text-white tracking-tight">{t('title')}</h1>
           </div>
 
           {/* Controls */}
@@ -210,13 +274,13 @@ export function DashboardShell() {
             {!isOnline && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] font-semibold border border-amber-200 dark:border-amber-700/40">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                Offline{pendingCount > 0 ? ` · ${pendingCount}` : ''}
+                {tc('offline')}{pendingCount > 0 ? ` · ${pendingCount}` : ''}
               </span>
             )}
             {isOnline && isSyncing && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary text-[10px] font-semibold border border-brand-primary/20">
                 <span className="w-3 h-3 rounded-full border border-brand-primary/30 border-t-brand-primary animate-spin flex-shrink-0" />
-                Syncing
+                {tc('syncing')}
               </span>
             )}
             {isLoading && (
@@ -230,14 +294,16 @@ export function DashboardShell() {
       </header>
 
       {/* ── Two-column layout ────────────────────────────────────────── */}
-      <div className="flex gap-4 px-3 sm:px-5 py-3 sm:py-4 items-start">
+      {/* Mobile: fixed full-height between header (3rem) and bottom nav (4rem), equal top/bottom padding */}
+      <div className="flex gap-4 px-3 sm:px-5 py-3 sm:py-4 items-stretch sm:items-start
+        h-[calc(100dvh-4rem-4rem)] sm:h-auto">
 
         {/* Left: stats + calendar */}
-        <div className="flex-1 min-w-0 flex flex-col gap-3">
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-3">
 
           {/* Stats bar — typographic headline style */}
           <div id="tour-stats"
-            className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(22,48,47,0.05)] dark:shadow-none">
+            className="flex-shrink-0 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(22,48,47,0.05)] dark:shadow-none">
 
             {/* Desktop: single horizontal row */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
@@ -245,25 +311,96 @@ export function DashboardShell() {
               {/* Balance Today — hero, wider */}
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">Balance Today</span>
-                  <button
-                    onClick={() => calendarNavRef.current?.today()}
-                    className="text-[9px] font-semibold text-brand-primary/60 hover:text-brand-primary transition-colors px-1.5 py-0.5 rounded-md hover:bg-brand-primary/8 dark:hover:bg-brand-primary/10"
-                  >
-                    Today
-                  </button>
+                  {searchOpen ? (
+                    /* ── Search input (desktop) ── */
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <input
+                        autoFocus
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder={t('searchPlaceholder')}
+                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none"
+                      />
+                      <button
+                        onClick={() => setShowAmountFilter((v) => !v)}
+                        title={t('filterByAmount')}
+                        className={cn(
+                          'flex-shrink-0 h-4 w-4 flex items-center justify-center rounded transition-colors',
+                          showAmountFilter ? 'text-amber-500' : 'text-brand-text/30 dark:text-white/25 hover:text-brand-primary',
+                        )}
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
+                        </svg>
+                      </button>
+                      <button onClick={closeSearch} className="flex-shrink-0 text-brand-text/30 dark:text-white/25 hover:text-brand-danger transition-colors">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">{t('balanceToday')}</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setSearchOpen(true)}
+                          aria-label={t('searchAriaLabel')}
+                          className="w-5 h-5 flex items-center justify-center rounded-lg text-brand-text/50 dark:text-white/40 hover:text-brand-primary hover:bg-brand-primary/8 transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => calendarNavRef.current?.today()}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-lg border border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary text-[9px] font-bold transition-all hover:bg-brand-primary/15"
+                        >
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {tc('today')}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
+                {/* Amount range inputs — desktop, shown when filter icon is toggled */}
+                {searchOpen && showAmountFilter && (
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <input
+                      type="number"
+                      value={searchAmountMin}
+                      onChange={(e) => setSearchAmountMin(e.target.value)}
+                      placeholder={tf('minAmount')}
+                      className="w-16 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                    />
+                    <span className="text-[9px] text-brand-text/25">–</span>
+                    <input
+                      type="number"
+                      value={searchAmountMax}
+                      onChange={(e) => setSearchAmountMax(e.target.value)}
+                      placeholder={tf('maxAmount')}
+                      className="w-16 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                    />
+                  </div>
+                )}
                 <span className={cn(
                   'text-[1.75rem] font-black tabular-nums leading-none tracking-tight truncate block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
+                {searchOpen && matchingDates && (
+                  <p className="text-[9px] text-amber-500 font-semibold mt-1 leading-none">
+                    {t('daysMatched', { count: matchingDates.size })}
+                  </p>
+                )}
               </div>
 
               {/* Income */}
               <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{format(visibleMonth, 'MMM')} Income</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-positive truncate block">
                   {formatAmount(monthIncome)}
                 </span>
@@ -272,7 +409,7 @@ export function DashboardShell() {
               {/* Expenses */}
               <div className="flex-1 px-4 py-3.5 min-w-0 relative">
                 <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">
-                  {format(visibleMonth, 'MMM')} Expenses
+                  {t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}
                 </span>
                 <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-danger truncate block">
                   {formatAmount(monthExpense)}
@@ -294,7 +431,7 @@ export function DashboardShell() {
 
               {/* Net */}
               <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{format(visibleMonth, 'MMM')} Net</span>
+                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className={cn(
                   'text-xl font-black tabular-nums leading-none tracking-tight truncate block',
                   monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
@@ -308,28 +445,117 @@ export function DashboardShell() {
             <div className="sm:hidden">
               <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">Balance Today</span>
-                  <button
-                    onClick={() => calendarNavRef.current?.today()}
-                    className="text-[9px] font-semibold text-brand-primary/60 hover:text-brand-primary transition-colors"
-                  >
-                    Today
-                  </button>
+                  {searchOpen ? (
+                    /* ── Search input (mobile) ── */
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <input
+                        autoFocus
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder={t('searchPlaceholder')}
+                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none"
+                      />
+                      <button
+                        onClick={() => setShowAmountFilter((v) => !v)}
+                        className={cn(
+                          'flex-shrink-0 h-5 w-5 flex items-center justify-center rounded transition-colors',
+                          showAmountFilter ? 'text-amber-500' : 'text-brand-text/30 dark:text-white/25',
+                        )}
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
+                        </svg>
+                      </button>
+                      <button onClick={closeSearch} className="flex-shrink-0 text-brand-text/30 dark:text-white/25 hover:text-brand-danger">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">{t('balanceToday')}</span>
+                      <div className="flex items-center gap-1.5">
+                        {/* Search icon */}
+                        <button
+                          onClick={() => setSearchOpen(true)}
+                          aria-label={t('searchAriaLabel')}
+                          className={cn(
+                            'h-5 w-5 flex items-center justify-center rounded-lg transition-colors',
+                            matchingDates ? 'text-amber-500' : 'text-brand-text/50 dark:text-white/40 hover:text-brand-primary hover:bg-brand-primary/8',
+                          )}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </button>
+                        {/* Stats toggle */}
+                        <button
+                          onClick={() => setShowMobileStats((v) => !v)}
+                          className={cn(
+                            'flex items-center gap-1 h-5 px-2 rounded-lg border text-[9px] font-bold transition-all active:scale-95',
+                            showMobileStats
+                              ? 'bg-brand-primary text-white border-brand-primary'
+                              : 'border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary',
+                          )}
+                        >
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                          {t('stats')}
+                        </button>
+                        <button
+                          onClick={() => calendarNavRef.current?.today()}
+                          className="flex items-center gap-1 h-5 px-2 rounded-lg border border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary text-[9px] font-bold transition-all active:bg-brand-primary/20"
+                        >
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {tc('today')}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
+                {/* Amount range filter — mobile */}
+                {searchOpen && showAmountFilter && (
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <input
+                      type="number"
+                      value={searchAmountMin}
+                      onChange={(e) => setSearchAmountMin(e.target.value)}
+                      placeholder={tf('minAmount')}
+                      className="w-14 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                    />
+                    <span className="text-[9px] text-brand-text/25">–</span>
+                    <input
+                      type="number"
+                      value={searchAmountMax}
+                      onChange={(e) => setSearchAmountMax(e.target.value)}
+                      placeholder={tf('maxAmount')}
+                      className="w-14 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                    />
+                  </div>
+                )}
                 <span className={cn(
                   'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
+                {searchOpen && matchingDates && (
+                  <p className="text-[9px] text-amber-500 font-semibold mt-0.5 leading-none">
+                    {t('daysMatched', { count: matchingDates.size })}
+                  </p>
+                )}
               </div>
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
                 <div className="flex-1 px-2.5 py-2 min-w-0">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Inc</span>
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className="text-sm font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
                 </div>
                 <div className="flex-1 px-2.5 py-2 min-w-0 relative">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Exp</span>
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className="text-sm font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
                   {clampedBudgetPct !== undefined && (
                     <div className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-primary/8">
@@ -338,7 +564,7 @@ export function DashboardShell() {
                   )}
                 </div>
                 <div className="flex-1 px-2.5 py-2 min-w-0">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{format(visibleMonth, 'MMM')} Net</span>
+                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className={cn(
                     'text-sm font-black tabular-nums truncate block',
                     monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
@@ -351,9 +577,9 @@ export function DashboardShell() {
 
           </div>
 
-          {/* Running-low warning */}
-          {runningLowDate && (
-            <div className="flex items-start gap-3 px-4 py-3 rounded-2xl
+          {/* Running-low warning — hidden on mobile when stats panel is open */}
+          {runningLowDate && !showMobileStats && (
+            <div className="flex-shrink-0 flex items-start gap-3 px-4 py-3 rounded-2xl
               bg-amber-50 border border-amber-200 shadow-[0_1px_6px_rgba(245,158,11,0.1)]
               dark:bg-amber-950/40 dark:border-amber-500/30 dark:shadow-[0_1px_8px_rgba(245,158,11,0.08)]">
               <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0 text-amber-500 dark:text-amber-400 mt-0.5">
@@ -375,7 +601,18 @@ export function DashboardShell() {
             </div>
           )}
 
-          {/* Calendar */}
+          {/* Mobile stats panel — shown instead of calendar when toggle is active */}
+          {showMobileStats && (
+            <div className="sm:hidden flex-1 min-h-0 overflow-y-auto rounded-3xl
+              bg-white border border-[#B2CFCE]/60 shadow-[0_2px_20px_rgba(22,48,47,0.08)]
+              dark:bg-[#122928] dark:border-[#3B7A78]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
+              <MonthSummary month={visibleMonth} dayTransactions={dayTransactions} formatAmount={formatAmount} />
+            </div>
+          )}
+
+          {/* Calendar — hidden on mobile when stats panel is active */}
+          {/* flex-1 min-h-0 lets it fill remaining height on mobile; sm:flex-initial resets on desktop */}
+          <div className={cn('flex-1 min-h-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
           {isLoading && balances.size === 0 ? (
             <div className="animate-pulse rounded-3xl bg-white dark:bg-[#122928] p-5 space-y-3 border border-[#B2CFCE]/60 dark:border-[#16302F]/30">
               <div className="h-5 bg-[#B2CFCE]/60 dark:bg-[#16302F]/30 rounded-lg w-36" />
@@ -386,8 +623,8 @@ export function DashboardShell() {
               </div>
             </div>
           ) : (
-            <div className="relative">
-              <div className="rounded-3xl overflow-hidden
+            <div className="relative h-full">
+              <div className="h-full rounded-3xl overflow-hidden
                 bg-white border border-[#B2CFCE]/60 shadow-[0_2px_20px_rgba(22,48,47,0.08)]
                 dark:bg-[#122928] dark:border-[#3B7A78]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
                 <CalendarView
@@ -403,6 +640,8 @@ export function DashboardShell() {
                   activeAccountId={activeAccountId}
                   onAccountChange={setActiveAccountId}
                   calendarNavRef={calendarNavRef}
+                  calendarHeight={calendarHeight}
+                  matchingDates={matchingDates}
                 />
               </div>
               {/* Step 0 tip — tap a day */}
@@ -415,13 +654,9 @@ export function DashboardShell() {
               )}
             </div>
           )}
+          </div>{/* end calendar hide wrapper */}
 
-          {/* Month summary — mobile only */}
-          <div className="lg:hidden rounded-3xl overflow-hidden
-            bg-white border border-[#B2CFCE]/60 shadow-[0_2px_20px_rgba(22,48,47,0.08)]
-            dark:bg-[#122928] dark:border-[#3B7A78]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
-            <MonthSummary month={visibleMonth} dayTransactions={dayTransactions} formatAmount={formatAmount} />
-          </div>
+          {/* Month summary — desktop right panel only */}
         </div>
 
         {/* Right panel — desktop */}
@@ -460,7 +695,7 @@ export function DashboardShell() {
 
               {create.isError && (
                 <div className="mx-4 mt-3 px-4 py-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-500/30 text-sm text-rose-700 dark:text-rose-400 flex-shrink-0">
-                  Failed to save: {(create.error as Error)?.message ?? 'Unknown error'}
+                  {tt('failedToSave', { message: (create.error as Error)?.message ?? 'Unknown error' })}
                 </div>
               )}
 
@@ -470,7 +705,7 @@ export function DashboardShell() {
                     {/* Account picker — desktop, only when 2+ accounts */}
                     {(accounts?.length ?? 0) >= 2 && (
                       <div className="flex gap-1 flex-wrap mb-2 pb-2 border-b border-slate-100 dark:border-white/[0.07]">
-                        <p className="w-full text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">Add to account</p>
+                        <p className="w-full text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{tt('addToAccount')}</p>
                         {accounts!.map((acct) => (
                           <button
                             key={acct.id}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useSettings } from '@/hooks/useSettings';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useCallback } from 'react';
@@ -11,6 +12,7 @@ import {
 } from '@/lib/notificationScheduler';
 import type { NotifPermission } from '@/lib/notificationScheduler';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
+import { useSettingsStore } from '@/store/settingsStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
@@ -107,6 +109,10 @@ function AddRowBtn({ label, accentHover, onClick }: { label: string; accentHover
 // ─── Tags section ─────────────────────────────────────────────────────────────
 
 function TagsSection() {
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
+  const tTags = useTranslations('tags');
+
   const {
     customTags,
     hiddenBuiltinTags,
@@ -161,205 +167,241 @@ function TagsSection() {
     const override = customTags.find((t) => t.id === key);
     return {
       key,
-      label: override?.label ?? defaults.label,
+      label: override?.label ?? (TAGS[key] ? tTags(key as never) : defaults.label),
       color: override?.color ?? defaults.color,
-      defaultLabel: defaults.label,
-      defaultColor: defaults.color,
       isOverridden: !!override,
       isHidden: hiddenBuiltinTags.includes(key),
+      category: defaults.category as TagCategory,
     };
   });
 
-  // Pure custom tags (not built-in overrides)
   const pureCustomTags = customTags.filter((t) => !TAGS[t.id]);
-
   const activeBuiltins = builtinEntries.filter((t) => !t.isHidden);
   const hiddenBuiltins = builtinEntries.filter((t) => t.isHidden);
 
-  return (
-    <SettingsCard
-      title="Tags & Categories"
-      subtitle="Rename or recolour any tag, hide ones you don't use, and add your own"
-      accent="bg-gradient-to-r from-violet-500 to-indigo-500"
+  // Group by category
+  const expenseBuiltins = activeBuiltins.filter((e) => e.category === 'expense');
+  const incomeBuiltins  = activeBuiltins.filter((e) => e.category === 'income');
+  const bothBuiltins    = activeBuiltins.filter((e) => e.category === 'both');
+  const expenseCustom   = pureCustomTags.filter((t) => (t.category ?? 'expense') === 'expense');
+  const incomeCustom    = pureCustomTags.filter((t) => (t.category ?? 'expense') === 'income');
+  const bothCustom      = pureCustomTags.filter((t) => (t.category ?? 'expense') === 'both');
+
+  // Which section does the currently-edited tag belong to?
+  const editSection: TagCategory | null = editId
+    ? (editIsBuiltin ? (TAGS[editId]?.category ?? 'both') : editCategory)
+    : null;
+
+  // Accordion open state + per-section search
+  const [openSection, setOpenSection] = useState<TagCategory | null>(null);
+  const [searches, setSearches] = useState<Record<string, string>>({});
+  const setSearch = (sec: string, val: string) => setSearches((s) => ({ ...s, [sec]: val }));
+
+  const toggle = (sec: TagCategory) => setOpenSection((prev) => (prev === sec ? null : sec));
+
+  // Auto-open section when edit starts
+  const startEditWithOpen = (id: string, label: string, color: string, category: TagCategory, isBuiltin: boolean) => {
+    startEdit(id, label, color, category, isBuiltin);
+    setOpenSection(category);
+  };
+
+  // Shared row renderer
+  const TagRow = ({ id, label, color, isBuiltin, isOverridden, category: rowCat }: {
+    id: string; label: string; color: string; isBuiltin: boolean; isOverridden?: boolean; category: TagCategory;
+  }) => (
+    <div
+      className={cn(
+        'flex items-center gap-2 px-3 py-2 rounded-xl border transition-colors group',
+        editId === id
+          ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/15'
+          : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
+      )}
     >
-      {/* Built-in tags */}
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">
-        Built-in
-      </p>
-
-      {/* Edit form — full width, shown above grid when active */}
-      {editId && editIsBuiltin && (() => {
-        const entry = activeBuiltins.find((t) => t.key === editId);
-        if (!entry) return null;
-        return (
-          <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
-            <div className="flex gap-2 items-center">
-              <input
-                value={editLabel}
-                onChange={(e) => setEditLabel(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                autoFocus
-                className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400"
-              />
-              <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
-                {editLabel || 'Preview'}
-              </span>
-            </div>
-            <ColorPicker value={editColor} onChange={setEditColor} />
-            <div className="flex gap-1.5">
-              <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">Save</button>
-              {entry.isOverridden && (
-                <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 hover:text-red-500 transition-colors">Reset</button>
-              )}
-              <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">Cancel</button>
-            </div>
-          </div>
-        );
-      })()}
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mb-4">
-        {activeBuiltins.map(({ key, label, color, isOverridden }) => (
-          <div
-            key={key}
-            className={cn(
-              'flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-colors group',
-              editId === key && editIsBuiltin
-                ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/15'
-                : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
-            )}
-          >
-            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-            <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{label}</span>
-            {isOverridden && <span className="text-[8px] font-bold text-indigo-400 flex-shrink-0">•</span>}
-            <div className="flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 transition-opacity">
-              <button type="button" onClick={() => startEdit(key, label, color, TAGS[key]?.category ?? 'both', true)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-              </button>
-              <button type="button" onClick={() => hideBuiltinTag(key)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" /></svg>
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+      <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{label}</span>
+      {isOverridden && <span className="text-[8px] font-bold text-indigo-400 flex-shrink-0">•</span>}
+      {!isBuiltin && (
+        <span className={cn('text-[8px] font-bold flex-shrink-0 mr-0.5',
+          rowCat === 'income' ? 'text-emerald-400' : rowCat === 'expense' ? 'text-red-400' : 'text-slate-400',
+        )}>
+          {rowCat === 'both' ? '±' : rowCat === 'income' ? '+' : '−'}
+        </span>
+      )}
+      <div className="flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 transition-opacity">
+        <button
+          type="button"
+          aria-label={tc('edit')}
+          onClick={() => startEditWithOpen(id, label, color, isBuiltin ? (TAGS[id]?.category ?? 'both') : rowCat, isBuiltin)}
+          className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+        </button>
+        {isBuiltin ? (
+          <button type="button" aria-label={t('hideAriaLabel')} onClick={() => hideBuiltinTag(id)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" /></svg>
+          </button>
+        ) : (
+          <button type="button" aria-label={tc('delete')} onClick={() => deleteCustomTag(id)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+        )}
       </div>
+    </div>
+  );
 
-      {/* Custom tags */}
-      {pureCustomTags.length > 0 && (
-        <>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">Custom</p>
-
-          {/* Edit form — full width */}
-          {editId && !editIsBuiltin && (() => {
-            const tag = pureCustomTags.find((t) => t.id === editId);
-            if (!tag) return null;
-            return (
-              <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
-                <div className="flex gap-2 items-center">
-                  <input
-                    value={editLabel}
-                    onChange={(e) => setEditLabel(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                    autoFocus
-                    className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400"
-                  />
-                  <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
-                    {editLabel || 'Preview'}
-                  </span>
-                </div>
-                <ColorPicker value={editColor} onChange={setEditColor} />
-                <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
-                  {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
-                    <button key={cat} type="button" onClick={() => setEditCategory(cat)}
-                      className={cn('flex-1 h-7 text-[10px] font-medium transition-all',
-                        editCategory === cat
-                          ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
-                          : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
-                      )}>
-                      {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-1.5">
-                  <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">Save</button>
-                  <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">Cancel</button>
-                </div>
-              </div>
-            );
-          })()}
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mb-4">
-            {pureCustomTags.map((tag) => (
-              <div
-                key={tag.id}
-                className={cn(
-                  'flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-colors group',
-                  editId === tag.id && !editIsBuiltin
-                    ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/60 dark:bg-indigo-900/15'
-                    : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
-                )}
-              >
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tag.color }} />
-                <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{tag.label}</span>
-                <span className={cn('text-[8px] font-bold flex-shrink-0',
-                  (tag.category ?? 'expense') === 'income' ? 'text-emerald-400' : (tag.category ?? 'expense') === 'expense' ? 'text-red-400' : 'text-slate-400',
+  // Edit form (shown inside the active section)
+  const EditForm = ({ isBuiltin }: { isBuiltin: boolean }) => {
+    if (!editId) return null;
+    const entry = isBuiltin ? activeBuiltins.find((e) => e.key === editId) : pureCustomTags.find((t) => t.id === editId);
+    if (!entry) return null;
+    return (
+      <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
+        <div className="flex gap-2 items-center">
+          <input value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && saveEdit()} autoFocus
+            className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400" />
+          <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
+            {editLabel || 'Preview'}
+          </span>
+        </div>
+        <ColorPicker value={editColor} onChange={setEditColor} />
+        {!isBuiltin && (
+          <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
+            {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
+              <button key={cat} type="button" onClick={() => setEditCategory(cat)}
+                className={cn('flex-1 h-7 text-[10px] font-medium transition-all',
+                  editCategory === cat
+                    ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
+                    : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
                 )}>
-                  {(tag.category ?? 'expense') === 'both' ? '±' : (tag.category ?? 'expense') === 'income' ? '+' : '−'}
-                </span>
-                <div className="flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex-shrink-0 transition-opacity">
-                  <button type="button" onClick={() => startEdit(tag.id, tag.label, tag.color, tag.category ?? 'expense', false)} className="p-1 rounded hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                  </button>
-                  <button type="button" onClick={() => deleteCustomTag(tag.id)} className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
-                </div>
-              </div>
+                {cat === 'income' ? tc('income') : cat === 'expense' ? tc('expense') : tc('both')}
+              </button>
             ))}
           </div>
-        </>
-      )}
+        )}
+        <div className="flex gap-1.5">
+          <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">{tc('save')}</button>
+          {isBuiltin && (entry as typeof activeBuiltins[0]).isOverridden && (
+            <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 hover:text-red-500 transition-colors">{tc('reset')}</button>
+          )}
+          <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">{tc('cancel')}</button>
+        </div>
+      </div>
+    );
+  };
+
+  // Renders a collapsible section
+  const renderSection = (
+    sec: TagCategory,
+    label: string,
+    accentClass: string,
+    builtins: typeof expenseBuiltins,
+    customs: typeof expenseCustom,
+  ) => {
+    const isOpen = openSection === sec;
+    const q = (searches[sec] ?? '').toLowerCase();
+    const filteredBuiltins = q ? builtins.filter((e) => e.label.toLowerCase().includes(q)) : builtins;
+    const filteredCustoms  = q ? customs.filter((t) => t.label.toLowerCase().includes(q)) : customs;
+    const total = builtins.length + customs.length;
+    const hasEdit = editId && editSection === sec;
+
+    return (
+      <div key={sec} className="rounded-xl border border-slate-100 dark:border-white/[0.05] overflow-hidden mb-2">
+        {/* Accordion header */}
+        <button
+          type="button"
+          onClick={() => toggle(sec)}
+          className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+        >
+          <span className={cn('w-2 h-2 rounded-full flex-shrink-0', accentClass)} />
+          <span className="flex-1 text-left text-xs font-semibold text-slate-700 dark:text-white/80">{label}</span>
+          <span className="text-[10px] text-slate-400 dark:text-white/30 mr-1">{total}</span>
+          <svg className={cn('w-3.5 h-3.5 text-slate-400 dark:text-white/25 transition-transform flex-shrink-0', isOpen && 'rotate-180')}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {isOpen && (
+          <div className="border-t border-slate-100 dark:border-white/[0.05] px-3 pb-3 pt-2">
+            {/* Edit form for the active tag in this section */}
+            {hasEdit && <EditForm isBuiltin={!!editIsBuiltin} />}
+
+            {/* Search */}
+            <div className="relative mb-2">
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 dark:text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={searches[sec] ?? ''}
+                onChange={(e) => setSearch(sec, e.target.value)}
+                placeholder={`Search ${label.toLowerCase()}…`}
+                className="w-full h-7 pl-7 pr-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-indigo-300 dark:focus:border-indigo-500/50"
+              />
+            </div>
+
+            {/* List */}
+            <div className="flex flex-col gap-1">
+              {filteredBuiltins.length === 0 && filteredCustoms.length === 0 && (
+                <p className="text-xs text-slate-400 dark:text-white/30 italic py-2 text-center">{t('noTagsMatch')}</p>
+              )}
+              {filteredBuiltins.map((e) => (
+                <TagRow key={e.key} id={e.key} label={e.label} color={e.color}
+                  isBuiltin category={e.category} isOverridden={e.isOverridden} />
+              ))}
+              {filteredCustoms.map((t) => (
+                <TagRow key={t.id} id={t.id} label={t.label} color={t.color}
+                  isBuiltin={false} category={t.category ?? 'expense'} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <SettingsCard
+      title={t('tags')}
+      subtitle={t('tagsDescription')}
+      accent="bg-gradient-to-r from-violet-500 to-indigo-500"
+    >
+      {renderSection('expense', t('expenseTags'), 'bg-red-400', expenseBuiltins, expenseCustom)}
+      {renderSection('income',  t('incomeTags'),  'bg-emerald-400', incomeBuiltins, incomeCustom)}
+      {(bothBuiltins.length > 0 || bothCustom.length > 0) &&
+        renderSection('both', t('bothTags'), 'bg-indigo-400', bothBuiltins, bothCustom)}
 
       {/* Hidden built-ins — tap to restore */}
       {hiddenBuiltins.length > 0 && (
-        <>
+        <div className="mb-3">
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">
             Hidden ({hiddenBuiltins.length})
           </p>
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5">
             {hiddenBuiltins.map(({ key, label, color }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => unhideBuiltinTag(key)}
-                title="Click to restore"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30 hover:border-slate-300 hover:text-slate-500 dark:hover:text-white/50 transition-colors"
-              >
+              <button key={key} type="button" onClick={() => unhideBuiltinTag(key)} title="Tap to restore"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30 hover:border-slate-300 hover:text-slate-500 dark:hover:text-white/50 transition-colors">
                 <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: color }} />
                 {label}
               </button>
             ))}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Add new */}
+      {/* Add custom tag */}
       {showAdd ? (
         <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
           <div className="flex gap-2 items-center">
-            <input
-              value={newLabel}
-              onChange={(e) => setNewLabel(e.target.value)}
-              placeholder="Tag name"
-              autoFocus
-              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400"
-            />
+            <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="Tag name" autoFocus onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400" />
             <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: newColor }}>
               {newLabel || 'Preview'}
             </span>
           </div>
           <ColorPicker value={newColor} onChange={setNewColor} />
-          {/* Category toggle */}
           <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
             {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
               <button key={cat} type="button" onClick={() => setNewCategory(cat)}
@@ -368,25 +410,17 @@ function TagsSection() {
                     ? cat === 'income' ? 'bg-emerald-500 text-white' : cat === 'expense' ? 'bg-red-500 text-white' : 'bg-indigo-500 text-white'
                     : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
                 )}>
-                {cat === 'income' ? 'Income' : cat === 'expense' ? 'Expense' : 'Both'}
+                {cat === 'income' ? tc('income') : cat === 'expense' ? tc('expense') : tc('both')}
               </button>
             ))}
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">
-              Add tag
-            </button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">
-              Cancel
-            </button>
+            <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">{tc('add')}</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">{tc('cancel')}</button>
           </div>
         </div>
       ) : (
-        <AddRowBtn
-          label="Add custom tag"
-          accentHover="hover:border-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-400"
-          onClick={() => setShowAdd(true)}
-        />
+        <AddRowBtn label={t('customTags')} accentHover="hover:border-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-400" onClick={() => setShowAdd(true)} />
       )}
     </SettingsCard>
   );
@@ -395,6 +429,8 @@ function TagsSection() {
 // ─── Templates section ────────────────────────────────────────────────────────
 
 function TemplatesSection() {
+  const t = useTranslations('settings');
+  const tTags = useTranslations('tags');
   const { templates, allTags, addTemplate, deleteTemplate } = useSettings();
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState<{
@@ -420,12 +456,12 @@ function TemplatesSection() {
 
   return (
     <SettingsCard
-      title="Quick Templates"
-      subtitle="One-tap to pre-fill the transaction form with saved details"
+      title={t('quickTemplates')}
+      subtitle={t('quickTemplatesDesc')}
       accent="bg-gradient-to-r from-sky-400 to-cyan-500"
     >
       {templates.length === 0 && !showAdd && (
-        <p className="text-sm text-slate-400 dark:text-white/30 mb-4">No templates yet.</p>
+        <p className="text-sm text-slate-400 dark:text-white/30 mb-4">{t('noTemplates')}</p>
       )}
 
       {templates.length > 0 && (
@@ -438,7 +474,7 @@ function TemplatesSection() {
                 <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
                   {tmpl.category === 'income' ? '+' : '−'}{tmpl.amount}
                   {tmpl.type === 'recurring' && tmpl.frequency ? ` · ${FREQUENCIES[tmpl.frequency]}` : ' · One-off'}
-                  {tmpl.tag && allTags[tmpl.tag] ? ` · ${allTags[tmpl.tag].label}` : ''}
+                  {tmpl.tag && allTags[tmpl.tag] ? ` · ${TAGS[tmpl.tag] ? tTags(tmpl.tag as never) : allTags[tmpl.tag].label}` : ''}
                 </p>
               </div>
               <TrashBtn onClick={() => deleteTemplate(tmpl.id)} />
@@ -521,24 +557,25 @@ function TemplatesSection() {
 // ─── Preferences section ──────────────────────────────────────────────────────
 
 function PreferencesSection() {
+  const t = useTranslations('settings');
   const { firstDayOfWeek, dateFormat, hapticsEnabled, setFirstDayOfWeek, setDateFormat, setHapticsEnabled } = useSettings();
   const { impact } = useHaptics();
 
   return (
     <SettingsCard
-      title="Preferences"
-      subtitle="Calendar layout and date display settings"
+      title={t('preferences')}
+      subtitle={t('preferencesDesc')}
       accent="bg-gradient-to-r from-amber-400 to-orange-400"
     >
       <div className="flex flex-col gap-5 mt-1">
         {/* First day of week */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Week starts on</p>
-            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">First column in the calendar grid</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('firstDayOfWeek')}</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('firstDayOfWeekDesc')}</p>
           </div>
           <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 flex-shrink-0">
-            {([{ label: 'Mon', value: 1 as const }, { label: 'Sun', value: 0 as const }]).map(({ label, value }) => (
+            {([{ label: t('monday'), value: 1 as const }, { label: t('sunday'), value: 0 as const }]).map(({ label, value }) => (
               <button key={value} type="button" onClick={() => setFirstDayOfWeek(value)}
                 className={cn('px-5 h-9 text-sm font-semibold transition-all',
                   firstDayOfWeek === value
@@ -554,8 +591,8 @@ function PreferencesSection() {
         {/* Date format */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Date format</p>
-            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">How dates appear in the app</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('dateFormat')}</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('dateFormatDesc')}</p>
           </div>
           <select
             value={dateFormat}
@@ -571,8 +608,8 @@ function PreferencesSection() {
         {/* Haptic feedback */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Haptic feedback</p>
-            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Vibration on taps and actions (iOS / Android)</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('hapticFeedback')}</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('hapticFeedbackDesc')}</p>
           </div>
           <button
             type="button"
@@ -608,6 +645,8 @@ function PreferencesSection() {
 // ─── Savings Goals section ────────────────────────────────────────────────────
 
 function GoalsSection() {
+  const t = useTranslations('settings');
+  const tTags = useTranslations('tags');
   const { goals, allTags, addGoal, updateGoal, deleteGoal } = useSettings();
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
@@ -637,7 +676,7 @@ function GoalsSection() {
 
   return (
     <SettingsCard
-      title="Savings Goals"
+      title={t('savingsGoals')}
       subtitle="Set targets and track progress. Link a tag so transactions auto-update progress."
       accent="bg-gradient-to-r from-emerald-400 to-teal-500"
     >
@@ -695,7 +734,7 @@ function GoalsSection() {
                         onClick={() => { updateGoal(goal.id, { linkedTagId: key, currentSaved: 0 }); setLinkingGoalId(null); }}
                         className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
                         <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                        {label}
+                        {TAGS[key] ? tTags(key as never) : label}
                       </button>
                     ))}
                     <button type="button" onClick={() => setLinkingGoalId(null)}
@@ -708,7 +747,7 @@ function GoalsSection() {
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />
                       <span className="text-xs text-slate-500 dark:text-white/40">
-                        Auto-tracked via <span className="font-medium text-slate-600 dark:text-white/60">{linkedTag.label}</span>
+                        Auto-tracked via <span className="font-medium text-slate-600 dark:text-white/60">{goal.linkedTagId && TAGS[goal.linkedTagId] ? tTags(goal.linkedTagId as never) : linkedTag.label}</span>
                       </span>
                     </div>
                     <button type="button"
@@ -786,7 +825,7 @@ function GoalsSection() {
                   )}
                   style={form.linkedTagId === key ? { backgroundColor: color } : undefined}>
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                  {label}
+                  {TAGS[key] ? tTags(key as never) : label}
                 </button>
               ))}
             </div>
@@ -806,6 +845,8 @@ function GoalsSection() {
 // ─── Accounts section ─────────────────────────────────────────────────────────
 
 function AccountsSection() {
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
   const { data: accounts, isLoading } = useAccounts();
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
@@ -849,8 +890,8 @@ function AccountsSection() {
 
   return (
     <SettingsCard
-      title="Accounts"
-      subtitle="Manage up to 5 accounts. Each gets its own calendar and running balance."
+      title={t('accountsSection')}
+      subtitle={t('accountsDesc')}
       accent="bg-gradient-to-r from-cyan-500 to-teal-500"
     >
       {isLoading && (
@@ -881,14 +922,14 @@ function AccountsSection() {
                   disabled={updateAccount.isPending}
                   className="h-8 px-3 rounded-lg bg-teal-500 text-white text-xs font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
                 >
-                  Save
+                  {tc('save')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditId(null)}
                   className="h-8 px-2 rounded-lg text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white text-xs transition-all"
                 >
-                  Cancel
+                  {tc('cancel')}
                 </button>
               </>
             ) : deleteConfirmId === acct.id ? (
@@ -900,7 +941,7 @@ function AccountsSection() {
                   disabled={deleteAccount.isPending}
                   className="h-7 px-2.5 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-all disabled:opacity-50"
                 >
-                  {deleteAccount.isPending ? '…' : 'Delete'}
+                  {deleteAccount.isPending ? '…' : tc('delete')}
                 </button>
                 <button type="button" onClick={() => setDeleteConfirmId(null)} className="text-slate-400 dark:text-white/40 hover:text-slate-600 transition-colors">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -958,15 +999,15 @@ function AccountsSection() {
             disabled={createAccount.isPending || !newName.trim()}
             className="h-9 px-4 rounded-xl bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
           >
-            {createAccount.isPending ? '…' : 'Add'}
+            {createAccount.isPending ? '…' : tc('add')}
           </button>
           <button type="button" onClick={() => { setShowAdd(false); setNewName(''); }} className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
-            Cancel
+            {tc('cancel')}
           </button>
         </div>
       ) : (accounts?.length ?? 0) < 5 ? (
         <AddRowBtn
-          label="Add account"
+          label={t('addAccount')}
           accentHover="hover:border-teal-400/60 hover:text-teal-600 dark:hover:text-teal-400"
           onClick={() => { setShowAdd(true); setError(''); }}
         />
@@ -979,7 +1020,144 @@ function AccountsSection() {
 
 // ─── Notifications section ───────────────────────────────────────────────────
 
+function BackupSection() {
+  const t = useTranslations('settings');
+  const [restoreState, setRestoreState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [restoreError, setRestoreError] = useState('');
+  const [downloadState, setDownloadState] = useState<'idle' | 'loading' | 'error'>('idle');
+
+  const handleDownload = async () => {
+    setDownloadState('loading');
+    try {
+      const res = await fetch('/api/backup');
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const today = new Date().toISOString().slice(0, 10);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `budget-backup-${today}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 200);
+      setDownloadState('idle');
+    } catch {
+      setDownloadState('error');
+    }
+  };
+
+  const handleRestore = async (file: File) => {
+    setRestoreState('loading');
+    setRestoreError('');
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const res = await fetch('/api/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? 'Restore failed');
+      }
+      setRestoreState('success');
+      setTimeout(() => setRestoreState('idle'), 4000);
+    } catch (err) {
+      setRestoreError(err instanceof Error ? err.message : 'Restore failed');
+      setRestoreState('error');
+      setTimeout(() => setRestoreState('idle'), 5000);
+    }
+  };
+
+  return (
+    <SettingsCard
+      title={t('backup')}
+      subtitle="Download all your data or restore from a previous backup"
+      accent="bg-gradient-to-r from-violet-500 to-indigo-500"
+    >
+      <div className="flex flex-col gap-3 mt-2">
+        {/* Download */}
+        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.07]">
+          <div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-white">{t('downloadBackup')}</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Saves all transactions as a JSON file</p>
+          </div>
+          <button
+            onClick={handleDownload}
+            disabled={downloadState === 'loading'}
+            className={cn(
+              'flex items-center gap-1.5 h-8 px-3 rounded-xl text-xs font-semibold transition-all border',
+              downloadState === 'error'
+                ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-500/30'
+                : 'bg-violet-600 text-white border-transparent hover:bg-violet-700 active:scale-95',
+              downloadState === 'loading' && 'opacity-60 cursor-wait',
+            )}
+          >
+            {downloadState === 'loading' ? (
+              <span className="w-3 h-3 rounded-full border border-white/30 border-t-white animate-spin" />
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            )}
+            {downloadState === 'error' ? 'Failed' : 'Download'}
+          </button>
+        </div>
+
+        {/* Restore */}
+        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.07]">
+          <div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-white">{t('restoreBackup')}</p>
+            <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Upload a previously downloaded JSON file</p>
+          </div>
+          <label
+            className={cn(
+              'flex items-center gap-1.5 h-8 px-3 rounded-xl text-xs font-semibold transition-all border cursor-pointer',
+              restoreState === 'success'
+                ? 'bg-emerald-500 text-white border-transparent'
+                : restoreState === 'error'
+                ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-500/30'
+                : 'bg-slate-800 text-white border-transparent hover:bg-slate-700 dark:bg-white/10 dark:hover:bg-white/15 active:scale-95',
+              restoreState === 'loading' && 'opacity-60 cursor-wait pointer-events-none',
+            )}
+          >
+            <input
+              type="file"
+              accept=".json,application/json"
+              className="sr-only"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleRestore(f); e.target.value = ''; }}
+              disabled={restoreState === 'loading'}
+            />
+            {restoreState === 'loading' ? (
+              <span className="w-3 h-3 rounded-full border border-white/30 border-t-white animate-spin" />
+            ) : restoreState === 'success' ? (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            )}
+            {restoreState === 'success' ? 'Restored!' : restoreState === 'error' ? 'Failed' : 'Upload'}
+          </label>
+        </div>
+
+        {restoreState === 'error' && restoreError && (
+          <p className="text-xs text-red-500 dark:text-red-400 px-1">{restoreError}</p>
+        )}
+        <p className="text-[11px] text-slate-400 dark:text-white/25 px-1 leading-relaxed">
+          Restoring merges the backup with your existing data — existing transactions are overwritten if IDs match, new ones are added.
+        </p>
+      </div>
+    </SettingsCard>
+  );
+}
+
 function NotificationsSection() {
+  const t = useTranslations('settings');
   const { notificationSettings, setNotificationSettings } = useSettings();
   const { impact } = useHaptics();
   const [permState, setPermState] = useState<NotifPermission | 'unknown'>('unknown');
@@ -1004,17 +1182,17 @@ function NotificationsSection() {
   }
 
   const rows: { key: keyof typeof notificationSettings; label: string; desc: string }[] = [
-    { key: 'dailyReminder',  label: 'Daily spending reminder', desc: "Reminds you to log today's transactions" },
-    { key: 'billReminders',  label: 'Bill due tomorrow',        desc: 'Alert the day before a recurring payment is due' },
-    { key: 'monthlyRecap',   label: 'Monthly recap',            desc: 'Summary notification on the 1st of each month' },
-    { key: 'weeklyDigest',   label: 'Weekly digest',            desc: 'Every Monday — upcoming bills and last week at a glance' },
-    { key: 'budgetWarnings', label: 'Budget limit warnings',    desc: 'Alert when you hit 85% of your monthly spending limit' },
+    { key: 'dailyReminder',  label: t('dailyReminderLabel'),  desc: t('dailyReminderDesc') },
+    { key: 'billReminders',  label: t('billRemindersLabel'),  desc: t('billRemindersDesc') },
+    { key: 'monthlyRecap',   label: t('monthlyRecapLabel'),   desc: t('monthlyRecapDesc') },
+    { key: 'weeklyDigest',   label: t('weeklyDigestLabel'),   desc: t('weeklyDigestDesc') },
+    { key: 'budgetWarnings', label: t('budgetWarningsLabel'), desc: t('budgetWarningsDesc') },
   ];
 
   return (
     <SettingsCard
-      title="Notifications"
-      subtitle="Push alerts on iOS and Android"
+      title={t('notifications')}
+      subtitle={t('notificationsDesc')}
       accent="bg-gradient-to-r from-sky-400 to-blue-500"
     >
       <div className="flex flex-col gap-5 mt-1">
@@ -1024,12 +1202,12 @@ function NotificationsSection() {
           <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200/60 dark:border-sky-400/15">
             <div>
               <p className="text-sm font-semibold text-sky-700 dark:text-sky-300">
-                {permState === 'denied' ? 'Notifications blocked' : 'Permission required'}
+                {permState === 'denied' ? t('notifBlocked') : t('notifRequired')}
               </p>
               <p className="text-xs text-sky-600/70 dark:text-sky-300/60 mt-0.5">
                 {permState === 'denied'
-                  ? 'Enable in your device Settings to receive alerts'
-                  : 'Tap below to allow Budget App to send notifications'}
+                  ? t('notifBlockedDesc')
+                  : t('notifRequiredDesc')}
               </p>
             </div>
             {permState !== 'denied' && (
@@ -1039,7 +1217,7 @@ function NotificationsSection() {
                 disabled={checking}
                 className="flex-shrink-0 h-8 px-3 rounded-lg bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition-colors disabled:opacity-50"
               >
-                {checking ? '…' : 'Allow'}
+                {checking ? '…' : t('notifAllow')}
               </button>
             )}
           </div>
@@ -1082,8 +1260,8 @@ function NotificationsSection() {
         {notificationSettings.dailyReminder && permState === 'granted' && (
           <div className="flex items-center justify-between gap-4 pl-1 border-l-2 border-brand-primary/30">
             <div>
-              <p className="text-sm font-semibold text-slate-700 dark:text-white/80">Reminder time</p>
-              <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">What time to send the daily reminder</p>
+              <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('reminderTime')}</p>
+              <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('reminderTimeDesc')}</p>
             </div>
             <input
               type="time"
@@ -1107,6 +1285,9 @@ function NotificationsSection() {
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function SettingsShell() {
+  const t = useTranslations('settings');
+  const { language, setLanguage } = useSettingsStore();
+
   return (
     <AppLayout>
     <div className="min-h-screen bg-[#F7FAF9] dark:bg-[#0C1F1E]">
@@ -1116,14 +1297,14 @@ export function SettingsShell() {
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 dark:via-indigo-400/40 to-transparent" />
-        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+        <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
           {/* Hamburger — mobile only */}
           <NavMenuButton />
           <MobileLogo />
 
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Settings</h1>
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('title')}</h1>
           </div>
           {/* Back button — mobile only (desktop uses sidebar) */}
           <Link
@@ -1144,8 +1325,36 @@ export function SettingsShell() {
         <TagsSection />
         <TemplatesSection />
         <PreferencesSection />
+
+        {/* Language */}
+        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] p-4 sm:p-5">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3">{t('language')}</p>
+          <p className="text-xs text-brand-text/45 dark:text-white/35 mb-3">{t('languageDescription')}</p>
+          <div className="flex gap-2">
+            {([
+              { lang: 'en', label: t('english') },
+              { lang: 'ro', label: t('romanian') },
+              { lang: 'es', label: t('spanish') },
+            ] as const).map(({ lang, label }) => (
+              <button
+                key={lang}
+                onClick={() => setLanguage(lang)}
+                className={cn(
+                  'flex-1 h-9 rounded-xl text-sm font-semibold border transition-all',
+                  language === lang
+                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
+                    : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <NotificationsSection />
         <GoalsSection />
+        <BackupSection />
       </div>
     </div>
     </AppLayout>

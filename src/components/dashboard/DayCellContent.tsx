@@ -10,9 +10,10 @@ interface Props {
   transactions: DayTransaction[];
   formatAmount: (n: number, opts?: { compact?: boolean }) => string;
   isSelected: boolean;
+  isSearchMatch?: boolean;
 }
 
-export function DayCellContent({ date, balance, transactions, formatAmount, isSelected }: Props) {
+export function DayCellContent({ date, balance, transactions, formatAmount, isSelected, isSearchMatch }: Props) {
   const today = isToday(date);
   const hasBalance = balance !== undefined;
   const isPositive = hasBalance && balance! > 0;
@@ -35,6 +36,8 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
         !hasBalance && 'bg-white/70 dark:bg-[#122928]/40',
         // Today
         today && !isSelected && 'border-brand-primary/25 dark:border-brand-primary/30 shadow-[inset_0_0_0_1px_rgba(59,122,120,0.15)]',
+        // Search match
+        isSearchMatch && !isSelected && 'border-amber-400/70 dark:border-amber-400/50 shadow-[0_0_0_2px_rgba(251,191,36,0.2)] dark:shadow-[0_0_0_2px_rgba(251,191,36,0.15)]',
         // Selected
         isSelected && 'bg-brand-primary/10 dark:bg-brand-primary/[0.12] border-brand-primary/60 shadow-[0_0_0_2px_rgba(59,122,120,0.15)]',
         // Hover
@@ -101,6 +104,11 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
         )}>
           {formatAmount(balance!, { compact: true })}
         </span>
+      )}
+
+      {/* ── Search match indicator ── */}
+      {isSearchMatch && !isSelected && (
+        <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_4px_rgba(251,191,36,0.6)]" />
       )}
 
       {/* ── Bottom accent strip ── */}

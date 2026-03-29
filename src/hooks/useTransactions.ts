@@ -88,7 +88,7 @@ export function useCreateTransaction(accountId?: string) {
     onSettled: (_data, err) => {
       // Don't invalidate on network errors — the optimistic entry stays until synced
       if (err instanceof TypeError) return;
-      qc.invalidateQueries({ queryKey: QK, refetchType: 'none' });
+      qc.invalidateQueries({ queryKey: QK });
     },
   });
 }

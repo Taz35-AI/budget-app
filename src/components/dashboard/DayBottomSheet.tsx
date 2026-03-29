@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
@@ -49,6 +50,9 @@ export function DayBottomSheet({
   useEffect(() => {
     setFormAccountId(accountId ?? accounts?.[0]?.id);
   }, [accountId, accounts, isAdding]);
+
+  const t = useTranslations('transactions');
+  const tc = useTranslations('common');
 
   const create = useOfflineCreate(formAccountId);
   const showAccountPicker = (accounts?.length ?? 0) >= 2;
@@ -136,7 +140,7 @@ export function DayBottomSheet({
           <button
             onClick={onClose}
             className="p-2 rounded-xl bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/50 active:bg-slate-200 dark:active:bg-white/20 transition-colors"
-            aria-label="Close"
+            aria-label={tc('close')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -147,7 +151,7 @@ export function DayBottomSheet({
         {/* Mutation error banner */}
         {create.isError && (
           <div className="mx-5 mb-2 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 text-sm text-red-700 dark:text-red-400">
-            Failed to save: {(create.error as Error)?.message ?? 'Unknown error'}
+            {t('failedToSave', { message: (create.error as Error)?.message ?? 'Unknown error' })}
           </div>
         )}
 
@@ -159,7 +163,7 @@ export function DayBottomSheet({
                 {/* Account picker — only when 2+ accounts */}
                 {showAccountPicker && (
                   <div className="flex gap-1.5 flex-wrap mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.07]">
-                    <p className="w-full text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">Add to account</p>
+                    <p className="w-full text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{t('addToAccount')}</p>
                     {accounts!.map((acct) => (
                       <button
                         key={acct.id}

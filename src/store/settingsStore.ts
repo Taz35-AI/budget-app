@@ -5,6 +5,8 @@ import type { CustomTag, RecurringTemplate, SavingsGoal, DateFormat, Account, Ta
 import { DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationScheduler';
 import type { NotificationSettings } from '@/lib/notificationScheduler';
 
+export type AppLanguage = 'en' | 'ro' | 'es';
+
 interface SettingsState {
   customTags: CustomTag[];
   hiddenBuiltinTags: string[];
@@ -16,6 +18,7 @@ interface SettingsState {
   dateFormat: DateFormat;
   hapticsEnabled: boolean;
   notificationSettings: NotificationSettings;
+  language: AppLanguage;
   // Actions
   _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
   addCustomTag: (tag: Omit<CustomTag, 'id'>) => void;
@@ -37,6 +40,7 @@ interface SettingsState {
   setDateFormat: (fmt: DateFormat) => void;
   setHapticsEnabled: (enabled: boolean) => void;
   setNotificationSettings: (patch: Partial<NotificationSettings>) => void;
+  setLanguage: (lang: AppLanguage) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -52,6 +56,7 @@ export const useSettingsStore = create<SettingsState>()(
       dateFormat: 'DD/MM/YYYY',
       hapticsEnabled: true,
       notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
+      language: 'en',
 
       _hydrate: (data) => set((s) => ({ ...s, ...data })),
 
@@ -115,6 +120,7 @@ export const useSettingsStore = create<SettingsState>()(
       setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
       setNotificationSettings: (patch) =>
         set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
+      setLanguage: (lang) => set({ language: lang }),
     }),
     { name: 'budgettool_settings' },
   ),

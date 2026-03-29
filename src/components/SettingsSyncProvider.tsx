@@ -44,6 +44,7 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
             tagBudgets: state.tagBudgets,
             firstDayOfWeek: state.firstDayOfWeek,
             dateFormat: state.dateFormat,
+            language: state.language,
           }),
         }).catch(() => {});
       }, 800);

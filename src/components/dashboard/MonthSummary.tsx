@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { format, startOfMonth, endOfMonth, getDaysInMonth, addDays, subMonths } from 'date-fns';
-import { FREQUENCIES } from '@/lib/constants';
+import { useTranslations } from 'next-intl';
+import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { useTransactions } from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
@@ -61,6 +62,9 @@ const ROW_CLASS = 'flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#F7FAF9] d
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
+  const t = useTranslations('monthSummary');
+  const tMonths = useTranslations('months');
+  const tTags = useTranslations('tags');
   const { allTags, goals } = useSettings();
   const { data: txData } = useTransactions();
   const rawTransactions = txData?.transactions ?? [];
@@ -190,10 +194,10 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {/* Month heading */}
       <div>
         <h2 className="text-base font-extrabold text-[#16302F] dark:text-white tracking-tight leading-tight">
-          {format(month, 'MMMM yyyy')}
+          {(tMonths.raw('long') as string[])[month.getMonth()]} {month.getFullYear()}
         </h2>
         <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/30 mt-0.5 font-medium">
-          Click a day to view or add transactions
+          {t('clickHint')}
         </p>
       </div>
 
@@ -202,7 +206,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
         {/* Daily avg */}
         <div className="relative rounded-xl overflow-hidden bg-[#F7FAF9] dark:bg-[#16302F]/10 border border-[#B2CFCE]/50 dark:border-[#3B7A78]/[0.07] px-3 py-2.5">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#16302F] to-[#16302F]/50 dark:from-[#3B7A78]/60 dark:to-[#5FAF6B]/40" />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">Daily avg</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">{t('dailyAvg')}</p>
           <p className="text-sm font-extrabold text-[#16302F] dark:text-white tabular-nums leading-none truncate">{formatAmount(dailyAvg)}</p>
         </div>
 
@@ -215,7 +219,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
             savingsRate >= 0 ? 'bg-gradient-to-r from-[#3B7A78] to-[#3B7A78]/50' :
             'bg-gradient-to-r from-red-400 to-rose-400',
           )} />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">Saved</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">{t('saved')}</p>
           <p className={cn(
             'text-sm font-extrabold tabular-nums leading-none',
             savingsRate === null ? 'text-[#16302F]/40 dark:text-[#B2CFCE]/30' :
@@ -230,7 +234,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
         {/* Transactions */}
         <div className="relative rounded-xl overflow-hidden bg-[#F7FAF9] dark:bg-[#16302F]/10 border border-[#B2CFCE]/50 dark:border-[#3B7A78]/[0.07] px-3 py-2.5">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#3B7A78] to-[#3B7A78]/50" />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">Count</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#16302F]/40 dark:text-[#B2CFCE]/30 mb-1">{t('count')}</p>
           <p className="text-sm font-extrabold text-[#16302F] dark:text-white tabular-nums leading-none">{txCount}</p>
         </div>
       </div>
@@ -245,9 +249,9 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">
-              {isCurrentMonth ? 'Spent so far this month' : `Spent in ${format(month, 'MMMM')}`}
-              {': '}
-              <span className="text-red-500 dark:text-red-400">{formatAmount(totalExpense)}</span>
+              {isCurrentMonth
+                ? t('spentSoFar', { amount: formatAmount(totalExpense) })
+                : t('spentInMonth', { month: (tMonths.raw('long') as string[])[month.getMonth()], amount: formatAmount(totalExpense) })}
             </p>
             {spendDiff !== null && (
               <p className="text-[11px] mt-0.5 text-[#16302F]/50 dark:text-[#B2CFCE]/40 leading-snug">
@@ -257,7 +261,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                 )}>
                   {spendDiff > 0 ? '+' : '−'}{formatAmount(Math.abs(spendDiff))}
                 </span>
-                {' '}vs all of {format(subMonths(month, 1), 'MMMM')}
+                {' '}{t('vsAllOfMonth', { month: (tMonths.raw('long') as string[])[subMonths(month, 1).getMonth()] })}
               </p>
             )}
           </div>
@@ -268,7 +272,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {(peakDay || hasDowData || avgTxValue > 0) && (
         <div>
           <SectionHeader
-            label="Spending patterns"
+            label={t('spendingPatterns')}
             accent="bg-gradient-to-b from-[#1A3B3A] to-[#3B7A78]"
             expandable
             expanded={expandedSections['patterns']}
@@ -285,7 +289,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">Biggest spending day</p>
+                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">{t('biggestDay')}</p>
                     <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35 mt-0.5">
                       {new Date(peakDay.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
@@ -305,7 +309,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">You spend most on</p>
+                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">{t('peakDayOfWeek')}</p>
                     <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35 mt-0.5">{DAY_NAMES[peakDow]}s</p>
                   </div>
                   {/* Mini bar chart */}
@@ -337,7 +341,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">Avg per transaction</p>
+                    <p className="text-xs font-semibold text-[#16302F] dark:text-white/90 leading-tight">{t('avgPerTransaction')}</p>
                     <p className="text-[11px] text-[#16302F]/40 dark:text-[#B2CFCE]/35 mt-0.5">expenses only</p>
                   </div>
                   <span className="text-sm font-bold text-[#16302F] dark:text-white tabular-nums flex-shrink-0">
@@ -354,7 +358,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {tagBreakdown.length > 0 && (
         <div>
           <SectionHeader
-            label="Spending by tag"
+            label={t('spendingByTag')}
             accent="bg-gradient-to-b from-[#3B7A78] to-[#3B7A78]/40"
             expandable
             expanded={expandedSections['tags']}
@@ -399,7 +403,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {upcoming.length > 0 && (
         <div>
           <SectionHeader
-            label="Next 7 days"
+            label={t('upcoming')}
             accent="bg-gradient-to-b from-[#16302F] to-[#3B7A78]"
             expandable
             expanded={expandedSections['upcoming'] ?? true}
@@ -436,7 +440,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {topExpenses.length > 0 && (
         <div>
           <SectionHeader
-            label="Biggest expenses"
+            label={t('topExpenses')}
             accent="bg-gradient-to-b from-red-400 to-rose-500"
             expandable
             expanded={expandedSections['expenses'] ?? true}
@@ -454,7 +458,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold text-white mt-0.5"
                         style={{ backgroundColor: allTags[tx.tag].color }}
                       >
-                        {allTags[tx.tag].label}
+                        {TAGS[tx.tag] ? tTags(tx.tag as never) : allTags[tx.tag].label}
                       </span>
                     )}
                   </div>
@@ -472,7 +476,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
       {recurringItems.length > 0 && (
         <div>
           <SectionHeader
-            label="Recurring this month"
+            label={t('recurringLabel')}
             accent="bg-gradient-to-b from-[#3B7A78] to-[#5FAF6B]"
             expandable
             expanded={expandedSections['recurring']}

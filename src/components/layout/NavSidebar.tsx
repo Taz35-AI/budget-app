@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useNavStore } from '@/store/navStore';
 import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
@@ -13,66 +14,68 @@ import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = [
-  {
-    href: '/dashboard',
-    label: 'Dashboard',
-    bottomNav: true,
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-  {
-    href: '/reports',
-    label: 'Reports',
-    bottomNav: true,
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-  },
-  {
-    href: '/accounts',
-    label: 'Accounts',
-    bottomNav: false,
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-      </svg>
-    ),
-  },
-  {
-    href: '/budgets',
-    label: 'Budgets',
-    bottomNav: true,
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-  {
-    href: '/settings',
-    label: 'Settings',
-    bottomNav: true,
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
-  },
-];
-
-const BOTTOM_NAV_ITEMS = NAV_ITEMS.filter((i) => i.bottomNav);
+function getNavItems(t: ReturnType<typeof useTranslations<'nav'>>) {
+  return [
+    {
+      href: '/dashboard',
+      label: t('dashboard'),
+      bottomNav: true,
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/reports',
+      label: t('reports'),
+      bottomNav: true,
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/accounts',
+      label: t('accounts'),
+      bottomNav: false,
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/budgets',
+      label: t('budgets'),
+      bottomNav: true,
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      href: '/settings',
+      label: t('settings'),
+      bottomNav: true,
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+    },
+  ];
+}
 
 // ─── Sidebar content (shared between desktop sidebar + mobile drawer) ─────────
 
 function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname();
+  const t = useTranslations('nav');
+  const navItems = getNavItems(t);
 
   return (
     <div className="flex flex-col h-full">
@@ -86,10 +89,10 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Nav links */}
       <div className="px-2.5 pt-4 pb-1">
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">Menu</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">{t('menu')}</p>
       </div>
       <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
-        {NAV_ITEMS.map(({ href, label, icon }) => {
+        {navItems.map(({ href, label, icon }) => {
           const isActive = pathname === href;
           return (
             <Link
@@ -115,12 +118,12 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Utility section */}
       <div className="flex-shrink-0 px-2.5 pb-4 pt-3 border-t border-white/[0.07] space-y-1.5">
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">Options</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">{t('options')}</p>
 
         {/* Theme toggle */}
         <div className="flex items-center gap-2 px-1">
           <ThemeToggle />
-          <span className="text-xs text-white/35 font-medium">Toggle theme</span>
+          <span className="text-xs text-white/35 font-medium">{t('toggleTheme')}</span>
         </div>
 
         {/* Export */}
@@ -215,6 +218,8 @@ export function NavSidebar() {
 
 function MobileBottomNav() {
   const pathname = usePathname();
+  const t = useTranslations('nav');
+  const bottomNavItems = getNavItems(t).filter((i) => i.bottomNav);
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 z-30
@@ -223,7 +228,7 @@ function MobileBottomNav() {
       border-t border-black/[0.07] dark:border-brand-primary/[0.15]
       shadow-[0_-2px_16px_rgba(22,48,47,0.08)]
       flex items-center justify-around px-1">
-      {BOTTOM_NAV_ITEMS.map(({ href, label, icon }) => {
+      {bottomNavItems.map(({ href, label, icon }) => {
         const isActive = pathname === href;
         return (
           <Link
