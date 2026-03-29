@@ -17,7 +17,7 @@ export default function SignupPage() {
     setError('');
     setLoading(true);
     const redirectTo = window.location.hostname === 'localhost'
-      ? 'https://budget-app-19qy.vercel.app/auth/callback'
+      ? 'https://budget-app.com/auth/callback'
       : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
