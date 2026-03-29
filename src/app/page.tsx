@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Budget App — Personal Finance Tracker & Balance Forecast',
-  description: 'Track income and expenses, forecast your balance up to 7 years ahead, manage multiple accounts and set savings goals. Free personal finance app for web and mobile.',
+  description: 'Track income and expenses, forecast your future balance day by day, manage multiple accounts and set savings goals. Free personal finance app for web and mobile.',
   keywords: [
     'budget app', 'personal finance tracker', 'balance forecast', 'expense tracker',
     'income tracker', 'budget planner', 'money manager', 'recurring expense tracker',
@@ -34,10 +34,10 @@ const jsonLd = {
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web, Android, iOS',
   url: 'https://budget-app.com',
-  description: 'Personal finance tracker that forecasts your balance up to 7 years ahead, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
+  description: 'Personal finance tracker that forecasts your future balance day by day, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   featureList: [
-    '7-year balance forecast',
+    'Long-term balance forecast',
     'Recurring transaction tracking',
     'Multiple account management',
     'Savings goals',
@@ -62,7 +62,7 @@ export default function LandingPage() {
 
         {/* Nav */}
         <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0C1F1E]/95 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link href="/" className="flex-shrink-0">
               <Image src="/budget-tool.png" alt="Budget App" width={260} height={104} className="h-16 w-auto" priority />
             </Link>
@@ -78,7 +78,7 @@ export default function LandingPage() {
         </header>
 
         {/* Hero */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
+        <section className="px-4 sm:px-6 pt-20 pb-16 text-center">
           <div className="inline-flex items-center gap-2 bg-[#3B7A78]/15 border border-[#3B7A78]/30 rounded-full px-4 py-1.5 text-sm text-[#3B7A78] font-medium mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-[#3B7A78] animate-pulse"></span>
             Free during beta — early users keep free access forever
@@ -91,7 +91,7 @@ export default function LandingPage() {
 
           <p className="text-lg sm:text-xl text-white/55 leading-relaxed max-w-2xl mx-auto mb-10">
             Budget App tracks every penny you earn and spend, then forecasts your exact balance
-            <strong className="text-white/80 font-semibold"> up to 7 years ahead</strong> — day by day, account by account.
+            <strong className="text-white/80 font-semibold"> months and years ahead</strong> — day by day, account by account.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
@@ -114,7 +114,7 @@ export default function LandingPage() {
 
         {/* Trust bar */}
         <section className="border-y border-white/[0.06] bg-[#122928]/60 py-4">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="px-4 sm:px-6">
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-white/30 text-sm font-medium">
               {['Web + Android + iOS', 'No bank connection', 'Dark & light mode', 'Multi-language', 'Data encrypted at rest', 'Free forever for early users'].map((item) => (
                 <div key={item} className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-20">
+        <section className="px-4 sm:px-6 py-20">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Everything your finances need</h2>
             <p className="text-white/50 text-lg max-w-xl mx-auto">Built for people who want real control — not just a pretty chart.</p>
@@ -138,8 +138,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               {
-                title: '7-Year Balance Forecast',
-                body: 'The only budget app that shows your exact balance every single day, years into the future. Know before you commit.',
+                title: 'Long-Term Balance Forecast',
+                body: 'See your exact balance every single day, months and years into the future. Know the impact of every financial decision before you make it.',
                 icon: <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />,
               },
               {
@@ -181,7 +181,7 @@ export default function LandingPage() {
 
         {/* How it works */}
         <section className="border-t border-white/[0.06] bg-[#122928]/40 py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="px-4 sm:px-6">
             <div className="text-center mb-14">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Up and running in 3 minutes</h2>
               <p className="text-white/50 text-lg max-w-xl mx-auto">No bank connection. No complicated setup. Just your numbers.</p>
@@ -204,7 +204,7 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ */}
-        <section className="max-w-3xl mx-auto px-4 sm:px-6 py-20">
+        <section className="px-4 sm:px-6 py-20">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Common questions</h2>
           </div>
@@ -213,7 +213,7 @@ export default function LandingPage() {
             {[
               { q: 'Is Budget App really free?', a: 'Yes — completely free during beta. Sign up now and keep free access forever. We may introduce a paid plan for new users in the future, but early users are never charged.' },
               { q: 'Do I need to connect my bank account?', a: 'No. Budget App never connects to your bank. You enter transactions manually, keeping your banking credentials completely private.' },
-              { q: 'How far ahead can it forecast my balance?', a: 'Up to 7 years, day by day. Every recurring income and expense is calculated automatically so you see the exact impact on your balance over time.' },
+              { q: 'How far ahead can it forecast my balance?', a: 'Months and years ahead, day by day. Every recurring income and expense is calculated automatically so you always know where your balance is heading.' },
               { q: 'Does it work on mobile?', a: 'Yes — there\'s a native Android and iOS app, plus the full web version works on any browser or device.' },
               { q: 'What currencies and languages are supported?', a: 'Budget App supports multiple currencies and is available in English, Romanian and Spanish. More languages coming.' },
               { q: 'Is my data safe?', a: 'All data is encrypted in transit and at rest. We never sell or share your data with anyone.' },
@@ -228,7 +228,7 @@ export default function LandingPage() {
 
         {/* CTA */}
         <section className="border-t border-white/[0.06] bg-[#122928]/40 py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="px-4 sm:px-6 text-center">
             <Image src="/budget-tool.png" alt="Budget App" width={160} height={64} className="h-12 w-auto mx-auto mb-8" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
             <p className="text-white/50 text-lg mb-3 max-w-lg mx-auto">
@@ -249,7 +249,7 @@ export default function LandingPage() {
 
         {/* Footer */}
         <footer className="border-t border-white/[0.06] py-10">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Image src="/budget-tool.png" alt="Budget App" width={90} height={36} className="h-5 w-auto opacity-35" />
               <span className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Budget App</span>
