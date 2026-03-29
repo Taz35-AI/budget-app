@@ -12,8 +12,8 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-[#0C1F1E] px-4 py-16">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-10">
-          <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png" alt="Budget App" width={36} height={36} className="w-full h-full object-cover" />
+          <div className="w-[90px] h-[90px] rounded-xl overflow-hidden flex-shrink-0">
+            <Image src="/budget-tool.png" alt="Budget App" width={90} height={90} className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Budget App</p>

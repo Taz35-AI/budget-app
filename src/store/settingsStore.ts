@@ -5,7 +5,7 @@ import type { CustomTag, RecurringTemplate, SavingsGoal, DateFormat, Account, Ta
 import { DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/notificationScheduler';
 import type { NotificationSettings } from '@/lib/notificationScheduler';
 
-export type AppLanguage = 'en' | 'ro' | 'es';
+export type AppLanguage = 'en' | 'ro' | 'es' | 'fr' | 'de' | 'pl';
 
 interface SettingsState {
   customTags: CustomTag[];

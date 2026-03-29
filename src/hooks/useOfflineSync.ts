@@ -5,9 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useOfflineQueueStore } from '@/store/offlineQueueStore';
 
 export function useOfflineSync() {
-  const [isOnline, setIsOnline] = useState(() =>
-    typeof navigator !== 'undefined' ? navigator.onLine : true,
-  );
+  const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const { pending, dequeue } = useOfflineQueueStore();
   const qc = useQueryClient();
@@ -44,6 +42,7 @@ export function useOfflineSync() {
   }, [pending, dequeue, qc]);
 
   useEffect(() => {
+    setIsOnline(navigator.onLine);
     const handleOnline = () => {
       setIsOnline(true);
       drain();

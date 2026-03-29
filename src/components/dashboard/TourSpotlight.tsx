@@ -2,37 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type Rect = { top: number; left: number; width: number; height: number };
-
-type SpotlightStep = {
-  targetId: string | null;
-  title: string;
-  content: string;
-};
-
-const STEPS: SpotlightStep[] = [
-  {
-    targetId: 'tour-stats',
-    title: 'Live stats',
-    content: 'These 4 cards update in real time — your running balance today, plus monthly income, expenses, and net.',
-  },
-  {
-    targetId: 'tour-adjust',
-    title: 'Adjust Balance',
-    content: "Type your real bank balance and we'll auto-create a correction transaction so the tracker stays accurate.",
-  },
-  {
-    targetId: 'tour-budget',
-    title: 'Budget Limit',
-    content: "Set a monthly spending cap. A progress bar fills as you spend and turns red when you're close to the limit.",
-  },
-  {
-    targetId: null,
-    title: "You're all set!",
-    content: 'Head to Settings to add custom tags, recurring templates, and savings goals.',
-  },
-];
 
 interface Props {
   step: number; // 2 | 3 | 4 | 5
@@ -43,10 +15,19 @@ interface Props {
 const PAD = 8;
 
 export function TourSpotlight({ step, onNext, onDone }: Props) {
+  const t = useTranslations('tour');
   const stepIdx = step - 2; // 0..3
-  const current = STEPS[stepIdx];
-  const isLast = stepIdx === STEPS.length - 1;
+  const isLast = stepIdx === 3;
   const [rect, setRect] = useState<Rect | null>(null);
+
+  const STEPS = [
+    { targetId: 'tour-stats',  title: t('step1Title'), content: t('step1Content') },
+    { targetId: 'tour-adjust', title: t('step2Title'), content: t('step2Content') },
+    { targetId: 'tour-budget', title: t('step3Title'), content: t('step3Content') },
+    { targetId: null,          title: t('step4Title'), content: t('step4Content') },
+  ];
+
+  const current = STEPS[stepIdx];
 
   const measure = useCallback(() => {
     if (!current?.targetId) { setRect(null); return; }
@@ -89,7 +70,7 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
         zIndex: 110,
       };
 
-  const stepLabel = `${stepIdx + 1} of ${STEPS.length}`;
+  const stepLabel = t('stepOf', { current: stepIdx + 1, total: STEPS.length });
 
   return (
     <>
@@ -151,7 +132,7 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
               onClick={onDone}
               className="text-white/30 hover:text-white/60 transition-colors text-xs"
             >
-              Skip tour
+              {t('skip')}
             </button>
           </div>
 
@@ -168,14 +149,14 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
                 onClick={onDone}
                 className="flex-1 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
               >
-                Done
+                {t('done')}
               </button>
               <Link
                 href="/settings"
                 onClick={onDone}
                 className="flex-1 h-8 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors flex items-center justify-center"
               >
-                Go to Settings
+                {t('goToSettings')}
               </Link>
             </div>
           ) : (
@@ -183,7 +164,7 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
               onClick={onNext}
               className="w-full h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
             >
-              Next →
+              {t('next')}
             </button>
           )}
         </div>

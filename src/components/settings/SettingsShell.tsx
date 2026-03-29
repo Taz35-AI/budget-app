@@ -1310,9 +1310,20 @@ function NotificationsSection() {
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
+type SettingsTab = 'general' | 'accounts' | 'tags' | 'notifications' | 'data';
+
 export function SettingsShell() {
   const t = useTranslations('settings');
   const { language, setLanguage } = useSettingsStore();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+
+  const tabs: { id: SettingsTab; label: string }[] = [
+    { id: 'general',       label: t('tabGeneral') },
+    { id: 'accounts',      label: t('tabAccounts') },
+    { id: 'tags',          label: t('tabTags') },
+    { id: 'notifications', label: t('tabNotifications') },
+    { id: 'data',          label: t('tabData') },
+  ];
 
   return (
     <AppLayout>
@@ -1323,16 +1334,14 @@ export function SettingsShell() {
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/40 dark:via-brand-primary/30 to-transparent" />
+
+        {/* Title row */}
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
-          {/* Hamburger — mobile only */}
           <NavMenuButton />
           <MobileLogo />
-
-          {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('title')}</h1>
           </div>
-          {/* Back button — mobile only (desktop uses sidebar) */}
           <Link
             href="/dashboard"
             className="lg:hidden ml-auto flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all"
@@ -1343,44 +1352,83 @@ export function SettingsShell() {
             Dashboard
           </Link>
         </div>
+
+        {/* Tab bar */}
+        <div className="flex gap-1 overflow-x-auto scrollbar-none px-4 sm:px-6 pb-2.5">
+          {tabs.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={cn(
+                'flex-shrink-0 h-8 px-4 rounded-full text-xs font-semibold transition-all whitespace-nowrap',
+                activeTab === id
+                  ? 'bg-brand-primary text-white shadow-sm'
+                  : 'text-slate-500 dark:text-white/45 hover:bg-slate-100 dark:hover:bg-white/[0.06]',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </header>
 
-      {/* Content — 2 columns on lg+ */}
+      {/* Content */}
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <AccountsSection />
-        <TagsSection />
-        <TemplatesSection />
-        <PreferencesSection />
 
-        {/* Language */}
-        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] p-4 sm:p-5">
-          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3">{t('language')}</p>
-          <p className="text-xs text-brand-text/45 dark:text-white/35 mb-3">{t('languageDescription')}</p>
-          <div className="flex gap-2">
-            {([
-              { lang: 'en', label: t('english') },
-              { lang: 'ro', label: t('romanian') },
-              { lang: 'es', label: t('spanish') },
-            ] as const).map(({ lang, label }) => (
-              <button
-                key={lang}
-                onClick={() => setLanguage(lang)}
-                className={cn(
-                  'flex-1 h-9 rounded-xl text-sm font-semibold border transition-all',
-                  language === lang
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                    : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        {activeTab === 'general' && (
+          <>
+            <PreferencesSection />
+            {/* Language */}
+            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#122928] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
+              <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
+              <div className="px-6 pt-5 pb-3">
+                <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('language')}</h2>
+                <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('languageDescription')}</p>
+              </div>
+              <div className="px-6 pb-6">
+                <div className="flex flex-wrap gap-2">
+                  {([
+                    { lang: 'en', label: t('english') },
+                    { lang: 'ro', label: t('romanian') },
+                    { lang: 'es', label: t('spanish') },
+                    { lang: 'fr', label: t('french') },
+                    { lang: 'de', label: t('german') },
+                    { lang: 'pl', label: t('polish') },
+                  ] as const).map(({ lang, label }) => (
+                    <button
+                      key={lang}
+                      onClick={() => setLanguage(lang)}
+                      className={cn(
+                        'h-9 px-4 rounded-xl text-sm font-semibold border transition-all',
+                        language === lang
+                          ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
+                          : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
-        <NotificationsSection />
-        <GoalsSection />
-        <BackupSection />
+        {activeTab === 'accounts' && <AccountsSection />}
+
+        {activeTab === 'tags' && <TagsSection />}
+
+        {activeTab === 'notifications' && <NotificationsSection />}
+
+        {activeTab === 'data' && (
+          <>
+            <TemplatesSection />
+            <GoalsSection />
+            <BackupSection />
+          </>
+        )}
+
       </div>
     </div>
     </AppLayout>

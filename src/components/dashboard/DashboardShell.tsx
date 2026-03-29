@@ -589,13 +589,15 @@ export function DashboardShell() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-amber-700 dark:text-amber-300 leading-tight">
-                  Balance goes negative soon
+                  {t('runningLowTitle')}
                 </p>
                 <p className="text-xs text-amber-600/80 dark:text-amber-400/70 mt-0.5">
-                  On {new Date(runningLowDate.date + 'T12:00:00').toLocaleDateString('en-GB', {
-                    weekday: 'short', day: 'numeric', month: 'short',
-                  })}, predicted balance:{' '}
-                  <span className="font-semibold">{formatAmount(runningLowDate.balance)}</span>
+                  {t('runningLow', {
+                    date: new Date(runningLowDate.date + 'T12:00:00').toLocaleDateString('en-GB', {
+                      weekday: 'short', day: 'numeric', month: 'short',
+                    }),
+                    amount: formatAmount(runningLowDate.balance),
+                  })}
                 </p>
               </div>
             </div>

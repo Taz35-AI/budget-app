@@ -1,28 +1,20 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 interface Props {
   onAddTransaction: () => void;
 }
 
-const STEPS = [
-  {
-    n: '1',
-    title: 'Pick a day',
-    desc: 'Click any date on the calendar to select it.',
-  },
-  {
-    n: '2',
-    title: 'Add a transaction',
-    desc: 'Hit "Add transaction" and enter your income or expense.',
-  },
-  {
-    n: '3',
-    title: 'Watch your balance',
-    desc: 'Your running balance projects across every day for 7 years.',
-  },
-];
-
 export function OnboardingBanner({ onAddTransaction }: Props) {
+  const t = useTranslations('onboarding');
+
+  const STEPS = [
+    { n: '1', title: t('step1Title'), desc: t('step1Desc') },
+    { n: '2', title: t('step2Title'), desc: t('step2Desc') },
+    { n: '3', title: t('step3Title'), desc: t('step3Desc') },
+  ];
+
   return (
     <div className="rounded-3xl overflow-hidden
       bg-white border border-slate-100 shadow-[0_2px_24px_rgba(0,0,0,0.06)]
@@ -37,9 +29,9 @@ export function OnboardingBanner({ onAddTransaction }: Props) {
       </div>
 
       <div>
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">Welcome to Budget App</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">{t('welcomeTitle')}</h2>
         <p className="text-sm text-slate-500 dark:text-white/40 max-w-xs">
-          Your calendar is empty. Add your first transaction to start tracking your finances.
+          {t('welcomeDesc')}
         </p>
       </div>
 
@@ -64,7 +56,7 @@ export function OnboardingBanner({ onAddTransaction }: Props) {
         onClick={onAddTransaction}
         className="h-10 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors"
       >
-        Add your first transaction
+        {t('addFirst')}
       </button>
     </div>
   );
