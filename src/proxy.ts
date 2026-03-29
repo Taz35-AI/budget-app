@@ -42,7 +42,7 @@ export async function proxy(request: NextRequest) {
 
   if (previewPassword && !isGateExempt) {
     const cookie = request.cookies.get('preview_access');
-    if (cookie?.value !== previewPassword) {
+    if (cookie?.value !== 'granted') {
       const url = request.nextUrl.clone();
       url.pathname = '/preview';
       url.searchParams.set('from', pathname);
