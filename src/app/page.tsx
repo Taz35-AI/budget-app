@@ -64,7 +64,7 @@ export default function LandingPage() {
         <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0C1F1E]/95 backdrop-blur-sm">
           <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link href="/" className="flex-shrink-0">
-              <Image src="/budget-tool.png" alt="Budget App" width={390} height={156} className="h-24 w-auto" priority />
+              <Image src="/budget-tool.png" alt="Budget App" width={390} height={156} className="h-[86px] w-auto" priority />
             </Link>
             <nav className="flex items-center gap-2">
               <Link href="/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-1.5">
@@ -229,7 +229,7 @@ export default function LandingPage() {
         {/* CTA */}
         <section className="border-t border-white/[0.06] bg-[#122928]/40 py-20">
           <div className="px-4 sm:px-6 text-center">
-            <Image src="/budget-tool.png" alt="Budget App" width={160} height={64} className="h-12 w-auto mx-auto mb-8" />
+            <Image src="/budget-tool.png" alt="Budget App" width={320} height={128} className="h-24 w-auto mx-auto mb-8" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
             <p className="text-white/50 text-lg mb-3 max-w-lg mx-auto">
               Join people using Budget App to track their finances and see their financial future clearly.
