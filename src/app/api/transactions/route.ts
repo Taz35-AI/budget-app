@@ -47,12 +47,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const supabase = createAdminClient();
 
+    const VALID_CATEGORIES = ['income', 'expense'];
+    const VALID_TYPES = ['one_off', 'recurring'];
+    const VALID_FREQUENCIES = ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'];
+
+    const name = String(body.name ?? '').trim().slice(0, 200);
+    const amount = Number(body.amount);
+    if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    if (!VALID_CATEGORIES.includes(body.category)) return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
+    if (!VALID_TYPES.includes(body.type)) return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    if (isNaN(amount) || amount < 0 || amount > 999_999_999) return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    if (body.frequency && !VALID_FREQUENCIES.includes(body.frequency)) return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
+
     const payload = {
       user_id: userId,
       account_id: body.account_id || null,
       parent_id: body.parent_id || null,
-      name: body.name,
-      amount: Number(body.amount),
+      name,
+      amount,
       category: body.category,
       type: body.type,
       tag: body.tag || null,

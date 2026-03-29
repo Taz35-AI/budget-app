@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
   const correct = process.env.PREVIEW_PASSWORD?.trim();
 
   if (!correct || password?.trim() !== correct) {
+    // Slow down brute force attempts
+    await new Promise((r) => setTimeout(r, 1500));
     return NextResponse.json({ error: 'Wrong password' }, { status: 401 });
   }
 

@@ -76,9 +76,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (Array.isArray(body.exceptions) && body.exceptions.length > 0) {
+      const excPayload = body.exceptions.map((ex: Record<string, unknown>) => ({
+        ...ex,
+        user_id: userId,
+      }));
       const { error: excError } = await supabase
         .from('transaction_exceptions')
-        .upsert(body.exceptions, { onConflict: 'id' });
+        .upsert(excPayload, { onConflict: 'id' });
 
       if (excError) {
         console.error('[POST /api/backup] exceptions upsert error:', excError.message);

@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
     const body = await req.json();
-    const name = (body.name ?? '').trim();
+    const name = (body.name ?? '').trim().slice(0, 100);
     if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
 
     // Enforce max 5 accounts
