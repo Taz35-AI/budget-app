@@ -211,9 +211,10 @@ interface Props {
   symbol: string;
   lockType?: boolean;
   compact?: boolean;
+  isCreditAccount?: boolean;
 }
 
-export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact }: Props) {
+export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact, isCreditAccount }: Props) {
   const t = useTranslations('transactionForm');
   const tc = useTranslations('common');
   const tt = useTranslations('transactions');
@@ -256,6 +257,13 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
   const category = watch('category');
   const tag = watch('tag');
   const nameValue = watch('name');
+
+  // Credit card accounts can only have expenses — force it and keep it locked
+  React.useEffect(() => {
+    if (isCreditAccount && category !== 'expense') {
+      setValue('category', 'expense');
+    }
+  }, [isCreditAccount, category, setValue]);
   const frequency = watch('frequency');
   const recurrences = watch('recurrences');
   const start_date = watch('start_date');
@@ -347,26 +355,37 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         </div>
       )}
 
-      {/* Category toggle */}
-      <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
-        {(['income', 'expense'] as const).map((cat) => (
-          <label
-            key={cat}
-            className={cn(
-              'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
-              compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-              category === cat
-                ? cat === 'income'
-                  ? 'bg-brand-positive text-white shadow-inner'
-                  : 'bg-brand-danger text-white shadow-inner'
-                : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
-            )}
-          >
-            <input type="radio" value={cat} {...register('category')} className="sr-only" />
-            {cat === 'income' ? t('income') : t('expense')}
-          </label>
-        ))}
-      </div>
+      {/* Category toggle — credit accounts only show expense */}
+      {isCreditAccount ? (
+        <div className={cn(
+          'flex items-center justify-center rounded-xl font-semibold',
+          compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
+          'bg-brand-danger text-white',
+        )}>
+          <input type="hidden" {...register('category')} value="expense" />
+          {t('expense')}
+        </div>
+      ) : (
+        <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
+          {(['income', 'expense'] as const).map((cat) => (
+            <label
+              key={cat}
+              className={cn(
+                'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
+                category === cat
+                  ? cat === 'income'
+                    ? 'bg-brand-positive text-white shadow-inner'
+                    : 'bg-brand-danger text-white shadow-inner'
+                  : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+              )}
+            >
+              <input type="radio" value={cat} {...register('category')} className="sr-only" />
+              {cat === 'income' ? t('income') : t('expense')}
+            </label>
+          ))}
+        </div>
+      )}
 
       {/* Type toggle — hidden when editing (type cannot change after creation) */}
       {lockType ? (

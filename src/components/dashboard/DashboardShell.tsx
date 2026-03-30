@@ -733,6 +733,7 @@ export function DashboardShell() {
                       compact
                       onCancel={handleCancelAdd}
                       isLoading={create.isPending}
+                      isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
                       onSubmit={(values: TransactionFormValues) => {
                         create.submit(values, {
                           onSuccess: () => {

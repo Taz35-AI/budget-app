@@ -56,6 +56,7 @@
   },
   "transactions": {
     "addTransaction": "Dodaj transakcję",
+    "transfer": "Przelew między kontami",
     "saveChanges": "Zapisz zmiany",
     "noTransactions": "Brak transakcji tego dnia",
     "tapToAdd": "Dotknij poniżej, aby dodać",

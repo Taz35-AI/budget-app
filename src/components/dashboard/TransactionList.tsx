@@ -229,6 +229,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                       lockType
                       compact
                       defaultDate={date}
+                      isCreditAccount={accounts?.find(a => a.id === (tx.account_id ?? editAccountId))?.type === 'credit'}
                       initialValues={{
                         id: tx.transaction_id,
                         name: tx.name,
@@ -392,7 +393,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
             {t('tapToAddFirst')}
           </OnboardingTip>
         )}
-        <div className={cn('flex gap-2', onTransfer && (accounts?.length ?? 0) >= 2 ? 'flex-row' : '')}>
+        <div className={cn('flex gap-2', onTransfer && (accounts?.length ?? 0) >= 2 ? 'flex-col' : '')}>
           <Button onClick={onAddNew} className="flex-1" size="lg">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -400,10 +401,11 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
             {t('addTransaction')}
           </Button>
           {onTransfer && (accounts?.length ?? 0) >= 2 && (
-            <Button onClick={onTransfer} size="lg" variant="ghost" className="flex-shrink-0 px-3">
+            <Button onClick={onTransfer} size="lg" variant="ghost" className="flex-1 border border-brand-primary/20 dark:border-white/10">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
               </svg>
+              {t('transfer')}
             </Button>
           )}
         </div>

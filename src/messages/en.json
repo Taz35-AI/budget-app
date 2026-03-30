@@ -56,6 +56,7 @@
   },
   "transactions": {
     "addTransaction": "Add transaction",
+    "transfer": "Transfer between accounts",
     "saveChanges": "Save changes",
     "noTransactions": "No transactions on this day",
     "tapToAdd": "Tap below to add one",

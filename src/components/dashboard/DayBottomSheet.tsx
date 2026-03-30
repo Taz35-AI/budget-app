@@ -188,6 +188,7 @@ export function DayBottomSheet({
                   symbol={symbol}
                   onCancel={onCancelAdd}
                   isLoading={create.isPending}
+                  isCreditAccount={accounts?.find(a => a.id === formAccountId)?.type === 'credit'}
                   onSubmit={(values: TransactionFormValues) => {
                     create.submit(values, { onSuccess: onCancelAdd });
                   }}
