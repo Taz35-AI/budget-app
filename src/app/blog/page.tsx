@@ -6,20 +6,20 @@ export const metadata: Metadata = {
   title: 'Blog | Personal Finance Tips & Guides | Spentum',
   description: 'Practical guides on saving money, paying off debt, budgeting, and taking control of your personal finances. Written clearly, no jargon.',
   keywords: ['personal finance blog', 'budgeting tips', 'save money', 'debt advice', 'money management', 'financial planning'],
-  alternates: { canonical: 'https://spentum.com/blog' },
+  alternates: { canonical: 'https://www.spentum.com/blog' },
   openGraph: {
     type: 'website',
-    url: 'https://spentum.com/blog',
+    url: 'https://www.spentum.com/blog',
     title: 'Blog | Personal Finance Tips & Guides | Spentum',
     description: 'Practical guides on saving money, paying off debt, budgeting, and taking control of your personal finances.',
     siteName: 'Spentum',
-    images: [{ url: 'https://spentum.com/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://www.spentum.com/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Blog | Personal Finance Tips & Guides | Spentum',
     description: 'Practical guides on saving money, paying off debt, budgeting, and taking control of your personal finances.',
-    images: ['https://spentum.com/og-image.png'],
+    images: ['https://www.spentum.com/og-image.png'],
   },
 };
 
@@ -31,11 +31,11 @@ const jsonLd = {
   '@type': 'Blog',
   name: 'Spentum Blog',
   description: 'Practical guides on saving money, paying off debt, and managing your personal finances.',
-  url: 'https://spentum.com/blog',
+  url: 'https://www.spentum.com/blog',
   publisher: {
     '@type': 'Organization',
     name: 'Spentum',
-    logo: { '@type': 'ImageObject', url: 'https://spentum.com/spentum.png' },
+    logo: { '@type': 'ImageObject', url: 'https://www.spentum.com/spentum.png' },
   },
 };
 

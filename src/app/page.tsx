@@ -6,20 +6,20 @@ export const metadata: Metadata = {
   title: 'Spentum — Budget Smarter. No Bank Login Required.',
   description: 'Track income, expenses & account transfers. Forecast your balance 7 years ahead — without giving anyone your banking password. Free during beta.',
   keywords: ['spentum', 'personal finance tracker', 'balance forecast', 'expense tracker', 'income tracker', 'budget planner', 'money manager'],
-  alternates: { canonical: 'https://spentum.com' },
+  alternates: { canonical: 'https://www.spentum.com' },
   openGraph: {
     type: 'website',
-    url: 'https://spentum.com',
+    url: 'https://www.spentum.com',
     title: 'Spentum — Budget Smarter. No Bank Login Required.',
     description: 'Track income, expenses & account transfers. Forecast your balance 7 years ahead — without giving anyone your banking password. Free during beta.',
     siteName: 'Spentum',
-    images: [{ url: 'https://spentum.com/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://www.spentum.com/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Spentum — Budget Smarter. No Bank Login Required.',
     description: 'Track income, expenses & account transfers. Forecast your balance 7 years ahead — without giving anyone your banking password. Free during beta.',
-    images: ['https://spentum.com/og-image.png'],
+    images: ['https://www.spentum.com/og-image.png'],
   },
 };
 
@@ -32,7 +32,7 @@ const jsonLd = {
   name: 'Spentum',
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web, Android, iOS',
-  url: 'https://spentum.com',
+  url: 'https://www.spentum.com',
   description: 'Personal finance tracker that forecasts your future balance day by day, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
