@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-[90px] h-[90px] rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png" alt="Spentum" width={90} height={90} className="w-full h-full object-cover" />
+            <Image src="/spentum.png" alt="Spentum" width={90} height={90} className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Spentum</p>

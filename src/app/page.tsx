@@ -64,7 +64,7 @@ export default function LandingPage() {
         <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0C1F1E]/95 backdrop-blur-sm">
           <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link href="/" className="flex-shrink-0">
-              <Image src="/budget-tool.png" alt="Spentum" width={390} height={156} className="h-[86px] w-auto" priority />
+              <Image src="/spentum.png" alt="Spentum" width={390} height={156} className="h-[86px] w-auto" priority />
             </Link>
             <nav className="flex items-center gap-2">
               <Link href="/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-1.5">
@@ -229,7 +229,7 @@ export default function LandingPage() {
         {/* CTA */}
         <section className="border-t border-white/[0.06] bg-[#122928]/40 py-20">
           <div className="px-4 sm:px-6 text-center">
-            <Image src="/budget-tool.png" alt="Spentum" width={320} height={128} className="h-24 w-auto mx-auto mb-8" />
+            <Image src="/spentum.png" alt="Spentum" width={320} height={128} className="h-24 w-auto mx-auto mb-8" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
             <p className="text-white/50 text-lg mb-3 max-w-lg mx-auto">
               Join people using Spentum to track their finances and see their financial future clearly.
@@ -251,7 +251,7 @@ export default function LandingPage() {
         <footer className="border-t border-white/[0.06] py-10">
           <div className="px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Image src="/budget-tool.png" alt="Spentum" width={90} height={36} className="h-5 w-auto opacity-35" />
+              <Image src="/spentum.png" alt="Spentum" width={90} height={36} className="h-5 w-auto opacity-35" />
               <span className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spentum</span>
             </div>
             <nav className="flex items-center gap-5 text-xs text-white/30">

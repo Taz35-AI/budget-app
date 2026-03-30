@@ -93,7 +93,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/budget-tool.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-white/40">
             {mode === 'login' ? 'Sign in to your account' : 'Reset your password'}
           </p>
