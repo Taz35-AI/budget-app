@@ -3,37 +3,37 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Budget App: Personal Finance Tracker & Balance Forecast',
+  title: 'Spentum: Personal Finance Tracker & Balance Forecast',
   description: 'Track income and expenses, forecast your future balance day by day, manage multiple accounts and set savings goals. Free personal finance app for web and mobile.',
   keywords: [
-    'budget app', 'personal finance tracker', 'balance forecast', 'expense tracker',
+    'spentum', 'personal finance tracker', 'balance forecast', 'expense tracker',
     'income tracker', 'budget planner', 'money manager', 'recurring expense tracker',
     'savings goals', 'monthly budget', 'financial planning', 'spending tracker',
   ],
-  alternates: { canonical: 'https://budget-app.com' },
+  alternates: { canonical: 'https://spentum.com' },
   openGraph: {
     type: 'website',
-    url: 'https://budget-app.com',
-    title: 'Budget App: Personal Finance Tracker & Balance Forecast',
+    url: 'https://spentum.com',
+    title: 'Spentum: Personal Finance Tracker & Balance Forecast',
     description: 'See your financial future day by day. Track income, expenses and savings goals across multiple accounts. Free for web and mobile.',
-    siteName: 'Budget App',
-    images: [{ url: 'https://budget-app.com/og-image.png', width: 1200, height: 630 }],
+    siteName: 'Spentum',
+    images: [{ url: 'https://spentum.com/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Budget App: Personal Finance Tracker & Balance Forecast',
+    title: 'Spentum: Personal Finance Tracker & Balance Forecast',
     description: 'See your financial future day by day. Track income, expenses and savings goals across multiple accounts. Free for web and mobile.',
-    images: ['https://budget-app.com/og-image.png'],
+    images: ['https://spentum.com/og-image.png'],
   },
 };
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Budget App',
+  name: 'Spentum',
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web, Android, iOS',
-  url: 'https://budget-app.com',
+  url: 'https://spentum.com',
   description: 'Personal finance tracker that forecasts your future balance day by day, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   featureList: [
@@ -64,7 +64,7 @@ export default function LandingPage() {
         <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0C1F1E]/95 backdrop-blur-sm">
           <div className="px-4 sm:px-6 h-14 flex items-center justify-between">
             <Link href="/" className="flex-shrink-0">
-              <Image src="/budget-tool.png" alt="Budget App" width={390} height={156} className="h-[86px] w-auto" priority />
+              <Image src="/budget-tool.png" alt="Spentum" width={390} height={156} className="h-[86px] w-auto" priority />
             </Link>
             <nav className="flex items-center gap-2">
               <Link href="/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-1.5">
@@ -90,7 +90,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-white/55 leading-relaxed max-w-2xl mx-auto mb-10">
-            Budget App tracks every penny you earn and spend, then forecasts your exact balance
+            Spentum tracks every penny you earn and spend, then forecasts your exact balance
             <strong className="text-white/80 font-semibold"> months and years ahead</strong>, day by day, account by account.
           </p>
 
@@ -144,7 +144,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Recurring Transactions',
-                body: 'Add salary, rent, subscriptions, loan repayments once. Daily, weekly, monthly, annual. Budget App handles every schedule automatically.',
+                body: 'Add salary, rent, subscriptions, loan repayments once. Daily, weekly, monthly, annual. Spentum handles every schedule automatically.',
                 icon: <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />,
               },
               {
@@ -154,7 +154,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Savings Goals',
-                body: 'Set a target, link it to a tag, and watch your progress in real time. Budget App tells you exactly when you\'ll hit your goal.',
+                body: 'Set a target, link it to a tag, and watch your progress in real time. Spentum tells you exactly when you\'ll hit your goal.',
                 icon: <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />,
               },
               {
@@ -164,7 +164,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Mobile App',
-                body: 'Coming soon on Android and iOS. The full Budget App experience in your pocket, with haptic feedback and offline support.',
+                body: 'Coming soon on Android and iOS. The full Spentum experience in your pocket, with haptic feedback and offline support.',
                 icon: <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3" />,
               },
             ].map((f) => (
@@ -211,11 +211,11 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-0">
             {[
-              { q: 'Is Budget App really free?', a: 'Yes, completely free during beta. Sign up now and keep free access forever. We may introduce a paid plan for new users in the future, but early users are never charged.' },
-              { q: 'Do I need to connect my bank account?', a: 'No. Budget App never connects to your bank. You enter transactions manually, keeping your banking credentials completely private.' },
+              { q: 'Is Spentum really free?', a: 'Yes, completely free during beta. Sign up now and keep free access forever. We may introduce a paid plan for new users in the future, but early users are never charged.' },
+              { q: 'Do I need to connect my bank account?', a: 'No. Spentum never connects to your bank. You enter transactions manually, keeping your banking credentials completely private.' },
               { q: 'How far ahead can it forecast my balance?', a: 'Months and years ahead, day by day. Every recurring income and expense is calculated automatically so you always know where your balance is heading.' },
               { q: 'Does it work on mobile?', a: 'The full web version works on any browser or device right now. Native Android and iOS apps are coming soon.' },
-              { q: 'What currencies and languages are supported?', a: 'Budget App supports multiple currencies and is available in English, Romanian and Spanish. More languages coming.' },
+              { q: 'What currencies and languages are supported?', a: 'Spentum supports multiple currencies and is available in English, Romanian, Spanish, French, German and Polish.' },
               { q: 'Is my data safe?', a: 'All data is encrypted in transit and at rest. We never sell or share your data with anyone.' },
             ].map((faq) => (
               <div key={faq.q} className="py-6 border-b border-white/[0.07]">
@@ -229,10 +229,10 @@ export default function LandingPage() {
         {/* CTA */}
         <section className="border-t border-white/[0.06] bg-[#122928]/40 py-20">
           <div className="px-4 sm:px-6 text-center">
-            <Image src="/budget-tool.png" alt="Budget App" width={320} height={128} className="h-24 w-auto mx-auto mb-8" />
+            <Image src="/budget-tool.png" alt="Spentum" width={320} height={128} className="h-24 w-auto mx-auto mb-8" />
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Stop guessing. Start knowing.</h2>
             <p className="text-white/50 text-lg mb-3 max-w-lg mx-auto">
-              Join people using Budget App to track their finances and see their financial future clearly.
+              Join people using Spentum to track their finances and see their financial future clearly.
             </p>
             <p className="text-sm text-[#3B7A78] font-medium mb-10">Free during beta. Early users keep free access forever.</p>
             <Link
@@ -251,8 +251,8 @@ export default function LandingPage() {
         <footer className="border-t border-white/[0.06] py-10">
           <div className="px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Image src="/budget-tool.png" alt="Budget App" width={90} height={36} className="h-5 w-auto opacity-35" />
-              <span className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Budget App</span>
+              <Image src="/budget-tool.png" alt="Spentum" width={90} height={36} className="h-5 w-auto opacity-35" />
+              <span className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spentum</span>
             </div>
             <nav className="flex items-center gap-5 text-xs text-white/30">
               <Link href="/terms" className="hover:text-white/60 transition-colors">Terms of Service</Link>

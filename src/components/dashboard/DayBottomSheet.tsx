@@ -18,6 +18,7 @@ interface Props {
   onAddNew: () => void;
   onCancelAdd: () => void;
   onClose: () => void;
+  onTransfer?: () => void;
   showTip?: boolean;
   accountId?: string;
   accounts?: BudgetAccount[];
@@ -33,6 +34,7 @@ export function DayBottomSheet({
   onAddNew,
   onCancelAdd,
   onClose,
+  onTransfer,
   showTip,
   accountId,
   accounts,
@@ -199,6 +201,7 @@ export function DayBottomSheet({
                 formatAmount={formatAmount}
                 symbol={symbol}
                 onAddNew={onAddNew}
+                onTransfer={onTransfer}
                 showTip={showTip}
                 accounts={accounts}
               />

@@ -3,8 +3,8 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Budget App',
-  description: 'Read the Budget App privacy policy. We collect only what is necessary, never sell your data, and store everything securely.',
+  title: 'Privacy Policy | Spentum',
+  description: 'Read the Spentum privacy policy. We collect only what is necessary, never sell your data, and store everything securely.',
 };
 
 export default function PrivacyPage() {
@@ -13,10 +13,10 @@ export default function PrivacyPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-[90px] h-[90px] rounded-xl overflow-hidden flex-shrink-0">
-            <Image src="/budget-tool.png" alt="Budget App" width={90} height={90} className="w-full h-full object-cover" />
+            <Image src="/budget-tool.png" alt="Spentum" width={90} height={90} className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Budget App</p>
+            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Spentum</p>
             <h1 className="text-xl font-bold text-white leading-none">Privacy Policy</h1>
           </div>
         </div>
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-base font-semibold text-white mb-3">2. How We Use Your Data</h2>
-            <p>Your data is used solely to provide and improve Budget App. We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
+            <p>Your data is used solely to provide and improve Spentum. We do not sell, rent, or share your personal data with third parties for marketing purposes.</p>
           </section>
 
           <section>

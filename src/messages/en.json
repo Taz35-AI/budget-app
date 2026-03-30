@@ -238,7 +238,7 @@
     "notifBlocked": "Notifications blocked",
     "notifRequired": "Permission required",
     "notifBlockedDesc": "Enable in your device Settings to receive alerts",
-    "notifRequiredDesc": "Tap below to allow Budget App to send notifications",
+    "notifRequiredDesc": "Tap below to allow Spentum to send notifications",
     "notifAllow": "Allow",
     "dailyReminderLabel": "Daily spending reminder",
     "dailyReminderDesc": "Reminds you to log today's transactions",
@@ -281,7 +281,7 @@
     "trackedCategories": "Tracked categories"
   },
   "onboarding": {
-    "welcomeTitle": "Welcome to Budget App",
+    "welcomeTitle": "Welcome to Spentum",
     "welcomeDesc": "Your calendar is empty. Add your first transaction to start tracking your finances.",
     "step1Title": "Pick a day",
     "step1Desc": "Click any date on the calendar to select it.",
@@ -384,6 +384,19 @@
     "deleting": "Deleting…",
     "emailMismatch": "Email does not match",
     "somethingWentWrong": "Something went wrong"
+  },
+  "transfer": {
+    "title": "Transfer",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "date": "Date",
+    "submit": "Transfer",
+    "transferring": "Transferring…",
+    "sameAccount": "Select different accounts",
+    "buttonLabel": "Transfer",
+    "toName": "Transfer to {name}",
+    "fromName": "Transfer from {name}"
   },
   "resetAll": {
     "buttonLabel": "Reset All",

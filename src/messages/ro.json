@@ -281,7 +281,7 @@
     "trackedCategories": "Categorii urmărite"
   },
   "onboarding": {
-    "welcomeTitle": "Bun venit în Budget App",
+    "welcomeTitle": "Bun venit în Spentum",
     "welcomeDesc": "Calendarul tău este gol. Adaugă prima tranzacție pentru a începe să-ți urmărești finanțele.",
     "step1Title": "Alege o zi",
     "step1Desc": "Fă clic pe orice dată din calendar pentru a o selecta.",
@@ -384,6 +384,19 @@
     "deleting": "Se șterge…",
     "emailMismatch": "Emailul nu se potrivește",
     "somethingWentWrong": "Ceva a mers greșit"
+  },
+  "transfer": {
+    "title": "Transfer",
+    "from": "Din",
+    "to": "Către",
+    "amount": "Sumă",
+    "date": "Dată",
+    "submit": "Transferă",
+    "transferring": "Se transferă…",
+    "sameAccount": "Selectează conturi diferite",
+    "buttonLabel": "Transfer",
+    "toName": "Transfer către {name}",
+    "fromName": "Transfer din {name}"
   },
   "resetAll": {
     "buttonLabel": "Resetează tot",

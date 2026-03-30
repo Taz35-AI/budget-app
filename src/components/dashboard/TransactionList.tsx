@@ -22,6 +22,7 @@ interface Props {
   formatAmount: (n: number) => string;
   symbol: string;
   onAddNew: () => void;
+  onTransfer?: () => void;
   showTip?: boolean;
   accounts?: BudgetAccount[];
 }
@@ -31,7 +32,7 @@ type ActiveAction =
   | { type: 'delete'; txId: string }
   | null;
 
-export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, showTip, accounts }: Props) {
+export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, onTransfer, showTip, accounts }: Props) {
   const t = useTranslations('transactions');
   const tc = useTranslations('common');
   const td = useTranslations('dashboard');
@@ -384,19 +385,28 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
         )}
       </div>
 
-      {/* Add button — hidden while editing or deleting */}
+      {/* Add / Transfer buttons — hidden while editing or deleting */}
       <div className={cn('pt-4 mt-auto border-t border-slate-100 dark:border-white/[0.08]', active && 'hidden')}>
         {showTip && (
           <OnboardingTip arrow="bottom" className="mb-3">
             {t('tapToAddFirst')}
           </OnboardingTip>
         )}
-        <Button onClick={onAddNew} className="w-full" size="lg">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          {t('addTransaction')}
-        </Button>
+        <div className={cn('flex gap-2', onTransfer && (accounts?.length ?? 0) >= 2 ? 'flex-row' : '')}>
+          <Button onClick={onAddNew} className="flex-1" size="lg">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            {t('addTransaction')}
+          </Button>
+          {onTransfer && (accounts?.length ?? 0) >= 2 && (
+            <Button onClick={onTransfer} size="lg" variant="ghost" className="flex-shrink-0 px-3">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+              </svg>
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

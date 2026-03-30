@@ -84,7 +84,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       {/* Logo */}
       <div className="flex items-center justify-center px-4 pt-4 pb-3 border-b border-white/[0.07] flex-shrink-0">
         <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
-          <Image src="/budget-tool.png" alt="Budget App" width={200} height={200} className="w-full h-auto object-contain" priority />
+          <Image src="/budget-tool.png" alt="Spentum" width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
       </div>
 
@@ -150,7 +150,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Version */}
       <div className="px-5 pb-3">
-        <p className="text-[10px] font-medium text-white/15">Budget App v1.0</p>
+        <p className="text-[10px] font-medium text-white/15">Spentum v1.0</p>
       </div>
     </div>
   );
@@ -288,7 +288,7 @@ export function MobileLogo() {
     <div className="lg:hidden flex-shrink-0 pointer-events-none">
       <Image
         src="/budget-tool.png"
-        alt="Budget App"
+        alt="Spentum"
         width={360}
         height={144}
         className="h-[65px] w-auto"

@@ -36,7 +36,7 @@ export default function LoginPage() {
     setLoading(true);
     // In Capacitor the WebView runs on localhost — always redirect to the live URL
     const redirectTo = window.location.hostname === 'localhost'
-      ? 'https://budget-app.com/auth/callback'
+      ? 'https://spentum.com/auth/callback'
       : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -93,7 +93,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/budget-tool.png" alt="Budget App" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/budget-tool.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-white/40">
             {mode === 'login' ? 'Sign in to your account' : 'Reset your password'}
           </p>

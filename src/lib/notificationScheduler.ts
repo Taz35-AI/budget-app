@@ -137,7 +137,7 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_DAILY,
-        title:     'Budget App',
+        title:     'Spentum',
         body:      "Don't forget to log today's spending",
         smallIcon: 'ic_notification',
         schedule: {
@@ -215,7 +215,7 @@ export async function scheduleWeeklyDigest() {
       notifications: [{
         id:        ID_WEEKLY,
         title:     'Weekly digest',
-        body:      'Your week in Budget App — tap to see spending and upcoming bills',
+        body:      'Your week in Spentum — tap to see spending and upcoming bills',
         smallIcon: 'ic_notification',
         schedule: {
           on: { weekday: 2, hour: 9, minute: 0 }, // Monday = 2

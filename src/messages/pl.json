@@ -281,7 +281,7 @@
     "trackedCategories": "Śledzone kategorie"
   },
   "onboarding": {
-    "welcomeTitle": "Witaj w Budget App",
+    "welcomeTitle": "Witaj w Spentum",
     "welcomeDesc": "Twój kalendarz jest pusty. Dodaj pierwszą transakcję, aby zacząć śledzić swoje finanse.",
     "step1Title": "Wybierz dzień",
     "step1Desc": "Kliknij dowolną datę w kalendarzu, aby ją wybrać.",
@@ -384,6 +384,19 @@
     "deleting": "Usuwanie…",
     "emailMismatch": "Email nie pasuje",
     "somethingWentWrong": "Coś poszło nie tak"
+  },
+  "transfer": {
+    "title": "Przelew",
+    "from": "Z",
+    "to": "Na",
+    "amount": "Kwota",
+    "date": "Data",
+    "submit": "Przelej",
+    "transferring": "Przelewanie…",
+    "sameAccount": "Wybierz różne konta",
+    "buttonLabel": "Przelew",
+    "toName": "Przelew na {name}",
+    "fromName": "Przelew z {name}"
   },
   "resetAll": {
     "buttonLabel": "Resetuj wszystko",

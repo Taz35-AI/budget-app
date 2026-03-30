@@ -238,7 +238,7 @@
     "notifBlocked": "Benachrichtigungen blockiert",
     "notifRequired": "Berechtigung erforderlich",
     "notifBlockedDesc": "In den Geräteeinstellungen aktivieren, um Benachrichtigungen zu erhalten",
-    "notifRequiredDesc": "Unten tippen, um Budget App das Senden von Benachrichtigungen zu erlauben",
+    "notifRequiredDesc": "Unten tippen, um Spentum das Senden von Benachrichtigungen zu erlauben",
     "notifAllow": "Erlauben",
     "dailyReminderLabel": "Tägliche Ausgabenerinnerung",
     "dailyReminderDesc": "Erinnert Sie, die heutigen Transaktionen einzutragen",
@@ -281,7 +281,7 @@
     "trackedCategories": "Verfolgte Kategorien"
   },
   "onboarding": {
-    "welcomeTitle": "Willkommen bei Budget App",
+    "welcomeTitle": "Willkommen bei Spentum",
     "welcomeDesc": "Ihr Kalender ist leer. Fügen Sie Ihre erste Transaktion hinzu, um Ihre Finanzen zu verfolgen.",
     "step1Title": "Tag auswählen",
     "step1Desc": "Klicken Sie auf ein beliebiges Datum im Kalender, um es auszuwählen.",
@@ -384,6 +384,19 @@
     "deleting": "Wird gelöscht…",
     "emailMismatch": "E-Mail stimmt nicht überein",
     "somethingWentWrong": "Etwas ist schiefgelaufen"
+  },
+  "transfer": {
+    "title": "Überweisung",
+    "from": "Von",
+    "to": "Nach",
+    "amount": "Betrag",
+    "date": "Datum",
+    "submit": "Überweisen",
+    "transferring": "Wird überwiesen…",
+    "sameAccount": "Verschiedene Konten auswählen",
+    "buttonLabel": "Überweisen",
+    "toName": "Überweisung an {name}",
+    "fromName": "Überweisung von {name}"
   },
   "resetAll": {
     "buttonLabel": "Alles zurücksetzen",

@@ -26,6 +26,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
+import { TransferModal } from './TransferModal';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -96,6 +97,7 @@ export function DashboardShell() {
   const { currency, setCurrency, formatAmount, symbol } = useCurrency();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [showMobileStats, setShowMobileStats] = useState(false);
 
@@ -749,6 +751,7 @@ export function DashboardShell() {
                     formatAmount={formatAmount}
                     symbol={symbol}
                     onAddNew={handleAddNew}
+                    onTransfer={() => setShowTransferModal(true)}
                     showTip={isEmpty && onboardingStep === 1}
                     accounts={accounts}
                   />
@@ -768,6 +771,16 @@ export function DashboardShell() {
         <TourSpotlight step={onboardingStep as 2 | 3 | 4 | 5} onNext={advanceTour} onDone={finishTour} />
       )}
 
+      {/* Transfer modal */}
+      {showTransferModal && (accounts?.length ?? 0) >= 2 && (
+        <TransferModal
+          accounts={accounts!}
+          defaultDate={selectedDate}
+          symbol={symbol}
+          onClose={() => setShowTransferModal(false)}
+        />
+      )}
+
       {/* Mobile bottom sheet */}
       <DayBottomSheet
         date={selectedDate}
@@ -779,6 +792,7 @@ export function DashboardShell() {
         onAddNew={handleAddNew}
         onCancelAdd={handleCancelAdd}
         onClose={handleClose}
+        onTransfer={() => setShowTransferModal(true)}
         showTip={isEmpty && onboardingStep === 1}
         accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
         accounts={accounts}

@@ -238,7 +238,7 @@
     "notifBlocked": "Notifications bloquées",
     "notifRequired": "Autorisation requise",
     "notifBlockedDesc": "Activez dans les paramètres de votre appareil pour recevoir des alertes",
-    "notifRequiredDesc": "Appuyez ci-dessous pour autoriser Budget App à envoyer des notifications",
+    "notifRequiredDesc": "Appuyez ci-dessous pour autoriser Spentum à envoyer des notifications",
     "notifAllow": "Autoriser",
     "dailyReminderLabel": "Rappel quotidien de dépenses",
     "dailyReminderDesc": "Vous rappelle d'enregistrer les transactions du jour",
@@ -281,7 +281,7 @@
     "trackedCategories": "Catégories suivies"
   },
   "onboarding": {
-    "welcomeTitle": "Bienvenue dans Budget App",
+    "welcomeTitle": "Bienvenue dans Spentum",
     "welcomeDesc": "Votre calendrier est vide. Ajoutez votre première transaction pour commencer à suivre vos finances.",
     "step1Title": "Choisissez un jour",
     "step1Desc": "Cliquez sur n'importe quelle date du calendrier pour la sélectionner.",
@@ -384,6 +384,19 @@
     "deleting": "Suppression…",
     "emailMismatch": "L'email ne correspond pas",
     "somethingWentWrong": "Quelque chose s'est mal passé"
+  },
+  "transfer": {
+    "title": "Virement",
+    "from": "De",
+    "to": "Vers",
+    "amount": "Montant",
+    "date": "Date",
+    "submit": "Virer",
+    "transferring": "Virement en cours…",
+    "sameAccount": "Sélectionnez des comptes différents",
+    "buttonLabel": "Virement",
+    "toName": "Virement vers {name}",
+    "fromName": "Virement depuis {name}"
   },
   "resetAll": {
     "buttonLabel": "Tout réinitialiser",

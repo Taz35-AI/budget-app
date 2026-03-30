@@ -29,6 +29,7 @@ export interface Transaction {
   user_id: string;
   account_id?: string | null;
   parent_id?: string | null;
+  transfer_id?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;

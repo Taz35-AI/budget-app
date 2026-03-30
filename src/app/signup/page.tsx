@@ -17,7 +17,7 @@ export default function SignupPage() {
     setError('');
     setLoading(true);
     const redirectTo = window.location.hostname === 'localhost'
-      ? 'https://budget-app.com/auth/callback'
+      ? 'https://spentum.com/auth/callback'
       : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -74,7 +74,7 @@ export default function SignupPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/budget-tool.png" alt="Budget App" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/budget-tool.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-white/40">Create your account</p>
         </div>
 

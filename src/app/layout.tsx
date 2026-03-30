@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Budget App — Personal Finance Tracker',
-  description: 'Track income and expenses, forecast your balance across 7 years, and take control of your personal finances with Budget App.',
+  title: 'Spentum — Personal Finance Tracker',
+  description: 'Track income and expenses, forecast your balance across 7 years, and take control of your personal finances with Spentum.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
