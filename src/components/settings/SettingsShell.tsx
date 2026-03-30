@@ -1021,7 +1021,7 @@ function AccountsSection() {
                 <div className="flex-1 min-w-0">
                   <span className="text-sm font-medium text-slate-800 dark:text-white/90 truncate block">{acct.name}</span>
                   <span className="text-[10px] text-slate-400 dark:text-white/30">
-                    {ta(`type${acct.type.charAt(0).toUpperCase() + acct.type.slice(1)}` as 'typeChecking')}
+                    {ta(`type${((acct.type ?? 'checking').charAt(0).toUpperCase() + (acct.type ?? 'checking').slice(1))}` as 'typeChecking')}
                     {acct.type === 'credit' && acct.credit_limit != null && ` · ${ta('creditLimit')} set`}
                   </span>
                 </div>

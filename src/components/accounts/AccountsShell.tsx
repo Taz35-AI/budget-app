@@ -175,7 +175,7 @@ function AccountCard({
                   ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300'
                   : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-white/40',
               )}>
-                {t(`type${account.type.charAt(0).toUpperCase() + account.type.slice(1)}` as 'typeChecking')}
+                {t(`type${((account.type ?? 'checking').charAt(0).toUpperCase() + (account.type ?? 'checking').slice(1))}` as 'typeChecking')}
               </span>
               {isOverLimit && (
                 <span className="text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex-shrink-0">
