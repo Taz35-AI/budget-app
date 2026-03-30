@@ -140,7 +140,7 @@ export interface SavingsGoal {
   linkedTagId?: string;  // when set, progress is computed from matching income transactions
 }
 
-export type AccountType = 'checking' | 'savings' | 'investment' | 'credit';
+export type AccountType = 'checking' | 'savings' | 'credit';
 
 export interface Account {
   id: string;
@@ -155,6 +155,8 @@ export interface BudgetAccount {
   id: string;
   user_id: string;
   name: string;
+  type: AccountType;
+  credit_limit?: number | null;
   created_at: string;
   updated_at: string;
 }

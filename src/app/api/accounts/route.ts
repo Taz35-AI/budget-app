@@ -77,6 +77,10 @@ export async function POST(req: NextRequest) {
     const name = (body.name ?? '').trim().slice(0, 100);
     if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
 
+    const validTypes = ['checking', 'savings', 'credit'];
+    const type = validTypes.includes(body.type) ? body.type : 'checking';
+    const credit_limit = type === 'credit' && body.credit_limit > 0 ? Number(body.credit_limit) : null;
+
     // Enforce max 5 accounts
     const { count } = await supabase
       .from('budget_accounts')
@@ -89,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('budget_accounts')
-      .insert({ user_id: userId, name })
+      .insert({ user_id: userId, name, type, credit_limit })
       .select()
       .single();
 

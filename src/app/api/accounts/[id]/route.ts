@@ -18,9 +18,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const name = (body.name ?? '').trim();
     if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
 
+    const validTypes = ['checking', 'savings', 'credit'];
+    const updatePayload: Record<string, unknown> = { name, updated_at: new Date().toISOString() };
+    if (body.type !== undefined && validTypes.includes(body.type)) {
+      updatePayload.type = body.type;
+      updatePayload.credit_limit = body.type === 'credit' && body.credit_limit > 0
+        ? Number(body.credit_limit)
+        : null;
+    }
+
     const { data, error } = await supabase
       .from('budget_accounts')
-      .update({ name, updated_at: new Date().toISOString() })
+      .update(updatePayload)
       .eq('id', id)
       .eq('user_id', userId)
       .select()

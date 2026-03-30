@@ -20,14 +20,27 @@ export function useAccounts() {
   });
 }
 
+export interface CreateAccountPayload {
+  name: string;
+  type: import('@/types').AccountType;
+  credit_limit?: number | null;
+}
+
+export interface UpdateAccountPayload {
+  id: string;
+  name: string;
+  type: import('@/types').AccountType;
+  credit_limit?: number | null;
+}
+
 export function useCreateAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string) => {
+    mutationFn: async (payload: CreateAccountPayload) => {
       const res = await fetch('/api/accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Failed to create account');
@@ -40,21 +53,21 @@ export function useCreateAccount() {
 export function useUpdateAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+    mutationFn: async ({ id, name, type, credit_limit }: UpdateAccountPayload) => {
       const res = await fetch(`/api/accounts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, type, credit_limit }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Failed to update account');
       return data.account as BudgetAccount;
     },
-    onMutate: async ({ id, name }) => {
+    onMutate: async ({ id, name, type, credit_limit }) => {
       await qc.cancelQueries({ queryKey: QK });
       const prev = qc.getQueryData<BudgetAccount[]>(QK);
       if (prev) {
-        qc.setQueryData<BudgetAccount[]>(QK, prev.map((a) => (a.id === id ? { ...a, name } : a)));
+        qc.setQueryData<BudgetAccount[]>(QK, prev.map((a) => (a.id === id ? { ...a, name, type, credit_limit } : a)));
       }
       return { prev };
     },

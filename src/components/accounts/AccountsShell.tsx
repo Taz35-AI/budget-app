@@ -91,6 +91,31 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
   return { summaries, isLoading: acctLoading || txLoading };
 }
 
+// ─── Account type icon ────────────────────────────────────────────────────────
+
+function AccountTypeIcon({ type, className }: { type: import('@/types').AccountType; className?: string }) {
+  if (type === 'savings') {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    );
+  }
+  if (type === 'credit') {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21z" />
+      </svg>
+    );
+  }
+  // checking (default)
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+  );
+}
+
 // ─── Account card ─────────────────────────────────────────────────────────────
 
 function AccountCard({
@@ -101,10 +126,22 @@ function AccountCard({
   formatAmount: (n: number) => string;
 }) {
   const { account, todayBalance, monthlySummaries } = summary;
-  const isPositive = todayBalance >= 0;
+  const isCredit = account.type === 'credit';
+  const isPositive = isCredit ? todayBalance >= 0 : todayBalance >= 0;
+  // For credit: positive balance means credit, negative means debt
+  // Red header when in debt (balance < 0) for credit, or negative for others
+  const isHeaderRed = todayBalance < 0;
   const t = useTranslations('accounts');
   const tMonths = useTranslations('months');
   const shortMonths = tMonths.raw('short') as string[];
+
+  // Credit card: check if any projected end-of-month exceeds the credit limit
+  const isOverLimit = isCredit && account.credit_limit != null &&
+    monthlySummaries.some(s => s.endBalance < -(account.credit_limit!));
+
+  const availableCredit = isCredit && account.credit_limit != null
+    ? account.credit_limit + todayBalance // credit_limit - |debt|
+    : null;
 
   return (
     <div className="bg-white dark:bg-[#122928] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(22,48,47,0.06)] dark:shadow-none">
@@ -113,33 +150,77 @@ function AccountCard({
         'px-3 py-2.5 flex items-center justify-between gap-2',
         'border-b border-slate-100 dark:border-white/[0.06]',
         'bg-gradient-to-r',
-        isPositive
-          ? 'from-brand-primary/[0.04] to-transparent dark:from-brand-primary/[0.06] dark:to-transparent'
-          : 'from-brand-danger/[0.04] to-transparent dark:from-brand-danger/[0.06] dark:to-transparent',
+        isHeaderRed
+          ? 'from-brand-danger/[0.04] to-transparent dark:from-brand-danger/[0.06] dark:to-transparent'
+          : 'from-brand-primary/[0.04] to-transparent dark:from-brand-primary/[0.06] dark:to-transparent',
       )}>
         <div className="flex items-center gap-2.5 min-w-0">
           <div className={cn(
             'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0',
-            isPositive ? 'bg-brand-primary/10 dark:bg-brand-primary/15' : 'bg-brand-danger/10 dark:bg-brand-danger/15',
+            isHeaderRed ? 'bg-brand-danger/10 dark:bg-brand-danger/15' : 'bg-brand-primary/10 dark:bg-brand-primary/15',
           )}>
-            <svg className={cn('w-4 h-4', isPositive ? 'text-brand-primary' : 'text-brand-danger')} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
+            <AccountTypeIcon
+              type={account.type ?? 'checking'}
+              className={cn('w-4 h-4', isHeaderRed ? 'text-brand-danger' : 'text-brand-primary')}
+            />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{account.name}</p>
-            <p className="text-[10px] text-slate-400 dark:text-white/35">{t('todayBalance')}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{account.name}</p>
+              <span className={cn(
+                'text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md flex-shrink-0',
+                account.type === 'credit'
+                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300'
+                  : account.type === 'savings'
+                  ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300'
+                  : 'bg-slate-100 dark:bg-white/8 text-slate-500 dark:text-white/40',
+              )}>
+                {t(`type${account.type.charAt(0).toUpperCase() + account.type.slice(1)}` as 'typeChecking')}
+              </span>
+              {isOverLimit && (
+                <span className="text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex-shrink-0">
+                  {t('overLimitWarning')}
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-slate-400 dark:text-white/35">
+              {isCredit ? t('debtBalance') : t('todayBalance')}
+            </p>
           </div>
         </div>
         <div className="text-right flex-shrink-0">
           <p className={cn(
             'text-xl font-black tabular-nums tracking-tight',
-            isPositive ? 'text-brand-positive' : 'text-brand-danger',
+            isHeaderRed ? 'text-brand-danger' : 'text-brand-positive',
           )}>
             {formatAmount(todayBalance)}
           </p>
+          {availableCredit != null && (
+            <p className="text-[10px] text-slate-400 dark:text-white/40 mt-0.5">
+              {t('availableCredit')}: {formatAmount(Math.max(0, availableCredit))}
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Credit limit info bar */}
+      {isCredit && account.credit_limit != null && (
+        <div className="px-3 py-2 bg-slate-50/70 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/[0.04] flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between text-[9px] font-semibold text-slate-400 dark:text-white/30 mb-1">
+              <span>{t('used')}</span>
+              <span>{t('creditLimit')}: {formatAmount(account.credit_limit)}</span>
+            </div>
+            {/* Usage bar */}
+            <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+              <div
+                className={cn('h-full rounded-full transition-all', isOverLimit ? 'bg-red-500' : 'bg-brand-primary')}
+                style={{ width: `${Math.min(100, (Math.abs(Math.min(0, todayBalance)) / account.credit_limit) * 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Monthly breakdown */}
       <div className="px-3 pb-2 pt-2.5">
@@ -207,6 +288,7 @@ export function AccountsShell() {
   const tc = useTranslations('common');
 
   const totalBalance = summaries.reduce((sum, s) => sum + s.todayBalance, 0);
+  const hasCredit = summaries.some(s => s.account.type === 'credit');
 
   return (
     <AppLayout>
@@ -231,7 +313,7 @@ export function AccountsShell() {
             'bg-gradient-to-br from-[#16302F] via-[#1a3d3b] to-[#0f2928]',
             'shadow-[0_4px_24px_rgba(22,48,47,0.3)]',
           )}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{t('totalBalance')}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{hasCredit ? t('netWorth') : t('totalBalance')}</p>
             <p className={cn('text-3xl sm:text-4xl font-black tracking-tight tabular-nums', totalBalance < 0 ? 'text-red-300' : 'text-white')}>
               {formatAmount(totalBalance)}
             </p>
