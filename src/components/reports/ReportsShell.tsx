@@ -78,7 +78,8 @@ export function ReportsShell() {
           months[mi].expense += tx.amount;
           if (tx.type === 'recurring') months[mi].recurringExpense += tx.amount;
           else months[mi].oneOffExpense += tx.amount;
-          const k = tx.tag ?? '__untagged__';
+          const isUuid = tx.tag != null && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag);
+          const k = (tx.tag == null || isUuid) ? '__untagged__' : tx.tag;
           months[mi].tags[k] = (months[mi].tags[k] ?? 0) + tx.amount;
         }
       }
