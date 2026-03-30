@@ -86,10 +86,7 @@ export default function BlogIndexPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {posts.map((post) => (
               <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                <article style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '32px 36px', transition: 'border-color 0.2s', cursor: 'pointer' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,122,120,0.4)'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}
-                >
+                <article style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(59,122,120,0.3)', borderRadius: 16, padding: '32px 36px', cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                     <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4E9E9B', background: 'rgba(59,122,120,0.12)', border: '1px solid rgba(59,122,120,0.3)', borderRadius: 100, padding: '3px 10px' }}>
                       {post.category}
