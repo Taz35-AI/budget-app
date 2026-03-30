@@ -7,5 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: 'https://spentum.com/signup', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.8 },
     { url: 'https://spentum.com/terms', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     { url: 'https://spentum.com/privacy', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
+    { url: 'https://spentum.com/blog', lastModified: new Date('2026-03-30'), changeFrequency: 'weekly', priority: 0.8 },
+    { url: 'https://spentum.com/blog/how-to-save-money-and-tackle-debt', lastModified: new Date('2026-03-30'), changeFrequency: 'monthly', priority: 0.9 },
   ];
 }
