@@ -59,7 +59,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/preview') ||
     pathname.startsWith('/api/preview-auth') ||
     pathname.startsWith('/terms') ||
-    pathname.startsWith('/privacy');
+    pathname.startsWith('/privacy') ||
+    pathname.startsWith('/blog') ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt';
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
@@ -74,6 +77,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|xml|txt|webmanifest)$).*)',
   ],
 };
