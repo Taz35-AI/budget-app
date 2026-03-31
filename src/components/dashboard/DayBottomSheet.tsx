@@ -18,7 +18,7 @@ interface Props {
   onAddNew: () => void;
   onCancelAdd: () => void;
   onClose: () => void;
-  onTransfer?: () => void;
+  onTransfer?: (defaultToId?: string) => void;
   showTip?: boolean;
   accountId?: string;
   accounts?: BudgetAccount[];
@@ -190,7 +190,7 @@ export function DayBottomSheet({
                   isLoading={create.isPending}
                   isCreditAccount={accounts?.find(a => a.id === formAccountId)?.type === 'credit'}
                   creditLimit={accounts?.find(a => a.id === formAccountId)?.credit_limit}
-                  onTransfer={(accounts?.length ?? 0) >= 2 && onTransfer ? () => { onCancelAdd(); onTransfer(); } : undefined}
+                  onTransfer={(accounts?.length ?? 0) >= 2 && onTransfer ? () => { onCancelAdd(); onTransfer(formAccountId); } : undefined}
                   onSubmit={(values: TransactionFormValues) => {
                     create.submit(values, { onSuccess: onCancelAdd });
                   }}

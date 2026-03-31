@@ -27,7 +27,7 @@ interface TagDropdownProps {
   compact?: boolean;
 }
 
-function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
+export function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
   const t = useTranslations('transactionForm');
   const tTags = useTranslations('tags');
   const [open, setOpen] = React.useState(false);
@@ -329,6 +329,18 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       })}
       className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-4')}
     >
+      {/* Editing reminder — shown only when editing an existing transaction */}
+      {initialValues?.name && (
+        <div className="rounded-lg bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/15 dark:border-brand-primary/20 px-2.5 py-1.5 flex items-center gap-2">
+          <svg className="w-3 h-3 text-brand-primary/60 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <div className="min-w-0">
+            <p className="text-[9px] text-brand-primary/60 dark:text-brand-primary/50 font-medium uppercase tracking-wider">{t('editingLabel')}</p>
+            <p className="text-[11px] font-semibold text-brand-text dark:text-white/90 truncate">{initialValues.name}</p>
+          </div>
+        </div>
+      )}
       {/* Template chips */}
       {templates.length > 0 && (
         <div className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>

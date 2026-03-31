@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
+import { TagDropdown } from './TransactionForm';
 import { FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { computeEndDateFromRecurrences, computeRecurrencesFromEndDate } from '@/engine/recurringResolver';
@@ -257,33 +258,13 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
       </div>
 
       {editMode === 'all' && (
-        <div className="flex flex-col gap-1">
-          <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{tf('category')}</p>
-          <div className="flex flex-wrap gap-1">
-            {Object.entries(allTags)
-              .filter(([, t]) => t.category === category || t.category === 'both')
-              .map(([key, { label, color }]) => {
-                const isSelected = tag === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setValue('tag', isSelected ? '' : key)}
-                    className={cn(
-                      'flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-medium transition-all border',
-                      isSelected
-                        ? 'text-white border-transparent'
-                        : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20',
-                    )}
-                    style={isSelected ? { backgroundColor: color } : undefined}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                    {label}
-                  </button>
-                );
-              })}
-          </div>
-        </div>
+        <TagDropdown
+          allTags={allTags}
+          category={category}
+          selected={tag ?? ''}
+          onSelect={(key) => setValue('tag', key === tag ? '' : key)}
+          compact
+        />
       )}
 
       {canEditSeries && (

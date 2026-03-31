@@ -102,7 +102,8 @@
     "frequencyRequired": "Frecvența este obligatorie",
     "minAmount": "Min",
     "maxAmount": "Max",
-    "overCreditLimit": "Aceasta depășește limita ta de credit de {limit}"
+    "overCreditLimit": "Aceasta depășește limita ta de credit de {limit}",
+    "editingLabel": "Editare"
   },
   "recurring": {
     "editTitle": "Editezi",

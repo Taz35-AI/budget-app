@@ -22,7 +22,7 @@ interface Props {
   formatAmount: (n: number) => string;
   symbol: string;
   onAddNew: () => void;
-  onTransfer?: () => void;
+  onTransfer?: (defaultToId?: string) => void;
   showTip?: boolean;
   accounts?: BudgetAccount[];
 }
@@ -236,6 +236,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         name: tx.name,
                         amount: tx.amount,
                         category: tx.category,
+                        tag: tx.tag ?? '',
                         type: tx.type,
                         date,
                       }}
@@ -402,7 +403,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
             {t('addTransaction')}
           </Button>
           {onTransfer && (accounts?.length ?? 0) >= 2 && (
-            <Button onClick={onTransfer} size="lg" variant="ghost" className="flex-1 border border-brand-primary/20 dark:border-white/10">
+            <Button onClick={() => onTransfer()} size="lg" variant="ghost" className="flex-1 border border-brand-primary/20 dark:border-white/10">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
               </svg>

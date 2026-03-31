@@ -98,6 +98,7 @@ export function DashboardShell() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transferDefaultToId, setTransferDefaultToId] = useState<string | undefined>(undefined);
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [showMobileStats, setShowMobileStats] = useState(false);
 
@@ -735,7 +736,7 @@ export function DashboardShell() {
                       isLoading={create.isPending}
                       isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
                       creditLimit={accounts?.find(a => a.id === desktopFormAccountId)?.credit_limit}
-                      onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleCancelAdd(); setShowTransferModal(true); } : undefined}
+                      onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleCancelAdd(); setTransferDefaultToId(desktopFormAccountId); setShowTransferModal(true); } : undefined}
                       onSubmit={(values: TransactionFormValues) => {
                         create.submit(values, {
                           onSuccess: () => {
@@ -754,7 +755,7 @@ export function DashboardShell() {
                     formatAmount={formatAmount}
                     symbol={symbol}
                     onAddNew={handleAddNew}
-                    onTransfer={() => setShowTransferModal(true)}
+                    onTransfer={() => { setTransferDefaultToId(undefined); setShowTransferModal(true); }}
                     showTip={isEmpty && onboardingStep === 1}
                     accounts={accounts}
                   />
@@ -780,7 +781,8 @@ export function DashboardShell() {
           accounts={accounts!}
           defaultDate={selectedDate}
           symbol={symbol}
-          onClose={() => setShowTransferModal(false)}
+          defaultToId={transferDefaultToId}
+          onClose={() => { setShowTransferModal(false); setTransferDefaultToId(undefined); }}
         />
       )}
 
@@ -795,7 +797,7 @@ export function DashboardShell() {
         onAddNew={handleAddNew}
         onCancelAdd={handleCancelAdd}
         onClose={handleClose}
-        onTransfer={() => setShowTransferModal(true)}
+        onTransfer={(toId) => { setTransferDefaultToId(toId); setShowTransferModal(true); }}
         showTip={isEmpty && onboardingStep === 1}
         accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
         accounts={accounts}

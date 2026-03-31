@@ -102,7 +102,8 @@
     "frequencyRequired": "La frecuencia es obligatoria",
     "minAmount": "Mín",
     "maxAmount": "Máx",
-    "overCreditLimit": "Esto supera tu límite de crédito de {limit}"
+    "overCreditLimit": "Esto supera tu límite de crédito de {limit}",
+    "editingLabel": "Editando"
   },
   "recurring": {
     "editTitle": "Editando",

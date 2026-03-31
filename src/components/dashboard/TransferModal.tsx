@@ -13,16 +13,17 @@ interface Props {
   defaultDate: string | null;
   symbol: string;
   onClose: () => void;
+  defaultToId?: string;
 }
 
-export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props) {
+export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultToId }: Props) {
   const t = useTranslations('transfer');
   const tc = useTranslations('common');
   const qc = useQueryClient();
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const [fromId, setFromId] = useState(accounts[0]?.id ?? '');
-  const [toId, setToId] = useState(accounts[1]?.id ?? '');
+  const [toId, setToId] = useState(defaultToId ?? accounts[1]?.id ?? '');
   const [amount, setAmount] = useState('');
   const [txType, setTxType] = useState<'one_off' | 'recurring'>('one_off');
   const [date, setDate] = useState(defaultDate ?? today);
@@ -79,7 +80,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center px-4"
       role="dialog"
       aria-modal="true"
     >
