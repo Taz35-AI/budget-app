@@ -5,24 +5,24 @@
 
 /* ─── Brand tokens (edit here to retheme the entire app) ────────────────────── */
 :root {
-  --brand-primary:   #3B7A78;   /* logo, primary buttons, active tabs         */
-  --brand-secondary: #2F5D8A;   /* secondary buttons, links, charts            */
-  --brand-positive:  #5FAF6B;   /* positive money, saved, completed            */
-  --brand-danger:    #C65A5A;   /* overspending, danger                        */
-  --brand-bg:        #F7FAF9;   /* page background                             */
-  --brand-card:      #FFFFFF;   /* card backgrounds                            */
-  --brand-text:      #16302F;   /* primary text                                */
+  --brand-primary:   #312E81;   /* Primary Indigo — logo, primary buttons, active tabs  */
+  --brand-secondary: #5B4AE6;   /* Royal Violet — secondary buttons, accents            */
+  --brand-positive:  #35C9A5;   /* Mint Growth — positive money, saved, completed       */
+  --brand-danger:    #C65A5A;   /* overspending, danger                                 */
+  --brand-bg:        #F7F8FC;   /* Cloud Background — page background                  */
+  --brand-card:      #FFFFFF;   /* card backgrounds                                     */
+  --brand-text:      #191B2F;   /* Midnight Ink — primary text                          */
 
   /* Dark mode variants */
-  --brand-dark-bg:   #0C1F1E;
-  --brand-dark-card: #122928;
+  --brand-dark-bg:   #0C0C1A;
+  --brand-dark-card: #15152E;
 
   /* Legacy aliases — keeps FullCalendar CSS overrides working without edits */
   --brand-navy:   var(--brand-text);
   --brand-green:  var(--brand-primary);
   --brand-lime:   var(--brand-positive);
   --brand-gold:   var(--brand-secondary);
-  --brand-silver: rgba(59, 122, 120, 0.18);
+  --brand-silver: rgba(49, 46, 129, 0.18);
 }
 
 /* ─── Tailwind v4 theme tokens ───────────────────────────────────────────────── */
@@ -227,24 +227,24 @@
 }
 
 .dark .fc .fc-button-primary {
-  background-color: rgba(59, 122, 120, 0.25) !important;
-  border: 1px solid rgba(59, 122, 120, 0.25) !important;
+  background-color: rgba(49, 46, 129, 0.25) !important;
+  border: 1px solid rgba(49, 46, 129, 0.25) !important;
   color: rgba(255, 255, 255, 0.65) !important;
   box-shadow: none !important;
 }
 
 .dark .fc .fc-button-primary:hover {
-  background-color: rgba(59, 122, 120, 0.12) !important;
-  border-color: rgba(59, 122, 120, 0.5) !important;
-  color: #3B7A78 !important;
+  background-color: rgba(49, 46, 129, 0.12) !important;
+  border-color: rgba(49, 46, 129, 0.5) !important;
+  color: #A79BFF !important;
 }
 
 .dark .fc .fc-button-primary:focus {
-  outline: 2px solid rgba(59, 122, 120, 0.6) !important;
+  outline: 2px solid rgba(49, 46, 129, 0.6) !important;
 }
 
 .dark .fc .fc-col-header-cell-cushion {
-  color: rgba(59, 122, 120, 0.7);
+  color: rgba(167, 155, 255, 0.7);
 }
 
 
@@ -316,5 +316,5 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
