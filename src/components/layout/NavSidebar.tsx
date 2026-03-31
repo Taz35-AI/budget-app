@@ -103,7 +103,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150',
                 isActive
-                  ? 'bg-brand-primary text-white shadow-[0_2px_8px_rgba(59,122,120,0.4)]'
+                  ? 'bg-brand-primary text-white shadow-[0_2px_8px_rgba(49,46,129,0.4)]'
                   : 'text-white/45 hover:bg-white/[0.07] hover:text-white/90',
               )}
             >
@@ -176,9 +176,9 @@ export function NavSidebar() {
       {/* ── Desktop sidebar (always visible, left-fixed) ────────────── */}
       {/* Force dark class so sidebar always renders with dark styles */}
       <aside className="dark hidden lg:flex flex-col fixed left-0 top-0 h-full w-[230px] z-30
-        bg-[#1e3a38]
+        bg-[#1a1845]
         border-r border-white/[0.06]
-        shadow-[2px_0_24px_rgba(12,31,30,0.35)]">
+        shadow-[2px_0_24px_rgba(12,12,26,0.35)]">
         <SidebarContent />
       </aside>
 
@@ -195,8 +195,8 @@ export function NavSidebar() {
       <div
         className={cn(
           'dark fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
-          'bg-[#1e3a38]',
-          'shadow-[4px_0_32px_rgba(12,31,30,0.6)]',
+          'bg-[#1a1845]',
+          'shadow-[4px_0_32px_rgba(12,12,26,0.6)]',
           'transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -229,7 +229,7 @@ function MobileBottomNav() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 z-30
-      bg-brand-card/97 dark:bg-[#1e3a38]/97
+      bg-brand-card/97 dark:bg-[#0C0C1A]/97
       backdrop-blur-xl
       border-t border-black/[0.07] dark:border-brand-primary/[0.15]
       shadow-[0_-2px_16px_rgba(25,27,47,0.08)]
