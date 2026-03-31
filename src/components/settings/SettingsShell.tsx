@@ -1507,7 +1507,6 @@ export function SettingsShell() {
         {activeTab === 'data' && (
           <>
             <TemplatesSection />
-            <GoalsSection />
             <BackupSection />
           </>
         )}

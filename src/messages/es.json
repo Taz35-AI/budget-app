@@ -181,7 +181,10 @@
     "topTransactions": "Principales transacciones — {month} {year}",
     "annualSpending": "Gasto anual por categoría — {year}",
     "totalSpent": "TOTAL GASTADO",
-    "savingsRateByMonth": "Tasa de ahorro por mes — {year}"
+    "savingsRateByMonth": "Tasa de ahorro por mes — {year}",
+    "tabGoals": "Objetivos",
+    "goalsSubtitle": "Sigue el progreso hacia tus metas de ahorro. Vincula una etiqueta para actualización automática.",
+    "noGoals": "Sin objetivos aún. Añade uno para empezar."
   },
   "settings": {
     "title": "Ajustes",

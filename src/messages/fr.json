@@ -181,7 +181,10 @@
     "topTransactions": "Principales transactions — {month} {year}",
     "annualSpending": "Dépenses annuelles par catégorie — {year}",
     "totalSpent": "TOTAL DÉPENSÉ",
-    "savingsRateByMonth": "Taux d'épargne par mois — {year}"
+    "savingsRateByMonth": "Taux d'épargne par mois — {year}",
+    "tabGoals": "Objectifs",
+    "goalsSubtitle": "Suivez vos progrès vers vos objectifs d'épargne. Liez un tag pour mise à jour auto.",
+    "noGoals": "Aucun objectif. Ajoutez-en un pour commencer."
   },
   "settings": {
     "title": "Paramètres",

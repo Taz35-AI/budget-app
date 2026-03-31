@@ -181,7 +181,10 @@
     "topTransactions": "Top-Transaktionen — {month} {year}",
     "annualSpending": "Jährliche Ausgaben nach Kategorie — {year}",
     "totalSpent": "GESAMT AUSGEGEBEN",
-    "savingsRateByMonth": "Sparquote nach Monat — {year}"
+    "savingsRateByMonth": "Sparquote nach Monat — {year}",
+    "tabGoals": "Ziele",
+    "goalsSubtitle": "Fortschritt zu Sparzielen verfolgen. Tag verknüpfen für automatische Updates.",
+    "noGoals": "Noch keine Ziele. Füge eines hinzu, um zu beginnen."
   },
   "settings": {
     "title": "Einstellungen",

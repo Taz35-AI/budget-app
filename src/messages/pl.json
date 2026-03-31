@@ -181,7 +181,10 @@
     "topTransactions": "Największe transakcje — {month} {year}",
     "annualSpending": "Roczne wydatki według kategorii — {year}",
     "totalSpent": "ŁĄCZNIE WYDANO",
-    "savingsRateByMonth": "Stopa oszczędności według miesiąca — {year}"
+    "savingsRateByMonth": "Stopa oszczędności według miesiąca — {year}",
+    "tabGoals": "Cele",
+    "goalsSubtitle": "Śledź postępy w realizacji celów oszczędnościowych. Połącz tag dla automatycznych aktualizacji.",
+    "noGoals": "Brak celów. Dodaj jeden, aby zacząć."
   },
   "settings": {
     "title": "Ustawienia",

@@ -5,7 +5,6 @@ import { format, startOfMonth, endOfMonth, getDaysInMonth, addDays, subMonths } 
 import { useTranslations } from 'next-intl';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
-import { useTransactions } from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
 import type { DayTransaction } from '@/types';
 
@@ -67,9 +66,7 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
   const tMonths = useTranslations('months');
   const tTags = useTranslations('tags');
   const { allTags, goals } = useSettings();
-  const { data: txData } = useTransactions();
-  const rawTransactions = txData?.transactions ?? [];
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const toggle = (key: string) =>
     setExpandedSections((s) => ({ ...s, [key]: !s[key] }));
@@ -523,14 +520,18 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
           {(expandedSections['goals'] ?? true) && (
             <div className="flex flex-col gap-2">
               {goals.map((goal) => {
-                // If a tag is linked, compute saved amount from one-off expense transactions with that tag.
-                // Savings are modelled as expenses — money leaving your spending balance into a pot.
-                // Recurring transactions are excluded — we can't reliably sum their occurrences from the raw row.
+                // Compute saved amount from all expanded day transactions up to today.
+                // dayTransactions already includes recurring occurrences expanded per-day,
+                // so both one-off and recurring past/present amounts are counted correctly.
+                const today = new Date().toISOString().slice(0, 10);
                 const linkedTxs = goal.linkedTagId
-                  ? rawTransactions.filter((tx) => tx.type === 'one_off' && tx.category === 'expense' && tx.tag === goal.linkedTagId)
+                  ? Array.from(dayTransactions.entries())
+                      .filter(([date]) => date <= today)
+                      .flatMap(([, txs]) => txs)
+                      .filter((tx) => tx.category === 'expense' && tx.tag === goal.linkedTagId)
                   : [];
                 const savedAmount = goal.linkedTagId
-                  ? linkedTxs.reduce((sum, tx) => sum + Number(tx.amount), 0)
+                  ? linkedTxs.reduce((sum, tx) => sum + tx.amount, 0)
                   : goal.currentSaved;
 
                 const pct = goal.targetAmount > 0 ? Math.min(savedAmount / goal.targetAmount, 1) : 0;
@@ -542,8 +543,12 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
                 // Savings rate countdown (only for linked-tag goals without a deadline)
                 let savingsCountdown: string | null = null;
                 if (goal.linkedTagId && !goal.deadline && savedAmount < goal.targetAmount && linkedTxs.length >= 2) {
-                  const dates = linkedTxs.map((tx) => new Date(tx.date ?? tx.created_at).getTime()).sort((a, b) => a - b);
-                  const daysSinceFirst = Math.max(1, (Date.now() - dates[0]) / 86_400_000);
+                  const matchingDates = Array.from(dayTransactions.entries())
+                    .filter(([date]) => date <= today)
+                    .filter(([, txs]) => txs.some((tx) => tx.category === 'expense' && tx.tag === goal.linkedTagId))
+                    .map(([date]) => new Date(date).getTime())
+                    .sort((a, b) => a - b);
+                  const daysSinceFirst = Math.max(1, (Date.now() - (matchingDates[0] ?? Date.now())) / 86_400_000);
                   const dailyRate = savedAmount / daysSinceFirst;
                   if (dailyRate > 0) {
                     const daysToGoal = Math.ceil((goal.targetAmount - savedAmount) / dailyRate);

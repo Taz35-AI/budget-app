@@ -181,7 +181,10 @@
     "topTransactions": "Top Tranzacții — {month} {year}",
     "annualSpending": "Cheltuieli anuale pe categorii — {year}",
     "totalSpent": "TOTAL CHELTUIT",
-    "savingsRateByMonth": "Rata de economii pe luni — {year}"
+    "savingsRateByMonth": "Rata de economii pe luni — {year}",
+    "tabGoals": "Obiective",
+    "goalsSubtitle": "Urmărește progresul spre obiectivele de economii. Leagă un tag pentru actualizare automată.",
+    "noGoals": "Niciun obiectiv încă. Adaugă unul pentru a începe."
   },
   "settings": {
     "title": "Setări",

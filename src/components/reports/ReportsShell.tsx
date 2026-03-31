@@ -51,14 +51,21 @@ export function ReportsShell() {
   const MONTH_FULL = tMonths.raw('long') as string[];
 
   const { dayTransactions, balances, isLoading } = useBalances();
-  const { allTags } = useSettings();
+  const { allTags, goals, addGoal, updateGoal, deleteGoal } = useSettings();
   const { formatAmount } = useCurrency();
 
   const currentYear = new Date().getFullYear();
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(new Date().getMonth());
   const [hoveredTag,       setHoveredTag]       = useState<string | null>(null);
-  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual'>('overview');
+  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals'>('overview');
+
+  // ── Goals management state ──────────────────────────────────────────────────
+  const [showAddGoal,    setShowAddGoal]    = useState(false);
+  const [goalForm,       setGoalForm]       = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
+  const [editGoalId,     setEditGoalId]     = useState<string | null>(null);
+  const [editSaved,      setEditSaved]      = useState('');
+  const [linkingGoalId,  setLinkingGoalId]  = useState<string | null>(null);
 
   // ── Monthly aggregates ──────────────────────────────────────────────────────
   const yearlyData = useMemo<MonthData[]>(() => {
@@ -226,6 +233,7 @@ export function ReportsShell() {
               { id: 'month',        label: t('tabMonth')         },
               { id: 'transactions', label: t('tabTransactions')  },
               { id: 'annual',       label: t('tabAnnual')        },
+              { id: 'goals',        label: t('tabGoals')         },
             ] as const).map(({ id, label }) => (
               <button
                 key={id}
@@ -669,6 +677,209 @@ export function ReportsShell() {
             </div>
           </div>
           )}
+
+          {/* ── Goals ────────────────────────────────────────────────── */}
+          <div className={cn(activeTab !== 'goals' && 'hidden sm:block')}>
+            <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(22,48,47,0.05)]">
+              <div className="h-[3px] w-full bg-gradient-to-r from-emerald-400 to-teal-500" />
+              <div className="px-5 pt-5 pb-4">
+                <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabGoals')}</h2>
+                <p className="text-xs text-brand-text/40 dark:text-white/35 mt-0.5">{t('goalsSubtitle')}</p>
+              </div>
+              <div className="px-5 pb-5 flex flex-col gap-3">
+                {goals.length === 0 && !showAddGoal && (
+                  <p className="text-sm text-brand-text/40 dark:text-white/30">{t('noGoals')}</p>
+                )}
+                {goals.map((goal) => {
+                  const today = new Date().toISOString().slice(0, 10);
+                  // Use dayTransactions (already expanded recurring occurrences) so
+                  // both one-off and recurring past/present amounts count toward progress.
+                  const savedAmount = goal.linkedTagId
+                    ? Array.from(dayTransactions.entries())
+                        .filter(([date]) => date <= today)
+                        .flatMap(([, txs]) => txs)
+                        .filter((tx) => tx.category === 'expense' && tx.tag === goal.linkedTagId)
+                        .reduce((sum, tx) => sum + tx.amount, 0)
+                    : goal.currentSaved;
+
+                  const pct = goal.targetAmount > 0 ? Math.min(savedAmount / goal.targetAmount, 1) : 0;
+                  const remaining = Math.max(0, goal.targetAmount - savedAmount);
+                  const daysLeft = goal.deadline
+                    ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
+                    : null;
+                  const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
+
+                  return (
+                    <div key={goal.id} className="p-4 rounded-xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] bg-[#F7FAF9] dark:bg-[#16302F]/10">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            {linkedTag && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />}
+                            <p className="text-sm font-semibold text-brand-text dark:text-white/90 truncate">{goal.name}</p>
+                          </div>
+                          {goal.deadline && (
+                            <p className="text-xs text-brand-text/40 dark:text-white/35 mt-0.5">
+                              {new Date(goal.deadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              {daysLeft !== null ? (daysLeft > 0 ? ` · ${daysLeft}d left` : ' · Overdue') : ''}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className={cn('text-xs font-bold tabular-nums', pct >= 1 ? 'text-brand-positive' : 'text-brand-text/40 dark:text-white/40')}>
+                            {Math.round(pct * 100)}%
+                          </span>
+                          <button type="button" onClick={() => deleteGoal(goal.id)}
+                            className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-brand-text/30 hover:text-red-500 transition-colors">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="h-2 rounded-full bg-brand-primary/[0.08] dark:bg-brand-primary/[0.12] overflow-hidden mb-1.5">
+                        <div
+                          className={cn('h-full rounded-full transition-all duration-700', pct >= 1 ? 'bg-brand-positive' : 'bg-gradient-to-r from-[#3B7A78] to-[#5FAF6B]')}
+                          style={{ width: `${pct * 100}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-brand-text/40 dark:text-white/35 mb-2">
+                        <span>{formatAmount(savedAmount)} / {formatAmount(goal.targetAmount)}</span>
+                        {pct < 1 && <span>{formatAmount(remaining)} remaining</span>}
+                      </div>
+
+                      {/* Linked tag or manual controls */}
+                      {linkingGoalId === goal.id ? (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {Object.entries(allTags).filter(([, tag]) => tag.category === 'expense' || tag.category === 'both').map(([key, { label, color }]) => (
+                            <button key={key} type="button"
+                              onClick={() => { updateGoal(goal.id, { linkedTagId: key, currentSaved: 0 }); setLinkingGoalId(null); }}
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-brand-primary/15 dark:border-white/10 bg-white dark:bg-white/5 text-brand-text/60 dark:text-white/60 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
+                              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                              {TAGS[key] ? tTags(key as never) : label}
+                            </button>
+                          ))}
+                          <button type="button" onClick={() => setLinkingGoalId(null)}
+                            className="px-2.5 py-1 rounded-lg text-xs border border-brand-primary/15 dark:border-white/10 text-brand-text/40 dark:text-white/30">
+                            Cancel
+                          </button>
+                        </div>
+                      ) : linkedTag ? (
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />
+                            <span className="text-xs text-brand-text/40 dark:text-white/40">
+                              Auto-tracked via <span className="font-medium text-brand-text/60 dark:text-white/60">{goal.linkedTagId && TAGS[goal.linkedTagId] ? tTags(goal.linkedTagId as never) : linkedTag.label}</span>
+                            </span>
+                          </div>
+                          <button type="button"
+                            onClick={() => updateGoal(goal.id, { linkedTagId: undefined })}
+                            className="text-[11px] text-brand-text/30 hover:text-red-400 transition-colors">
+                            Unlink
+                          </button>
+                        </div>
+                      ) : editGoalId === goal.id ? (
+                        <div className="flex gap-2">
+                          <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
+                            placeholder="Amount saved so far" autoFocus
+                            className="flex-1 h-8 px-2 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                          <button type="button" onClick={() => { updateGoal(goal.id, { currentSaved: Number(editSaved) || 0 }); setEditGoalId(null); }}
+                            className="px-3 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">Save</button>
+                          <button type="button" onClick={() => setEditGoalId(null)}
+                            className="px-2 h-8 rounded-lg bg-brand-primary/8 dark:bg-white/5 text-brand-text/50 dark:text-white/50 text-xs transition-colors">✕</button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <button type="button" onClick={() => { setEditGoalId(goal.id); setEditSaved(goal.currentSaved.toString()); }}
+                            className="text-xs font-semibold text-brand-primary hover:underline">
+                            Update amount
+                          </button>
+                          <span className="text-brand-primary/20 text-xs">·</span>
+                          <button type="button" onClick={() => { setLinkingGoalId(goal.id); setEditGoalId(null); }}
+                            className="text-xs text-brand-text/35 dark:text-white/30 hover:text-emerald-500 transition-colors">
+                            Link to tag
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Add goal form */}
+                {showAddGoal ? (
+                  <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
+                    <input value={goalForm.name} onChange={(e) => setGoalForm((f) => ({ ...f, name: e.target.value }))}
+                      placeholder="Goal name (e.g. Holiday fund)" autoFocus
+                      className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                    <input type="number" value={goalForm.target} onChange={(e) => setGoalForm((f) => ({ ...f, target: e.target.value }))}
+                      placeholder="Target amount" min="0"
+                      className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                    {!goalForm.linkedTagId && (
+                      <input type="number" value={goalForm.currentSaved} onChange={(e) => setGoalForm((f) => ({ ...f, currentSaved: e.target.value }))}
+                        placeholder="Already saved (optional)" min="0"
+                        className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                    )}
+                    <div>
+                      <p className="text-xs text-brand-text/40 dark:text-white/40 mb-1">Deadline (optional)</p>
+                      <input type="date" value={goalForm.deadline} onChange={(e) => setGoalForm((f) => ({ ...f, deadline: e.target.value }))}
+                        className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white outline-none focus:border-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-brand-text/40 dark:text-white/40 mb-1.5">Link to expense tag — matching transactions auto-update progress</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        <button type="button" onClick={() => setGoalForm((f) => ({ ...f, linkedTagId: '' }))}
+                          className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                            !goalForm.linkedTagId
+                              ? 'bg-brand-primary text-white border-brand-primary'
+                              : 'border-brand-primary/15 dark:border-white/10 text-brand-text/50 dark:text-white/40 bg-white dark:bg-white/5')}>
+                          Manual
+                        </button>
+                        {Object.entries(allTags).filter(([, tag]) => tag.category === 'expense' || tag.category === 'both').map(([key, { label, color }]) => (
+                          <button key={key} type="button"
+                            onClick={() => setGoalForm((f) => ({ ...f, linkedTagId: f.linkedTagId === key ? '' : key }))}
+                            className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                              goalForm.linkedTagId === key
+                                ? 'text-white border-transparent'
+                                : 'border-brand-primary/15 dark:border-white/10 bg-white dark:bg-white/5 text-brand-text/60 dark:text-white/60')}
+                            style={goalForm.linkedTagId === key ? { backgroundColor: color } : undefined}>
+                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: goalForm.linkedTagId === key ? 'rgba(255,255,255,0.7)' : color }} />
+                            {TAGS[key] ? tTags(key as never) : label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button"
+                        onClick={() => {
+                          const target = Number(goalForm.target);
+                          if (!goalForm.name.trim() || !target || target <= 0) return;
+                          addGoal({
+                            name: goalForm.name.trim(),
+                            targetAmount: target,
+                            currentSaved: goalForm.linkedTagId ? 0 : (Number(goalForm.currentSaved) || 0),
+                            deadline: goalForm.deadline || undefined,
+                            linkedTagId: goalForm.linkedTagId || undefined,
+                          });
+                          setGoalForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
+                          setShowAddGoal(false);
+                        }}
+                        className="flex-1 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors">
+                        Add goal
+                      </button>
+                      <button type="button" onClick={() => setShowAddGoal(false)}
+                        className="px-4 h-9 rounded-xl bg-brand-primary/8 dark:bg-white/5 text-brand-text/60 dark:text-white/60 text-sm font-semibold transition-colors">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => setShowAddGoal(true)}
+                    className="w-full h-10 rounded-xl border border-dashed border-brand-primary/20 dark:border-white/10 text-sm text-brand-text/40 dark:text-white/30 hover:border-emerald-400 hover:text-emerald-500 transition-colors">
+                    + Add savings goal
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* ── Savings rate trend ───────────────────────────────────── */}
           {hasSomeData && (

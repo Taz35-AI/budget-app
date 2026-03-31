@@ -181,7 +181,10 @@
     "topTransactions": "Top Transactions — {month} {year}",
     "annualSpending": "Annual Spending by Category — {year}",
     "totalSpent": "TOTAL SPENT",
-    "savingsRateByMonth": "Savings Rate by Month — {year}"
+    "savingsRateByMonth": "Savings Rate by Month — {year}",
+    "tabGoals": "Goals",
+    "goalsSubtitle": "Track progress toward savings targets. Link an expense tag to auto-update.",
+    "noGoals": "No goals yet. Add one to start tracking."
   },
   "settings": {
     "title": "Settings",
