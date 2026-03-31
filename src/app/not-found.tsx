@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#0C1F1E] flex flex-col items-center justify-center px-4 text-center">
+    <div className="min-h-screen bg-[#0C0C1A] flex flex-col items-center justify-center px-4 text-center">
       {/* Logo — hero element */}
       <div className="w-36 h-36 rounded-[2.5rem] overflow-hidden shadow-[0_0_80px_rgba(99,102,241,0.25)] mb-8">
         <Image

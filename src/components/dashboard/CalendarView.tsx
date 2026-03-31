@@ -136,7 +136,7 @@ export function CalendarView({
       onTouchEnd={onTouchEnd}
     >
       {/* ── Custom toolbar: account tabs (left) + month name (right) ── */}
-      <div className="flex items-center gap-2 px-3 pt-5 pb-4 border-b border-[#B2CFCE]/40 dark:border-white/[0.06]">
+      <div className="flex items-center gap-2 px-3 pt-5 pb-4 border-b border-[#D9DDF0]/40 dark:border-white/[0.06]">
 
         {/* Account tabs — left, scrollable.
             Stop touch events propagating to the outer swipe-month listener. */}

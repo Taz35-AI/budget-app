@@ -112,7 +112,7 @@ export function ProfileShell() {
       <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-brand-primary/[0.06] via-brand-primary/[0.02] to-transparent dark:from-brand-primary/[0.08] dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
+      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C0C1A]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/40 dark:via-brand-primary/30 to-transparent" />
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
           <NavMenuButton />
@@ -136,7 +136,7 @@ export function ProfileShell() {
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Profile header ──────────────────────────────────────────── */}
-        <div className="lg:col-span-2 bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-6 flex flex-row items-center gap-5">
+        <div className="lg:col-span-2 bg-brand-card dark:bg-[#15152E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-6 flex flex-row items-center gap-5">
           <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/30 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={displayName} width={64} height={64} className="w-full h-full object-cover" unoptimized />
@@ -163,7 +163,7 @@ export function ProfileShell() {
 
         {/* ── Recent transactions ─────────────────────────────────────── */}
         {recentTx.length > 0 && (
-          <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
+          <div className="bg-brand-card dark:bg-[#15152E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
             <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3">{t('recentEntries')}</p>
             <div className="flex flex-col divide-y divide-slate-50 dark:divide-white/[0.04]">
               {recentTx.map((tx) => (
@@ -185,7 +185,7 @@ export function ProfileShell() {
         )}
 
         {/* ── Security ────────────────────────────────────────────────── */}
-        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
+        <div className="bg-brand-card dark:bg-[#15152E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-4">{t('security')}</p>
 
           {!showPwForm && (
@@ -243,7 +243,7 @@ export function ProfileShell() {
         </div>
 
         {/* ── Danger zone ─────────────────────────────────────────────── */}
-        <div className="bg-brand-card dark:bg-[#122928] rounded-2xl border border-red-200 dark:border-red-500/20 shadow-[0_1px_6px_rgba(22,48,47,0.05)] p-5">
+        <div className="bg-brand-card dark:bg-[#15152E] rounded-2xl border border-red-200 dark:border-red-500/20 shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-red-400 mb-4">{t('dangerZone')}</p>
 
           {deleteStep === 'idle' && (

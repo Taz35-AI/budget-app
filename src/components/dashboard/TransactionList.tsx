@@ -171,7 +171,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                                 className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
                                   editAccountId === acct.id
                                     ? 'bg-brand-primary text-white border-brand-primary'
-                                    : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                                    : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
                                 )}>
                                 {acct.name}
                               </button>
@@ -217,7 +217,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                               className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
                                 editAccountId === acct.id
                                   ? 'bg-brand-primary text-white border-brand-primary'
-                                  : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                                  : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
                               )}>
                               {acct.name}
                             </button>

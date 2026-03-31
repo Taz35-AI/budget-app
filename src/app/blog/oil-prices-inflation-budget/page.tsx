@@ -75,7 +75,7 @@ export default function BlogPostPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/blog" style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Blog</Link>
             <Link href="/login" style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Sign in</Link>
-            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#3B7A78', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
+            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#312E81', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
           </div>
         </nav>
 
@@ -247,7 +247,7 @@ export default function BlogPostPage() {
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, marginBottom: 24 }}>
                 The best defence against rising prices is knowing your actual spending, not guessing it. Spentum is a free budget tracker that shows you exactly where your money goes, so you can see your own inflation rate, not just the national average.
               </p>
-              <Link href="/signup" style={{ display: 'inline-block', background: '#3B7A78', color: '#fff', fontSize: 14, fontWeight: 600, padding: '12px 24px', borderRadius: 10, textDecoration: 'none' }}>
+              <Link href="/signup" style={{ display: 'inline-block', background: '#312E81', color: '#fff', fontSize: 14, fontWeight: 600, padding: '12px 24px', borderRadius: 10, textDecoration: 'none' }}>
                 Start tracking for free
               </Link>
             </div>

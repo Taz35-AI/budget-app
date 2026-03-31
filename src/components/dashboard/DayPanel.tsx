@@ -68,7 +68,7 @@ export function DayPanel({
         ref={panelRef}
         className={cn(
           'fixed top-0 right-0 h-full w-full max-w-sm shadow-2xl z-30',
-          'bg-white dark:bg-[#131926]',
+          'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out',
           'hidden lg:flex',
           isOpen ? 'translate-x-0' : 'translate-x-full',

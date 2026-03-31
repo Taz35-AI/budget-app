@@ -118,7 +118,7 @@ export function DayBottomSheet({
         ref={sheetRef}
         className={cn(
           'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-2xl',
-          'bg-white dark:bg-[#131926]',
+          'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
           'max-h-[92dvh]',
           isOpen ? 'translate-y-0' : 'translate-y-full',

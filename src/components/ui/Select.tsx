@@ -22,7 +22,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           className={cn(
             'w-full h-10 rounded-xl border px-3 text-sm transition-all appearance-none',
             'border-brand-primary/15 bg-white text-brand-text',
-            'dark:border-brand-primary/20 dark:bg-[#122928] dark:text-white',
+            'dark:border-brand-primary/20 dark:bg-[#15152E] dark:text-white',
             'focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/50',
             'disabled:opacity-50 disabled:cursor-not-allowed',
             'bg-[url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%233B7A78\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")] bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem] pr-8',

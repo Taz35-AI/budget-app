@@ -88,12 +88,12 @@ export function BudgetsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F7FAF9] dark:bg-[#0C1F1E]">
+      <div className="min-h-screen bg-[#F7F8FC] dark:bg-[#0C0C1A]">
         {/* Ambient glow */}
         <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-amber-100/40 via-orange-50/20 to-transparent dark:from-amber-950/15 dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C1F1E]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
+        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C0C1A]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
           <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />

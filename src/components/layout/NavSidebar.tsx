@@ -232,7 +232,7 @@ function MobileBottomNav() {
       bg-brand-card/97 dark:bg-[#1e3a38]/97
       backdrop-blur-xl
       border-t border-black/[0.07] dark:border-brand-primary/[0.15]
-      shadow-[0_-2px_16px_rgba(22,48,47,0.08)]
+      shadow-[0_-2px_16px_rgba(25,27,47,0.08)]
       flex items-center justify-around px-1">
       {bottomNavItems.map(({ href, label, icon }) => {
         const isActive = pathname === href;

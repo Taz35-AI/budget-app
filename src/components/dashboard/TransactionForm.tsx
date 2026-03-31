@@ -87,7 +87,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
             ? 'border-brand-danger/40 bg-red-50 dark:bg-red-900/10'
             : open
             ? 'border-brand-primary/40 bg-brand-primary/5 dark:bg-brand-primary/10'
-            : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928]',
+            : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E]',
         )}
       >
         {selectedTag ? (
@@ -108,7 +108,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
 
       {/* Dropdown panel */}
       {open && (
-        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] shadow-lg overflow-hidden">
+        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E] shadow-lg overflow-hidden">
           {/* Search input */}
           <div className="px-2.5 py-2 border-b border-brand-primary/[0.06] dark:border-white/[0.04]">
             <div className="relative">
@@ -376,7 +376,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
                   if (tpl.frequency) setValue('frequency', tpl.frequency);
                 }}
                 className={cn(
-                  'flex-shrink-0 flex items-center gap-1 rounded-lg border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all',
+                  'flex-shrink-0 flex items-center gap-1 rounded-lg border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all',
                   compact ? 'h-6 px-2 text-[10px]' : 'h-7 px-2.5 text-xs',
                 )}
               >
@@ -431,7 +431,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
                   ? cat === 'income'
                     ? 'bg-brand-positive text-white shadow-inner'
                     : 'bg-brand-danger text-white shadow-inner'
-                  : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                  : 'bg-white dark:bg-[#15152E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
               )}
             >
               <input type="radio" value={cat} {...register('category')} className="sr-only" />
@@ -454,7 +454,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
                 compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
                 type === txType
                   ? 'bg-brand-primary text-white shadow-inner'
-                  : 'bg-white dark:bg-[#122928] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                  : 'bg-white dark:bg-[#15152E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
               )}
             >
               <input type="radio" value={txType} {...register('type')} className="sr-only" />
@@ -497,7 +497,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
           autoComplete="off"
         />
         {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#122928] shadow-lg overflow-hidden">
+          <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#15152E] shadow-lg overflow-hidden">
             {suggestions.map((t) => (
               <li key={`${t.id}`}>
                 <button

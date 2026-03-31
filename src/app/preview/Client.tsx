@@ -32,15 +32,15 @@ function PreviewForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F7FAF9] dark:bg-[#0C1F1E] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F7F8FC] dark:bg-[#0C0C1A] px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#3B7A78] flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#312E81] flex items-center justify-center mx-auto mb-4">
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-black text-[#16302F] dark:text-white">Private preview</h1>
+          <h1 className="text-2xl font-black text-[#191B2F] dark:text-white">Private preview</h1>
           <p className="text-sm text-slate-400 dark:text-white/40 mt-1">Enter the password to access this app</p>
         </div>
 
@@ -52,13 +52,13 @@ function PreviewForm() {
             placeholder="Password"
             autoFocus
             required
-            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-slate-800 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#3B7A78]/30 transition-all"
+            className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-slate-800 dark:text-white text-sm outline-none focus:ring-2 focus:ring-[#312E81]/30 transition-all"
           />
           {error && <p className="text-xs text-red-500 -mt-1">Wrong password</p>}
           <button
             type="submit"
             disabled={loading || !password}
-            className="w-full py-2.5 rounded-xl bg-[#3B7A78] text-white text-sm font-semibold hover:bg-[#2d6260] transition-colors disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-[#312E81] text-white text-sm font-semibold hover:bg-[#2d6260] transition-colors disabled:opacity-50"
           >
             {loading ? 'Checking…' : 'Enter'}
           </button>

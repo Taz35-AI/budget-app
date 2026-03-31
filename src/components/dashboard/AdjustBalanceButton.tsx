@@ -67,7 +67,7 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
       {open && (
         <>
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#122928] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 p-4"
+          <div className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#15152E] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">

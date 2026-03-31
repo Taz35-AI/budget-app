@@ -28,7 +28,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'w-full h-10 rounded-xl border px-3 text-sm transition-all',
               'border-brand-primary/15 bg-white text-brand-text placeholder:text-brand-text/30',
-              'dark:border-brand-primary/20 dark:bg-[#122928] dark:text-white dark:placeholder:text-white/25',
+              'dark:border-brand-primary/20 dark:bg-[#15152E] dark:text-white dark:placeholder:text-white/25',
               'focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/50',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               prefix && 'pl-7',
