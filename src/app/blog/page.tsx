@@ -41,6 +41,16 @@ const jsonLd = {
 
 const posts = [
   {
+    slug: 'oil-prices-inflation-budget',
+    category: 'Personal Finance',
+    date: 'March 31, 2026',
+    dateIso: '2026-03-31',
+    readTime: '14 min read',
+    title: 'Oil Prices Are Rising Again. Here Is What It Means for Your Budget',
+    excerpt: 'Tensions in the Strait of Hormuz are pushing oil up, and that rise reaches your wallet through fuel, food, energy bills and rising interest rates all at once. Here is why it happens and what you can actually do about it.',
+    tags: ['Inflation', 'Oil Prices', 'Cost of Living', 'Budgeting'],
+  },
+  {
     slug: 'how-to-save-money-and-tackle-debt',
     category: 'Personal Finance',
     date: 'March 30, 2026',
