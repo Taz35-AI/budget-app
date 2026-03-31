@@ -230,6 +230,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                       compact
                       defaultDate={date}
                       isCreditAccount={accounts?.find(a => a.id === (tx.account_id ?? editAccountId))?.type === 'credit'}
+                      creditLimit={accounts?.find(a => a.id === (tx.account_id ?? editAccountId))?.credit_limit}
                       initialValues={{
                         id: tx.transaction_id,
                         name: tx.name,

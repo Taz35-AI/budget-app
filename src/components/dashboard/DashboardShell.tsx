@@ -734,6 +734,8 @@ export function DashboardShell() {
                       onCancel={handleCancelAdd}
                       isLoading={create.isPending}
                       isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
+                      creditLimit={accounts?.find(a => a.id === desktopFormAccountId)?.credit_limit}
+                      onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleCancelAdd(); setShowTransferModal(true); } : undefined}
                       onSubmit={(values: TransactionFormValues) => {
                         create.submit(values, {
                           onSuccess: () => {

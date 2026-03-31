@@ -73,6 +73,7 @@
     "failedToSave": "Błąd zapisu: {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Zapłać kartę przelewem",
     "quickFill": "Szybkie wypełnienie",
     "category": "Kategoria",
     "selectCategory": "Wybierz kategorię…",
@@ -100,7 +101,8 @@
     "startDateRequired": "Data początkowa jest wymagana",
     "frequencyRequired": "Częstotliwość jest wymagana",
     "minAmount": "Min £",
-    "maxAmount": "Max £"
+    "maxAmount": "Max £",
+    "overCreditLimit": "To przekracza Twój limit kredytowy {limit}"
   },
   "recurring": {
     "editTitle": "Edycja",
@@ -410,7 +412,12 @@
     "sameAccount": "Wybierz różne konta",
     "buttonLabel": "Przelew",
     "toName": "Przelew na {name}",
-    "fromName": "Przelew z {name}"
+    "fromName": "Przelew z {name}",
+    "oneOff": "Jednorazowy",
+    "recurring": "Cykliczny",
+    "frequency": "Częstotliwość",
+    "startDate": "Data rozpoczęcia",
+    "overCreditLimitWarning": "Ten przelew przekracza limit kredytowy {limit} dla {name}"
   },
   "resetAll": {
     "buttonLabel": "Resetuj wszystko",

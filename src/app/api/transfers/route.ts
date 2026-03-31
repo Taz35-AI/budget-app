@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { fromAccountId, toAccountId, amount, date, expenseName, incomeName } = body;
+    const { fromAccountId, toAccountId, amount, txType, date, startDate, frequency, expenseName, incomeName } = body;
 
     if (!fromAccountId || !toAccountId)
       return NextResponse.json({ error: 'Both accounts are required' }, { status: 400 });
@@ -19,8 +19,17 @@ export async function POST(req: NextRequest) {
     const amt = Number(amount);
     if (isNaN(amt) || amt <= 0 || amt > 999_999_999)
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
-    if (!date)
-      return NextResponse.json({ error: 'Date is required' }, { status: 400 });
+
+    const isRecurring = txType === 'recurring';
+    const validFrequencies = ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'];
+
+    if (isRecurring) {
+      if (!startDate) return NextResponse.json({ error: 'Start date is required' }, { status: 400 });
+      if (!frequency || !validFrequencies.includes(frequency))
+        return NextResponse.json({ error: 'Valid frequency is required' }, { status: 400 });
+    } else {
+      if (!date) return NextResponse.json({ error: 'Date is required' }, { status: 400 });
+    }
 
     const nameExpense = String(expenseName ?? 'Transfer').slice(0, 200);
     const nameIncome = String(incomeName ?? 'Transfer').slice(0, 200);
@@ -28,19 +37,15 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const transferId = randomUUID();
 
+    const sharedFields = { user_id: userId, transfer_id: transferId, amount: amt };
+    const dateFields = isRecurring
+      ? { type: 'recurring', start_date: startDate, frequency }
+      : { type: 'one_off', date };
+
     // Insert expense on source account
     const { data: expTx, error: expErr } = await supabase
       .from('transactions')
-      .insert({
-        user_id: userId,
-        account_id: fromAccountId,
-        transfer_id: transferId,
-        name: nameExpense,
-        amount: amt,
-        category: 'expense',
-        type: 'one_off',
-        date,
-      })
+      .insert({ ...sharedFields, ...dateFields, account_id: fromAccountId, name: nameExpense, category: 'expense' })
       .select()
       .single();
 
@@ -52,16 +57,7 @@ export async function POST(req: NextRequest) {
     // Insert income on destination account
     const { data: incTx, error: incErr } = await supabase
       .from('transactions')
-      .insert({
-        user_id: userId,
-        account_id: toAccountId,
-        transfer_id: transferId,
-        name: nameIncome,
-        amount: amt,
-        category: 'income',
-        type: 'one_off',
-        date,
-      })
+      .insert({ ...sharedFields, ...dateFields, account_id: toAccountId, name: nameIncome, category: 'income' })
       .select()
       .single();
 

@@ -73,6 +73,7 @@
     "failedToSave": "Failed to save: {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Pay this card via transfer",
     "quickFill": "Quick fill",
     "category": "Category",
     "selectCategory": "Select category…",
@@ -100,7 +101,8 @@
     "startDateRequired": "Start date is required",
     "frequencyRequired": "Frequency is required",
     "minAmount": "Min £",
-    "maxAmount": "Max £"
+    "maxAmount": "Max £",
+    "overCreditLimit": "This exceeds your {limit} credit limit"
   },
   "recurring": {
     "editTitle": "Editing",
@@ -410,7 +412,12 @@
     "sameAccount": "Select different accounts",
     "buttonLabel": "Transfer",
     "toName": "Transfer to {name}",
-    "fromName": "Transfer from {name}"
+    "fromName": "Transfer from {name}",
+    "oneOff": "One-off",
+    "recurring": "Recurring",
+    "frequency": "Frequency",
+    "startDate": "Start date",
+    "overCreditLimitWarning": "This transfer exceeds the {name} credit limit of {limit}"
   },
   "resetAll": {
     "buttonLabel": "Reset All",

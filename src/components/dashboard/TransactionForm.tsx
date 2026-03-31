@@ -212,9 +212,11 @@ interface Props {
   lockType?: boolean;
   compact?: boolean;
   isCreditAccount?: boolean;
+  creditLimit?: number | null;
+  onTransfer?: () => void;
 }
 
-export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact, isCreditAccount }: Props) {
+export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact, isCreditAccount, creditLimit, onTransfer }: Props) {
   const t = useTranslations('transactionForm');
   const tc = useTranslations('common');
   const tt = useTranslations('transactions');
@@ -257,6 +259,10 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
   const category = watch('category');
   const tag = watch('tag');
   const nameValue = watch('name');
+  const amountValue = watch('amount');
+
+  const overCreditLimit =
+    isCreditAccount && creditLimit != null && Number(amountValue) > creditLimit;
 
   // Credit card accounts can only have expenses — force it and keep it locked
   React.useEffect(() => {
@@ -357,13 +363,32 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
 
       {/* Category toggle — credit accounts only show expense */}
       {isCreditAccount ? (
-        <div className={cn(
-          'flex items-center justify-center rounded-xl font-semibold',
-          compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-          'bg-brand-danger text-white',
-        )}>
-          <input type="hidden" {...register('category')} value="expense" />
-          {t('expense')}
+        <div className="flex flex-col gap-2">
+          <div className={cn(
+            'flex items-center justify-center rounded-xl font-semibold',
+            compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
+            'bg-brand-danger text-white',
+          )}>
+            <input type="hidden" {...register('category')} value="expense" />
+            {t('expense')}
+          </div>
+          {onTransfer && (
+            <button
+              type="button"
+              onClick={onTransfer}
+              className={cn(
+                'flex items-center justify-center gap-2 rounded-xl font-semibold border transition-all',
+                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
+                'border-brand-primary/30 dark:border-brand-primary/40 text-brand-primary dark:text-brand-positive',
+                'hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15',
+              )}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+              </svg>
+              {t('payViaTransfer')}
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
@@ -410,18 +435,25 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
         </div>
       )}
 
-      <Input
-        id="amount"
-        label={t('amount')}
-        type="number"
-        step="0.01"
-        min="0"
-        placeholder={t('amountPlaceholder')}
-        prefix={symbol}
-        error={errors.amount?.message}
-        className={compact ? 'h-7 text-[11px]' : undefined}
-        {...register('amount')}
-      />
+      <div className="flex flex-col gap-1">
+        <Input
+          id="amount"
+          label={t('amount')}
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder={t('amountPlaceholder')}
+          prefix={symbol}
+          error={errors.amount?.message}
+          className={compact ? 'h-7 text-[11px]' : undefined}
+          {...register('amount')}
+        />
+        {overCreditLimit && (
+          <p className={cn('text-amber-600 dark:text-amber-400 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
+            {t('overCreditLimit', { limit: `${symbol}${creditLimit}` })}
+          </p>
+        )}
+      </div>
 
       <div className="relative">
         <Input

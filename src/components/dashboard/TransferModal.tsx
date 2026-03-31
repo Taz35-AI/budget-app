@@ -5,7 +5,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import type { BudgetAccount } from '@/types';
+import type { BudgetAccount, Frequency } from '@/types';
+import { FREQUENCIES } from '@/lib/constants';
 
 interface Props {
   accounts: BudgetAccount[];
@@ -23,12 +24,20 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props)
   const [fromId, setFromId] = useState(accounts[0]?.id ?? '');
   const [toId, setToId] = useState(accounts[1]?.id ?? '');
   const [amount, setAmount] = useState('');
+  const [txType, setTxType] = useState<'one_off' | 'recurring'>('one_off');
   const [date, setDate] = useState(defaultDate ?? today);
+  const [startDate, setStartDate] = useState(defaultDate ?? today);
+  const [frequency, setFrequency] = useState<Frequency>('monthly');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const fromAccount = accounts.find((a) => a.id === fromId);
   const toAccount = accounts.find((a) => a.id === toId);
+
+  const overCreditLimit =
+    toAccount?.type === 'credit' &&
+    toAccount.credit_limit != null &&
+    Number(amount) > toAccount.credit_limit;
 
   const sameAccount = fromId === toId;
 
@@ -46,7 +55,10 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props)
           fromAccountId: fromId,
           toAccountId: toId,
           amount: Number(amount),
-          date,
+          txType,
+          date: txType === 'one_off' ? date : undefined,
+          startDate: txType === 'recurring' ? startDate : undefined,
+          frequency: txType === 'recurring' ? frequency : undefined,
           expenseName: t('toName', { name: toAccount?.name ?? '' }),
           incomeName: t('fromName', { name: fromAccount?.name ?? '' }),
         }),
@@ -166,6 +178,43 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props)
             <p className="text-xs text-red-500 dark:text-red-400 -mt-2">{t('sameAccount')}</p>
           )}
 
+          {/* One-off / Recurring toggle */}
+          <div className="flex rounded-xl overflow-hidden border border-[#B2CFCE]/60 dark:border-white/10">
+            {(['one_off', 'recurring'] as const).map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setTxType(type)}
+                className={cn(
+                  'flex-1 h-9 text-xs font-semibold transition-all',
+                  txType === type
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-[#B2CFCE]/10 dark:bg-white/[0.04] text-[#16302F]/55 dark:text-white/40 hover:bg-[#B2CFCE]/20 dark:hover:bg-white/[0.07]',
+                )}
+              >
+                {type === 'one_off' ? t('oneOff') : t('recurring')}
+              </button>
+            ))}
+          </div>
+
+          {/* Frequency — only when recurring */}
+          {txType === 'recurring' && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#16302F]/40 dark:text-white/30">
+                {t('frequency')}
+              </label>
+              <select
+                value={frequency}
+                onChange={(e) => setFrequency(e.target.value as Frequency)}
+                className="h-9 rounded-xl border border-[#B2CFCE]/60 dark:border-white/10 bg-[#B2CFCE]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#16302F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+              >
+                {(Object.entries(FREQUENCIES) as [Frequency, string][]).map(([k, label]) => (
+                  <option key={k} value={k}>{label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Amount */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#16302F]/40 dark:text-white/30">
@@ -186,17 +235,22 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose }: Props)
                 className="w-full h-10 pl-8 pr-3 rounded-xl border border-[#B2CFCE]/60 dark:border-white/10 bg-[#B2CFCE]/10 dark:bg-white/[0.04] text-sm font-semibold text-[#16302F] dark:text-white placeholder:text-[#16302F]/25 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
               />
             </div>
+            {overCreditLimit && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 pl-1">
+                {t('overCreditLimitWarning', { name: toAccount?.name ?? '', limit: `${symbol}${toAccount?.credit_limit}` })}
+              </p>
+            )}
           </div>
 
-          {/* Date */}
+          {/* Date / Start date */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#16302F]/40 dark:text-white/30">
-              {t('date')}
+              {txType === 'recurring' ? t('startDate') : t('date')}
             </label>
             <input
               type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={txType === 'recurring' ? startDate : date}
+              onChange={(e) => txType === 'recurring' ? setStartDate(e.target.value) : setDate(e.target.value)}
               required
               className="h-10 px-3 rounded-xl border border-[#B2CFCE]/60 dark:border-white/10 bg-[#B2CFCE]/10 dark:bg-white/[0.04] text-sm font-medium text-[#16302F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
             />

@@ -73,6 +73,7 @@
     "failedToSave": "Speichern fehlgeschlagen: {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Karte per Überweisung bezahlen",
     "quickFill": "Schnellausfüllung",
     "category": "Kategorie",
     "selectCategory": "Kategorie auswählen…",
@@ -100,7 +101,8 @@
     "startDateRequired": "Startdatum ist erforderlich",
     "frequencyRequired": "Häufigkeit ist erforderlich",
     "minAmount": "Min £",
-    "maxAmount": "Max £"
+    "maxAmount": "Max £",
+    "overCreditLimit": "Dies überschreitet Ihr Kreditlimit von {limit}"
   },
   "recurring": {
     "editTitle": "Bearbeitung",
@@ -410,7 +412,12 @@
     "sameAccount": "Verschiedene Konten auswählen",
     "buttonLabel": "Überweisen",
     "toName": "Überweisung an {name}",
-    "fromName": "Überweisung von {name}"
+    "fromName": "Überweisung von {name}",
+    "oneOff": "Einmalig",
+    "recurring": "Wiederkehrend",
+    "frequency": "Häufigkeit",
+    "startDate": "Startdatum",
+    "overCreditLimitWarning": "Diese Überweisung überschreitet das Kreditlimit von {limit} für {name}"
   },
   "resetAll": {
     "buttonLabel": "Alles zurücksetzen",

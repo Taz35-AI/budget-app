@@ -73,6 +73,7 @@
     "failedToSave": "Eroare la salvare: {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Plătește cardul prin transfer",
     "quickFill": "Completare rapidă",
     "category": "Categorie",
     "selectCategory": "Selectează categoria…",
@@ -100,7 +101,8 @@
     "startDateRequired": "Data de început este obligatorie",
     "frequencyRequired": "Frecvența este obligatorie",
     "minAmount": "Min",
-    "maxAmount": "Max"
+    "maxAmount": "Max",
+    "overCreditLimit": "Aceasta depășește limita ta de credit de {limit}"
   },
   "recurring": {
     "editTitle": "Editezi",
@@ -410,7 +412,12 @@
     "sameAccount": "Selectează conturi diferite",
     "buttonLabel": "Transfer",
     "toName": "Transfer către {name}",
-    "fromName": "Transfer din {name}"
+    "fromName": "Transfer din {name}",
+    "oneOff": "O singură dată",
+    "recurring": "Recurent",
+    "frequency": "Frecvență",
+    "startDate": "Data de început",
+    "overCreditLimitWarning": "Acest transfer depășește limita de credit {limit} a contului {name}"
   },
   "resetAll": {
     "buttonLabel": "Resetează tot",

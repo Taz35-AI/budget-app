@@ -73,6 +73,7 @@
     "failedToSave": "Échec de l'enregistrement : {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Payer cette carte par virement",
     "quickFill": "Remplissage rapide",
     "category": "Catégorie",
     "selectCategory": "Sélectionner une catégorie…",
@@ -100,7 +101,8 @@
     "startDateRequired": "La date de début est requise",
     "frequencyRequired": "La fréquence est requise",
     "minAmount": "Min £",
-    "maxAmount": "Max £"
+    "maxAmount": "Max £",
+    "overCreditLimit": "Ceci dépasse votre limite de crédit de {limit}"
   },
   "recurring": {
     "editTitle": "Modification",
@@ -410,7 +412,12 @@
     "sameAccount": "Sélectionnez des comptes différents",
     "buttonLabel": "Virement",
     "toName": "Virement vers {name}",
-    "fromName": "Virement depuis {name}"
+    "fromName": "Virement depuis {name}",
+    "oneOff": "Ponctuel",
+    "recurring": "Récurrent",
+    "frequency": "Fréquence",
+    "startDate": "Date de début",
+    "overCreditLimitWarning": "Ce virement dépasse la limite de crédit de {limit} pour {name}"
   },
   "resetAll": {
     "buttonLabel": "Tout réinitialiser",

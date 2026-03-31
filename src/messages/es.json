@@ -73,6 +73,7 @@
     "failedToSave": "Error al guardar: {message}"
   },
   "transactionForm": {
+    "payViaTransfer": "Pagar esta tarjeta mediante transferencia",
     "quickFill": "Relleno rápido",
     "category": "Categoría",
     "selectCategory": "Selecciona categoría…",
@@ -100,7 +101,8 @@
     "startDateRequired": "La fecha de inicio es obligatoria",
     "frequencyRequired": "La frecuencia es obligatoria",
     "minAmount": "Mín",
-    "maxAmount": "Máx"
+    "maxAmount": "Máx",
+    "overCreditLimit": "Esto supera tu límite de crédito de {limit}"
   },
   "recurring": {
     "editTitle": "Editando",
@@ -410,7 +412,12 @@
     "sameAccount": "Selecciona cuentas diferentes",
     "buttonLabel": "Transferir",
     "toName": "Transferencia a {name}",
-    "fromName": "Transferencia desde {name}"
+    "fromName": "Transferencia desde {name}",
+    "oneOff": "Una vez",
+    "recurring": "Recurrente",
+    "frequency": "Frecuencia",
+    "startDate": "Fecha de inicio",
+    "overCreditLimitWarning": "Esta transferencia supera el límite de crédito de {limit} de {name}"
   },
   "resetAll": {
     "buttonLabel": "Restablecer todo",
