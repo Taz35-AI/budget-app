@@ -82,7 +82,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
     <div className="flex flex-col h-full">
 
       {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-4 pb-3 border-b border-white/[0.07] flex-shrink-0">
+      <div className="flex items-center justify-center px-4 pt-4 pb-3 border-b border-slate-200 dark:border-white/[0.07] flex-shrink-0">
         <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
@@ -90,7 +90,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Nav links */}
       <div className="px-2.5 pt-4 pb-1">
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">{t('menu')}</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400 dark:text-white/20 px-2 mb-2">{t('menu')}</p>
       </div>
       <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
         {navItems.map(({ href, label, icon }) => {
@@ -104,7 +104,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150',
                 isActive
                   ? 'bg-brand-primary text-white shadow-[0_2px_8px_rgba(49,46,129,0.4)]'
-                  : 'text-white/45 hover:bg-white/[0.07] hover:text-white/90',
+                  : 'text-slate-500 dark:text-white/45 hover:bg-slate-100 dark:hover:bg-white/[0.07] hover:text-slate-900 dark:hover:text-white/90',
               )}
             >
               <span className="flex-shrink-0 opacity-90">{icon}</span>
@@ -118,18 +118,18 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       </nav>
 
       {/* Utility section */}
-      <div className="flex-shrink-0 px-2.5 pb-4 pt-3 border-t border-white/[0.07] space-y-1.5">
+      <div className="flex-shrink-0 px-2.5 pb-4 pt-3 border-t border-slate-200 dark:border-white/[0.07] space-y-1.5">
         {/* Logged-in user */}
         <div className="px-1 mb-3">
           <UserBadge />
         </div>
 
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/20 px-2 mb-2">{t('options')}</p>
+        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400 dark:text-white/20 px-2 mb-2">{t('options')}</p>
 
         {/* Theme toggle */}
         <div className="flex items-center gap-2 px-1">
           <ThemeToggle />
-          <span className="text-xs text-white/35 font-medium">{t('toggleTheme')}</span>
+          <span className="text-xs text-slate-400 dark:text-white/35 font-medium">{t('toggleTheme')}</span>
         </div>
 
         {/* Export */}
@@ -150,7 +150,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Version */}
       <div className="px-5 pb-3">
-        <p className="text-[10px] font-medium text-white/15">Spentum v1.0</p>
+        <p className="text-[10px] font-medium text-slate-300 dark:text-white/15">Spentum v1.0</p>
       </div>
     </div>
   );
@@ -174,11 +174,10 @@ export function NavSidebar() {
   return (
     <>
       {/* ── Desktop sidebar (always visible, left-fixed) ────────────── */}
-      {/* Force dark class so sidebar always renders with dark styles */}
-      <aside className="dark hidden lg:flex flex-col fixed left-0 top-0 h-full w-[230px] z-30
-        bg-[#1a1845]
-        border-r border-white/[0.06]
-        shadow-[2px_0_24px_rgba(12,12,26,0.35)]">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full w-[230px] z-30
+        bg-white dark:bg-[#1a1845]
+        border-r border-slate-200 dark:border-white/[0.06]
+        shadow-[2px_0_24px_rgba(12,12,26,0.08)] dark:shadow-[2px_0_24px_rgba(12,12,26,0.35)]">
         <SidebarContent />
       </aside>
 
@@ -194,9 +193,9 @@ export function NavSidebar() {
       {/* ── Mobile: slim left drawer ─────────────────────────────────── */}
       <div
         className={cn(
-          'dark fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
-          'bg-[#1a1845]',
-          'shadow-[4px_0_32px_rgba(12,12,26,0.6)]',
+          'fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
+          'bg-white dark:bg-[#1a1845]',
+          'shadow-[4px_0_32px_rgba(12,12,26,0.12)] dark:shadow-[4px_0_32px_rgba(12,12,26,0.6)]',
           'transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -204,7 +203,7 @@ export function NavSidebar() {
         {/* Close button */}
         <button
           onClick={close}
-          className="absolute top-4 right-4 p-2 rounded-xl hover:bg-white/10 text-white/30 hover:text-white transition-all z-10"
+          className="absolute top-4 right-4 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-700 dark:hover:text-white transition-all z-10"
           aria-label="Close menu"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
