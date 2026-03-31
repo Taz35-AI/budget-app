@@ -205,6 +205,7 @@ function buildSchema(t: (key: string) => string, tc: (key: string) => string) {
 interface Props {
   defaultDate?: string;
   initialValues?: Partial<Transaction>;
+  isDuplicate?: boolean;
   onSubmit: (values: TransactionFormValues) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -216,7 +217,7 @@ interface Props {
   onTransfer?: () => void;
 }
 
-export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel, isLoading, symbol, lockType, compact, isCreditAccount, creditLimit, onTransfer }: Props) {
+export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSubmit, onCancel, isLoading, symbol, lockType, compact, isCreditAccount, creditLimit, onTransfer }: Props) {
   const t = useTranslations('transactionForm');
   const tc = useTranslations('common');
   const tt = useTranslations('transactions');
@@ -329,14 +330,30 @@ export function TransactionForm({ defaultDate, initialValues, onSubmit, onCancel
       })}
       className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-4')}
     >
-      {/* Editing reminder — shown only when editing an existing transaction */}
+      {/* Context banner — shown when editing or duplicating */}
       {initialValues?.name && (
-        <div className="rounded-lg bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/15 dark:border-brand-primary/20 px-2.5 py-1.5 flex items-center gap-2">
-          <svg className="w-3 h-3 text-brand-primary/60 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
+        <div className={cn(
+          'rounded-lg border px-2.5 py-1.5 flex items-center gap-2',
+          isDuplicate
+            ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-500/30'
+            : 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/15 dark:border-brand-primary/20',
+        )}>
+          {isDuplicate ? (
+            <svg className="w-3 h-3 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          ) : (
+            <svg className="w-3 h-3 text-brand-primary/60 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          )}
           <div className="min-w-0">
-            <p className="text-[9px] text-brand-primary/60 dark:text-brand-primary/50 font-medium uppercase tracking-wider">{t('editingLabel')}</p>
+            <p className={cn(
+              'text-[9px] font-medium uppercase tracking-wider',
+              isDuplicate ? 'text-emerald-600 dark:text-emerald-400' : 'text-brand-primary/60 dark:text-brand-primary/50',
+            )}>
+              {isDuplicate ? t('duplicatingLabel') : t('editingLabel')}
+            </p>
             <p className="text-[11px] font-semibold text-brand-text dark:text-white/90 truncate">{initialValues.name}</p>
           </div>
         </div>

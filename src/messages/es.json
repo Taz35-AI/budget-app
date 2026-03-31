@@ -104,7 +104,8 @@
     "minAmount": "Mín",
     "maxAmount": "Máx",
     "overCreditLimit": "Esto supera tu límite de crédito de {limit}",
-    "editingLabel": "Editando"
+    "editingLabel": "Editando",
+    "duplicatingLabel": "Copiando de"
   },
   "recurring": {
     "editTitle": "Editando",

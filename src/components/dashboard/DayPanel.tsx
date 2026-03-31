@@ -110,6 +110,7 @@ export function DayPanel({
               <TransactionForm
                 defaultDate={date}
                 symbol={symbol}
+                isDuplicate={duplicateValues !== null}
                 initialValues={duplicateValues ?? undefined}
                 onCancel={() => { cancelDuplicate(); if (isAdding) onCancelAdd(); }}
                 isLoading={create.isPending}

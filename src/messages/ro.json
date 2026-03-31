@@ -104,7 +104,8 @@
     "minAmount": "Min",
     "maxAmount": "Max",
     "overCreditLimit": "Aceasta depășește limita ta de credit de {limit}",
-    "editingLabel": "Editare"
+    "editingLabel": "Editare",
+    "duplicatingLabel": "Copiere din"
   },
   "recurring": {
     "editTitle": "Editezi",

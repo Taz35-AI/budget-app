@@ -30,7 +30,7 @@ import { TransferModal } from './TransferModal';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
-import type { DayTransaction, TransactionFormValues } from '@/types';
+import type { DayTransaction, Transaction, TransactionFormValues } from '@/types';
 
 // ─── Month stats ──────────────────────────────────────────────────────────────
 
@@ -232,8 +232,12 @@ export function DashboardShell() {
 
   const handleDateClick = useCallback((date: string) => { impact('light'); setSelectedDate(date); setIsAdding(false); }, [impact]);
   const handleClose = useCallback(() => { setSelectedDate(null); setIsAdding(false); }, []);
+  const [desktopDuplicateValues, setDesktopDuplicateValues] = useState<Partial<Transaction> | null>(null);
   const handleAddNew = useCallback(() => { impact('medium'); setIsAdding(true); }, [impact]);
-  const handleCancelAdd = useCallback(() => setIsAdding(false), []);
+  const handleCancelAdd = useCallback(() => { setIsAdding(false); setDesktopDuplicateValues(null); }, []);
+  const handleDesktopDuplicate = useCallback((tx: DayTransaction) => {
+    setDesktopDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
+  }, []);
   const handleOnboardingAdd = useCallback(() => {
     const today = format(new Date(), 'yyyy-MM-dd');
     setSelectedDate(today);
@@ -705,7 +709,7 @@ export function DashboardShell() {
               )}
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
-                {isAdding ? (
+                {(isAdding || desktopDuplicateValues !== null) ? (
                   <>
                     {/* Account picker — desktop, only when 2+ accounts */}
                     {(accounts?.length ?? 0) >= 2 && (
@@ -732,6 +736,8 @@ export function DashboardShell() {
                       defaultDate={selectedDate}
                       symbol={symbol}
                       compact
+                      isDuplicate={desktopDuplicateValues !== null}
+                      initialValues={desktopDuplicateValues ?? undefined}
                       onCancel={handleCancelAdd}
                       isLoading={create.isPending}
                       isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
@@ -755,6 +761,7 @@ export function DashboardShell() {
                     formatAmount={formatAmount}
                     symbol={symbol}
                     onAddNew={handleAddNew}
+                    onDuplicate={handleDesktopDuplicate}
                     onTransfer={() => { setTransferDefaultToId(undefined); setShowTransferModal(true); }}
                     showTip={isEmpty && onboardingStep === 1}
                     accounts={accounts}

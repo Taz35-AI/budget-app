@@ -104,7 +104,8 @@
     "minAmount": "Min £",
     "maxAmount": "Max £",
     "overCreditLimit": "Ceci dépasse votre limite de crédit de {limit}",
-    "editingLabel": "Modification"
+    "editingLabel": "Modification",
+    "duplicatingLabel": "Copie de"
   },
   "recurring": {
     "editTitle": "Modification",

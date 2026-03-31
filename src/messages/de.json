@@ -104,7 +104,8 @@
     "minAmount": "Min £",
     "maxAmount": "Max £",
     "overCreditLimit": "Dies überschreitet Ihr Kreditlimit von {limit}",
-    "editingLabel": "Bearbeitung"
+    "editingLabel": "Bearbeitung",
+    "duplicatingLabel": "Kopie von"
   },
   "recurring": {
     "editTitle": "Bearbeitung",
