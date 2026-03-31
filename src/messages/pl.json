@@ -68,6 +68,7 @@
     "balance": "Saldo · {date}",
     "deleteTitle": "Usunąć \"{name}\"?",
     "editAriaLabel": "Edytuj transakcję",
+    "duplicateAriaLabel": "Duplikuj transakcję",
     "deleteAriaLabel": "Usuń transakcję",
     "addToAccount": "Dodaj do konta",
     "failedToSave": "Błąd zapisu: {message}"

@@ -68,6 +68,7 @@
     "balance": "Sold · {date}",
     "deleteTitle": "Ștergi \"{name}\"?",
     "editAriaLabel": "Editează tranzacția",
+    "duplicateAriaLabel": "Duplică tranzacția",
     "deleteAriaLabel": "Șterge tranzacția",
     "addToAccount": "Adaugă la cont",
     "failedToSave": "Eroare la salvare: {message}"

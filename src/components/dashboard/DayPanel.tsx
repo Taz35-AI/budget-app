@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useCreateTransaction } from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
-import type { DayTransaction, TransactionFormValues } from '@/types';
+import type { DayTransaction, Transaction, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string | null;
@@ -35,6 +35,13 @@ export function DayPanel({
   const panelRef = useRef<HTMLDivElement>(null);
   const create = useCreateTransaction();
   const isOpen = date !== null;
+  const [duplicateValues, setDuplicateValues] = useState<Partial<Transaction> | null>(null);
+
+  const handleDuplicate = (tx: DayTransaction) => {
+    setDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
+  };
+  const cancelDuplicate = () => setDuplicateValues(null);
+  const isShowingForm = isAdding || duplicateValues !== null;
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -99,15 +106,20 @@ export function DayPanel({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {date && (
-            isAdding ? (
+            isShowingForm ? (
               <TransactionForm
                 defaultDate={date}
                 symbol={symbol}
-                onCancel={onCancelAdd}
+                initialValues={duplicateValues ?? undefined}
+                onCancel={() => { cancelDuplicate(); if (isAdding) onCancelAdd(); }}
                 isLoading={create.isPending}
                 onSubmit={(values: TransactionFormValues) => {
                   create.reset();
-                  create.mutate(values, { onSuccess: onCancelAdd });
+                  if (duplicateValues !== null) {
+                    create.mutate(values, { onSuccess: cancelDuplicate });
+                  } else {
+                    create.mutate(values, { onSuccess: onCancelAdd });
+                  }
                 }}
               />
             ) : (
@@ -118,6 +130,7 @@ export function DayPanel({
                 formatAmount={formatAmount}
                 symbol={symbol}
                 onAddNew={onAddNew}
+                onDuplicate={handleDuplicate}
                 showTip={showTip}
               />
             )

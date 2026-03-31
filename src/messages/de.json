@@ -68,6 +68,7 @@
     "balance": "Kontostand · {date}",
     "deleteTitle": "\"{name}\" löschen?",
     "editAriaLabel": "Transaktion bearbeiten",
+    "duplicateAriaLabel": "Transaktion duplizieren",
     "deleteAriaLabel": "Transaktion löschen",
     "addToAccount": "Zum Konto hinzufügen",
     "failedToSave": "Speichern fehlgeschlagen: {message}"

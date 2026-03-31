@@ -6,7 +6,7 @@ import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { cn } from '@/lib/utils';
-import type { BudgetAccount, DayTransaction, TransactionFormValues } from '@/types';
+import type { BudgetAccount, DayTransaction, Transaction, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string | null;
@@ -59,6 +59,13 @@ export function DayBottomSheet({
   const create = useOfflineCreate(formAccountId);
   const showAccountPicker = (accounts?.length ?? 0) >= 2;
   const isOpen = date !== null;
+  const [duplicateValues, setDuplicateValues] = useState<Partial<Transaction> | null>(null);
+
+  const handleDuplicate = (tx: DayTransaction) => {
+    setDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
+  };
+  const cancelDuplicate = () => setDuplicateValues(null);
+  const isShowingForm = isAdding || duplicateValues !== null;
 
   useEffect(() => {
     if (isOpen) {
@@ -160,7 +167,7 @@ export function DayBottomSheet({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 pb-8 overscroll-contain">
           {date && (
-            isAdding ? (
+            isShowingForm ? (
               <>
                 {/* Account picker — only when 2+ accounts */}
                 {showAccountPicker && (
@@ -186,13 +193,18 @@ export function DayBottomSheet({
                 <TransactionForm
                   defaultDate={date}
                   symbol={symbol}
-                  onCancel={onCancelAdd}
+                  initialValues={duplicateValues ?? undefined}
+                  onCancel={() => { cancelDuplicate(); if (isAdding) onCancelAdd(); }}
                   isLoading={create.isPending}
                   isCreditAccount={accounts?.find(a => a.id === formAccountId)?.type === 'credit'}
                   creditLimit={accounts?.find(a => a.id === formAccountId)?.credit_limit}
-                  onTransfer={(accounts?.length ?? 0) >= 2 && onTransfer ? () => { onCancelAdd(); onTransfer(formAccountId); } : undefined}
+                  onTransfer={(accounts?.length ?? 0) >= 2 && onTransfer ? () => { cancelDuplicate(); if (isAdding) onCancelAdd(); onTransfer(formAccountId); } : undefined}
                   onSubmit={(values: TransactionFormValues) => {
-                    create.submit(values, { onSuccess: onCancelAdd });
+                    if (duplicateValues !== null) {
+                      create.submit(values, { onSuccess: cancelDuplicate });
+                    } else {
+                      create.submit(values, { onSuccess: onCancelAdd });
+                    }
                   }}
                 />
               </>
@@ -204,6 +216,7 @@ export function DayBottomSheet({
                 formatAmount={formatAmount}
                 symbol={symbol}
                 onAddNew={onAddNew}
+                onDuplicate={handleDuplicate}
                 onTransfer={onTransfer}
                 showTip={showTip}
                 accounts={accounts}

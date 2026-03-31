@@ -68,6 +68,7 @@
     "balance": "Balance · {date}",
     "deleteTitle": "Delete \"{name}\"?",
     "editAriaLabel": "Edit transaction",
+    "duplicateAriaLabel": "Duplicate transaction",
     "deleteAriaLabel": "Delete transaction",
     "addToAccount": "Add to account",
     "failedToSave": "Failed to save: {message}"
