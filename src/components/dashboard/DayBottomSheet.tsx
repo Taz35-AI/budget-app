@@ -84,7 +84,7 @@ export function DayBottomSheet({
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     if (dragStartY.current === null) return;
     const delta = e.touches[0].clientY - dragStartY.current;
-    if (delta < 0) return;
+    if (delta > 0) return; // only allow upward drag
     currentDragY.current = delta;
     if (sheetRef.current) {
       sheetRef.current.style.transform = `translateY(${delta}px)`;
@@ -95,7 +95,7 @@ export function DayBottomSheet({
     if (sheetRef.current) {
       sheetRef.current.style.transform = '';
     }
-    if (currentDragY.current > 120) {
+    if (currentDragY.current < -120) {
       onClose();
     }
     dragStartY.current = null;
@@ -117,26 +117,20 @@ export function DayBottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-2xl',
+          'fixed inset-x-0 top-0 z-50 rounded-b-3xl shadow-2xl',
           'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
           'max-h-[92dvh]',
-          isOpen ? 'translate-y-0' : 'translate-y-full',
+          isOpen ? 'translate-y-0' : '-translate-y-full',
         )}
-        style={{ willChange: 'transform' }}
+        style={{ willChange: 'transform', paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
-        {/* Drag handle + close button on same row */}
-        <div
-          className="flex items-center justify-between px-5 pt-3 pb-2 cursor-grab active:cursor-grabbing"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
+        {/* Close button row */}
+        <div className="flex items-center justify-between px-5 pt-3 pb-2">
           <div className="w-8" />
-          <div className="w-10 h-1 rounded-full bg-slate-200 dark:bg-white/20" />
+          <div className="w-8" />
           <button
             onClick={onClose}
-            onTouchStart={(e) => e.stopPropagation()}
             className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/50 active:bg-slate-200 dark:active:bg-white/20 transition-colors"
             aria-label={tc('close')}
           >
@@ -153,7 +147,7 @@ export function DayBottomSheet({
           </div>
         )}
 
-        {/* Body — padding-bottom grows by keyboard height so the browser can scroll any focused input above the keyboard */}
+        {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 overscroll-contain" style={{ paddingBottom: 'calc(2rem + var(--kb, 0px))' }}>
           {date && (
             isShowingForm ? (
@@ -213,6 +207,16 @@ export function DayBottomSheet({
               />
             )
           )}
+        </div>
+
+        {/* Drag handle — swipe up to dismiss */}
+        <div
+          className="flex justify-center pb-3 pt-2 cursor-grab active:cursor-grabbing"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <div className="w-10 h-1 rounded-full bg-slate-200 dark:bg-white/20" />
         </div>
       </div>
     </>

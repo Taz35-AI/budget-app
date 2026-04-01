@@ -108,7 +108,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
 
       {/* Dropdown panel */}
       {open && (
-        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden">
+        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden min-w-[200px]">
           {/* Search input */}
           <div className="px-2.5 py-2 border-b border-brand-primary/[0.06] dark:border-white/[0.04]">
             <div className="relative">
@@ -471,114 +471,123 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
         </button>
       )}
 
-      <div className="flex flex-col gap-1">
-        <Input
-          id="amount"
-          label={t('amount')}
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder={t('amountPlaceholder')}
-          prefix={symbol}
-          error={errors.amount?.message}
-          className={compact ? 'h-7 text-[11px]' : undefined}
-          {...register('amount')}
-        />
-        {overCreditLimit && (
-          <p className={cn('text-amber-600 dark:text-amber-400 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
-            {t('overCreditLimit', { limit: `${symbol}${creditLimit}` })}
-          </p>
-        )}
+      {/* Row: Amount + Description */}
+      <div className="flex gap-2">
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
+          <Input
+            id="amount"
+            label={t('amount')}
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder={t('amountPlaceholder')}
+            prefix={symbol}
+            error={errors.amount?.message}
+            className={compact ? 'h-7 text-[11px]' : undefined}
+            {...register('amount')}
+          />
+          {overCreditLimit && (
+            <p className={cn('text-amber-600 dark:text-amber-400 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
+              {t('overCreditLimit', { limit: `${symbol}${creditLimit}` })}
+            </p>
+          )}
+        </div>
+        <div className="flex-1 min-w-0 relative">
+          <Input
+            id="name"
+            label={t('description')}
+            placeholder={t('descriptionPlaceholder')}
+            error={errors.name?.message}
+            className={compact ? 'h-7 text-[11px]' : undefined}
+            {...register('name')}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            autoComplete="off"
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden">
+              {suggestions.map((t) => (
+                <li key={`${t.id}`}>
+                  <button
+                    type="button"
+                    onMouseDown={() => {
+                      setValue('name', t.name);
+                      setValue('amount', String(t.amount));
+                      setValue('category', t.category as 'income' | 'expense');
+                      if (t.tag) setValue('tag', t.tag);
+                      setShowSuggestions(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10 transition-colors"
+                  >
+                    <span className="flex-1 text-sm text-brand-text dark:text-white/80 truncate">{t.name}</span>
+                    <span className={cn('text-xs font-semibold flex-shrink-0', t.category === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400')}>
+                      {t.category === 'income' ? '+' : '−'}{t.amount}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
-      <div className="relative">
-        <Input
-          id="name"
-          label={t('description')}
-          placeholder={t('descriptionPlaceholder')}
-          error={errors.name?.message}
-          className={compact ? 'h-7 text-[11px]' : undefined}
-          {...register('name')}
-          onFocus={() => setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-          autoComplete="off"
-        />
-        {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden">
-            {suggestions.map((t) => (
-              <li key={`${t.id}`}>
-                <button
-                  type="button"
-                  onMouseDown={() => {
-                    setValue('name', t.name);
-                    setValue('amount', String(t.amount));
-                    setValue('category', t.category as 'income' | 'expense');
-                    if (t.tag) setValue('tag', t.tag);
-                    setShowSuggestions(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10 transition-colors"
-                >
-                  <span className="flex-1 text-sm text-brand-text dark:text-white/80 truncate">{t.name}</span>
-                  <span className={cn('text-xs font-semibold flex-shrink-0', t.category === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400')}>
-                    {t.category === 'income' ? '+' : '−'}{t.amount}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+      {/* Row: Category + Date (one-off) or Frequency (recurring) */}
+      <div className="flex gap-2">
+        <div className="flex-1 min-w-0">
+          <TagDropdown
+            allTags={allTags}
+            category={category}
+            selected={tag ?? ''}
+            onSelect={(key) => setValue('tag', key)}
+            error={errors.tag?.message}
+            compact={compact}
+          />
+        </div>
+        {type === 'one_off' && (
+          <div className="flex-1 min-w-0">
+            <Input
+              id="date"
+              label={t('date')}
+              type="date"
+              error={errors.date?.message}
+              className={compact ? 'h-7 text-[11px]' : undefined}
+              {...register('date')}
+            />
+          </div>
+        )}
+        {type === 'recurring' && (
+          <div className="flex-1 min-w-0">
+            <input type="hidden" {...register('start_date')} />
+            <Select
+              id="frequency"
+              label={t('frequency')}
+              error={errors.frequency?.message}
+              options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
+              {...register('frequency')}
+            />
+          </div>
         )}
       </div>
-
-      {/* Tag picker — scrollable dropdown */}
-      <TagDropdown
-        allTags={allTags}
-        category={category}
-        selected={tag ?? ''}
-        onSelect={(key) => setValue('tag', key)}
-        error={errors.tag?.message}
-        compact={compact}
-      />
-
-      {type === 'one_off' && (
-        <Input
-          id="date"
-          label={t('date')}
-          type="date"
-          error={errors.date?.message}
-          className={compact ? 'h-7 text-[11px]' : undefined}
-          {...register('date')}
-        />
-      )}
 
       {type === 'recurring' && (
-        <>
-          <input type="hidden" {...register('start_date')} />
-          <Select
-            id="frequency"
-            label={t('frequency')}
-            error={errors.frequency?.message}
-            options={Object.entries(FREQUENCIES).map(([value, label]) => ({ value, label }))}
-            {...register('frequency')}
+        <div className="flex flex-col gap-1">
+          <Input
+            id="recurrences"
+            label={t('occurrences')}
+            type="number"
+            min="1"
+            step="1"
+            placeholder={t('occurrencesPlaceholder')}
+            error={errors.recurrences?.message}
+            className={compact ? 'h-7 text-[11px]' : undefined}
+            {...register('recurrences')}
           />
-          <div className="flex flex-col gap-1">
-            <Input
-              id="recurrences"
-              label={t('occurrences')}
-              type="number"
-              min="1"
-              step="1"
-              placeholder={t('occurrencesPlaceholder')}
-              error={errors.recurrences?.message}
-              className={compact ? 'h-7 text-[11px]' : undefined}
-              {...register('recurrences')}
-            />
-            {computedEndDate && (
-              <p className={cn('text-brand-text/40 dark:text-white/35 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
-                {t('lastOccurrence', { date: format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy') })}
-              </p>
-            )}
-          </div>
-        </>
+          {computedEndDate && (
+            <p className={cn('text-brand-text/40 dark:text-white/35 pl-1', compact ? 'text-[10px]' : 'text-xs')}>
+              {t('lastOccurrence', { date: format(new Date(computedEndDate + 'T12:00:00'), 'd MMM yyyy') })}
+            </p>
+          )}
+        </div>
       )}
 
       <div className={cn('flex gap-2', compact ? 'pt-1' : 'pt-2')}>
