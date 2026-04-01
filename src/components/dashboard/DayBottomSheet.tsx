@@ -77,25 +77,9 @@ export function DayBottomSheet({
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // Keyboard avoidance — direct DOM so it's instant (no React re-render lag)
-  useEffect(() => {
-    const el = sheetRef.current;
-    const vv = window.visualViewport;
-    if (!el || !vv) return;
-    const update = () => {
-      // iOS: window.innerHeight stays fixed, vv.height shrinks → keyboardH > 0 → move sheet up
-      // Android: both shrink equally → keyboardH ≈ 0 → no shift needed; but cap height to vv.height
-      const keyboardH = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      el.style.bottom = keyboardH > 80 ? `${keyboardH}px` : '';
-      el.style.maxHeight = `${vv.height * 0.96}px`;
-    };
-    const reset = () => { el.style.bottom = ''; el.style.maxHeight = ''; };
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    return () => { vv.removeEventListener('resize', update); vv.removeEventListener('scroll', update); reset(); };
-  }, []);
-
-  // Scroll focused input into view inside the sheet body (for both iOS + Android)
+  // Scroll focused input into view inside the sheet body.
+  // Keyboard resizing is handled natively: adjustResize on Android (AndroidManifest) +
+  // @capacitor/keyboard resize:body on iOS (capacitor.config.ts)
   useEffect(() => {
     const body = bodyRef.current;
     if (!body) return;

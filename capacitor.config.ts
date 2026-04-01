@@ -14,6 +14,12 @@ const config: CapacitorConfig = {
   android: {
     backgroundColor: '#0C0C1A',
   },
+  plugins: {
+    Keyboard: {
+      resize: 'body',
+      resizeOnFullScreen: true,
+    },
+  },
 };
 
 export default config;
