@@ -36,12 +36,9 @@ type ActiveAction =
 export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, onDuplicate, onTransfer, showTip, accounts }: Props) {
   const t = useTranslations('transactions');
   const tc = useTranslations('common');
-  const td = useTranslations('dashboard');
   const tTags = useTranslations('tags');
   const [active, setActive] = useState<ActiveAction>(null);
   const [editAccountId, setEditAccountId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [filterCat, setFilterCat] = useState<'all' | 'income' | 'expense'>('all');
   const update = useUpdateTransaction();
   const del = useDeleteTransaction();
   const { allTags } = useSettings();
@@ -55,12 +52,6 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
   };
   const showAccountBadge = (accounts?.length ?? 0) >= 2;
   const accountMap = new Map((accounts ?? []).map((a) => [a.id, a.name]));
-
-  const filtered = transactions.filter((tx) => {
-    if (filterCat !== 'all' && tx.category !== filterCat) return false;
-    if (search && !tx.name.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
 
   return (
     <div className="flex flex-col h-full">
@@ -92,50 +83,6 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
         </div>
       </div>
 
-      {/* Search + filter — hidden while editing or deleting */}
-      {transactions.length > 0 && !active && (
-        <div className="flex flex-col gap-2 mb-3">
-          <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={td('searchPlaceholder')}
-              className="w-full h-8 pl-8 pr-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 outline-none focus:border-slate-400 dark:focus:border-white/30 transition-colors"
-            />
-            {search && (
-              <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
-            {(['all', 'income', 'expense'] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilterCat(cat)}
-                className={cn(
-                  'flex-1 h-7 text-xs font-medium transition-all',
-                  filterCat === cat
-                    ? cat === 'income'
-                      ? 'bg-emerald-500 text-white'
-                      : cat === 'expense'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-slate-900 text-white'
-                    : 'bg-white dark:bg-transparent text-slate-500 dark:text-white/40 hover:bg-slate-50 dark:hover:bg-white/5',
-                )}
-              >
-                {cat === 'all' ? tc('all') : cat === 'income' ? t('filterIncome') : t('filterExpense')}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Transaction list */}
       <div className="flex-1 overflow-y-auto">
@@ -149,13 +96,13 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
             <p className="text-sm font-medium text-slate-400 dark:text-white/25">{t('noTransactions')}</p>
             <p className="text-xs text-slate-300 dark:text-white/15 mt-0.5">{t('tapToAdd')}</p>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <p className="text-sm text-slate-400 dark:text-white/30">{t('noMatching')}</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2">
-            {filtered.filter((tx) => active === null || tx.transaction_id === active.txId).map((tx) => {
+            {transactions.filter((tx) => active === null || tx.transaction_id === active.txId).map((tx) => {
               const isEditing = active?.type === 'edit' && active.txId === tx.transaction_id;
               const isDeleting = active?.type === 'delete' && active.txId === tx.transaction_id;
 
