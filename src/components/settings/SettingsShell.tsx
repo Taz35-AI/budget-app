@@ -15,6 +15,9 @@ import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } fro
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
+import { LogoutButton } from '@/components/dashboard/LogoutButton';
+import { ResetAllButton } from '@/components/dashboard/ResetAllButton';
+import { UserBadge } from '@/components/layout/UserBadge';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import type { Frequency, CustomTag, RecurringTemplate, TagCategory, AccountType } from '@/types';
@@ -1393,7 +1396,7 @@ function NotificationsSection() {
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
-type SettingsTab = 'general' | 'accounts' | 'tags' | 'notifications' | 'data';
+type SettingsTab = 'general' | 'accounts' | 'tags' | 'notifications' | 'data' | 'profile';
 
 export function SettingsShell() {
   const t = useTranslations('settings');
@@ -1406,6 +1409,7 @@ export function SettingsShell() {
     { id: 'tags',          label: t('tabTags') },
     { id: 'notifications', label: t('tabNotifications') },
     { id: 'data',          label: t('tabData') },
+    { id: 'profile',       label: t('tabProfile') },
   ];
 
   return (
@@ -1509,6 +1513,38 @@ export function SettingsShell() {
             <TemplatesSection />
             <BackupSection />
           </>
+        )}
+
+        {activeTab === 'profile' && (
+          <div className="lg:col-span-2 space-y-5">
+            {/* Account info */}
+            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+              <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
+              <div className="px-6 pt-5 pb-3">
+                <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabProfile')}</h2>
+              </div>
+              <div className="px-6 pb-6">
+                <UserBadge />
+              </div>
+            </div>
+
+            {/* Danger zone */}
+            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-red-200 dark:border-red-900/40 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+              <div className="h-[3px] w-full bg-gradient-to-r from-red-500 to-rose-400" />
+              <div className="px-6 pt-5 pb-3">
+                <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('dangerZone')}</h2>
+                <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('dangerZoneDescription')}</p>
+              </div>
+              <div className="px-6 pb-6 flex flex-col gap-3">
+                <div className="[&>div]:w-full [&>button]:w-full">
+                  <ResetAllButton />
+                </div>
+                <div className="[&>button]:w-full">
+                  <LogoutButton />
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
       </div>

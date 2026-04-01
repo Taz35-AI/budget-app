@@ -9,8 +9,6 @@ import { cn } from '@/lib/utils';
 import { useNavStore } from '@/store/navStore';
 import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
 import { ExportButton } from '@/components/dashboard/ExportButton';
-import { ResetAllButton } from '@/components/dashboard/ResetAllButton';
-import { LogoutButton } from '@/components/dashboard/LogoutButton';
 import { UserBadge } from '@/components/layout/UserBadge';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
@@ -93,7 +91,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Menu section label */}
       <div className="px-3 pt-2 pb-1">
-        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-400 dark:text-teal-400/70 px-2 mb-1">{t('menu')}</p>
+        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-700 dark:text-teal-400/70 px-2 mb-1">{t('menu')}</p>
       </div>
 
       {/* Nav links */}
@@ -109,14 +107,14 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
                 'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 overflow-hidden',
                 isActive
                   ? 'bg-white dark:bg-teal-700 text-teal-900 dark:text-white font-semibold shadow-sm'
-                  : 'text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-700/30 hover:text-teal-700 dark:hover:text-teal-200',
+                  : 'text-teal-900 dark:text-teal-400 font-medium hover:bg-white/70 dark:hover:bg-teal-700/30 hover:text-teal-900 dark:hover:text-teal-200',
               )}
             >
               {/* 3px active indicator bar — per spec */}
               {isActive && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-teal-700 dark:bg-teal-400 rounded-r-[3px]" />
               )}
-              <span className="flex-shrink-0 opacity-90">{icon}</span>
+              <span className="flex-shrink-0">{icon}</span>
               {label}
             </Link>
           );
@@ -124,12 +122,12 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       </nav>
 
       {/* Divider */}
-      <div className="mx-3 my-2 h-px bg-teal-200 dark:bg-teal-700/50" />
+      <div className="mx-3 my-2 h-px bg-teal-300/60 dark:bg-teal-700/50" />
 
       {/* Utility section */}
       <div className="flex-shrink-0 px-2 pb-4 pt-1 space-y-1">
         {/* Options label */}
-        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-400 dark:text-teal-400/70 px-3 mb-2">{t('options')}</p>
+        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-700 dark:text-teal-400/70 px-3 mb-2">{t('options')}</p>
 
         {/* Logged-in user */}
         <div className="px-1 mb-2">
@@ -139,28 +137,18 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
         {/* Theme toggle */}
         <div className="flex items-center gap-2 px-1">
           <ThemeToggle />
-          <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">{t('toggleTheme')}</span>
+          <span className="text-xs text-teal-900 dark:text-teal-400 font-medium">{t('toggleTheme')}</span>
         </div>
 
         {/* Export */}
         <div className="px-1 [&>button]:w-full [&>button]:justify-start">
           <ExportButton />
         </div>
-
-        {/* Reset */}
-        <div className="px-1 [&>button]:w-full [&>button]:justify-start [&>div]:w-full">
-          <ResetAllButton />
-        </div>
-
-        {/* Logout */}
-        <div className="px-1 [&>button]:w-full [&>button]:justify-start">
-          <LogoutButton />
-        </div>
       </div>
 
       {/* Version */}
-      <div className="px-5 pb-4 border-t border-teal-200 dark:border-teal-700/50 pt-3">
-        <p className="text-[10px] font-medium text-teal-400 dark:text-teal-400/50">Spentum v1.0</p>
+      <div className="px-5 pb-4 border-t border-teal-300/60 dark:border-teal-700/50 pt-3">
+        <p className="text-[10px] font-medium text-teal-700 dark:text-teal-400/50">Spentum v1.0</p>
       </div>
     </div>
   );
