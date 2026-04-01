@@ -58,6 +58,23 @@ function useMonthStats(
 }
 
 
+// ─── Mini sparkline ───────────────────────────────────────────────────────────
+
+function MiniSparkline({ data }: { data: number[] }) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const W = 40, H = 18;
+  const pts = data.map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / range) * H}`).join(' ');
+  const isPositive = data[data.length - 1] >= data[0];
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none" className="flex-shrink-0">
+      <polyline points={pts} stroke={isPositive ? '#16A34A' : '#DC2626'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function DashboardShell() {
@@ -146,11 +163,11 @@ export function DashboardShell() {
     return result;
   }, [dayTransactions, searchText, searchAmountMin, searchAmountMax, allTags, tTags]);
 
-  // On mobile, FullCalendar uses height="100%" so it fills the flex-1 container.
+  // On mobile, FullCalendar uses a fixed pixel height so the calendar doesn't fill the viewport.
   // On desktop it uses "auto" (content-sized). Switch on resize.
-  const [calendarHeight, setCalendarHeight] = useState<'auto' | '100%'>('auto');
+  const [calendarHeight, setCalendarHeight] = useState<string | number>('auto');
   useEffect(() => {
-    const update = () => setCalendarHeight(window.innerWidth < 640 ? '100%' : 'auto');
+    const update = () => setCalendarHeight(window.innerWidth < 640 ? 240 : 'auto');
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
@@ -247,6 +264,18 @@ export function DashboardShell() {
   const selectedBalance = selectedDate ? (balances.get(selectedDate) ?? 0) : 0;
   const selectedTransactions: DayTransaction[] = selectedDate ? (dayTransactions.get(selectedDate) ?? []) : [];
 
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const todayTransactions: DayTransaction[] = dayTransactions.get(today) ?? [];
+
+  const sparklineData = useMemo(() => {
+    const result: number[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = format(addDays(new Date(), -i), 'yyyy-MM-dd');
+      result.push(balances.get(d) ?? 0);
+    }
+    return result;
+  }, [balances]);
+
   return (
     <AppLayout>
     <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
@@ -264,7 +293,7 @@ export function DashboardShell() {
         {/* Accent line */}
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#0D9488]/40 to-transparent" />
 
-        <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
+        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
 
           {/* Hamburger — mobile only */}
           <NavMenuButton />
@@ -303,7 +332,7 @@ export function DashboardShell() {
       {/* ── Two-column layout ────────────────────────────────────────── */}
       {/* Mobile: fixed full-height between header (3rem) and bottom nav (4rem), equal top/bottom padding */}
       <div className="flex gap-4 px-3 sm:px-5 py-3 sm:py-4 items-stretch sm:items-start
-        h-[calc(100dvh-4rem-4rem)] sm:h-auto">
+        h-[calc(100dvh-3rem-54px)] sm:h-auto">
 
         {/* Left: stats + calendar */}
         <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-3">
@@ -450,7 +479,7 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
-              <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
+              <div className="px-3 pt-2 pb-1.5 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (mobile) ── */
@@ -544,12 +573,15 @@ export function DashboardShell() {
                     />
                   </div>
                 )}
-                <span className={cn(
-                  'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
-                  todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
-                )}>
-                  {formatAmount(todayBalance)}
-                </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className={cn(
+                    'text-[1.2rem] font-black tabular-nums leading-none tracking-tight',
+                    todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                  )}>
+                    {formatAmount(todayBalance)}
+                  </span>
+                  <MiniSparkline data={sparklineData} />
+                </div>
                 {searchOpen && matchingDates && (
                   <p className="text-[9px] text-amber-500 font-semibold mt-0.5 leading-none">
                     {t('daysMatched', { count: matchingDates.size })}
@@ -621,7 +653,7 @@ export function DashboardShell() {
 
           {/* Calendar — hidden on mobile when stats panel is active */}
           {/* flex-1 min-h-0 lets it fill remaining height on mobile; sm:flex-initial resets on desktop */}
-          <div className={cn('flex-1 min-h-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
+          <div className={cn('flex-shrink-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
           {isLoading && balances.size === 0 ? (
             <div className="animate-pulse rounded-3xl bg-white dark:bg-[#042F2E] p-5 space-y-3 border border-[#D9DDF0]/60 dark:border-[#042F2E]/30">
               <div className="h-5 bg-[#D9DDF0]/60 dark:bg-[#042F2E]/30 rounded-lg w-36" />
@@ -664,6 +696,49 @@ export function DashboardShell() {
             </div>
           )}
           </div>{/* end calendar hide wrapper */}
+
+          {/* Today's transactions — mobile only, below calendar */}
+          {!showMobileStats && (
+            <div className="sm:hidden flex-1 min-h-0 overflow-hidden rounded-2xl
+              bg-white dark:bg-[#042F2E]
+              border border-[#D9DDF0]/60 dark:border-[#0D9488]/[0.08]
+              shadow-[0_2px_12px_rgba(25,27,47,0.06)] dark:shadow-none">
+              <div className="flex items-center justify-between px-3 py-1.5 border-b border-brand-primary/[0.07] dark:border-brand-primary/[0.06] flex-shrink-0">
+                <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20">
+                  {tc('today')} · {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                </span>
+                <button
+                  onClick={() => handleDateClick(today)}
+                  className="text-[10px] font-bold text-brand-primary active:opacity-60 transition-opacity"
+                >
+                  + {tt('addTransaction')}
+                </button>
+              </div>
+              <div className="overflow-y-auto h-[calc(100%-30px)]">
+                {todayTransactions.length === 0 ? (
+                  <div className="px-3 py-3 text-center">
+                    <p className="text-[11px] text-brand-text/30 dark:text-white/20">{tt('noTransactions')}</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-brand-primary/[0.05] dark:divide-brand-primary/[0.06]">
+                    {todayTransactions.map((tx) => (
+                      <div key={tx.id} className="flex items-center gap-2 px-3 py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-semibold text-brand-text dark:text-white truncate leading-tight">{tx.name}</p>
+                        </div>
+                        <span className={cn(
+                          'text-[12px] font-black tabular-nums flex-shrink-0',
+                          tx.category === 'income' ? 'text-brand-positive' : 'text-brand-danger',
+                        )}>
+                          {tx.category === 'income' ? '+' : '−'}{formatAmount(tx.amount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Month summary — desktop right panel only */}
         </div>

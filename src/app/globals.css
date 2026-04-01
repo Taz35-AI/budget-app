@@ -273,21 +273,21 @@
   }
 
   .fc .fc-daygrid-day-frame {
-    height: 56px !important;
-    max-height: 56px !important;
+    height: 42px !important;
+    max-height: 42px !important;
     min-height: 0 !important;
     border-radius: 0.625rem;
     overflow: hidden !important;
   }
 
   .fc .fc-daygrid-day {
-    height: 56px !important;
-    max-height: 56px !important;
+    height: 42px !important;
+    max-height: 42px !important;
   }
 
   .fc .fc-daygrid-body table tbody tr {
-    height: 56px !important;
-    max-height: 56px !important;
+    height: 42px !important;
+    max-height: 42px !important;
   }
 
   .fc .fc-toolbar-title {
