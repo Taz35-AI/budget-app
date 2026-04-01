@@ -5,6 +5,7 @@ import { useState, createContext, useContext, useEffect } from 'react';
 import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
+import { CapacitorAuthHandler } from '@/components/CapacitorAuthHandler';
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <I18nProvider>
           <RealtimeSyncProvider>
-            <SettingsSyncProvider>{children}</SettingsSyncProvider>
+            <SettingsSyncProvider>
+              <CapacitorAuthHandler />
+              {children}
+            </SettingsSyncProvider>
           </RealtimeSyncProvider>
         </I18nProvider>
       </ThemeProvider>

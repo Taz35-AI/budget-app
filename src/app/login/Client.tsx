@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 type Mode = 'login' | 'forgot' | 'forgot-sent';
 
@@ -34,19 +36,31 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     setError('');
     setLoading(true);
-    // In Capacitor the WebView runs on localhost — always redirect to the live URL
-    const redirectTo = window.location.hostname === 'localhost'
-      ? 'https://spentum.com/auth/callback'
-      : `${window.location.origin}/auth/callback`;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo, queryParams: { prompt: 'select_account' } },
-    });
-    if (error) {
-      setError(error.message);
+
+    if (Capacitor.isNativePlatform()) {
+      // Native: open OAuth in an in-app browser overlay, redirect back via custom scheme
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'com.spentum.app://auth/callback',
+          skipBrowserRedirect: true,
+          queryParams: { prompt: 'select_account' },
+        },
+      });
+      if (error) { setError(error.message); setLoading(false); return; }
+      if (data.url) await Browser.open({ url: data.url });
       setLoading(false);
+    } else {
+      // Web: normal OAuth redirect
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: { prompt: 'select_account' },
+        },
+      });
+      if (error) { setError(error.message); setLoading(false); }
     }
-    // on success the browser navigates away — no need to setLoading(false)
   };
 
   const handleForgot = async (e: React.FormEvent) => {
