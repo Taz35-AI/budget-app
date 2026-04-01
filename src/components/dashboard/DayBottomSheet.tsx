@@ -137,10 +137,13 @@ export function DayBottomSheet({
           'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-2xl',
           'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
-          'max-h-[92dvh]',
           isOpen ? 'translate-y-0' : 'translate-y-full',
         )}
-        style={{ willChange: 'transform' }}
+        style={{
+          willChange: 'transform',
+          bottom: 'var(--kb, 0px)',
+          maxHeight: 'calc(92dvh - var(--kb, 0px))',
+        }}
       >
         {/* Drag handle + close button on same row */}
         <div

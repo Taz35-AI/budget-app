@@ -6,6 +6,8 @@ import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
 import { CapacitorAuthHandler } from '@/components/CapacitorAuthHandler';
+import { Capacitor } from '@capacitor/core';
+import { Keyboard } from '@capacitor/keyboard';
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
 
@@ -46,6 +48,27 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ── Keyboard height CSS variable ───────────────────────────────────────────────
+// Sets --kb on :root so any component can use it for keyboard-aware positioning.
+// Only runs on native (Android/iOS) — no-op on web.
+
+function KeyboardProvider() {
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const show = Keyboard.addListener('keyboardWillShow', (info) => {
+      document.documentElement.style.setProperty('--kb', `${info.keyboardHeight}px`);
+    });
+    const hide = Keyboard.addListener('keyboardWillHide', () => {
+      document.documentElement.style.setProperty('--kb', '0px');
+    });
+    return () => {
+      show.then((h) => h.remove());
+      hide.then((h) => h.remove());
+    };
+  }, []);
+  return null;
+}
+
 // ── App Providers ──────────────────────────────────────────────────────────────
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -67,6 +90,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <I18nProvider>
           <RealtimeSyncProvider>
             <SettingsSyncProvider>
+              <KeyboardProvider />
               <CapacitorAuthHandler />
               {children}
             </SettingsSyncProvider>
