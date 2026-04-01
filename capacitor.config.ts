@@ -5,17 +5,16 @@ const config: CapacitorConfig = {
   appName: 'Spentum',
   webDir: 'out',
   server: {
-    // Points the native shell to the live production site.
-    // Remove this block (and run `npx next build && npx next export`)
-    // only if you later convert the app to a fully static export.
-    url: 'https://spentum.com',
+    url: 'https://www.spentum.com',
     cleartext: false,
+    androidScheme: 'https',
   },
   ios: {
     contentInset: 'automatic',
   },
   android: {
-    backgroundColor: '#0C1F1E',
+    backgroundColor: '#0C0C1A',
+    allowMixedContent: false,
   },
 };
 
