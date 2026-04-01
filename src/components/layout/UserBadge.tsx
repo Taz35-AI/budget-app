@@ -30,21 +30,21 @@ export function UserBadge() {
     .toUpperCase() || '?';
 
   return (
-    <Link href="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.06] hover:bg-white/[0.09] transition-colors">
+    <Link href="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-teal-200/50 dark:bg-white/[0.05] border border-teal-300/70 dark:border-white/[0.06] hover:bg-teal-200 dark:hover:bg-white/[0.09] transition-colors">
       {/* Avatar */}
-      <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/40 flex items-center justify-center">
+      <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-teal-600/20 dark:bg-brand-primary/40 flex items-center justify-center">
         {avatarUrl ? (
           <Image src={avatarUrl} alt={displayName} width={28} height={28} className="w-full h-full object-cover" unoptimized />
         ) : (
-          <span className="text-[10px] font-bold text-white/80">{initials}</span>
+          <span className="text-[10px] font-bold text-teal-800 dark:text-white/80">{initials}</span>
         )}
       </div>
 
       {/* Name + email */}
       <div className="flex flex-col min-w-0">
-        <span className="text-xs font-semibold text-white/75 truncate leading-tight">{displayName}</span>
+        <span className="text-xs font-semibold text-teal-900 dark:text-teal-100 truncate leading-tight">{displayName}</span>
         {fullName && (
-          <span className="text-[10px] text-white/30 truncate leading-tight">{email}</span>
+          <span className="text-[10px] text-teal-700/70 dark:text-white/40 truncate leading-tight">{email}</span>
         )}
       </div>
     </Link>

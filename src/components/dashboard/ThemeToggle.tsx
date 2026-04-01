@@ -12,11 +12,8 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       className={cn(
         'flex items-center justify-center w-9 h-9 rounded-xl transition-all border',
-        'bg-white/5 dark:bg-white/5 border-white/10 dark:border-white/10',
-        'hover:bg-white/10 dark:hover:bg-white/10',
-        // Light mode overrides
-        'bg-slate-100 border-slate-200 text-slate-600',
-        'hover:bg-slate-200',
+        'bg-teal-200 border-teal-300 text-teal-700',
+        'hover:bg-teal-300 hover:text-teal-900',
         'dark:bg-white/5 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white',
       )}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
