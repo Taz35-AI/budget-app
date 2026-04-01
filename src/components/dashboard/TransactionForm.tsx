@@ -328,7 +328,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
         }
         onSubmit({ ...rest, end_date } as TransactionFormValues);
       })}
-      className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-4')}
+      className={cn('flex flex-col', compact ? 'gap-1.5' : 'gap-3')}
     >
       {/* Context banner — shown when editing or duplicating */}
       {initialValues?.name && (
@@ -390,78 +390,85 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
         </div>
       )}
 
-      {/* Category toggle — credit accounts only show expense */}
-      {isCreditAccount ? (
-        <div className="flex flex-col gap-2">
+      {/* Category + type toggles — one compact row */}
+      <div className={cn('flex gap-2', compact ? 'gap-1' : 'gap-2')}>
+        {/* Income / Expense toggle */}
+        {isCreditAccount ? (
           <div className={cn(
-            'flex items-center justify-center rounded-xl font-semibold',
-            compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-            'bg-brand-danger text-white',
+            'flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20',
           )}>
-            <input type="hidden" {...register('category')} value="expense" />
-            {t('expense')}
+            <div className={cn(
+              'flex-1 flex items-center justify-center rounded-xl font-semibold',
+              compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
+              'bg-brand-danger text-white',
+            )}>
+              <input type="hidden" {...register('category')} value="expense" />
+              {t('expense')}
+            </div>
           </div>
-          {onTransfer && (
-            <button
-              type="button"
-              onClick={onTransfer}
-              className={cn(
-                'flex items-center justify-center gap-2 rounded-xl font-semibold border transition-all',
-                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-                'border-brand-primary/30 dark:border-brand-primary/40 text-brand-primary dark:text-brand-positive',
-                'hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15',
-              )}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
-              </svg>
-              {t('payViaTransfer')}
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
-          {(['income', 'expense'] as const).map((cat) => (
-            <label
-              key={cat}
-              className={cn(
-                'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
-                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-                category === cat
-                  ? cat === 'income'
-                    ? 'bg-brand-positive text-white shadow-inner'
-                    : 'bg-brand-danger text-white shadow-inner'
-                  : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
-              )}
-            >
-              <input type="radio" value={cat} {...register('category')} className="sr-only" />
-              {cat === 'income' ? t('income') : t('expense')}
-            </label>
-          ))}
-        </div>
-      )}
+        ) : (
+          <div className="flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
+            {(['income', 'expense'] as const).map((cat) => (
+              <label
+                key={cat}
+                className={cn(
+                  'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                  compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
+                  category === cat
+                    ? cat === 'income'
+                      ? 'bg-brand-positive text-white shadow-inner'
+                      : 'bg-brand-danger text-white shadow-inner'
+                    : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                )}
+              >
+                <input type="radio" value={cat} {...register('category')} className="sr-only" />
+                {cat === 'income' ? t('income') : t('expense')}
+              </label>
+            ))}
+          </div>
+        )}
 
-      {/* Type toggle — hidden when editing (type cannot change after creation) */}
-      {lockType ? (
-        <input type="hidden" {...register('type')} />
-      ) : (
-        <div className="flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
-          {(['one_off', 'recurring'] as const).map((txType) => (
-            <label
-              key={txType}
-              className={cn(
-                'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
-                compact ? 'h-6 text-[10px]' : 'h-10 text-sm',
-                type === txType
-                  ? 'bg-brand-primary text-white shadow-inner'
-                  : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
-              )}
-            >
-              <input type="radio" value={txType} {...register('type')} className="sr-only" />
-              {txType === 'one_off' ? t('oneOff') : t('recurring')}
-            </label>
-          ))}
-        </div>
+        {/* One-off / Recurring toggle */}
+        {lockType ? (
+          <input type="hidden" {...register('type')} />
+        ) : (
+          <div className="flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
+            {(['one_off', 'recurring'] as const).map((txType) => (
+              <label
+                key={txType}
+                className={cn(
+                  'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                  compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
+                  type === txType
+                    ? 'bg-brand-primary text-white shadow-inner'
+                    : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                )}
+              >
+                <input type="radio" value={txType} {...register('type')} className="sr-only" />
+                {txType === 'one_off' ? t('oneOff') : t('recurring')}
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Transfer button for credit accounts — below the toggles */}
+      {isCreditAccount && onTransfer && (
+        <button
+          type="button"
+          onClick={onTransfer}
+          className={cn(
+            'flex items-center justify-center gap-2 rounded-xl font-semibold border transition-all',
+            compact ? 'h-7 text-[10px]' : 'h-9 text-xs',
+            'border-brand-primary/30 dark:border-brand-primary/40 text-brand-primary dark:text-brand-positive',
+            'hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15',
+          )}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+          </svg>
+          {t('payViaTransfer')}
+        </button>
       )}
 
       <div className="flex flex-col gap-1">

@@ -77,17 +77,19 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
           isNegative && 'bg-gradient-to-r from-red-400 to-rose-400',
           !isPositive && !isNegative && 'bg-gradient-to-r from-slate-300 to-slate-200 dark:from-white/10 dark:to-white/5',
         )} />
-        <p className="text-[9px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest mb-1 mt-0.5">
-          {t('balance', { date: format(new Date(date + 'T12:00:00'), 'd MMM yyyy') })}
-        </p>
-        <p className={cn(
-          'text-xl font-extrabold tracking-tight tabular-nums',
-          isPositive && 'text-emerald-600 dark:text-emerald-400',
-          isNegative && 'text-red-600 dark:text-red-400',
-          !isPositive && !isNegative && 'text-slate-600 dark:text-slate-400',
-        )}>
-          {formatAmount(balance)}
-        </p>
+        <div className="flex items-center justify-between gap-2 mt-0.5">
+          <p className="text-[9px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest">
+            {t('balance', { date: format(new Date(date + 'T12:00:00'), 'd MMM yyyy') })}
+          </p>
+          <p className={cn(
+            'text-lg font-extrabold tracking-tight tabular-nums flex-shrink-0',
+            isPositive && 'text-emerald-600 dark:text-emerald-400',
+            isNegative && 'text-red-600 dark:text-red-400',
+            !isPositive && !isNegative && 'text-slate-600 dark:text-slate-400',
+          )}>
+            {formatAmount(balance)}
+          </p>
+        </div>
       </div>
 
       {/* Search + filter — hidden while editing or deleting */}

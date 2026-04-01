@@ -42,6 +42,7 @@ export function DayBottomSheet({
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentDragY = useRef<number>(0);
+  const [keyboardInset, setKeyboardInset] = useState(0);
 
   // Which account new transactions go to — defaults to the active tab's account,
   // or the first account if on the Combined tab.
@@ -75,6 +76,22 @@ export function DayBottomSheet({
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  // Shrink sheet when software keyboard opens so they don't overlap
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const inset = Math.max(0, window.innerHeight - (vv.offsetTop + vv.height));
+      setKeyboardInset(inset);
+    };
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+    };
+  }, []);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     dragStartY.current = e.touches[0].clientY;
@@ -123,7 +140,13 @@ export function DayBottomSheet({
           'max-h-[92dvh]',
           isOpen ? 'translate-y-0' : 'translate-y-full',
         )}
-        style={{ willChange: 'transform' }}
+        style={{
+          willChange: 'transform',
+          ...(keyboardInset > 0 && {
+            bottom: keyboardInset,
+            maxHeight: `calc(100dvh - ${keyboardInset}px - 16px)`,
+          }),
+        }}
       >
         {/* Drag handle */}
         <div
