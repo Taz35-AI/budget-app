@@ -38,7 +38,7 @@ function SettingsCard({ title, subtitle, accent, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#15152E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+    <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
       <div className={cn('h-[3px] w-full', accent)} />
       <div className="px-6 pt-5 pb-3">
         <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{title}</h2>
@@ -1410,12 +1410,12 @@ export function SettingsShell() {
 
   return (
     <AppLayout>
-    <div className="min-h-screen bg-[#F7F8FC] dark:bg-[#0C0C1A]">
+    <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
       {/* Ambient glow */}
       <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-brand-primary/[0.06] via-brand-primary/[0.02] to-transparent dark:from-brand-primary/[0.08] dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C0C1A]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
+      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#011817]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/40 dark:via-brand-primary/30 to-transparent" />
 
         {/* Title row */}
@@ -1463,7 +1463,7 @@ export function SettingsShell() {
           <>
             <PreferencesSection />
             {/* Language */}
-            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#15152E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('language')}</h2>

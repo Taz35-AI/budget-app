@@ -92,26 +92,26 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
 
       {/* Panel */}
       <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl
-        bg-white dark:bg-[#15152E]
-        border border-[#D9DDF0]/60 dark:border-[#312E81]/20">
+        bg-white dark:bg-[#042F2E]
+        border border-[#D9DDF0]/60 dark:border-[#0D9488]/20">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4
           border-b border-[#D9DDF0]/40 dark:border-white/[0.07]
-          bg-gradient-to-r from-white to-[#D9DDF0]/10 dark:from-[#15152E] dark:to-[#15152E]">
+          bg-gradient-to-r from-white to-[#D9DDF0]/10 dark:from-[#042F2E] dark:to-[#042F2E]">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-xl bg-brand-primary/10 dark:bg-brand-primary/15 flex items-center justify-center">
               <svg className="w-3.5 h-3.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
               </svg>
             </div>
-            <h2 className="text-sm font-bold text-[#191B2F] dark:text-white tracking-tight">
+            <h2 className="text-sm font-bold text-[#042F2E] dark:text-white tracking-tight">
               {t('title')}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-[#D9DDF0]/30 dark:hover:bg-white/[0.08] text-[#191B2F]/40 dark:text-white/30 hover:text-[#191B2F] dark:hover:text-white transition-all"
+            className="p-1.5 rounded-xl hover:bg-[#D9DDF0]/30 dark:hover:bg-white/[0.08] text-[#042F2E]/40 dark:text-white/30 hover:text-[#042F2E] dark:hover:text-white transition-all"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -130,13 +130,13 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           <div className="flex items-center gap-2">
             {/* From */}
             <div className="flex-1 flex flex-col gap-1.5">
-              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#191B2F]/40 dark:text-white/30">
+              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
                 {t('from')}
               </label>
               <select
                 value={fromId}
                 onChange={(e) => setFromId(e.target.value)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#191B2F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
@@ -160,13 +160,13 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
 
             {/* To */}
             <div className="flex-1 flex flex-col gap-1.5">
-              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#191B2F]/40 dark:text-white/30">
+              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
                 {t('to')}
               </label>
               <select
                 value={toId}
                 onChange={(e) => setToId(e.target.value)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#191B2F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
@@ -190,7 +190,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                   'flex-1 h-9 text-xs font-semibold transition-all',
                   txType === type
                     ? 'bg-brand-primary text-white'
-                    : 'bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-[#191B2F]/55 dark:text-white/40 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.07]',
+                    : 'bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-[#042F2E]/55 dark:text-white/40 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.07]',
                 )}
               >
                 {type === 'one_off' ? t('oneOff') : t('recurring')}
@@ -201,13 +201,13 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           {/* Frequency — only when recurring */}
           {txType === 'recurring' && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#191B2F]/40 dark:text-white/30">
+              <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
                 {t('frequency')}
               </label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value as Frequency)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#191B2F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
               >
                 {(Object.entries(FREQUENCIES) as [Frequency, string][]).map(([k, label]) => (
                   <option key={k} value={k}>{label}</option>
@@ -218,11 +218,11 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
 
           {/* Amount */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#191B2F]/40 dark:text-white/30">
+            <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
               {t('amount')}
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#191B2F]/50 dark:text-white/40 pointer-events-none">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#042F2E]/50 dark:text-white/40 pointer-events-none">
                 {symbol}
               </span>
               <input
@@ -233,7 +233,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                 onChange={(e) => setAmount(e.target.value)}
                 required
                 placeholder="0.00"
-                className="w-full h-10 pl-8 pr-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-semibold text-[#191B2F] dark:text-white placeholder:text-[#191B2F]/25 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
+                className="w-full h-10 pl-8 pr-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-semibold text-[#042F2E] dark:text-white placeholder:text-[#042F2E]/25 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
               />
             </div>
             {overCreditLimit && (
@@ -245,7 +245,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
 
           {/* Date / Start date */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#191B2F]/40 dark:text-white/30">
+            <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
               {txType === 'recurring' ? t('startDate') : t('date')}
             </label>
             <input
@@ -253,7 +253,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               value={txType === 'recurring' ? startDate : date}
               onChange={(e) => txType === 'recurring' ? setStartDate(e.target.value) : setDate(e.target.value)}
               required
-              className="h-10 px-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-medium text-[#191B2F] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
+              className="h-10 px-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
             />
           </div>
 
@@ -262,7 +262,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 h-10 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-transparent text-sm font-semibold text-[#191B2F]/60 dark:text-white/50 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.06] transition-all"
+              className="flex-1 h-10 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-transparent text-sm font-semibold text-[#042F2E]/60 dark:text-white/50 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.06] transition-all"
             >
               {tc('cancel')}
             </button>

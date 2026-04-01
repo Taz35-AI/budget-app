@@ -249,20 +249,20 @@ export function DashboardShell() {
 
   return (
     <AppLayout>
-    <div className="min-h-screen bg-[#F7F8FC] dark:bg-[#0C0C1A]">
+    <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
 
       {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#191B2F]/15 dark:to-transparent pointer-events-none -z-10" />
+      <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#042F2E]/15 dark:to-transparent pointer-events-none -z-10" />
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20
-        bg-white/95 dark:bg-[#0C0C1A]/95
+        bg-white/95 dark:bg-[#011817]/95
         backdrop-blur-2xl
-        border-b border-[#D9DDF0]/70 dark:border-[#312E81]/[0.08]
+        border-b border-[#D9DDF0]/70 dark:border-[#0D9488]/[0.08]
         shadow-[0_1px_0_rgba(25,27,47,0.06),0_4px_16px_rgba(25,27,47,0.04)]
         dark:shadow-[0_1px_0_rgba(59,122,120,0.06)]">
         {/* Accent line */}
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#312E81]/40 to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#0D9488]/40 to-transparent" />
 
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
 
@@ -272,7 +272,7 @@ export function DashboardShell() {
 
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-xl font-extrabold text-[#191B2F] dark:text-white tracking-tight">{t('title')}</h1>
+            <h1 className="text-xl font-extrabold text-[#042F2E] dark:text-white tracking-tight">{t('title')}</h1>
           </div>
 
           {/* Controls */}
@@ -310,7 +310,7 @@ export function DashboardShell() {
 
           {/* Stats bar — typographic headline style */}
           <div id="tour-stats"
-            className="flex-shrink-0 bg-brand-card dark:bg-[#15152E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)] dark:shadow-none">
+            className="flex-shrink-0 bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)] dark:shadow-none">
 
             {/* Desktop: single horizontal row */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
@@ -614,7 +614,7 @@ export function DashboardShell() {
           {showMobileStats && (
             <div className="sm:hidden flex-1 min-h-0 overflow-y-auto rounded-3xl
               bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]
-              dark:bg-[#15152E] dark:border-[#312E81]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
+              dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
               <MonthSummary month={visibleMonth} dayTransactions={dayTransactions} formatAmount={formatAmount} />
             </div>
           )}
@@ -623,11 +623,11 @@ export function DashboardShell() {
           {/* flex-1 min-h-0 lets it fill remaining height on mobile; sm:flex-initial resets on desktop */}
           <div className={cn('flex-1 min-h-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
           {isLoading && balances.size === 0 ? (
-            <div className="animate-pulse rounded-3xl bg-white dark:bg-[#15152E] p-5 space-y-3 border border-[#D9DDF0]/60 dark:border-[#191B2F]/30">
-              <div className="h-5 bg-[#D9DDF0]/60 dark:bg-[#191B2F]/30 rounded-lg w-36" />
+            <div className="animate-pulse rounded-3xl bg-white dark:bg-[#042F2E] p-5 space-y-3 border border-[#D9DDF0]/60 dark:border-[#042F2E]/30">
+              <div className="h-5 bg-[#D9DDF0]/60 dark:bg-[#042F2E]/30 rounded-lg w-36" />
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 35 }).map((_, i) => (
-                  <div key={i} className="h-[90px] sm:h-[110px] bg-[#D9DDF0]/40 dark:bg-[#191B2F]/20 rounded-xl" />
+                  <div key={i} className="h-[90px] sm:h-[110px] bg-[#D9DDF0]/40 dark:bg-[#042F2E]/20 rounded-xl" />
                 ))}
               </div>
             </div>
@@ -635,7 +635,7 @@ export function DashboardShell() {
             <div className="relative h-full">
               <div className="h-full rounded-3xl overflow-hidden
                 bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]
-                dark:bg-[#15152E] dark:border-[#312E81]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
+                dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
                 <CalendarView
                   balances={balances}
                   dayTransactions={dayTransactions}
@@ -674,18 +674,18 @@ export function DashboardShell() {
           'sticky top-[56px] max-h-[calc(100vh-56px-16px)] self-start',
           'rounded-3xl overflow-hidden',
           'bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]',
-          'dark:bg-[#15152E] dark:border-[#312E81]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]',
+          'dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]',
         )}>
           {selectedDate ? (
             <>
               {/* Day panel header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#D9DDF0]/50 dark:border-[#312E81]/[0.08] flex-shrink-0
-                bg-gradient-to-r from-white to-[#D9DDF0]/10 dark:from-[#15152E] dark:to-[#15152E]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.08] flex-shrink-0
+                bg-gradient-to-r from-white to-[#D9DDF0]/10 dark:from-[#042F2E] dark:to-[#042F2E]">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#191B2F]/40 dark:text-[#D9DDF0]/30 mb-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-0.5">
                     Selected day
                   </p>
-                  <h2 className="text-base font-bold text-[#191B2F] dark:text-white tracking-tight">
+                  <h2 className="text-base font-bold text-[#042F2E] dark:text-white tracking-tight">
                     {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-GB', {
                       weekday: 'long', day: 'numeric', month: 'long',
                     })}
@@ -693,7 +693,7 @@ export function DashboardShell() {
                 </div>
                 <button
                   onClick={handleClose}
-                  className="p-2 rounded-xl hover:bg-[#D9DDF0]/40 dark:hover:bg-[#191B2F]/40 text-[#191B2F]/40 dark:text-[#D9DDF0]/30 hover:text-[#191B2F] dark:hover:text-white transition-all"
+                  className="p-2 rounded-xl hover:bg-[#D9DDF0]/40 dark:hover:bg-[#042F2E]/40 text-[#042F2E]/40 dark:text-[#D9DDF0]/30 hover:text-[#042F2E] dark:hover:text-white transition-all"
                   aria-label="Close"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

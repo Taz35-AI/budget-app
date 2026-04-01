@@ -29,13 +29,13 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
         'relative flex flex-col h-full w-full overflow-hidden cursor-pointer transition-all duration-150',
         'p-1.5 sm:p-2 rounded-xl sm:rounded-2xl',
         // Base card
-        'bg-brand-card dark:bg-[#15152E]/80',
+        'bg-brand-card dark:bg-[#042F2E]/80',
         'border border-transparent',
         // State backgrounds
         isPositive && !isSelected && 'bg-gradient-to-br from-brand-primary/[0.06] to-brand-positive/[0.03] dark:from-brand-primary/[0.08] dark:to-brand-positive/[0.04]',
         isNegative && !isSelected && 'bg-gradient-to-br from-brand-danger/[0.06] to-brand-danger/[0.03] dark:from-brand-danger/[0.10] dark:to-brand-danger/[0.05]',
-        isZero && !isSelected && 'bg-brand-bg/60 dark:bg-[#0C0C1A]/40',
-        !hasBalance && 'bg-white/70 dark:bg-[#15152E]/40',
+        isZero && !isSelected && 'bg-brand-bg/60 dark:bg-[#011817]/40',
+        !hasBalance && 'bg-white/70 dark:bg-[#042F2E]/40',
         // Today
         today && !isSelected && 'border-brand-primary/25 dark:border-brand-primary/30 shadow-[inset_0_0_0_1px_rgba(59,122,120,0.15)]',
         // Search match

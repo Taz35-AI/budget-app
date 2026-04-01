@@ -87,7 +87,7 @@ export default function LandingPage() {
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
             <Link href="/blog" className="m-nav-blog" style={{ fontSize:14, color:'rgba(255,255,255,0.55)', padding:'6px 14px', borderRadius:8, textDecoration:'none' }}>Blog</Link>
             <Link href="/login" className="m-nav-signin" style={{ fontSize:14, color:'rgba(255,255,255,0.55)', padding:'6px 14px', borderRadius:8, textDecoration:'none' }}>Sign in</Link>
-            <Link href="/signup" style={{ fontSize:14, fontWeight:500, background:'#312E81', color:'#fff', padding:'7px 18px', borderRadius:10, textDecoration:'none', whiteSpace:'nowrap' }}>Get started free</Link>
+            <Link href="/signup" style={{ fontSize:14, fontWeight:500, background:'#0D9488', color:'#fff', padding:'7px 18px', borderRadius:10, textDecoration:'none', whiteSpace:'nowrap' }}>Get started free</Link>
           </div>
         </nav>
 
@@ -104,7 +104,7 @@ export default function LandingPage() {
             Balance forecasts, recurring transactions, transfers between accounts — all without ever handing over your banking password.
           </p>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, flexWrap:'wrap', marginBottom:24 }}>
-            <Link href="/signup" style={{ background:'#312E81', color:'#fff', fontSize:15, fontWeight:600, padding:'13px 28px', borderRadius:12, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:8 }}>
+            <Link href="/signup" style={{ background:'#0D9488', color:'#fff', fontSize:15, fontWeight:600, padding:'13px 28px', borderRadius:12, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:8 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               Start for free
             </Link>
@@ -142,7 +142,7 @@ export default function LandingPage() {
           <div className="m-trust-items" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:24 }}>
             {['Web app · Android & iOS coming','Multi-currency & multi-language','Dark & light mode','CSV export & backup','Free forever for early users'].map(item => (
               <div key={item} style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, color:'rgba(255,255,255,0.30)' }}>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13.5 4l-7 7L3 7.5" stroke="#312E81" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13.5 4l-7 7L3 7.5" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 {item}
               </div>
             ))}
@@ -151,7 +151,7 @@ export default function LandingPage() {
 
         {/* ── COMPARE ── */}
         <section className="m-compare-wrap" style={{ padding:'80px 40px', maxWidth:1100, margin:'0 auto' }}>
-          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#312E81', textTransform:'uppercase', marginBottom:14 }}>Why Spentum</p>
+          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#0D9488', textTransform:'uppercase', marginBottom:14 }}>Why Spentum</p>
           <h2 style={{ ...serif, fontSize:'clamp(28px, 4vw, 44px)', color:'#fff', fontWeight:400, lineHeight:1.15, marginBottom:48 }}>
             Other apps want your passwords.<br />We just want to help you budget.
           </h2>
@@ -195,7 +195,7 @@ export default function LandingPage() {
 
         {/* ── APP PREVIEW ── */}
         <section className="m-preview-wrap" style={{ padding:'0 40px 80px', maxWidth:1180, margin:'0 auto' }}>
-          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#312E81', textTransform:'uppercase', marginBottom:14 }}>App preview</p>
+          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#0D9488', textTransform:'uppercase', marginBottom:14 }}>App preview</p>
           <h2 style={{ ...serif, fontSize:'clamp(26px, 3.5vw, 40px)', color:'#fff', fontWeight:400, lineHeight:1.15, marginBottom:28 }}>
             Your finances, at a glance.
           </h2>
@@ -223,7 +223,7 @@ export default function LandingPage() {
                   { label:'Budgets',   active:false, icon:'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
                   { label:'Settings',  active:false, icon:'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
                 ].map(item => (
-                  <div key={item.label} style={{ display:'flex', alignItems:'center', gap:10, margin:'1px 10px', padding:'8px 12px', borderRadius:10, background: item.active ? '#312E81' : 'transparent', color: item.active ? '#fff' : 'rgba(255,255,255,0.38)', fontSize:13, fontWeight:600 }}>
+                  <div key={item.label} style={{ display:'flex', alignItems:'center', gap:10, margin:'1px 10px', padding:'8px 12px', borderRadius:10, background: item.active ? '#0D9488' : 'transparent', color: item.active ? '#fff' : 'rgba(255,255,255,0.38)', fontSize:13, fontWeight:600 }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
                     {item.label}
                     {item.active && <div style={{ marginLeft:'auto', width:6, height:6, borderRadius:'50%', background:'rgba(255,255,255,0.5)' }} />}
@@ -260,7 +260,7 @@ export default function LandingPage() {
                     <div style={{ display:'flex', alignItems:'center', gap:6, padding:'10px 12px 9px', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
                       <div style={{ display:'flex', gap:4, flex:1 }}>
                         {(['Combined','Current','Savings'] as string[]).map((tab, i) => (
-                          <span key={tab} style={{ fontSize:9, fontWeight:700, padding:'3px 8px', borderRadius:6, border:'1px solid', background: i===0 ? '#312E81' : 'rgba(255,255,255,0.05)', color: i===0 ? '#fff' : 'rgba(255,255,255,0.35)', borderColor: i===0 ? '#312E81' : 'rgba(255,255,255,0.10)' }}>{tab}</span>
+                          <span key={tab} style={{ fontSize:9, fontWeight:700, padding:'3px 8px', borderRadius:6, border:'1px solid', background: i===0 ? '#0D9488' : 'rgba(255,255,255,0.05)', color: i===0 ? '#fff' : 'rgba(255,255,255,0.35)', borderColor: i===0 ? '#0D9488' : 'rgba(255,255,255,0.10)' }}>{tab}</span>
                         ))}
                       </div>
                       <div style={{ display:'flex', alignItems:'center', gap:4 }}>
@@ -314,7 +314,7 @@ export default function LandingPage() {
                       ] as Array<{d:string;grey?:boolean;bal?:string|null;pos?:boolean;today?:boolean;sel?:boolean;txs:Array<{n:string;inc:boolean}>}>)).map((cell, i) => (
                         <div key={i} style={{ borderRadius:6, padding:'4px 4px 3px', position:'relative', overflow:'hidden', display:'flex', flexDirection:'column', minHeight:38, border:'1px solid', background: cell.grey ? 'rgba(255,255,255,0.02)' : cell.sel ? 'rgba(59,122,120,0.12)' : cell.pos ? 'rgba(59,122,120,0.07)' : 'rgba(255,255,255,0.04)', borderColor: cell.grey ? 'rgba(255,255,255,0.04)' : cell.sel ? 'rgba(59,122,120,0.50)' : cell.today ? 'rgba(59,122,120,0.30)' : 'rgba(255,255,255,0.06)' }}>
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                            <span style={{ fontSize:9, fontWeight:700, lineHeight:1, width:14, height:14, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background: cell.today ? '#312E81' : 'transparent', color: cell.grey ? 'rgba(255,255,255,0.15)' : cell.today ? '#fff' : cell.sel ? '#4E9E9B' : 'rgba(255,255,255,0.30)' }}>{cell.d}</span>
+                            <span style={{ fontSize:9, fontWeight:700, lineHeight:1, width:14, height:14, display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', background: cell.today ? '#0D9488' : 'transparent', color: cell.grey ? 'rgba(255,255,255,0.15)' : cell.today ? '#fff' : cell.sel ? '#4E9E9B' : 'rgba(255,255,255,0.30)' }}>{cell.d}</span>
                             {cell.txs && cell.txs.length > 0 && (
                               <span style={{ fontSize:7, fontWeight:700, padding:'1px 3px', borderRadius:3, background: cell.pos ? 'rgba(59,122,120,0.2)' : 'rgba(229,83,75,0.2)', color: cell.pos ? '#4E9E9B' : '#E5534B' }}>{cell.txs.length}</span>
                             )}
@@ -338,12 +338,12 @@ export default function LandingPage() {
                   <div style={{ background:'rgba(255,255,255,0.04)', borderRadius:10, padding:14, border:'1px solid rgba(255,255,255,0.07)' }}>
                     <div style={{ fontSize:11, color:'rgba(255,255,255,0.40)', marginBottom:10, fontWeight:500 }}>Recent transactions</div>
                     {[
-                      { name:'Salary',              tag:'Income',   date:'1 Apr', amt:'+£3,200', c:'#3EC97A', dot:'#312E81' },
+                      { name:'Salary',              tag:'Income',   date:'1 Apr', amt:'+£3,200', c:'#3EC97A', dot:'#0D9488' },
                       { name:'Rent',                tag:'Housing',  date:'1 Apr', amt:'−£950',   c:'#E5534B', dot:'#E5534B' },
                       { name:'→ Transfer · Savings',tag:'Transfer', date:'31 Mar',amt:'−£500',   c:'rgba(255,255,255,0.45)', dot:'#4E9E9B' },
                       { name:'Groceries',           tag:'Food',     date:'30 Mar',amt:'−£87',    c:'#E5534B', dot:'#F0A04B' },
                       { name:'Netflix',             tag:'Subs',     date:'28 Mar',amt:'−£17',    c:'#E5534B', dot:'#E5534B' },
-                      { name:'Freelance',           tag:'Income',   date:'27 Mar',amt:'+£450',   c:'#3EC97A', dot:'#312E81' },
+                      { name:'Freelance',           tag:'Income',   date:'27 Mar',amt:'+£450',   c:'#3EC97A', dot:'#0D9488' },
                     ].map(tx => (
                       <div key={tx.name} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
                         <span style={{ width:7, height:7, borderRadius:'50%', background:tx.dot, flexShrink:0, display:'inline-block' }} />
@@ -412,10 +412,10 @@ export default function LandingPage() {
                 {/* Transaction items */}
                 {[
                   { name:'Groceries',  tag:'Food',   amt:'−£87',    c:'#E5534B', dot:'#F0A04B' },
-                  { name:'Salary',     tag:'Income', amt:'+£3,200', c:'#3EC97A', dot:'#312E81' },
+                  { name:'Salary',     tag:'Income', amt:'+£3,200', c:'#3EC97A', dot:'#0D9488' },
                   { name:'Rent',       tag:'Housing',amt:'−£950',   c:'#E5534B', dot:'#E5534B' },
                   { name:'Netflix',    tag:'Subs',   amt:'−£17',    c:'#E5534B', dot:'#E5534B' },
-                  { name:'Freelance',  tag:'Income', amt:'+£450',   c:'#3EC97A', dot:'#312E81' },
+                  { name:'Freelance',  tag:'Income', amt:'+£450',   c:'#3EC97A', dot:'#0D9488' },
                 ].map((tx, i) => (
                   <div key={tx.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 0', borderBottom: i < 4 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
                     <div style={{ width:32, height:32, borderRadius:10, background:'rgba(255,255,255,0.05)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
@@ -451,7 +451,7 @@ export default function LandingPage() {
 
         {/* ── FEATURES ── */}
         <section className="m-features-wrap" style={{ padding:'0 40px 80px', maxWidth:1100, margin:'0 auto' }}>
-          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#312E81', textTransform:'uppercase', marginBottom:14 }}>Features</p>
+          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#0D9488', textTransform:'uppercase', marginBottom:14 }}>Features</p>
           <h2 style={{ ...serif, fontSize:'clamp(28px, 4vw, 44px)', color:'#fff', fontWeight:400, lineHeight:1.15, marginBottom:40 }}>Everything you need. Nothing you don&apos;t.</h2>
           <div className="m-feature-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16 }}>
             <div className="m-span2" style={{ background:'#0F2222', border:'1px solid rgba(255,255,255,0.07)', borderRadius:16, padding:24, gridColumn:'span 2' }}>
@@ -486,7 +486,7 @@ export default function LandingPage() {
 
         {/* ── HOW IT WORKS ── */}
         <section className="m-steps-wrap" style={{ padding:'80px 40px', maxWidth:900, margin:'0 auto', textAlign:'center', borderTop:'1px solid rgba(255,255,255,0.07)' }}>
-          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#312E81', textTransform:'uppercase', marginBottom:14 }}>How it works</p>
+          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#0D9488', textTransform:'uppercase', marginBottom:14 }}>How it works</p>
           <h2 style={{ ...serif, fontSize:'clamp(28px, 4vw, 44px)', color:'#fff', fontWeight:400, marginBottom:12 }}>Up and running in 3 minutes</h2>
           <p style={{ color:'rgba(255,255,255,0.55)', fontSize:16, marginBottom:48, fontWeight:300 }}>No bank connection. No complicated setup. Just your numbers.</p>
           <div className="steps-line m-steps-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:32, position:'relative' }}>
@@ -506,7 +506,7 @@ export default function LandingPage() {
 
         {/* ── FAQ ── */}
         <section className="m-faq-wrap" style={{ padding:'80px 40px', maxWidth:780, margin:'0 auto' }}>
-          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#312E81', textTransform:'uppercase', marginBottom:14, textAlign:'center' }}>Common questions</p>
+          <p style={{ fontSize:12, fontWeight:600, letterSpacing:'1.5px', color:'#0D9488', textTransform:'uppercase', marginBottom:14, textAlign:'center' }}>Common questions</p>
           <h2 style={{ ...serif, fontSize:'clamp(28px, 4vw, 44px)', color:'#fff', fontWeight:400, marginBottom:32, textAlign:'center' }}>Still not sure? We&apos;ve heard it all.</h2>
           {[
             { q:"Why don't you connect to my bank automatically?", a:"Because your banking credentials are yours. Automatic bank sync means handing credentials or OAuth tokens to a third party. When that third party gets hacked or sells data, your financial life is exposed. Manual entry takes an extra minute; it keeps your banking passwords out of any database except your bank's." },
@@ -534,7 +534,7 @@ export default function LandingPage() {
             <p style={{ fontSize:16, color:'rgba(255,255,255,0.55)', marginBottom:36, fontWeight:300 }}>
               Join people using Spentum to see their financial future clearly — without handing their bank password to anyone.
             </p>
-            <Link href="/signup" className="m-cta-btn" style={{ background:'#312E81', color:'#fff', fontSize:16, fontWeight:600, padding:'15px 34px', borderRadius:12, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:8 }}>
+            <Link href="/signup" className="m-cta-btn" style={{ background:'#0D9488', color:'#fff', fontSize:16, fontWeight:600, padding:'15px 34px', borderRadius:12, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:8 }}>
               Create free account
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>

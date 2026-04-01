@@ -75,7 +75,7 @@ export default function BlogPostPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/blog" style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Blog</Link>
             <Link href="/login" style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Sign in</Link>
-            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#312E81', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
+            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#0D9488', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
           </div>
         </nav>
 
@@ -214,7 +214,7 @@ export default function BlogPostPage() {
               <p style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#fff' }}>Start tracking with Spentum</p>
               <p style={{ margin: 0, fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>See your future balance, track recurring income and expenses, and stop guessing where your money goes. Free during beta, no bank login needed.</p>
               <div>
-                <Link href="/signup" style={{ display: 'inline-block', background: '#312E81', color: '#fff', fontSize: 14, fontWeight: 600, padding: '11px 22px', borderRadius: 10, textDecoration: 'none' }}>
+                <Link href="/signup" style={{ display: 'inline-block', background: '#0D9488', color: '#fff', fontSize: 14, fontWeight: 600, padding: '11px 22px', borderRadius: 10, textDecoration: 'none' }}>
                   Try Spentum free
                 </Link>
               </div>

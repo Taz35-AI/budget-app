@@ -71,9 +71,10 @@ function getNavItems(t: ReturnType<typeof useTranslations<'nav'>>) {
   ];
 }
 
-// ─── Sidebar content (shared between desktop sidebar + mobile drawer) ─────────
-// Light mode → sidebar is dark indigo (inverted contrast with white page)
-// Dark mode  → sidebar is white (inverted contrast with dark page)
+// ─── Sidebar content ──────────────────────────────────────────────────────────
+// Light mode: Teal 100 (#CCFBF1) bg — spec Option B (approved)
+// Dark mode:  Teal 900 (#042F2E) bg — derived dark equivalent
+// Active item: white card + 3px Teal 700 left indicator bar (per spec)
 
 function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname();
@@ -84,17 +85,19 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
     <div className="flex flex-col h-full">
 
       {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-4 pb-3 border-b border-white/[0.07] dark:border-slate-200 flex-shrink-0">
+      <div className="flex items-center justify-center px-4 pt-5 pb-4 flex-shrink-0">
         <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
       </div>
 
-      {/* Nav links */}
-      <div className="px-2.5 pt-4 pb-1">
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/30 dark:text-slate-400 px-2 mb-2">{t('menu')}</p>
+      {/* Menu section label */}
+      <div className="px-3 pt-2 pb-1">
+        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-400 dark:text-teal-400/70 px-2 mb-1">{t('menu')}</p>
       </div>
-      <nav className="flex flex-col gap-0.5 px-2.5 flex-1">
+
+      {/* Nav links */}
+      <nav className="flex flex-col gap-0.5 px-2 flex-1">
         {navItems.map(({ href, label, icon }) => {
           const isActive = pathname === href;
           return (
@@ -103,35 +106,40 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
               href={href}
               onClick={onLinkClick}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150',
+                'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 overflow-hidden',
                 isActive
-                  ? 'bg-brand-primary text-white shadow-[0_2px_8px_rgba(49,46,129,0.4)]'
-                  : 'text-white/60 dark:text-slate-500 hover:bg-white/[0.08] dark:hover:bg-slate-100 hover:text-white dark:hover:text-slate-900',
+                  ? 'bg-white dark:bg-teal-700 text-teal-900 dark:text-white font-semibold shadow-sm'
+                  : 'text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-700/30 hover:text-teal-700 dark:hover:text-teal-200',
               )}
             >
+              {/* 3px active indicator bar — per spec */}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-teal-700 dark:bg-teal-400 rounded-r-[3px]" />
+              )}
               <span className="flex-shrink-0 opacity-90">{icon}</span>
               {label}
-              {isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/50 flex-shrink-0" />
-              )}
             </Link>
           );
         })}
       </nav>
 
+      {/* Divider */}
+      <div className="mx-3 my-2 h-px bg-teal-200 dark:bg-teal-700/50" />
+
       {/* Utility section */}
-      <div className="flex-shrink-0 px-2.5 pb-4 pt-3 border-t border-white/[0.07] dark:border-slate-200 space-y-1.5">
+      <div className="flex-shrink-0 px-2 pb-4 pt-1 space-y-1">
+        {/* Options label */}
+        <p className="text-[7px] font-semibold uppercase tracking-[0.09em] text-teal-400 dark:text-teal-400/70 px-3 mb-2">{t('options')}</p>
+
         {/* Logged-in user */}
-        <div className="px-1 mb-3">
+        <div className="px-1 mb-2">
           <UserBadge />
         </div>
-
-        <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/30 dark:text-slate-400 px-2 mb-2">{t('options')}</p>
 
         {/* Theme toggle */}
         <div className="flex items-center gap-2 px-1">
           <ThemeToggle />
-          <span className="text-xs text-white/50 dark:text-slate-500 font-medium">{t('toggleTheme')}</span>
+          <span className="text-xs text-teal-600 dark:text-teal-400 font-medium">{t('toggleTheme')}</span>
         </div>
 
         {/* Export */}
@@ -151,8 +159,8 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       </div>
 
       {/* Version */}
-      <div className="px-5 pb-3">
-        <p className="text-[10px] font-medium text-white/20 dark:text-slate-400">Spentum v1.0</p>
+      <div className="px-5 pb-4 border-t border-teal-200 dark:border-teal-700/50 pt-3">
+        <p className="text-[10px] font-medium text-teal-400 dark:text-teal-400/50">Spentum v1.0</p>
       </div>
     </div>
   );
@@ -164,10 +172,8 @@ export function NavSidebar() {
   const { isOpen, close } = useNavStore();
   const pathname = usePathname();
 
-  // Close drawer on route change
   useEffect(() => { close(); }, [pathname, close]);
 
-  // Prevent body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -175,30 +181,30 @@ export function NavSidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar (always visible, left-fixed) ────────────── */}
-      {/* Light mode: dark indigo sidebar. Dark mode: white sidebar. */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full w-[230px] z-30
-        bg-[#1a1845] dark:bg-white
-        border-r border-white/[0.06] dark:border-slate-200
-        shadow-[2px_0_24px_rgba(12,12,26,0.35)] dark:shadow-[2px_0_24px_rgba(12,12,26,0.08)]">
+      {/* ── Desktop sidebar ─────────────────────────────────────── */}
+      {/* Spec: bg #CCFBF1 (Teal 100), right border #99F6E4 (Teal 200), width 240px */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-full w-[240px] z-30
+        bg-teal-100 dark:bg-teal-900
+        border-r border-teal-200 dark:border-teal-700/50
+        shadow-[2px_0_16px_rgba(4,47,46,0.06)] dark:shadow-[2px_0_16px_rgba(1,24,23,0.4)]">
         <SidebarContent />
       </aside>
 
-      {/* ── Mobile: backdrop ────────────────────────────────────────── */}
+      {/* ── Mobile: backdrop ────────────────────────────────────── */}
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
         onClick={close}
       />
 
-      {/* ── Mobile: slim left drawer ─────────────────────────────────── */}
+      {/* ── Mobile: left drawer ──────────────────────────────────── */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-52 flex flex-col lg:hidden',
-          'bg-[#1a1845] dark:bg-white',
-          'shadow-[4px_0_32px_rgba(12,12,26,0.6)] dark:shadow-[4px_0_32px_rgba(12,12,26,0.12)]',
+          'fixed inset-y-0 left-0 z-50 w-[240px] flex flex-col lg:hidden',
+          'bg-teal-100 dark:bg-teal-900',
+          'shadow-[4px_0_24px_rgba(4,47,46,0.12)] dark:shadow-[4px_0_24px_rgba(1,24,23,0.6)]',
           'transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -206,7 +212,7 @@ export function NavSidebar() {
         {/* Close button */}
         <button
           onClick={close}
-          className="absolute top-4 right-4 p-2 rounded-xl hover:bg-white/10 dark:hover:bg-slate-100 text-white/40 dark:text-slate-400 hover:text-white dark:hover:text-slate-700 transition-all z-10"
+          className="absolute top-4 right-4 p-2 rounded-xl hover:bg-teal-200 dark:hover:bg-teal-700 text-teal-600 dark:text-teal-400 hover:text-teal-900 dark:hover:text-white transition-all z-10"
           aria-label="Close menu"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -216,7 +222,7 @@ export function NavSidebar() {
         <SidebarContent onLinkClick={close} />
       </div>
 
-      {/* ── Mobile: bottom tab bar ───────────────────────────────────── */}
+      {/* ── Mobile: bottom tab bar ───────────────────────────────── */}
       <MobileBottomNav />
     </>
   );
@@ -230,12 +236,10 @@ function MobileBottomNav() {
   const bottomNavItems = getNavItems(t).filter((i) => i.bottomNav);
 
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 h-16 z-30
-      bg-brand-card/97 dark:bg-[#0C0C1A]/97
-      backdrop-blur-xl
-      border-t border-black/[0.07] dark:border-brand-primary/[0.15]
-      shadow-[0_-2px_16px_rgba(25,27,47,0.08)]
-      flex items-center justify-around px-1">
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 flex items-center justify-around px-1"
+      style={{ height: '54px' }}>
+      {/* Background */}
+      <div className="absolute inset-0 bg-white/97 dark:bg-[#011817]/97 backdrop-blur-xl border-t border-teal-200 dark:border-teal-700/30 shadow-[0_-2px_16px_rgba(4,47,46,0.06)]" />
       {bottomNavItems.map(({ href, label, icon }) => {
         const isActive = pathname === href;
         return (
@@ -243,8 +247,8 @@ function MobileBottomNav() {
             key={href}
             href={href}
             className={cn(
-              'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-150 min-w-[52px]',
-              isActive ? 'text-brand-primary' : 'text-brand-text/38 dark:text-white/32 hover:text-brand-primary',
+              'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-150 min-w-[52px] z-10',
+              isActive ? 'text-teal-700' : 'text-teal-600/60 dark:text-teal-400/50 hover:text-teal-700',
             )}
           >
             <span className={cn('transition-transform duration-150', isActive && 'scale-110')}>{icon}</span>
@@ -252,7 +256,7 @@ function MobileBottomNav() {
               {label}
             </span>
             {isActive && (
-              <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-brand-primary" />
+              <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-teal-700" />
             )}
           </Link>
         );
@@ -261,7 +265,7 @@ function MobileBottomNav() {
   );
 }
 
-// ─── NavMenuButton — opens the left drawer on mobile (hidden on desktop) ──────
+// ─── NavMenuButton ────────────────────────────────────────────────────────────
 
 export function NavMenuButton() {
   const { toggle } = useNavStore();
@@ -269,10 +273,10 @@ export function NavMenuButton() {
     <button
       onClick={toggle}
       className="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl
-        bg-brand-primary/10 dark:bg-white/5
-        border border-brand-primary/20 dark:border-white/10
-        text-brand-primary dark:text-white/50
-        hover:bg-brand-primary/20 hover:text-brand-primary
+        bg-teal-100 dark:bg-teal-900/50
+        border border-teal-200 dark:border-teal-700/50
+        text-teal-700 dark:text-teal-400
+        hover:bg-teal-200 dark:hover:bg-teal-800 hover:text-teal-900
         transition-all flex-shrink-0"
       aria-label="Open menu"
     >
@@ -283,7 +287,7 @@ export function NavMenuButton() {
   );
 }
 
-// ─── MobileLogo — centered logo shown in every page's mobile header ────────────
+// ─── MobileLogo ───────────────────────────────────────────────────────────────
 
 export function MobileLogo() {
   return (

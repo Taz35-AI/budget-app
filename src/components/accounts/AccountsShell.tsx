@@ -144,7 +144,7 @@ function AccountCard({
     : null;
 
   return (
-    <div className="bg-white dark:bg-[#15152E] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(25,27,47,0.06)] dark:shadow-none">
+    <div className="bg-white dark:bg-[#042F2E] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(25,27,47,0.06)] dark:shadow-none">
       {/* Account header */}
       <div className={cn(
         'px-3 py-2.5 flex items-center justify-between gap-2',
@@ -292,11 +292,11 @@ export function AccountsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F7F8FC] dark:bg-[#0C0C1A]">
-        <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-cyan-100/40 via-teal-50/20 to-transparent dark:from-[#191B2F]/20 dark:to-transparent pointer-events-none -z-10" />
+      <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
+        <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-cyan-100/40 via-teal-50/20 to-transparent dark:from-[#042F2E]/20 dark:to-transparent pointer-events-none -z-10" />
 
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#0C0C1A]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
+        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#011817]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
           <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-teal-500/40 to-transparent" />
           <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
@@ -310,7 +310,7 @@ export function AccountsShell() {
           {/* Total balance hero */}
           <div className={cn(
             'rounded-2xl p-5 text-white',
-            'bg-gradient-to-br from-[#191B2F] via-[#1a3d3b] to-[#0f2928]',
+            'bg-gradient-to-br from-[#042F2E] via-[#1a3d3b] to-[#0f2928]',
             'shadow-[0_4px_24px_rgba(25,27,47,0.3)]',
           )}>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{hasCredit ? t('netWorth') : t('totalBalance')}</p>
@@ -328,7 +328,7 @@ export function AccountsShell() {
           {isLoading && (
             <div className="flex flex-col gap-3">
               {[1, 2].map((i) => (
-                <div key={i} className="rounded-2xl bg-white dark:bg-[#15152E] border border-slate-100 dark:border-white/[0.06] overflow-hidden animate-pulse">
+                <div key={i} className="rounded-2xl bg-white dark:bg-[#042F2E] border border-slate-100 dark:border-white/[0.06] overflow-hidden animate-pulse">
                   <div className="px-4 py-3.5 flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06]">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/5" />

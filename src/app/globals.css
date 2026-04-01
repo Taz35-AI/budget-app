@@ -3,26 +3,35 @@
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
 
-/* ─── Brand tokens (edit here to retheme the entire app) ────────────────────── */
+/* ─── Brand tokens — Spentum Teal palette v1.1 ───────────────────────────────── */
 :root {
-  --brand-primary:   #312E81;   /* Primary Indigo — logo, primary buttons, active tabs  */
-  --brand-secondary: #5B4AE6;   /* Royal Violet — secondary buttons, accents            */
-  --brand-positive:  #35C9A5;   /* Mint Growth — positive money, saved, completed       */
-  --brand-danger:    #C65A5A;   /* overspending, danger                                 */
-  --brand-bg:        #F7F8FC;   /* Cloud Background — page background                  */
-  --brand-card:      #FFFFFF;   /* card backgrounds                                     */
-  --brand-text:      #191B2F;   /* Midnight Ink — primary text                          */
+  --brand-primary:   #0D9488;   /* Teal 700 — CTA buttons, active tabs, links, brand mark  */
+  --brand-secondary: #0F766E;   /* Teal 600 — card borders, hover states, icon strokes     */
+  --brand-positive:  #16A34A;   /* Income Green — positive values, savings gains           */
+  --brand-danger:    #DC2626;   /* Expense Red — negative values, budget overruns          */
+  --brand-bg:        #F4FDFB;   /* App background — never pure white                       */
+  --brand-card:      #FFFFFF;   /* Card backgrounds                                        */
+  --brand-text:      #042F2E;   /* Teal 900 — primary body text, headings                  */
+
+  /* Extended teal palette */
+  --teal-50:  #F0FDFA;
+  --teal-100: #CCFBF1;
+  --teal-200: #99F6E4;
+  --teal-400: #5EEAD4;
+  --teal-600: #0F766E;
+  --teal-700: #0D9488;
+  --teal-900: #042F2E;
 
   /* Dark mode variants */
-  --brand-dark-bg:   #0C0C1A;
-  --brand-dark-card: #15152E;
+  --brand-dark-bg:   #011817;
+  --brand-dark-card: #042F2E;
 
-  /* Legacy aliases — keeps FullCalendar CSS overrides working without edits */
+  /* Legacy aliases — keeps FullCalendar CSS overrides working */
   --brand-navy:   var(--brand-text);
   --brand-green:  var(--brand-primary);
-  --brand-lime:   var(--brand-positive);
+  --brand-lime:   var(--teal-400);
   --brand-gold:   var(--brand-secondary);
-  --brand-silver: rgba(49, 46, 129, 0.18);
+  --brand-silver: rgba(13, 148, 136, 0.18);
 }
 
 /* ─── Tailwind v4 theme tokens ───────────────────────────────────────────────── */
@@ -34,6 +43,13 @@
   --color-brand-bg:        var(--brand-bg);
   --color-brand-card:      var(--brand-card);
   --color-brand-text:      var(--brand-text);
+  --color-teal-50:         var(--teal-50);
+  --color-teal-100:        var(--teal-100);
+  --color-teal-200:        var(--teal-200);
+  --color-teal-400:        var(--teal-400);
+  --color-teal-600:        var(--teal-600);
+  --color-teal-700:        var(--teal-700);
+  --color-teal-900:        var(--teal-900);
 }
 
 @keyframes pulse-slow {
@@ -76,14 +92,14 @@
   padding: 0.375rem 0.875rem !important;
   font-size: 0.8125rem !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(25,27,47,0.08) !important;
+  box-shadow: 0 1px 3px rgba(4,47,46,0.08) !important;
   transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
 .fc .fc-button-primary:hover {
-  background-color: #f0f7ff !important;
+  background-color: var(--teal-50) !important;
   border-color: var(--brand-navy) !important;
-  box-shadow: 0 2px 6px rgba(25,27,47,0.12) !important;
+  box-shadow: 0 2px 6px rgba(4,47,46,0.12) !important;
 }
 
 .fc .fc-button-primary:focus {
@@ -97,30 +113,30 @@
   box-shadow: none !important;
 }
 
-/* Today button — distinct emerald style */
+/* Today button */
 .fc .fc-today-button {
   background-color: var(--brand-green) !important;
   border-color: var(--brand-green) !important;
-  color: #0C0C1A !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
-  box-shadow: 0 1px 6px rgba(59,122,120,0.3) !important;
+  box-shadow: 0 1px 6px rgba(13,148,136,0.3) !important;
 }
 .fc .fc-today-button:not(:disabled):hover {
-  background-color: var(--brand-lime) !important;
-  border-color: var(--brand-lime) !important;
-  box-shadow: 0 2px 10px rgba(59,122,120,0.4) !important;
+  background-color: var(--brand-secondary) !important;
+  border-color: var(--brand-secondary) !important;
+  box-shadow: 0 2px 10px rgba(13,148,136,0.4) !important;
 }
 .fc .fc-today-button:disabled {
   background-color: var(--brand-silver) !important;
   border-color: transparent !important;
-  color: rgba(25,27,47,0.35) !important;
+  color: rgba(4,47,46,0.35) !important;
   box-shadow: none !important;
   opacity: 1 !important;
   cursor: default !important;
 }
 .dark .fc .fc-today-button:disabled {
-  background-color: rgba(25,27,47,0.2) !important;
-  color: rgba(209,227,238,0.25) !important;
+  background-color: rgba(13,148,136,0.15) !important;
+  color: rgba(204,251,241,0.25) !important;
 }
 
 /* Day-of-week headers */
@@ -134,7 +150,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(25, 27, 47, 0.4);
+  color: rgba(4, 47, 46, 0.4);
   padding: 0.25rem 0;
   text-decoration: none !important;
 }
@@ -155,7 +171,7 @@
   border-spacing: 4px !important;
 }
 
-/* Day cells — taller so they're closer to square */
+/* Day cells */
 .fc .fc-daygrid-day {
   border: none !important;
   background: transparent !important;
@@ -164,7 +180,6 @@
   overflow: hidden !important;
 }
 
-/* Lock row height so a busy cell can't push the whole row taller */
 .fc .fc-daygrid-body table tbody tr {
   height: 96px !important;
   max-height: 96px !important;
@@ -223,28 +238,28 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .dark .fc .fc-toolbar-title {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(204, 251, 241, 0.92);
 }
 
 .dark .fc .fc-button-primary {
-  background-color: rgba(49, 46, 129, 0.25) !important;
-  border: 1px solid rgba(49, 46, 129, 0.25) !important;
-  color: rgba(255, 255, 255, 0.65) !important;
+  background-color: rgba(13, 148, 136, 0.15) !important;
+  border: 1px solid rgba(13, 148, 136, 0.25) !important;
+  color: rgba(204, 251, 241, 0.65) !important;
   box-shadow: none !important;
 }
 
 .dark .fc .fc-button-primary:hover {
-  background-color: rgba(49, 46, 129, 0.12) !important;
-  border-color: rgba(49, 46, 129, 0.5) !important;
-  color: #A79BFF !important;
+  background-color: rgba(13, 148, 136, 0.25) !important;
+  border-color: rgba(13, 148, 136, 0.5) !important;
+  color: #CCFBF1 !important;
 }
 
 .dark .fc .fc-button-primary:focus {
-  outline: 2px solid rgba(49, 46, 129, 0.6) !important;
+  outline: 2px solid rgba(13, 148, 136, 0.6) !important;
 }
 
 .dark .fc .fc-col-header-cell-cushion {
-  color: rgba(167, 155, 255, 0.7);
+  color: rgba(94, 234, 212, 0.7);
 }
 
 
@@ -291,22 +306,22 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(59,122,120,0.12) transparent;
+  scrollbar-color: rgba(13,148,136,0.15) transparent;
 }
 
 .dark * {
-  scrollbar-color: rgba(59,122,120,0.15) transparent;
+  scrollbar-color: rgba(13,148,136,0.2) transparent;
 }
 
 *::-webkit-scrollbar { width: 4px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(59,122,120,0.12);
+  background-color: rgba(13,148,136,0.15);
   border-radius: 2px;
 }
 
 .dark *::-webkit-scrollbar-thumb {
-  background-color: rgba(59,122,120,0.15);
+  background-color: rgba(13,148,136,0.2);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -316,5 +331,5 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }

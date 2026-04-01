@@ -77,7 +77,7 @@ export default function BlogIndexPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/blog" style={{ fontSize: 14, color: '#4E9E9B', padding: '6px 14px', borderRadius: 8, textDecoration: 'none', fontWeight: 500 }}>Blog</Link>
             <Link href="/login" style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Sign in</Link>
-            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#312E81', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
+            <Link href="/signup" style={{ fontSize: 14, fontWeight: 500, background: '#0D9488', color: '#fff', padding: '7px 18px', borderRadius: 10, textDecoration: 'none' }}>Get started free</Link>
           </div>
         </nav>
 

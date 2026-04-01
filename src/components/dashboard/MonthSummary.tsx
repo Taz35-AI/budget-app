@@ -38,13 +38,13 @@ function SectionHeader({
       )}
     >
       <div className={cn('w-1 h-3.5 rounded-full flex-shrink-0', accent)} />
-      <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#191B2F]/50 dark:text-[#D9DDF0]/35 flex-1 text-left">
+      <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#042F2E]/50 dark:text-[#D9DDF0]/35 flex-1 text-left">
         {label}
       </p>
       {expandable && (
         <svg
           className={cn(
-            'w-3 h-3 text-[#191B2F]/30 dark:text-[#D9DDF0]/25 transition-transform duration-200 flex-shrink-0',
+            'w-3 h-3 text-[#042F2E]/30 dark:text-[#D9DDF0]/25 transition-transform duration-200 flex-shrink-0',
             expanded && 'rotate-180',
           )}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
@@ -56,7 +56,7 @@ function SectionHeader({
   );
 }
 
-const ROW_CLASS = 'flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07] hover:bg-[#D9DDF0]/30 dark:hover:bg-[#191B2F]/20 transition-colors';
+const ROW_CLASS = 'flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] hover:bg-[#D9DDF0]/30 dark:hover:bg-[#042F2E]/20 transition-colors';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -191,10 +191,10 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
 
       {/* Month heading */}
       <div>
-        <h2 className="text-base font-extrabold text-[#191B2F] dark:text-white tracking-tight leading-tight">
+        <h2 className="text-base font-extrabold text-[#042F2E] dark:text-white tracking-tight leading-tight">
           {(tMonths.raw('long') as string[])[month.getMonth()]} {month.getFullYear()}
         </h2>
-        <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/30 mt-0.5 font-medium">
+        <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mt-0.5 font-medium">
           {t('clickHint')}
         </p>
       </div>
@@ -202,27 +202,27 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
       {/* Quick insight row */}
       <div className="grid grid-cols-3 gap-2">
         {/* Daily avg */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07] px-3 py-2.5">
-          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#191B2F] to-[#191B2F]/50 dark:from-[#312E81]/60 dark:to-[#35C9A5]/40" />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#191B2F]/40 dark:text-[#D9DDF0]/30 mb-1">{t('dailyAvg')}</p>
-          <p className="text-sm font-extrabold text-[#191B2F] dark:text-white tabular-nums leading-none truncate">{formatAmount(dailyAvg)}</p>
+        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
+          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#042F2E] to-[#042F2E]/50 dark:from-[#0D9488]/60 dark:to-[#35C9A5]/40" />
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-1">{t('dailyAvg')}</p>
+          <p className="text-sm font-extrabold text-[#042F2E] dark:text-white tabular-nums leading-none truncate">{formatAmount(dailyAvg)}</p>
         </div>
 
         {/* Savings rate */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07] px-3 py-2.5">
+        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
           <div className={cn(
             'absolute top-0 inset-x-0 h-[2px]',
-            savingsRate === null ? 'bg-[#D9DDF0]/60 dark:bg-[#191B2F]/40' :
-            savingsRate >= 20 ? 'bg-gradient-to-r from-[#312E81] to-[#35C9A5]' :
-            savingsRate >= 0 ? 'bg-gradient-to-r from-[#312E81] to-[#312E81]/50' :
+            savingsRate === null ? 'bg-[#D9DDF0]/60 dark:bg-[#042F2E]/40' :
+            savingsRate >= 20 ? 'bg-gradient-to-r from-[#0D9488] to-[#35C9A5]' :
+            savingsRate >= 0 ? 'bg-gradient-to-r from-[#0D9488] to-[#0D9488]/50' :
             'bg-gradient-to-r from-red-400 to-rose-400',
           )} />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#191B2F]/40 dark:text-[#D9DDF0]/30 mb-1">{t('saved')}</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-1">{t('saved')}</p>
           <p className={cn(
             'text-sm font-extrabold tabular-nums leading-none',
-            savingsRate === null ? 'text-[#191B2F]/40 dark:text-[#D9DDF0]/30' :
-            savingsRate >= 20 ? 'text-[#312E81]' :
-            savingsRate >= 0 ? 'text-[#312E81]' :
+            savingsRate === null ? 'text-[#042F2E]/40 dark:text-[#D9DDF0]/30' :
+            savingsRate >= 20 ? 'text-[#0D9488]' :
+            savingsRate >= 0 ? 'text-[#0D9488]' :
             'text-red-500 dark:text-red-400',
           )}>
             {savingsRate === null ? '—' : `${savingsRate}%`}
@@ -230,32 +230,32 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         </div>
 
         {/* Transactions */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07] px-3 py-2.5">
-          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#312E81] to-[#312E81]/50" />
-          <p className="text-[9px] font-bold uppercase tracking-wider text-[#191B2F]/40 dark:text-[#D9DDF0]/30 mb-1">{t('count')}</p>
-          <p className="text-sm font-extrabold text-[#191B2F] dark:text-white tabular-nums leading-none">{txCount}</p>
+        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
+          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#0D9488] to-[#0D9488]/50" />
+          <p className="text-[9px] font-bold uppercase tracking-wider text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-1">{t('count')}</p>
+          <p className="text-sm font-extrabold text-[#042F2E] dark:text-white tabular-nums leading-none">{txCount}</p>
         </div>
       </div>
 
       {/* Month-over-month spending insight */}
       {totalExpense > 0 && (
-        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-br from-[#F7F8FC] to-[#f7fafc] dark:from-[#0d1e35]/70 dark:to-[#15152E]/50 border border-[#D9DDF0]/60 dark:border-[#191B2F]/50">
-          <div className="w-7 h-7 rounded-lg bg-[#191B2F]/8 dark:bg-[#312E81]/10 flex items-center justify-center flex-shrink-0 text-[#191B2F]/50 dark:text-[#312E81]">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-br from-[#F4FDFB] to-[#f7fafc] dark:from-[#0d1e35]/70 dark:to-[#042F2E]/50 border border-[#D9DDF0]/60 dark:border-[#042F2E]/50">
+          <div className="w-7 h-7 rounded-lg bg-[#042F2E]/8 dark:bg-[#0D9488]/10 flex items-center justify-center flex-shrink-0 text-[#042F2E]/50 dark:text-[#0D9488]">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#191B2F] dark:text-white/90 leading-tight">
+            <p className="text-xs font-semibold text-[#042F2E] dark:text-white/90 leading-tight">
               {isCurrentMonth
                 ? t('spentSoFar', { amount: formatAmount(totalExpense) })
                 : t('spentInMonth', { month: (tMonths.raw('long') as string[])[month.getMonth()], amount: formatAmount(totalExpense) })}
             </p>
             {spendDiff !== null && (
-              <p className="text-[11px] mt-0.5 text-[#191B2F]/50 dark:text-[#D9DDF0]/40 leading-snug">
+              <p className="text-[11px] mt-0.5 text-[#042F2E]/50 dark:text-[#D9DDF0]/40 leading-snug">
                 <span className={cn(
                   'font-semibold',
-                  spendDiff > 0 ? 'text-red-500 dark:text-red-400' : 'text-[#312E81]',
+                  spendDiff > 0 ? 'text-red-500 dark:text-red-400' : 'text-[#0D9488]',
                 )}>
                   {spendDiff > 0 ? '+' : '−'}{formatAmount(Math.abs(spendDiff))}
                 </span>
@@ -271,7 +271,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         <div>
           <SectionHeader
             label={t('spendingPatterns')}
-            accent="bg-gradient-to-b from-[#1A3B3A] to-[#312E81]"
+            accent="bg-gradient-to-b from-[#1A3B3A] to-[#0D9488]"
             expandable
             expanded={expandedSections['patterns']}
             onToggle={() => toggle('patterns')}
@@ -281,14 +281,14 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
               {/* Peak day */}
               {peakDay && (
                 <div className={ROW_CLASS}>
-                  <div className="w-7 h-7 rounded-lg bg-[#312E81]/10 flex items-center justify-center flex-shrink-0 text-[#312E81]">
+                  <div className="w-7 h-7 rounded-lg bg-[#0D9488]/10 flex items-center justify-center flex-shrink-0 text-[#0D9488]">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#191B2F] dark:text-white/90 leading-tight">{t('biggestDay')}</p>
-                    <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35 mt-0.5">
+                    <p className="text-xs font-semibold text-[#042F2E] dark:text-white/90 leading-tight">{t('biggestDay')}</p>
+                    <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5">
                       {new Date(peakDay.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
@@ -301,14 +301,14 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
               {/* Peak day of week */}
               {hasDowData && (
                 <div className={ROW_CLASS}>
-                  <div className="w-7 h-7 rounded-lg bg-[#312E81]/10 flex items-center justify-center flex-shrink-0 text-[#312E81]">
+                  <div className="w-7 h-7 rounded-lg bg-[#0D9488]/10 flex items-center justify-center flex-shrink-0 text-[#0D9488]">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#191B2F] dark:text-white/90 leading-tight">{t('peakDayOfWeek')}</p>
-                    <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35 mt-0.5">{DAY_NAMES[peakDow]}s</p>
+                    <p className="text-xs font-semibold text-[#042F2E] dark:text-white/90 leading-tight">{t('peakDayOfWeek')}</p>
+                    <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5">{DAY_NAMES[peakDow]}s</p>
                   </div>
                   {/* Mini bar chart */}
                   <div className="flex items-end gap-[2px] h-6 flex-shrink-0">
@@ -320,7 +320,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                           key={i}
                           className={cn(
                             'w-2 rounded-sm transition-all',
-                            i === peakDow ? 'bg-[#312E81]' : 'bg-[#D9DDF0]/60 dark:bg-[#191B2F]/40',
+                            i === peakDow ? 'bg-[#0D9488]' : 'bg-[#D9DDF0]/60 dark:bg-[#042F2E]/40',
                           )}
                           style={{ height: `${Math.max(pct * 100, 6)}%` }}
                         />
@@ -333,16 +333,16 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
               {/* Avg transaction */}
               {avgTxValue > 0 && (
                 <div className={ROW_CLASS}>
-                  <div className="w-7 h-7 rounded-lg bg-[#191B2F]/10 dark:bg-[#D9DDF0]/10 flex items-center justify-center flex-shrink-0 text-[#191B2F]/60 dark:text-[#D9DDF0]/50">
+                  <div className="w-7 h-7 rounded-lg bg-[#042F2E]/10 dark:bg-[#D9DDF0]/10 flex items-center justify-center flex-shrink-0 text-[#042F2E]/60 dark:text-[#D9DDF0]/50">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#191B2F] dark:text-white/90 leading-tight">{t('avgPerTransaction')}</p>
-                    <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35 mt-0.5">expenses only</p>
+                    <p className="text-xs font-semibold text-[#042F2E] dark:text-white/90 leading-tight">{t('avgPerTransaction')}</p>
+                    <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5">expenses only</p>
                   </div>
-                  <span className="text-sm font-bold text-[#191B2F] dark:text-white tabular-nums flex-shrink-0">
+                  <span className="text-sm font-bold text-[#042F2E] dark:text-white tabular-nums flex-shrink-0">
                     {formatAmount(avgTxValue)}
                   </span>
                 </div>
@@ -357,7 +357,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         <div>
           <SectionHeader
             label={t('spendingByTag')}
-            accent="bg-gradient-to-b from-[#312E81] to-[#312E81]/40"
+            accent="bg-gradient-to-b from-[#0D9488] to-[#0D9488]/40"
             expandable
             expanded={expandedSections['tags']}
             onToggle={() => toggle('tags')}
@@ -368,25 +368,25 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 const tag = allTags[tagKey];
                 const pct = totalExpense > 0 ? amount / totalExpense : 0;
                 return (
-                  <div key={tagKey} className="flex flex-col gap-1 px-3 py-2 rounded-xl bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07]">
+                  <div key={tagKey} className="flex flex-col gap-1 px-3 py-2 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {tag && (
                           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: tag.color }} />
                         )}
-                        <span className="text-xs font-semibold text-[#191B2F] dark:text-white/90 truncate">
+                        <span className="text-xs font-semibold text-[#042F2E] dark:text-white/90 truncate">
                           {tag?.label ?? tagKey}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[10px] text-[#191B2F]/40 dark:text-[#D9DDF0]/30">{Math.round(pct * 100)}%</span>
+                        <span className="text-[10px] text-[#042F2E]/40 dark:text-[#D9DDF0]/30">{Math.round(pct * 100)}%</span>
                         <span className="text-xs font-bold text-red-500 dark:text-red-400 tabular-nums">−{formatAmount(amount)}</span>
                       </div>
                     </div>
-                    <div className="h-1 rounded-full bg-[#D9DDF0]/50 dark:bg-[#191B2F]/30 overflow-hidden">
+                    <div className="h-1 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/30 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct * 100}%`, backgroundColor: tag?.color ?? '#312E81' }}
+                        style={{ width: `${pct * 100}%`, backgroundColor: tag?.color ?? '#0D9488' }}
                       />
                     </div>
                   </div>
@@ -402,7 +402,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         <div>
           <SectionHeader
             label={t('upcoming')}
-            accent="bg-gradient-to-b from-[#191B2F] to-[#312E81]"
+            accent="bg-gradient-to-b from-[#042F2E] to-[#0D9488]"
             expandable
             expanded={expandedSections['upcoming'] ?? true}
             onToggle={() => toggle('upcoming')}
@@ -413,17 +413,17 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 <div key={tx.id} className={ROW_CLASS}>
                   <div className={cn(
                     'w-[3px] self-stretch rounded-full flex-shrink-0 min-h-[1.5rem]',
-                    tx.category === 'income' ? 'bg-[#312E81]' : 'bg-red-400',
+                    tx.category === 'income' ? 'bg-[#0D9488]' : 'bg-red-400',
                   )} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#191B2F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
-                    <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35 mt-0.5 leading-tight">
+                    <p className="text-sm text-[#042F2E] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
+                    <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5 leading-tight">
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
                   <span className={cn(
                     'text-sm font-bold tabular-nums flex-shrink-0',
-                    tx.category === 'income' ? 'text-[#312E81]' : 'text-red-500 dark:text-red-400',
+                    tx.category === 'income' ? 'text-[#0D9488]' : 'text-red-500 dark:text-red-400',
                   )}>
                     {tx.category === 'income' ? '+' : '−'}{formatAmount(tx.amount)}
                   </span>
@@ -450,7 +450,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 <div key={tx.id} className={ROW_CLASS}>
                   <div className="w-[3px] self-stretch rounded-full bg-red-400 flex-shrink-0 min-h-[1.5rem]" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#191B2F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
+                    <p className="text-sm text-[#042F2E] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     {tx.tag && allTags[tx.tag] && (
                       <span
                         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold text-white mt-0.5"
@@ -475,7 +475,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         <div>
           <SectionHeader
             label={t('recurringLabel')}
-            accent="bg-gradient-to-b from-[#312E81] to-[#35C9A5]"
+            accent="bg-gradient-to-b from-[#0D9488] to-[#35C9A5]"
             expandable
             expanded={expandedSections['recurring']}
             onToggle={() => toggle('recurring')}
@@ -486,17 +486,17 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 <div key={tx.transaction_id} className={ROW_CLASS}>
                   <div className={cn(
                     'w-[3px] self-stretch rounded-full flex-shrink-0 min-h-[1.5rem]',
-                    tx.category === 'income' ? 'bg-[#312E81]' : 'bg-[#191B2F]/40 dark:bg-[#D9DDF0]/30',
+                    tx.category === 'income' ? 'bg-[#0D9488]' : 'bg-[#042F2E]/40 dark:bg-[#D9DDF0]/30',
                   )} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#191B2F] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
+                    <p className="text-sm text-[#042F2E] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     {tx.frequency && (
-                      <p className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35 mt-0.5 leading-tight">{FREQUENCIES[tx.frequency]}</p>
+                      <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5 leading-tight">{FREQUENCIES[tx.frequency]}</p>
                     )}
                   </div>
                   <span className={cn(
                     'text-sm font-bold tabular-nums flex-shrink-0',
-                    tx.category === 'income' ? 'text-[#312E81]' : 'text-red-500 dark:text-red-400',
+                    tx.category === 'income' ? 'text-[#0D9488]' : 'text-red-500 dark:text-red-400',
                   )}>
                     {tx.category === 'income' ? '+' : '−'}{formatAmount(tx.amount)}
                   </span>
@@ -512,7 +512,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         <div>
           <SectionHeader
             label="Savings goals"
-            accent="bg-gradient-to-b from-[#312E81] to-[#35C9A5]"
+            accent="bg-gradient-to-b from-[#0D9488] to-[#35C9A5]"
             expandable
             expanded={expandedSections['goals'] ?? true}
             onToggle={() => toggle('goals')}
@@ -558,39 +558,39 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                   }
                 }
                 return (
-                  <div key={goal.id} className="flex flex-col gap-1.5 px-3 py-2.5 rounded-xl bg-[#F7F8FC] dark:bg-[#191B2F]/10 border border-[#D9DDF0]/50 dark:border-[#312E81]/[0.07]">
+                  <div key={goal.id} className="flex flex-col gap-1.5 px-3 py-2.5 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {linkedTag && (
                           <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />
                         )}
-                        <p className="text-sm font-medium text-[#191B2F] dark:text-white/90 truncate">{goal.name}</p>
+                        <p className="text-sm font-medium text-[#042F2E] dark:text-white/90 truncate">{goal.name}</p>
                       </div>
                       <span className={cn(
                         'text-xs font-semibold tabular-nums flex-shrink-0',
-                        pct >= 1 ? 'text-[#312E81]' : 'text-[#191B2F]/50 dark:text-[#D9DDF0]/40',
+                        pct >= 1 ? 'text-[#0D9488]' : 'text-[#042F2E]/50 dark:text-[#D9DDF0]/40',
                       )}>
                         {Math.round(pct * 100)}%
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-[#D9DDF0]/50 dark:bg-[#191B2F]/40 overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/40 overflow-hidden">
                       <div
-                        className={cn('h-full rounded-full transition-all duration-700', pct >= 1 ? 'bg-[#312E81]' : 'bg-gradient-to-r from-[#312E81] to-[#35C9A5]')}
+                        className={cn('h-full rounded-full transition-all duration-700', pct >= 1 ? 'bg-[#0D9488]' : 'bg-gradient-to-r from-[#0D9488] to-[#35C9A5]')}
                         style={{ width: `${pct * 100}%` }}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35">
+                      <span className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35">
                         {formatAmount(savedAmount)} / {formatAmount(goal.targetAmount)}
                       </span>
                       {daysLeft !== null ? (
-                        <span className="text-[11px] text-[#191B2F]/40 dark:text-[#D9DDF0]/35">
+                        <span className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35">
                           {daysLeft > 0 ? `${daysLeft}d left` : 'Overdue'}
                         </span>
                       ) : savingsCountdown ? (
-                        <span className="text-[11px] text-[#312E81] dark:text-[#312E81]/70 font-medium">{savingsCountdown}</span>
+                        <span className="text-[11px] text-[#0D9488] dark:text-[#0D9488]/70 font-medium">{savingsCountdown}</span>
                       ) : linkedTag ? (
-                        <span className="text-[10px] text-[#191B2F]/30 dark:text-[#D9DDF0]/25 italic">auto</span>
+                        <span className="text-[10px] text-[#042F2E]/30 dark:text-[#D9DDF0]/25 italic">auto</span>
                       ) : null}
                     </div>
                   </div>
@@ -603,12 +603,12 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
 
       {isEmpty && (
         <div className="py-12 text-center">
-          <div className="w-10 h-10 rounded-full bg-[#D9DDF0]/40 dark:bg-[#191B2F]/20 flex items-center justify-center mx-auto mb-3">
-            <svg className="w-5 h-5 text-[#191B2F]/30 dark:text-[#D9DDF0]/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="w-10 h-10 rounded-full bg-[#D9DDF0]/40 dark:bg-[#042F2E]/20 flex items-center justify-center mx-auto mb-3">
+            <svg className="w-5 h-5 text-[#042F2E]/30 dark:text-[#D9DDF0]/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-[#191B2F]/35 dark:text-[#D9DDF0]/25">No transactions this month</p>
+          <p className="text-sm font-medium text-[#042F2E]/35 dark:text-[#D9DDF0]/25">No transactions this month</p>
         </div>
       )}
     </div>
