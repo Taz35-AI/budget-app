@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { ReportsShell } from '@/components/reports/ReportsShell';
 

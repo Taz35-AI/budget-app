@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { ProfileShell } from '@/components/profile/ProfileShell';
 

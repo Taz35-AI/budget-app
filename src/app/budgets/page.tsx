@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 import { BudgetsShell } from '@/components/budgets/BudgetsShell';
 
