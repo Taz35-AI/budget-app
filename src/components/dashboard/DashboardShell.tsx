@@ -265,7 +265,19 @@ export function DashboardShell() {
   const selectedTransactions: DayTransaction[] = selectedDate ? (dayTransactions.get(selectedDate) ?? []) : [];
 
   const today = format(new Date(), 'yyyy-MM-dd');
-  const todayTransactions: DayTransaction[] = dayTransactions.get(today) ?? [];
+  // Mobile panel — full CRUD for selected (or today's) date
+  const [mobilePanelIsAdding, setMobilePanelIsAdding] = useState(false);
+  const [mobilePanelDuplicateValues, setMobilePanelDuplicateValues] = useState<Partial<Transaction> | null>(null);
+  const isMobile = typeof calendarHeight === 'number';
+  const effectiveMobileDate = selectedDate ?? today;
+  const mobilePanelTransactions: DayTransaction[] = dayTransactions.get(effectiveMobileDate) ?? [];
+  const mobilePanelBalance = balances.get(effectiveMobileDate) ?? 0;
+  const handleMobileAddNew = useCallback(() => { impact('medium'); setMobilePanelIsAdding(true); }, [impact]);
+  const handleMobileCancelAdd = useCallback(() => { setMobilePanelIsAdding(false); setMobilePanelDuplicateValues(null); }, []);
+  const handleMobileDuplicate = useCallback((tx: DayTransaction) => {
+    setMobilePanelDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
+    setMobilePanelIsAdding(true);
+  }, []);
 
   const sparklineData = useMemo(() => {
     const result: number[] = [];
@@ -697,44 +709,98 @@ export function DashboardShell() {
           )}
           </div>{/* end calendar hide wrapper */}
 
-          {/* Today's transactions — mobile only, below calendar */}
+          {/* Mobile transactions panel — full CRUD for selected/today's date */}
           {!showMobileStats && (
-            <div className="sm:hidden flex-1 min-h-0 overflow-hidden rounded-2xl
+            <div className="sm:hidden flex-1 min-h-0 flex flex-col overflow-hidden rounded-2xl
               bg-white dark:bg-[#042F2E]
               border border-[#D9DDF0]/60 dark:border-[#0D9488]/[0.08]
               shadow-[0_2px_12px_rgba(25,27,47,0.06)] dark:shadow-none">
+
+              {/* Panel header */}
               <div className="flex items-center justify-between px-3 py-1.5 border-b border-brand-primary/[0.07] dark:border-brand-primary/[0.06] flex-shrink-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20">
-                  {tc('today')} · {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                </span>
-                <button
-                  onClick={() => handleDateClick(today)}
-                  className="text-[10px] font-bold text-brand-primary active:opacity-60 transition-opacity"
-                >
-                  + {tt('addTransaction')}
-                </button>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 flex-shrink-0">
+                    {new Date(effectiveMobileDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                  </span>
+                  {selectedDate && selectedDate !== today && (
+                    <button
+                      onClick={() => { setSelectedDate(null); setMobilePanelIsAdding(false); setMobilePanelDuplicateValues(null); }}
+                      className="text-[9px] text-brand-text/25 dark:text-white/20 hover:text-brand-primary transition-colors flex-shrink-0"
+                    >
+                      ← {tc('today')}
+                    </button>
+                  )}
+                </div>
+                {!mobilePanelIsAdding && (
+                  <button
+                    onClick={handleMobileAddNew}
+                    className="text-[10px] font-bold text-brand-primary active:opacity-60 transition-opacity flex-shrink-0"
+                  >
+                    + {tt('addTransaction')}
+                  </button>
+                )}
               </div>
-              <div className="overflow-y-auto h-[calc(100%-30px)]">
-                {todayTransactions.length === 0 ? (
-                  <div className="px-3 py-3 text-center">
-                    <p className="text-[11px] text-brand-text/30 dark:text-white/20">{tt('noTransactions')}</p>
+
+              {/* Panel body */}
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {create.isError && (
+                  <div className="mx-3 mt-2 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-500/30 text-xs text-rose-700 dark:text-rose-400">
+                    {tt('failedToSave', { message: (create.error as Error)?.message ?? 'Unknown error' })}
+                  </div>
+                )}
+                {mobilePanelIsAdding ? (
+                  <div className="px-3 py-2">
+                    {(accounts?.length ?? 0) >= 2 && (
+                      <div className="flex gap-1 flex-wrap mb-2 pb-2 border-b border-slate-100 dark:border-white/[0.07]">
+                        <p className="w-full text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{tt('addToAccount')}</p>
+                        {accounts!.map((acct) => (
+                          <button
+                            key={acct.id}
+                            type="button"
+                            onClick={() => setDesktopFormAccountId(acct.id)}
+                            className={cn(
+                              'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                              desktopFormAccountId === acct.id
+                                ? 'bg-brand-primary text-white border-brand-primary'
+                                : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                            )}
+                          >
+                            {acct.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <TransactionForm
+                      defaultDate={effectiveMobileDate}
+                      symbol={symbol}
+                      compact
+                      isDuplicate={mobilePanelDuplicateValues !== null}
+                      initialValues={mobilePanelDuplicateValues ?? undefined}
+                      onCancel={handleMobileCancelAdd}
+                      isLoading={create.isPending}
+                      isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
+                      creditLimit={accounts?.find(a => a.id === desktopFormAccountId)?.credit_limit}
+                      onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleMobileCancelAdd(); setTransferDefaultToId(desktopFormAccountId); setShowTransferModal(true); } : undefined}
+                      onSubmit={(values: TransactionFormValues) => {
+                        create.submit(values, {
+                          onSuccess: () => { notification('success'); handleMobileCancelAdd(); },
+                        });
+                      }}
+                    />
                   </div>
                 ) : (
-                  <div className="divide-y divide-brand-primary/[0.05] dark:divide-brand-primary/[0.06]">
-                    {todayTransactions.map((tx) => (
-                      <div key={tx.id} className="flex items-center gap-2 px-3 py-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-semibold text-brand-text dark:text-white truncate leading-tight">{tx.name}</p>
-                        </div>
-                        <span className={cn(
-                          'text-[12px] font-black tabular-nums flex-shrink-0',
-                          tx.category === 'income' ? 'text-brand-positive' : 'text-brand-danger',
-                        )}>
-                          {tx.category === 'income' ? '+' : '−'}{formatAmount(tx.amount)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  <TransactionList
+                    date={effectiveMobileDate}
+                    transactions={mobilePanelTransactions}
+                    balance={mobilePanelBalance}
+                    formatAmount={formatAmount}
+                    symbol={symbol}
+                    onAddNew={handleMobileAddNew}
+                    onDuplicate={handleMobileDuplicate}
+                    onTransfer={() => { setTransferDefaultToId(undefined); setShowTransferModal(true); }}
+                    showTip={isEmpty && onboardingStep === 1}
+                    accounts={accounts}
+                  />
                 )}
               </div>
             </div>
@@ -868,22 +934,24 @@ export function DashboardShell() {
         />
       )}
 
-      {/* Mobile bottom sheet */}
-      <DayBottomSheet
-        date={selectedDate}
-        transactions={selectedTransactions}
-        balance={selectedBalance}
-        formatAmount={formatAmount}
-        symbol={symbol}
-        isAdding={isAdding}
-        onAddNew={handleAddNew}
-        onCancelAdd={handleCancelAdd}
-        onClose={handleClose}
-        onTransfer={(toId) => { setTransferDefaultToId(toId); setShowTransferModal(true); }}
-        showTip={isEmpty && onboardingStep === 1}
-        accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
-        accounts={accounts}
-      />
+      {/* Bottom sheet — desktop only (mobile uses inline panel below calendar) */}
+      {!isMobile && (
+        <DayBottomSheet
+          date={selectedDate}
+          transactions={selectedTransactions}
+          balance={selectedBalance}
+          formatAmount={formatAmount}
+          symbol={symbol}
+          isAdding={isAdding}
+          onAddNew={handleAddNew}
+          onCancelAdd={handleCancelAdd}
+          onClose={handleClose}
+          onTransfer={(toId) => { setTransferDefaultToId(toId); setShowTransferModal(true); }}
+          showTip={isEmpty && onboardingStep === 1}
+          accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
+          accounts={accounts}
+        />
+      )}
     </div>
     </AppLayout>
   );
