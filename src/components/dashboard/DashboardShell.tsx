@@ -58,23 +58,6 @@ function useMonthStats(
 }
 
 
-// ─── Mini sparkline ───────────────────────────────────────────────────────────
-
-function MiniSparkline({ data }: { data: number[] }) {
-  if (data.length < 2) return null;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const W = 40, H = 18;
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / range) * H}`).join(' ');
-  const isPositive = data[data.length - 1] >= data[0];
-  return (
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none" className="flex-shrink-0">
-      <polyline points={pts} stroke={isPositive ? '#16A34A' : '#DC2626'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
 export function DashboardShell() {
@@ -163,11 +146,11 @@ export function DashboardShell() {
     return result;
   }, [dayTransactions, searchText, searchAmountMin, searchAmountMax, allTags, tTags]);
 
-  // On mobile, FullCalendar uses a fixed pixel height so the calendar doesn't fill the viewport.
+  // On mobile, FullCalendar uses height="100%" so it fills the flex-1 container.
   // On desktop it uses "auto" (content-sized). Switch on resize.
-  const [calendarHeight, setCalendarHeight] = useState<string | number>('auto');
+  const [calendarHeight, setCalendarHeight] = useState<'auto' | '100%'>('auto');
   useEffect(() => {
-    const update = () => setCalendarHeight(window.innerWidth < 640 ? 240 : 'auto');
+    const update = () => setCalendarHeight(window.innerWidth < 640 ? '100%' : 'auto');
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
@@ -264,30 +247,6 @@ export function DashboardShell() {
   const selectedBalance = selectedDate ? (balances.get(selectedDate) ?? 0) : 0;
   const selectedTransactions: DayTransaction[] = selectedDate ? (dayTransactions.get(selectedDate) ?? []) : [];
 
-  const today = format(new Date(), 'yyyy-MM-dd');
-  // Mobile panel — full CRUD for selected (or today's) date
-  const [mobilePanelIsAdding, setMobilePanelIsAdding] = useState(false);
-  const [mobilePanelDuplicateValues, setMobilePanelDuplicateValues] = useState<Partial<Transaction> | null>(null);
-  const isMobile = typeof calendarHeight === 'number';
-  const effectiveMobileDate = selectedDate ?? today;
-  const mobilePanelTransactions: DayTransaction[] = dayTransactions.get(effectiveMobileDate) ?? [];
-  const mobilePanelBalance = balances.get(effectiveMobileDate) ?? 0;
-  const handleMobileAddNew = useCallback(() => { impact('medium'); setMobilePanelIsAdding(true); }, [impact]);
-  const handleMobileCancelAdd = useCallback(() => { setMobilePanelIsAdding(false); setMobilePanelDuplicateValues(null); }, []);
-  const handleMobileDuplicate = useCallback((tx: DayTransaction) => {
-    setMobilePanelDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
-    setMobilePanelIsAdding(true);
-  }, []);
-
-  const sparklineData = useMemo(() => {
-    const result: number[] = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = format(addDays(new Date(), -i), 'yyyy-MM-dd');
-      result.push(balances.get(d) ?? 0);
-    }
-    return result;
-  }, [balances]);
-
   return (
     <AppLayout>
     <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
@@ -305,7 +264,7 @@ export function DashboardShell() {
         {/* Accent line */}
         <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#0D9488]/40 to-transparent" />
 
-        <div className="px-4 sm:px-6 h-12 sm:h-14 flex items-center gap-3">
+        <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
 
           {/* Hamburger — mobile only */}
           <NavMenuButton />
@@ -344,7 +303,7 @@ export function DashboardShell() {
       {/* ── Two-column layout ────────────────────────────────────────── */}
       {/* Mobile: fixed full-height between header (3rem) and bottom nav (4rem), equal top/bottom padding */}
       <div className="flex gap-4 px-3 sm:px-5 py-3 sm:py-4 items-stretch sm:items-start
-        h-[calc(100dvh-3rem-54px)] sm:h-auto">
+        h-[calc(100dvh-4rem-4rem)] sm:h-auto">
 
         {/* Left: stats + calendar */}
         <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-3">
@@ -491,7 +450,7 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
-              <div className="px-3 pt-2 pb-1.5 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
+              <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (mobile) ── */
@@ -585,15 +544,12 @@ export function DashboardShell() {
                     />
                   </div>
                 )}
-                <div className="flex items-center justify-between gap-2">
-                  <span className={cn(
-                    'text-[1.2rem] font-black tabular-nums leading-none tracking-tight',
-                    todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
-                  )}>
-                    {formatAmount(todayBalance)}
-                  </span>
-                  <MiniSparkline data={sparklineData} />
-                </div>
+                <span className={cn(
+                  'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
+                  todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                )}>
+                  {formatAmount(todayBalance)}
+                </span>
                 {searchOpen && matchingDates && (
                   <p className="text-[9px] text-amber-500 font-semibold mt-0.5 leading-none">
                     {t('daysMatched', { count: matchingDates.size })}
@@ -665,7 +621,7 @@ export function DashboardShell() {
 
           {/* Calendar — hidden on mobile when stats panel is active */}
           {/* flex-1 min-h-0 lets it fill remaining height on mobile; sm:flex-initial resets on desktop */}
-          <div className={cn('flex-shrink-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
+          <div className={cn('flex-1 min-h-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
           {isLoading && balances.size === 0 ? (
             <div className="animate-pulse rounded-3xl bg-white dark:bg-[#042F2E] p-5 space-y-3 border border-[#D9DDF0]/60 dark:border-[#042F2E]/30">
               <div className="h-5 bg-[#D9DDF0]/60 dark:bg-[#042F2E]/30 rounded-lg w-36" />
@@ -708,103 +664,6 @@ export function DashboardShell() {
             </div>
           )}
           </div>{/* end calendar hide wrapper */}
-
-          {/* Mobile transactions panel — full CRUD for selected/today's date */}
-          {!showMobileStats && (
-            <div className="sm:hidden flex-1 min-h-0 flex flex-col overflow-hidden rounded-2xl
-              bg-white dark:bg-[#042F2E]
-              border border-[#D9DDF0]/60 dark:border-[#0D9488]/[0.08]
-              shadow-[0_2px_12px_rgba(25,27,47,0.06)] dark:shadow-none">
-
-              {/* Panel header */}
-              <div className="flex items-center justify-between px-3 py-1.5 border-b border-brand-primary/[0.07] dark:border-brand-primary/[0.06] flex-shrink-0">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 flex-shrink-0">
-                    {new Date(effectiveMobileDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
-                  </span>
-                  {selectedDate && selectedDate !== today && (
-                    <button
-                      onClick={() => { setSelectedDate(null); setMobilePanelIsAdding(false); setMobilePanelDuplicateValues(null); }}
-                      className="text-[9px] text-brand-text/25 dark:text-white/20 hover:text-brand-primary transition-colors flex-shrink-0"
-                    >
-                      ← {tc('today')}
-                    </button>
-                  )}
-                </div>
-                {!mobilePanelIsAdding && (
-                  <button
-                    onClick={handleMobileAddNew}
-                    className="text-[10px] font-bold text-brand-primary active:opacity-60 transition-opacity flex-shrink-0"
-                  >
-                    + {tt('addTransaction')}
-                  </button>
-                )}
-              </div>
-
-              {/* Panel body */}
-              <div className="flex-1 min-h-0 overflow-y-auto">
-                {create.isError && (
-                  <div className="mx-3 mt-2 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-500/30 text-xs text-rose-700 dark:text-rose-400">
-                    {tt('failedToSave', { message: (create.error as Error)?.message ?? 'Unknown error' })}
-                  </div>
-                )}
-                {mobilePanelIsAdding ? (
-                  <div className="px-3 py-2">
-                    {(accounts?.length ?? 0) >= 2 && (
-                      <div className="flex gap-1 flex-wrap mb-2 pb-2 border-b border-slate-100 dark:border-white/[0.07]">
-                        <p className="w-full text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{tt('addToAccount')}</p>
-                        {accounts!.map((acct) => (
-                          <button
-                            key={acct.id}
-                            type="button"
-                            onClick={() => setDesktopFormAccountId(acct.id)}
-                            className={cn(
-                              'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
-                              desktopFormAccountId === acct.id
-                                ? 'bg-brand-primary text-white border-brand-primary'
-                                : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
-                            )}
-                          >
-                            {acct.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <TransactionForm
-                      defaultDate={effectiveMobileDate}
-                      symbol={symbol}
-                      compact
-                      isDuplicate={mobilePanelDuplicateValues !== null}
-                      initialValues={mobilePanelDuplicateValues ?? undefined}
-                      onCancel={handleMobileCancelAdd}
-                      isLoading={create.isPending}
-                      isCreditAccount={accounts?.find(a => a.id === desktopFormAccountId)?.type === 'credit'}
-                      creditLimit={accounts?.find(a => a.id === desktopFormAccountId)?.credit_limit}
-                      onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleMobileCancelAdd(); setTransferDefaultToId(desktopFormAccountId); setShowTransferModal(true); } : undefined}
-                      onSubmit={(values: TransactionFormValues) => {
-                        create.submit(values, {
-                          onSuccess: () => { notification('success'); handleMobileCancelAdd(); },
-                        });
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <TransactionList
-                    date={effectiveMobileDate}
-                    transactions={mobilePanelTransactions}
-                    balance={mobilePanelBalance}
-                    formatAmount={formatAmount}
-                    symbol={symbol}
-                    onAddNew={handleMobileAddNew}
-                    onDuplicate={handleMobileDuplicate}
-                    onTransfer={() => { setTransferDefaultToId(undefined); setShowTransferModal(true); }}
-                    showTip={isEmpty && onboardingStep === 1}
-                    accounts={accounts}
-                  />
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Month summary — desktop right panel only */}
         </div>
@@ -934,24 +793,22 @@ export function DashboardShell() {
         />
       )}
 
-      {/* Bottom sheet — desktop only (mobile uses inline panel below calendar) */}
-      {!isMobile && (
-        <DayBottomSheet
-          date={selectedDate}
-          transactions={selectedTransactions}
-          balance={selectedBalance}
-          formatAmount={formatAmount}
-          symbol={symbol}
-          isAdding={isAdding}
-          onAddNew={handleAddNew}
-          onCancelAdd={handleCancelAdd}
-          onClose={handleClose}
-          onTransfer={(toId) => { setTransferDefaultToId(toId); setShowTransferModal(true); }}
-          showTip={isEmpty && onboardingStep === 1}
-          accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
-          accounts={accounts}
-        />
-      )}
+      {/* Mobile bottom sheet */}
+      <DayBottomSheet
+        date={selectedDate}
+        transactions={selectedTransactions}
+        balance={selectedBalance}
+        formatAmount={formatAmount}
+        symbol={symbol}
+        isAdding={isAdding}
+        onAddNew={handleAddNew}
+        onCancelAdd={handleCancelAdd}
+        onClose={handleClose}
+        onTransfer={(toId) => { setTransferDefaultToId(toId); setShowTransferModal(true); }}
+        showTip={isEmpty && onboardingStep === 1}
+        accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
+        accounts={accounts}
+      />
     </div>
     </AppLayout>
   );

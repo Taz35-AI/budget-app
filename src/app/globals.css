@@ -273,42 +273,26 @@
   }
 
   .fc .fc-daygrid-day-frame {
-    height: 42px !important;
-    max-height: 42px !important;
+    height: 56px !important;
+    max-height: 56px !important;
     min-height: 0 !important;
     border-radius: 0.625rem;
     overflow: hidden !important;
   }
 
   .fc .fc-daygrid-day {
-    height: 42px !important;
-    max-height: 42px !important;
+    height: 56px !important;
+    max-height: 56px !important;
   }
 
   .fc .fc-daygrid-body table tbody tr {
-    height: 42px !important;
-    max-height: 42px !important;
+    height: 56px !important;
+    max-height: 56px !important;
   }
 
   .fc .fc-toolbar-title {
-    font-size: 0.78rem;
+    font-size: 1rem;
     font-weight: 800;
-  }
-
-  .fc .fc-toolbar {
-    padding: 4px 8px !important;
-    margin-bottom: 2px !important;
-    min-height: 0 !important;
-  }
-
-  .fc .fc-toolbar.fc-header-toolbar {
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-  }
-
-  .fc .fc-button {
-    padding: 2px 6px !important;
-    font-size: 0.7rem !important;
   }
 
   .fc table {

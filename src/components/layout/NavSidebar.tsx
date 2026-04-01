@@ -297,7 +297,7 @@ export function MobileLogo() {
         alt="Spentum"
         width={360}
         height={144}
-        className="h-[34px] w-auto"
+        className="h-[65px] w-auto"
         priority
       />
     </div>
