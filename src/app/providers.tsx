@@ -55,10 +55,10 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 function KeyboardProvider() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    const show = Keyboard.addListener('keyboardWillShow', (info) => {
+    const show = Keyboard.addListener('keyboardDidShow', (info) => {
       document.documentElement.style.setProperty('--kb', `${info.keyboardHeight}px`);
     });
-    const hide = Keyboard.addListener('keyboardWillHide', () => {
+    const hide = Keyboard.addListener('keyboardDidHide', () => {
       document.documentElement.style.setProperty('--kb', '0px');
     });
     return () => {

@@ -40,7 +40,6 @@ export function DayBottomSheet({
   accounts,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
   const currentDragY = useRef<number>(0);
 
@@ -76,22 +75,6 @@ export function DayBottomSheet({
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
-
-  // Scroll focused input into view inside the sheet body.
-  // Keyboard resizing is handled natively: adjustResize on Android (AndroidManifest) +
-  // @capacitor/keyboard resize:body on iOS (capacitor.config.ts)
-  useEffect(() => {
-    const body = bodyRef.current;
-    if (!body) return;
-    const onFocusIn = (e: FocusEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
-        setTimeout(() => target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 350);
-      }
-    };
-    body.addEventListener('focusin', onFocusIn);
-    return () => body.removeEventListener('focusin', onFocusIn);
-  }, []);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     dragStartY.current = e.touches[0].clientY;
@@ -137,13 +120,10 @@ export function DayBottomSheet({
           'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-2xl',
           'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
+          'max-h-[92dvh]',
           isOpen ? 'translate-y-0' : 'translate-y-full',
         )}
-        style={{
-          willChange: 'transform',
-          bottom: 'var(--kb, 0px)',
-          maxHeight: 'calc(92dvh - var(--kb, 0px))',
-        }}
+        style={{ willChange: 'transform' }}
       >
         {/* Drag handle + close button on same row */}
         <div
@@ -173,8 +153,8 @@ export function DayBottomSheet({
           </div>
         )}
 
-        {/* Body */}
-        <div ref={bodyRef} className="flex-1 overflow-y-auto px-5 pb-8 overscroll-contain">
+        {/* Body — padding-bottom grows by keyboard height so the browser can scroll any focused input above the keyboard */}
+        <div className="flex-1 overflow-y-auto px-5 overscroll-contain" style={{ paddingBottom: 'calc(2rem + var(--kb, 0px))' }}>
           {date && (
             isShowingForm ? (
               <>
