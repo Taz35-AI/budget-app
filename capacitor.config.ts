@@ -7,14 +7,12 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://www.spentum.com',
     cleartext: false,
-    androidScheme: 'https',
   },
   ios: {
     contentInset: 'automatic',
   },
   android: {
     backgroundColor: '#0C0C1A',
-    allowMixedContent: false,
   },
 };
 
