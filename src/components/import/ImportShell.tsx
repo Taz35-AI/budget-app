@@ -161,8 +161,6 @@ export default function ImportShell() {
   const [recurringGroups, setRecurringGroups] = useState<RecurringGroup[]>([]);
   const [categorising, setCategorising] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
-  const [importProgress, setImportProgress] = useState(0);
-  const [importTotal, setImportTotal] = useState(0);
   const [savedTemplates, setSavedTemplates] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -315,56 +313,47 @@ export default function ImportShell() {
   // ── Import ─────────────────────────────────────────────────────────────────
   const doImport = useCallback(async (txs: ParsedTransaction[], recurring: RecurringGroup[]) => {
     setStep('importing');
-    const confirmedGroups = recurring.filter((g) => g.confirmed);
-    const confirmedMerchants = new Set(confirmedGroups.map((g) => g.merchant));
-    const oneOffs = txs.filter((tx) => !confirmedMerchants.has(tx.name));
-    const total = confirmedGroups.length + oneOffs.length;
-    setImportTotal(total);
-    setImportProgress(0);
 
-    let count = 0;
+    const confirmedGroups = recurring.filter((g) => g.confirmed);
+    const confirmedMerchantNorms = new Set(confirmedGroups.map((g) => normalizeMerchant(g.merchant)));
+    const oneOffs = txs.filter((tx) => !confirmedMerchantNorms.has(normalizeMerchant(tx.name)));
     const accountId = selectedAccountId || null;
 
-    for (const group of confirmedGroups) {
-      try {
-        const res = await fetch('/api/transactions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: group.merchant,
-            amount: group.amount,
-            category: group.category,
-            type: 'recurring',
-            tag: group.tag,
-            frequency: group.interval,
-            start_date: txs.filter((t) => group.transactionIds.includes(t.id)).map((t) => t.date).sort()[0],
-            account_id: accountId,
-          }),
-        });
-        if (res.ok) count++;
-      } catch { /* continue */ }
-      setImportProgress((p) => p + 1);
-    }
+    // Build a flat array of all rows — single network call to the bulk endpoint
+    const rows = [
+      ...confirmedGroups.map((group) => ({
+        name: group.merchant,
+        amount: group.amount,
+        category: group.category,
+        type: 'recurring',
+        tag: group.tag,
+        frequency: group.interval,
+        start_date: txs.filter((t) => group.transactionIds.includes(t.id)).map((t) => t.date).sort()[0],
+        account_id: accountId,
+      })),
+      ...oneOffs.map((tx) => ({
+        name: tx.name,
+        amount: tx.amount,
+        category: tx.category,
+        type: 'one_off',
+        tag: tx.tag,
+        date: tx.date,
+        account_id: accountId,
+      })),
+    ];
 
-    for (const tx of oneOffs) {
-      try {
-        const res = await fetch('/api/transactions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: tx.name,
-            amount: tx.amount,
-            category: tx.category,
-            type: 'one_off',
-            tag: tx.tag,
-            date: tx.date,
-            account_id: accountId,
-          }),
-        });
-        if (res.ok) count++;
-      } catch { /* continue */ }
-      setImportProgress((p) => p + 1);
-    }
+    let count = 0;
+    try {
+      const res = await fetch('/api/import/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactions: rows }),
+      });
+      if (res.ok) {
+        const { inserted } = await res.json() as { inserted: number };
+        count = inserted;
+      }
+    } catch { /* count stays 0 */ }
 
     // Tell React Query the transactions cache is stale so the dashboard
     // shows the newly imported data immediately
@@ -600,22 +589,11 @@ export default function ImportShell() {
         </div>
       )}
 
-      {/* ── Importing (progress) ── */}
+      {/* ── Importing (spinner) ── */}
       {step === 'importing' && (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <div className="w-10 h-10 rounded-full border-2 border-brand-text/20 dark:border-white/20 border-t-teal-500 animate-spin" />
           <p className="text-brand-text dark:text-white font-medium">{t('importing')}</p>
-          {importTotal > 0 && (
-            <div className="w-full max-w-xs">
-              <div className="flex justify-between text-xs text-brand-text/50 dark:text-white/50 mb-1.5">
-                <span>{importProgress} / {importTotal}</span>
-                <span>{Math.round((importProgress / importTotal) * 100)}%</span>
-              </div>
-              <div className="h-1.5 rounded-full bg-brand-text/10 dark:bg-white/10 overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full transition-all duration-200" style={{ width: `${(importProgress / importTotal) * 100}%` }} />
-              </div>
-            </div>
-          )}
         </div>
       )}
 
