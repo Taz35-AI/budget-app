@@ -91,6 +91,26 @@ function uid() {
   return Math.random().toString(36).slice(2);
 }
 
+/**
+ * Strips bank-statement noise from a merchant name so that entries like
+ * "NETFLIX.COM 12345" and "NETFLIX.COM 67890" resolve to the same key.
+ * Only used for grouping — the original name is kept for display.
+ */
+function normalizeMerchant(name: string): string {
+  let s = name.toUpperCase().trim();
+  // Remove trailing pure-digit references (e.g. card transaction IDs)
+  s = s.replace(/\s+\d{4,}$/, '');
+  // Remove REF: / REF / TXN / ID patterns
+  s = s.replace(/\s*(REF[:\s#]|TXN[:\s]|TRANS[:\s]|ID[:\s])\S+$/i, '');
+  // Remove trailing hash codes (#1234, *1234)
+  s = s.replace(/[\s*#\/]+\w{4,}$/, '');
+  // Collapse internal whitespace and trim
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  // Drop trailing punctuation
+  s = s.replace(/[^A-Z0-9]+$/, '').trim();
+  return s || name.toUpperCase().trim();
+}
+
 // ─── Step indicator ───────────────────────────────────────────────────────────
 
 function StepIndicator({ step }: { step: Step }) {
@@ -254,10 +274,10 @@ export default function ImportShell() {
   const handlePreviewNext = () => {
     const active = transactions.filter((tx) => !tx.skipped);
 
-    // Group by merchant + category only (ignore tag — it may still be 'other')
+    // Group by normalised merchant + category (strips trailing refs/IDs from bank names)
     const groups: Record<string, ParsedTransaction[]> = {};
     for (const tx of active) {
-      const key = `${tx.name}||${tx.category}`;
+      const key = `${normalizeMerchant(tx.name)}||${tx.category}`;
       (groups[key] ??= []).push(tx);
     }
 
@@ -273,13 +293,15 @@ export default function ImportShell() {
       const interval = detectInterval(txs.map((t) => t.date));
       if (!interval) continue;
 
-      const [merchant, category] = key.split('||');
+      const [normName, category] = key.split('||');
       // Use the most common tag among the group's transactions
       const tagCounts: Record<string, number> = {};
       for (const tx of txs) tagCounts[tx.tag] = (tagCounts[tx.tag] ?? 0) + 1;
       const tag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0][0];
+      // Use the most common raw merchant name (shortest = least noise) as display name
+      const merchant = txs.map((t) => t.name).sort((a, b) => a.length - b.length)[0];
 
-      detected.push({ merchant, tag, category: category as 'income' | 'expense', amount: avg, interval, transactionIds: txs.map((t) => t.id), confirmed: true });
+      detected.push({ merchant: merchant ?? normName, tag, category: category as 'income' | 'expense', amount: avg, interval, transactionIds: txs.map((t) => t.id), confirmed: true });
     }
 
     setRecurringGroups(detected);
