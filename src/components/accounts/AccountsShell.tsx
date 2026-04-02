@@ -42,8 +42,9 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
     return accounts.map((acct) => {
       const acctTxs = txData.transactions.filter((t) => t.account_id === acct.id);
 
-      // Find earliest relevant date
-      let fromDate = todayStr;
+      // Start at least 3 months back so past-month rows have data
+      const threeMonthsAgo = format(startOfMonth(addMonths(today, -3)), 'yyyy-MM-dd');
+      let fromDate = threeMonthsAgo;
       for (const tx of acctTxs) {
         const d = tx.type === 'one_off' ? (tx.date ?? todayStr) : (tx.start_date ?? todayStr);
         if (d < fromDate) fromDate = d;
@@ -59,9 +60,10 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
 
       const todayBalance = balances.get(todayStr) ?? 0;
 
-      // Current month + next 3 months
+      // 3 past months + current + 8 future = 12 rows total
+      const PAST_MONTHS = 3;
       const monthlySummaries: MonthSummary[] = Array.from({ length: 12 }, (_, i) => {
-        const month = addMonths(today, i);
+        const month = addMonths(today, i - PAST_MONTHS);
         const start = format(startOfMonth(month), 'yyyy-MM-dd');
         const end = format(endOfMonth(month), 'yyyy-MM-dd');
 
@@ -75,8 +77,8 @@ function useAccountSummaries(): { summaries: AccountSummary[]; isLoading: boolea
           }
         });
 
-        // End-of-month projected balance: use last known balance at or before end of month
-        let endBalance = todayBalance;
+        // End-of-month balance: use last known balance at or before end of month
+        let endBalance = 0;
         for (const [date, bal] of balances) {
           if (date <= end) endBalance = bal;
         }
@@ -236,7 +238,7 @@ function AccountCard({
           </div>
 
           {monthlySummaries.map(({ month, income, expense, endBalance }, i) => {
-            const isCurrentMonth = i === 0;
+            const isCurrentMonth = i === 3; // index 3 = current month (after 3 past months)
             return (
               <div
                 key={i}
