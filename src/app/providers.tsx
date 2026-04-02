@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, createContext, useContext, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
@@ -69,6 +70,37 @@ function KeyboardProvider() {
   return null;
 }
 
+// ── Recovery redirect ──────────────────────────────────────────────────────────
+// Supabase sometimes appends the recovery token as a hash to the site URL
+// (e.g. https://spentum.com/#access_token=...&type=recovery) when the
+// redirectTo URL isn't resolved correctly. This detects it client-side and
+// forwards the user to the reset-password page before they see the landing page.
+
+function RecoveryRedirectHandler() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Hash-based implicit flow: #access_token=...&type=recovery
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      router.replace('/reset-password' + hash);
+      return;
+    }
+
+    // PKCE flow: Supabase sent ?code= to the site root instead of redirectTo
+    if (window.location.pathname === '/') {
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (code) {
+        router.replace('/reset-password?code=' + code);
+      }
+    }
+  }, [router]);
+
+  return null;
+}
+
 // ── App Providers ──────────────────────────────────────────────────────────────
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -90,6 +122,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <I18nProvider>
           <RealtimeSyncProvider>
             <SettingsSyncProvider>
+              <RecoveryRedirectHandler />
               <KeyboardProvider />
               <CapacitorAuthHandler />
               {children}
