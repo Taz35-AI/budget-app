@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -68,18 +67,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    // Use implicit flow so the email link uses token-hash (verified server-side by
-    // Supabase) rather than PKCE. PKCE stores a code verifier in the originating
-    // browser's localStorage — clicking the link in an email app's browser fails
-    // because that browser has no verifier. Implicit flow has no such requirement.
-    const resetClient = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { auth: { flowType: 'implicit' } },
-    );
-    const { error } = await resetClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/reset-password`,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {
       setError(error.message);

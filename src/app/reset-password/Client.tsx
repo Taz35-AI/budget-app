@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 type Stage = 'loading' | 'form' | 'success' | 'invalid';
 
-function ResetPasswordForm() {
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const supabase = createClient();
 
   const [stage, setStage] = useState<Stage>('loading');
@@ -20,43 +19,10 @@ function ResetPasswordForm() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const code = searchParams.get('code');
-
-    // PKCE flow — ?code= param
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        setStage(error ? 'invalid' : 'form');
-      });
-      return;
-    }
-
-    // Implicit/hash flow — #access_token=...&type=recovery
-    const hash = window.location.hash;
-    if (hash && hash.includes('type=recovery')) {
-      const params = new URLSearchParams(hash.slice(1));
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-      if (access_token && refresh_token) {
-        supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
-          setStage(error ? 'invalid' : 'form');
-        });
-        return;
-      }
-    }
-
-    // Already have a session (set server-side by /auth/confirm)
+    // /auth/confirm verified the token_hash server-side and set a session cookie.
+    // Just check if the user is present — if yes, show the form.
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) { setStage('form'); return; }
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setStage('form');
-      });
-
-      const timer = setTimeout(() => {
-        setStage((s) => (s === 'loading' ? 'invalid' : s));
-      }, 3000);
-
-      return () => { subscription.unsubscribe(); clearTimeout(timer); };
+      setStage(user ? 'form' : 'invalid');
     });
   }, []);
 
@@ -180,14 +146,3 @@ function ResetPasswordForm() {
   );
 }
 
-export default function ResetPasswordPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#011817] flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
-      </div>
-    }>
-      <ResetPasswordForm />
-    </Suspense>
-  );
-}
