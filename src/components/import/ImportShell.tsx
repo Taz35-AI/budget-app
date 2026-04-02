@@ -181,8 +181,8 @@ export default function ImportShell() {
     if (f) handleFile(f);
   };
 
-  // ── Step 2: Map → parse & categorise ──────────────────────────────────────
-  const handleMap = async () => {
+  // ── Step 2: Map → parse (instant, no AI) ──────────────────────────────────
+  const handleMap = () => {
     if (!colDate || !colName || !colAmount) { setError(t('errorMapRequired')); return; }
     setError('');
     const cutoff = threeMthsAgo();
@@ -195,23 +195,16 @@ export default function ImportShell() {
       const nameRaw = (row[colName] ?? '').trim().slice(0, 200);
       if (!nameRaw) continue;
 
-      // Parse amount — strip currency symbols, handle comma decimals
-      const rawAmtStr = (row[colAmount] ?? '').trim();
-      const amtStr = rawAmtStr.replace(/[^0-9.,\-]/g, '').replace(',', '.');
+      const amtStr = (row[colAmount] ?? '').trim().replace(/[^0-9.,\-]/g, '').replace(',', '.');
       const rawNum = parseFloat(amtStr);
       if (isNaN(rawNum) || rawNum === 0) continue;
       const amt = Math.abs(rawNum);
 
-      // Category detection (priority order):
-      // 1. Explicit debit/credit column if mapped
-      // 2. Sign of the raw amount (positive = income, negative = expense)
-      // Grok will further refine per-merchant name below.
       let category: 'income' | 'expense';
       if (colCategory) {
         const v = (row[colCategory] ?? '').toLowerCase().trim();
         category = /^cr$|credit|^c$|^in$/.test(v) ? 'income' : 'expense';
       } else {
-        // Positive raw value → income (credit), negative → expense (debit)
         category = rawNum >= 0 ? 'income' : 'expense';
       }
 
@@ -219,40 +212,42 @@ export default function ImportShell() {
     }
 
     if (!parsed.length) { setError(t('errorNoRows')); return; }
+    setTransactions(parsed);
+    setStep('preview');
+  };
 
-    // Batch categorise unique merchants via Grok
+  // ── AI auto-categorise (on demand from preview) ────────────────────────────
+  const handleAutoCategorise = async () => {
     setCategorising(true);
-    const uniqueMerchants = [...new Set(parsed.map((p) => p.name))];
+    setError('');
+    const uniqueMerchants = [...new Set(transactions.map((tx) => tx.name))];
     try {
       const res = await fetch('/api/import/categorise', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ merchants: uniqueMerchants, tags: allTags }),
       });
-      if (res.ok) {
-        const { categorisations } = await res.json() as {
-          categorisations: Record<string, { tag: string; category: string }>;
-        };
-        // Build a normalised lookup (trim + lowercase) so casing/whitespace in
-        // bank statement names doesn't prevent a match
-        const normMap: Record<string, { tag: string; category: string }> = {};
-        for (const [k, v] of Object.entries(categorisations)) {
-          normMap[k.trim().toLowerCase()] = v;
-        }
-        for (const tx of parsed) {
-          const cat = normMap[tx.name.trim().toLowerCase()];
-          if (cat?.tag) tx.tag = cat.tag;
-          if (cat?.category === 'income' || cat?.category === 'expense') tx.category = cat.category;
-        }
+      if (!res.ok) throw new Error('API error');
+      const { categorisations } = await res.json() as {
+        categorisations: Record<string, { tag: string; category: string }>;
+      };
+      const normMap: Record<string, { tag: string; category: string }> = {};
+      for (const [k, v] of Object.entries(categorisations)) {
+        normMap[k.trim().toLowerCase()] = v;
       }
+      setTransactions((prev) => prev.map((tx) => {
+        const cat = normMap[tx.name.trim().toLowerCase()];
+        return {
+          ...tx,
+          tag: cat?.tag ?? tx.tag,
+          category: (cat?.category === 'income' || cat?.category === 'expense') ? cat.category : tx.category,
+        };
+      }));
     } catch {
-      // non-fatal — proceed with expense defaults
+      setError(t('errorCategorise'));
     } finally {
       setCategorising(false);
     }
-
-    setTransactions(parsed);
-    setStep('preview');
   };
 
   // ── Step 3 → detect recurring ──────────────────────────────────────────────
@@ -414,10 +409,7 @@ export default function ImportShell() {
           ))}
           <div className="flex gap-3 mt-2">
             <button onClick={() => setStep('upload')} className={btnSecondary}>{t('back')}</button>
-            <button onClick={handleMap} disabled={categorising} className={btnPrimary}>
-              {categorising && <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
-              {categorising ? t('categorising') : t('next')}
-            </button>
+            <button onClick={handleMap} className={btnPrimary}>{t('next')}</button>
           </div>
         </div>
       )}
@@ -425,7 +417,28 @@ export default function ImportShell() {
       {/* ── STEP 3: Preview ── */}
       {step === 'preview' && (
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
+            <button
+              onClick={handleAutoCategorise}
+              disabled={categorising}
+              className="flex-shrink-0 flex items-center gap-2 px-4 h-9 rounded-xl border border-teal-500/40 bg-teal-500/10 text-teal-300 text-sm font-medium hover:bg-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {categorising ? (
+                <>
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-teal-400/30 border-t-teal-400 animate-spin" />
+                  {t('categorising')}
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                  </svg>
+                  {t('autoCategorise')}
+                </>
+              )}
+            </button>
+          </div>
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">

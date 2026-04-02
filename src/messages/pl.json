@@ -457,6 +457,8 @@
     "back": "Wstecz",
     "next": "Dalej",
     "categorising": "Kategoryzowanie…",
+    "autoCategorise": "Auto-kategoryzuj z AI",
+    "errorCategorise": "Kategoryzacja AI nie powiodła się. Możesz kontynuować i kategoryzować ręcznie.",
     "importing": "Importowanie…",
     "importBtn": "Importuj",
     "previewHint": "{count} transakcji gotowych. Odznacz te, które chcesz pominąć.",

@@ -457,6 +457,8 @@
     "back": "Back",
     "next": "Next",
     "categorising": "Categorising…",
+    "autoCategorise": "Auto-categorise with AI",
+    "errorCategorise": "AI categorisation failed. You can still proceed and categorise manually.",
     "importing": "Importing…",
     "importBtn": "Import",
     "previewHint": "{count} transactions ready to import. Uncheck any you want to skip.",

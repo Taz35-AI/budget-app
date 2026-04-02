@@ -457,6 +457,8 @@
     "back": "Zurück",
     "next": "Weiter",
     "categorising": "Kategorisiere…",
+    "autoCategorise": "Mit KI kategorisieren",
+    "errorCategorise": "KI-Kategorisierung fehlgeschlagen. Sie können fortfahren und manuell kategorisieren.",
     "importing": "Importiere…",
     "importBtn": "Importieren",
     "previewHint": "{count} Transaktionen bereit. Deaktivieren Sie Einträge zum Überspringen.",

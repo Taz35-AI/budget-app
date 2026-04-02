@@ -457,6 +457,8 @@
     "back": "Atrás",
     "next": "Siguiente",
     "categorising": "Categorizando…",
+    "autoCategorise": "Auto-categorizar con IA",
+    "errorCategorise": "La categorización IA falló. Puedes continuar y categorizar manualmente.",
     "importing": "Importando…",
     "importBtn": "Importar",
     "previewHint": "{count} transacciones listas. Desmarca las que quieras omitir.",

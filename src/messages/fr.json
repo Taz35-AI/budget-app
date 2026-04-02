@@ -457,6 +457,8 @@
     "back": "Retour",
     "next": "Suivant",
     "categorising": "Catégorisation…",
+    "autoCategorise": "Catégoriser avec l'IA",
+    "errorCategorise": "La catégorisation IA a échoué. Vous pouvez continuer et catégoriser manuellement.",
     "importing": "Importation…",
     "importBtn": "Importer",
     "previewHint": "{count} transactions prêtes. Décochez celles à ignorer.",
