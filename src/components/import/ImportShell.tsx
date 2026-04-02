@@ -2,9 +2,11 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import Papa from 'papaparse';
 import { useTranslations } from 'next-intl';
 import { useSettings } from '@/hooks/useSettings';
+import { useAccounts } from '@/hooks/useAccounts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,6 +44,11 @@ function toYMD(raw: string): string | null {
   const dmySlash = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (dmySlash) {
     const [, d, m, y] = dmySlash;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  const mdySlash = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mdySlash) {
+    const [, m, d, y] = mdySlash;
     return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
   }
   const dmyDash = clean.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
@@ -86,26 +93,25 @@ function uid() {
 // ─── Step indicator ───────────────────────────────────────────────────────────
 
 function StepIndicator({ step }: { step: Step }) {
-  const steps: Step[] = ['upload', 'map', 'preview', 'recurring', 'importing', 'done'];
-  const idx = steps.indexOf(step);
-  const visible: Step[] = ['upload', 'map', 'preview', 'recurring', 'done'];
+  const steps: Step[] = ['upload', 'map', 'preview', 'recurring', 'done'];
+  const current = step === 'importing' ? 'done' : step;
+  const idx = steps.indexOf(current);
   return (
     <div className="flex items-center gap-1 mb-6">
-      {visible.map((s, i) => (
+      {steps.map((s, i) => (
         <div key={s} className="flex items-center gap-1">
           <div className={`w-2 h-2 rounded-full transition-colors ${
-            steps.indexOf(s) < idx ? 'bg-teal-400' : steps.indexOf(s) === idx ? 'bg-white' : 'bg-white/20'
+            i < idx ? 'bg-teal-400' : i === idx ? 'bg-white' : 'bg-white/20'
           }`} />
-          {i < visible.length - 1 && <div className="w-6 h-px bg-white/15" />}
+          {i < steps.length - 1 && <div className="w-6 h-px bg-white/15" />}
         </div>
       ))}
     </div>
   );
 }
 
-// ─── Shared input classes ─────────────────────────────────────────────────────
+// ─── Shared classes ───────────────────────────────────────────────────────────
 
-const inputCls = 'h-10 rounded-xl border border-white/15 bg-[#042F2E] px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all';
 const selectCls = 'h-10 rounded-xl border border-white/15 bg-[#042F2E] px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full';
 const btnSecondary = 'flex-1 h-10 rounded-xl border border-white/15 text-sm text-white/70 hover:bg-white/5 transition-colors';
 const btnPrimary = 'flex-1 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2';
@@ -114,8 +120,10 @@ const btnPrimary = 'flex-1 h-10 rounded-xl bg-teal-600 text-white text-sm font-s
 
 export default function ImportShell() {
   const router = useRouter();
+  const qc = useQueryClient();
   const t = useTranslations('import');
   const { allTags: allTagsMap } = useSettings();
+  const { data: accounts = [] } = useAccounts();
   const allTags = Object.entries(allTagsMap).map(([id, v]) => ({ id, label: v.label, category: v.category }));
 
   const [step, setStep] = useState<Step>('upload');
@@ -125,6 +133,7 @@ export default function ImportShell() {
   const [colName, setColName] = useState('');
   const [colAmount, setColAmount] = useState('');
   const [colCategory, setColCategory] = useState('');
+  const [selectedAccountId, setSelectedAccountId] = useState('');
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
   const [recurringGroups, setRecurringGroups] = useState<RecurringGroup[]>([]);
   const [categorising, setCategorising] = useState(false);
@@ -146,11 +155,11 @@ export default function ImportShell() {
         setHeaders(hdrs);
         setRows(results.data);
         const lower = hdrs.map((h) => h.toLowerCase());
-        const find = (...terms: string[]) => hdrs[lower.findIndex((h) => terms.some((t) => h.includes(t)))] ?? '';
+        const find = (...terms: string[]) => hdrs[lower.findIndex((h) => terms.some((term) => h.includes(term)))] ?? '';
         setColDate(find('date'));
-        setColName(find('description', 'merchant', 'name', 'payee', 'narrative'));
-        setColAmount(find('amount', 'value', 'sum', 'debit', 'credit'));
-        setColCategory(find('type', 'cr/dr', 'dc'));
+        setColName(find('description', 'merchant', 'payee', 'narrative', 'name'));
+        setColAmount(find('amount', 'value', 'sum'));
+        setColCategory(find('type', 'cr/dr', 'debit', 'credit', 'dc'));
         setStep('map');
       },
       error: () => setError(t('errorParse')),
@@ -182,20 +191,18 @@ export default function ImportShell() {
       const nameRaw = (row[colName] ?? '').trim().slice(0, 200);
       if (!nameRaw) continue;
 
-      const amtRaw = (row[colAmount] ?? '').replace(/[^0-9.,\-]/g, '').replace(',', '.');
-      const amt = Math.abs(parseFloat(amtRaw));
+      // Parse amount — strip currency symbols, handle comma decimals
+      const amtStr = (row[colAmount] ?? '').replace(/[^0-9.,\-]/g, '').replace(',', '.');
+      const amt = Math.abs(parseFloat(amtStr));
       if (isNaN(amt) || amt === 0) continue;
 
+      // Category: use debit/credit column if mapped, else default to expense.
+      // Grok will override per-merchant below.
       let category: 'income' | 'expense' = 'expense';
       if (colCategory) {
         const v = (row[colCategory] ?? '').toLowerCase();
-        if (v.includes('cr') || v.includes('credit') || v.includes('income') || v === 'in') {
-          category = 'income';
-        }
-      } else {
-        // Negative raw value → income (refund / credit in bank statements)
-        const rawNum = parseFloat((row[colAmount] ?? '').replace(/[^0-9.\-]/g, ''));
-        if (!isNaN(rawNum) && rawNum < 0) category = 'income';
+        // credit / CR / C / IN → income
+        if (/^cr$|credit|^c$|^in$/.test(v)) category = 'income';
       }
 
       parsed.push({ id: uid(), name: nameRaw, amount: amt, category, tag: 'other', date, skipped: false });
@@ -203,6 +210,7 @@ export default function ImportShell() {
 
     if (!parsed.length) { setError(t('errorNoRows')); return; }
 
+    // Batch categorise unique merchants via Grok
     setCategorising(true);
     const uniqueMerchants = [...new Set(parsed.map((p) => p.name))];
     try {
@@ -212,15 +220,23 @@ export default function ImportShell() {
         body: JSON.stringify({ merchants: uniqueMerchants, tags: allTags }),
       });
       if (res.ok) {
-        const { categorisations } = await res.json();
+        const { categorisations } = await res.json() as {
+          categorisations: Record<string, { tag: string; category: string }>;
+        };
+        // Build a normalised lookup (trim + lowercase) so casing/whitespace in
+        // bank statement names doesn't prevent a match
+        const normMap: Record<string, { tag: string; category: string }> = {};
+        for (const [k, v] of Object.entries(categorisations)) {
+          normMap[k.trim().toLowerCase()] = v;
+        }
         for (const tx of parsed) {
-          const cat = categorisations[tx.name];
+          const cat = normMap[tx.name.trim().toLowerCase()];
           if (cat?.tag) tx.tag = cat.tag;
           if (cat?.category === 'income' || cat?.category === 'expense') tx.category = cat.category;
         }
       }
     } catch {
-      // non-fatal — proceed with defaults
+      // non-fatal — proceed with expense defaults
     } finally {
       setCategorising(false);
     }
@@ -234,8 +250,7 @@ export default function ImportShell() {
     const active = transactions.filter((tx) => !tx.skipped);
     const groups: Record<string, ParsedTransaction[]> = {};
     for (const tx of active) {
-      const key = `${tx.name}||${tx.category}||${tx.tag}`;
-      (groups[key] ??= []).push(tx);
+      (groups[`${tx.name}||${tx.category}||${tx.tag}`] ??= []).push(tx);
     }
     const detected: RecurringGroup[] = [];
     for (const [key, txs] of Object.entries(groups)) {
@@ -256,58 +271,67 @@ export default function ImportShell() {
     }
   };
 
-  // ── Import (sequential, counted) ──────────────────────────────────────────
+  // ── Import ─────────────────────────────────────────────────────────────────
   const doImport = useCallback(async (txs: ParsedTransaction[], recurring: RecurringGroup[]) => {
     setStep('importing');
     const confirmedGroups = recurring.filter((g) => g.confirmed);
     const confirmedMerchants = new Set(confirmedGroups.map((g) => g.merchant));
-
-    // Count total jobs
     const oneOffs = txs.filter((tx) => !confirmedMerchants.has(tx.name));
     const total = confirmedGroups.length + oneOffs.length;
     setImportTotal(total);
     setImportProgress(0);
 
     let count = 0;
+    const accountId = selectedAccountId || null;
 
     for (const group of confirmedGroups) {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: group.merchant,
-          amount: group.amount,
-          category: group.category,
-          type: 'recurring',
-          tag: group.tag,
-          frequency: group.interval,
-          start_date: txs.filter((t) => group.transactionIds.includes(t.id)).map((t) => t.date).sort()[0],
-        }),
-      });
-      if (res.ok) count++;
+      try {
+        const res = await fetch('/api/transactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: group.merchant,
+            amount: group.amount,
+            category: group.category,
+            type: 'recurring',
+            tag: group.tag,
+            frequency: group.interval,
+            start_date: txs.filter((t) => group.transactionIds.includes(t.id)).map((t) => t.date).sort()[0],
+            account_id: accountId,
+          }),
+        });
+        if (res.ok) count++;
+      } catch { /* continue */ }
       setImportProgress((p) => p + 1);
     }
 
     for (const tx of oneOffs) {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: tx.name,
-          amount: tx.amount,
-          category: tx.category,
-          type: 'one_off',
-          tag: tx.tag,
-          date: tx.date,
-        }),
-      });
-      if (res.ok) count++;
+      try {
+        const res = await fetch('/api/transactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: tx.name,
+            amount: tx.amount,
+            category: tx.category,
+            type: 'one_off',
+            tag: tx.tag,
+            date: tx.date,
+            account_id: accountId,
+          }),
+        });
+        if (res.ok) count++;
+      } catch { /* continue */ }
       setImportProgress((p) => p + 1);
     }
 
+    // Tell React Query the transactions cache is stale so the dashboard
+    // shows the newly imported data immediately
+    await qc.invalidateQueries({ queryKey: ['transactions'] });
+
     setImportedCount(count);
     setStep('done');
-  }, []);
+  }, [selectedAccountId, qc]);
 
   const handleRecurringNext = () => {
     doImport(transactions.filter((tx) => !tx.skipped), recurringGroups);
@@ -350,6 +374,18 @@ export default function ImportShell() {
       {step === 'map' && (
         <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 flex flex-col gap-5">
           <p className="text-sm text-white/60">{t('mapHint', { count: rows.length })}</p>
+
+          {/* Account picker */}
+          {accounts.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-white/80">{t('account')}</label>
+              <select value={selectedAccountId} onChange={(e) => setSelectedAccountId(e.target.value)} className={selectCls}>
+                <option value="">{t('noAccount')}</option>
+                {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
+          )}
+
           {[
             { label: t('colDate'), value: colDate, set: setColDate, required: true },
             { label: t('colName'), value: colName, set: setColName, required: true },
@@ -379,7 +415,7 @@ export default function ImportShell() {
       {/* ── STEP 3: Preview ── */}
       {step === 'preview' && (
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-white/60">{t('previewHint', { count: transactions.filter((t) => !t.skipped).length })}</p>
+          <p className="text-sm text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
           <div className="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
@@ -390,6 +426,7 @@ export default function ImportShell() {
                     <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('colName')}</th>
                     <th className="px-4 py-2.5 text-right font-medium text-white/60">{t('colAmount')}</th>
                     <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('tag')}</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('type')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -404,17 +441,27 @@ export default function ImportShell() {
                         />
                       </td>
                       <td className="px-4 py-2 text-white/60 whitespace-nowrap">{tx.date}</td>
-                      <td className="px-4 py-2 text-white max-w-[160px] truncate">{tx.name}</td>
-                      <td className={`px-4 py-2 text-right font-mono whitespace-nowrap ${tx.category === 'income' ? 'text-emerald-400' : 'text-white'}`}>
+                      <td className="px-4 py-2 text-white max-w-[140px] truncate">{tx.name}</td>
+                      <td className={`px-4 py-2 text-right font-mono whitespace-nowrap ${tx.category === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
                         {tx.category === 'income' ? '+' : '−'}{tx.amount.toFixed(2)}
                       </td>
                       <td className="px-4 py-2">
                         <select
                           value={tx.tag}
                           onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, tag: e.target.value } : p))}
-                          className="text-xs rounded-lg border border-white/15 bg-[#042F2E] px-2 py-1 text-white focus:outline-none max-w-[120px]"
+                          className="text-xs rounded-lg border border-white/15 bg-[#042F2E] px-2 py-1 text-white focus:outline-none max-w-[110px]"
                         >
                           {allTags.map((tg) => <option key={tg.id} value={tg.id}>{tg.label}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-4 py-2">
+                        <select
+                          value={tx.category}
+                          onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, category: e.target.value as 'income' | 'expense' } : p))}
+                          className="text-xs rounded-lg border border-white/15 bg-[#042F2E] px-2 py-1 text-white focus:outline-none"
+                        >
+                          <option value="expense">Expense</option>
+                          <option value="income">Income</option>
                         </select>
                       </td>
                     </tr>
@@ -423,6 +470,13 @@ export default function ImportShell() {
               </table>
             </div>
           </div>
+          {/* Bulk flip button if signs are wrong */}
+          <button
+            onClick={() => setTransactions((prev) => prev.map((tx) => ({ ...tx, category: tx.category === 'income' ? 'expense' : 'income' })))}
+            className="text-xs text-white/40 hover:text-white/70 transition-colors text-left"
+          >
+            {t('flipAll')}
+          </button>
           <div className="flex gap-3">
             <button onClick={() => setStep('map')} className={btnSecondary}>{t('back')}</button>
             <button onClick={handlePreviewNext} className={btnPrimary}>{t('next')}</button>
@@ -466,7 +520,7 @@ export default function ImportShell() {
         </div>
       )}
 
-      {/* ── STEP: Importing (progress) ── */}
+      {/* ── Importing (progress) ── */}
       {step === 'importing' && (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
           <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-teal-400 animate-spin" />
@@ -488,7 +542,7 @@ export default function ImportShell() {
         </div>
       )}
 
-      {/* ── STEP 5: Done ── */}
+      {/* ── Done ── */}
       {step === 'done' && (
         <div className="text-center py-8">
           <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
