@@ -81,9 +81,9 @@ function detectInterval(dates: string[]): 'weekly' | 'biweekly' | 'monthly' | nu
     gaps.push((new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86_400_000);
   }
   const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
-  if (avg >= 5 && avg <= 9) return 'weekly';
-  if (avg >= 12 && avg <= 17) return 'biweekly';
-  if (avg >= 25 && avg <= 35) return 'monthly';
+  if (avg >= 5 && avg <= 10) return 'weekly';
+  if (avg >= 11 && avg <= 20) return 'biweekly';
+  if (avg >= 21 && avg <= 45) return 'monthly'; // wide — covers 28-31 day months + some drift
   return null;
 }
 
@@ -253,21 +253,35 @@ export default function ImportShell() {
   // ── Step 3 → detect recurring ──────────────────────────────────────────────
   const handlePreviewNext = () => {
     const active = transactions.filter((tx) => !tx.skipped);
+
+    // Group by merchant + category only (ignore tag — it may still be 'other')
     const groups: Record<string, ParsedTransaction[]> = {};
     for (const tx of active) {
-      (groups[`${tx.name}||${tx.category}||${tx.tag}`] ??= []).push(tx);
+      const key = `${tx.name}||${tx.category}`;
+      (groups[key] ??= []).push(tx);
     }
+
     const detected: RecurringGroup[] = [];
     for (const [key, txs] of Object.entries(groups)) {
       if (txs.length < 2) continue;
+
       const amounts = txs.map((t) => t.amount);
       const avg = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-      if (!amounts.every((a) => Math.abs(a - avg) / avg < 0.05)) continue;
+      // Allow 20% tolerance — subscriptions can vary, and FX fluctuations happen
+      if (!amounts.every((a) => avg === 0 || Math.abs(a - avg) / avg < 0.20)) continue;
+
       const interval = detectInterval(txs.map((t) => t.date));
       if (!interval) continue;
-      const [merchant, category, tag] = key.split('||');
+
+      const [merchant, category] = key.split('||');
+      // Use the most common tag among the group's transactions
+      const tagCounts: Record<string, number> = {};
+      for (const tx of txs) tagCounts[tx.tag] = (tagCounts[tx.tag] ?? 0) + 1;
+      const tag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0][0];
+
       detected.push({ merchant, tag, category: category as 'income' | 'expense', amount: avg, interval, transactionIds: txs.map((t) => t.id), confirmed: true });
     }
+
     setRecurringGroups(detected);
     if (detected.length > 0) {
       setStep('recurring');

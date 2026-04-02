@@ -20,20 +20,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'merchants array required' }, { status: 400 });
     }
 
-    const tagList = (tags as { id: string; label: string; category: string }[])
-      .map((t) => `${t.id} (${t.label}, ${t.category})`)
-      .join('\n');
+    const tagIds = (tags as { id: string }[]).map((t) => t.id).join(', ');
 
-    const prompt = `You are a personal finance categoriser. Given a list of merchant/transaction names and available tags, assign each merchant the most appropriate tag and category.
+    // Use index-based response to avoid key-matching issues with long merchant names
+    const merchantList = (merchants as string[]).map((m, i) => `${i}|${m}`).join('\n');
 
-Available tags (id, label, category):
-${tagList}
+    const prompt = `You are a personal finance transaction categoriser.
 
-Merchants to categorise:
-${merchants.map((m: string, i: number) => `${i + 1}. ${m}`).join('\n')}
+Available tag IDs: ${tagIds}
 
-Respond ONLY with a valid JSON object mapping each merchant name to an object with "tag" (the tag id) and "category" ("income" or "expense"). Do not include any explanation or markdown.
-Example: {"Tesco": {"tag": "food", "category": "expense"}, "HMRC": {"tag": "tax_refund", "category": "income"}}`;
+For each line below (format: INDEX|MERCHANT_NAME), respond with a JSON object where keys are the INDEX numbers and values have "tag" (pick from the tag IDs above) and "category" ("income" or "expense").
+
+${merchantList}
+
+Rules:
+- Use "income" only for salary, wages, benefits, refunds, cashback, investment returns
+- Use "expense" for everything else (shopping, food, bills, subscriptions, transfers out)
+- Pick the most specific tag that fits; use "other" only if nothing fits
+- Respond ONLY with raw JSON, no markdown, no explanation
+
+Example response: {"0":{"tag":"food","category":"expense"},"1":{"tag":"salary","category":"income"}}`;
 
     const message = await client.chat.completions.create({
       model: 'grok-3-mini',
@@ -50,11 +56,19 @@ Example: {"Tesco": {"tag": "food", "category": "expense"}, "HMRC": {"tag": "tax_
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) text = jsonMatch[0];
 
-    let result: Record<string, { tag: string; category: string }> = {};
+    // Parse index-keyed response and remap to merchant names
+    let indexed: Record<string, { tag: string; category: string }> = {};
     try {
-      result = JSON.parse(text);
+      indexed = JSON.parse(text);
     } catch {
-      console.error('[import/categorise] Failed to parse Grok response:', text.slice(0, 500));
+      console.error('[import/categorise] Failed to parse Grok response:', text.slice(0, 300));
+    }
+
+    // Convert {"0": {tag, category}, "1": ...} → {"MERCHANT_NAME": {tag, category}}
+    const result: Record<string, { tag: string; category: string }> = {};
+    for (const [idx, val] of Object.entries(indexed)) {
+      const merchant = (merchants as string[])[Number(idx)];
+      if (merchant && val?.tag) result[merchant] = val;
     }
 
     return NextResponse.json({ categorisations: result });
