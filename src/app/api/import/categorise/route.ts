@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth';
 import OpenAI from 'openai';
 
-const client = new OpenAI({
-  apiKey: process.env.XAI_API_KEY,
-  baseURL: 'https://api.x.ai/v1',
-});
-
 // POST /api/import/categorise
 // Body: { merchants: string[], tags: { id: string; label: string; category: 'income'|'expense'|'both' }[] }
 // Returns: { [merchant: string]: { tag: string; category: 'income'|'expense' } }
@@ -14,6 +9,12 @@ export async function POST(req: NextRequest) {
   try {
     const userId = await getAuthUserId();
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Instantiate lazily so the build doesn't fail when XAI_API_KEY is absent
+    const client = new OpenAI({
+      apiKey: process.env.XAI_API_KEY,
+      baseURL: 'https://api.x.ai/v1',
+    });
 
     const { merchants, tags } = await req.json();
     if (!Array.isArray(merchants) || merchants.length === 0) {
