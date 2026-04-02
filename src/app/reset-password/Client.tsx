@@ -22,17 +22,29 @@ function ResetPasswordForm() {
   useEffect(() => {
     const code = searchParams.get('code');
 
+    // PKCE flow — ?code= param
     if (code) {
-      // PKCE flow — exchange the one-time code for a session
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         setStage(error ? 'invalid' : 'form');
       });
       return;
     }
 
-    // No code — check if the user already has a session (set server-side by
-    // /auth/confirm after verifying the token_hash) or wait for the
-    // PASSWORD_RECOVERY event from the old implicit flow.
+    // Implicit/hash flow — #access_token=...&type=recovery
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      const params = new URLSearchParams(hash.slice(1));
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
+          setStage(error ? 'invalid' : 'form');
+        });
+        return;
+      }
+    }
+
+    // Already have a session (set server-side by /auth/confirm)
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) { setStage('form'); return; }
 
