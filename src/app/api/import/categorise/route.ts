@@ -37,18 +37,24 @@ Example: {"Tesco": {"tag": "food", "category": "expense"}, "HMRC": {"tag": "tax_
 
     const message = await client.chat.completions.create({
       model: 'grok-3-mini',
-      max_tokens: 1024,
+      max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const text = message.choices[0]?.message?.content?.trim() ?? '{}';
+    let text = message.choices[0]?.message?.content?.trim() ?? '{}';
+
+    // Strip markdown code fences if model wrapped the JSON
+    text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+
+    // Extract just the JSON object in case there's surrounding text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) text = jsonMatch[0];
 
     let result: Record<string, { tag: string; category: string }> = {};
     try {
       result = JSON.parse(text);
     } catch {
-      // If parsing fails, return empty so the UI falls back to 'other'
-      console.error('[import/categorise] Failed to parse Claude response:', text);
+      console.error('[import/categorise] Failed to parse Grok response:', text.slice(0, 500));
     }
 
     return NextResponse.json({ categorisations: result });

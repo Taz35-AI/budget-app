@@ -7,6 +7,7 @@ import Papa from 'papaparse';
 import { useTranslations } from 'next-intl';
 import { useSettings } from '@/hooks/useSettings';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useSettingsStore } from '@/store/settingsStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -126,6 +127,8 @@ export default function ImportShell() {
   const { data: accounts = [] } = useAccounts();
   const allTags = Object.entries(allTagsMap).map(([id, v]) => ({ id, label: v.label, category: v.category }));
 
+  const addTemplate = useSettingsStore((s) => s.addTemplate);
+
   const [step, setStep] = useState<Step>('upload');
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<RawRow[]>([]);
@@ -140,6 +143,7 @@ export default function ImportShell() {
   const [importedCount, setImportedCount] = useState(0);
   const [importProgress, setImportProgress] = useState(0);
   const [importTotal, setImportTotal] = useState(0);
+  const [savedTemplates, setSavedTemplates] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -192,17 +196,23 @@ export default function ImportShell() {
       if (!nameRaw) continue;
 
       // Parse amount — strip currency symbols, handle comma decimals
-      const amtStr = (row[colAmount] ?? '').replace(/[^0-9.,\-]/g, '').replace(',', '.');
-      const amt = Math.abs(parseFloat(amtStr));
-      if (isNaN(amt) || amt === 0) continue;
+      const rawAmtStr = (row[colAmount] ?? '').trim();
+      const amtStr = rawAmtStr.replace(/[^0-9.,\-]/g, '').replace(',', '.');
+      const rawNum = parseFloat(amtStr);
+      if (isNaN(rawNum) || rawNum === 0) continue;
+      const amt = Math.abs(rawNum);
 
-      // Category: use debit/credit column if mapped, else default to expense.
-      // Grok will override per-merchant below.
-      let category: 'income' | 'expense' = 'expense';
+      // Category detection (priority order):
+      // 1. Explicit debit/credit column if mapped
+      // 2. Sign of the raw amount (positive = income, negative = expense)
+      // Grok will further refine per-merchant name below.
+      let category: 'income' | 'expense';
       if (colCategory) {
-        const v = (row[colCategory] ?? '').toLowerCase();
-        // credit / CR / C / IN → income
-        if (/^cr$|credit|^c$|^in$/.test(v)) category = 'income';
+        const v = (row[colCategory] ?? '').toLowerCase().trim();
+        category = /^cr$|credit|^c$|^in$/.test(v) ? 'income' : 'expense';
+      } else {
+        // Positive raw value → income (credit), negative → expense (debit)
+        category = rawNum >= 0 ? 'income' : 'expense';
       }
 
       parsed.push({ id: uid(), name: nameRaw, amount: amt, category, tag: 'other', date, skipped: false });
@@ -492,24 +502,57 @@ export default function ImportShell() {
           </div>
           <div className="flex flex-col gap-3">
             {recurringGroups.map((g, i) => (
-              <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="font-semibold text-white truncate">{g.merchant}</p>
-                  <p className="text-xs text-white/50 mt-0.5">
-                    {g.interval === 'weekly' ? t('weekly') : g.interval === 'biweekly' ? t('biweekly') : t('monthly')}
-                    {' · '}{g.amount.toFixed(2)}
-                    {' · '}{g.transactionIds.length}×
-                  </p>
+              <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-white truncate">{g.merchant}</p>
+                    <p className="text-xs text-white/50 mt-0.5">
+                      {g.interval === 'weekly' ? t('weekly') : g.interval === 'biweekly' ? t('biweekly') : t('monthly')}
+                      {' · '}{g.amount.toFixed(2)}
+                      {' · '}{g.transactionIds.length}×
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
+                    <span className="text-sm text-white/70">{t('setRecurring')}</span>
+                    <input
+                      type="checkbox"
+                      checked={g.confirmed}
+                      onChange={() => setRecurringGroups((prev) => prev.map((r, ri) => ri === i ? { ...r, confirmed: !r.confirmed } : r))}
+                      className="accent-teal-500 w-4 h-4"
+                    />
+                  </label>
                 </div>
-                <label className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
-                  <span className="text-sm text-white/70">{t('setRecurring')}</span>
-                  <input
-                    type="checkbox"
-                    checked={g.confirmed}
-                    onChange={() => setRecurringGroups((prev) => prev.map((r, ri) => ri === i ? { ...r, confirmed: !r.confirmed } : r))}
-                    className="accent-teal-500 w-4 h-4"
-                  />
-                </label>
+                {/* Save as quick-fill template */}
+                <div className="flex items-center justify-between border-t border-white/[0.06] pt-2.5">
+                  <div>
+                    <p className="text-xs text-white/60">{t('templateHint')}</p>
+                  </div>
+                  {savedTemplates.has(i) ? (
+                    <span className="text-xs text-emerald-400 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {t('templateSaved')}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        addTemplate({
+                          name: g.merchant,
+                          amount: g.amount,
+                          category: g.category,
+                          type: 'recurring',
+                          tag: g.tag,
+                          frequency: g.interval,
+                        });
+                        setSavedTemplates((prev) => new Set([...prev, i]));
+                      }}
+                      className="text-xs text-teal-400 hover:text-teal-300 transition-colors font-medium"
+                    >
+                      {t('saveTemplate')}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
