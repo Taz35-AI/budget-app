@@ -32,7 +32,8 @@
     "menu": "Meniu",
     "options": "Opțiuni",
     "toggleTheme": "Schimbă tema",
-    "logout": "Deconectare"
+    "logout": "Deconectare",
+    "import": "Import"
   },
   "months": {
     "short": ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -436,5 +437,37 @@
     "confirmWarning": "Nu poate fi anulat. Ești sigur?",
     "confirmDelete": "Da, șterge tot",
     "deleting": "Se șterge…"
+  },
+  "import": {
+    "title": "Importă tranzacții",
+    "subtitle": "Încarcă un extras CSV — se vor importa doar ultimele 3 luni.",
+    "dropzone": "Trage CSV-ul aici sau apasă pentru a naviga",
+    "dropzoneHint": "Compatibil cu majoritatea formatelor bancare",
+    "mapHint": "Am găsit {count} rânduri. Asociază coloanele CSV mai jos.",
+    "colDate": "Dată",
+    "colName": "Descriere / Comerciant",
+    "colAmount": "Sumă",
+    "colCategory": "Debit / Credit (opțional)",
+    "colNone": "— ignoră —",
+    "tag": "Etichetă",
+    "back": "Înapoi",
+    "next": "Înainte",
+    "categorising": "Categorizare…",
+    "importing": "Importare…",
+    "importBtn": "Importă",
+    "previewHint": "{count} tranzacții pregătite. Debifează cele pe care vrei să le omiți.",
+    "recurringHint": "{count, plural, one {# tranzacție pare recurentă} other {# tranzacții par recurente}}.",
+    "setRecurring": "Setează recurent",
+    "weekly": "Săptămânal",
+    "biweekly": "La 2 săptămâni",
+    "monthly": "Lunar",
+    "doneTitle": "Import finalizat",
+    "doneSubtitle": "{count, plural, one {# tranzacție importată} other {# tranzacții importate}}.",
+    "importAnother": "Importă alt fișier",
+    "goToDashboard": "Du-te la panou",
+    "errorEmpty": "Fișierul CSV pare gol.",
+    "errorParse": "Nu s-a putut procesa fișierul.",
+    "errorMapRequired": "Asociază coloanele Dată, Descriere și Sumă.",
+    "errorNoRows": "Nu s-au găsit tranzacții din ultimele 3 luni."
   }
 }

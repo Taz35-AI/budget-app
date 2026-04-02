@@ -32,7 +32,8 @@
     "menu": "Menü",
     "options": "Optionen",
     "toggleTheme": "Design wechseln",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "import": "Importieren"
   },
   "months": {
     "short": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
@@ -436,5 +437,37 @@
     "confirmWarning": "Kann nicht rückgängig gemacht werden. Sind Sie sicher?",
     "confirmDelete": "Ja, alles löschen",
     "deleting": "Wird gelöscht…"
+  },
+  "import": {
+    "title": "Transaktionen importieren",
+    "subtitle": "CSV-Kontoauszug hochladen – nur die letzten 3 Monate werden importiert.",
+    "dropzone": "CSV hier ablegen oder klicken zum Durchsuchen",
+    "dropzoneHint": "Unterstützt die meisten Bankexportformate",
+    "mapHint": "Wir haben {count} Zeilen gefunden. Spalten zuordnen:",
+    "colDate": "Datum",
+    "colName": "Beschreibung / Händler",
+    "colAmount": "Betrag",
+    "colCategory": "Soll / Haben (optional)",
+    "colNone": "— überspringen —",
+    "tag": "Kategorie",
+    "back": "Zurück",
+    "next": "Weiter",
+    "categorising": "Kategorisiere…",
+    "importing": "Importiere…",
+    "importBtn": "Importieren",
+    "previewHint": "{count} Transaktionen bereit. Deaktivieren Sie Einträge zum Überspringen.",
+    "recurringHint": "{count, plural, one {# Transaktion sieht wiederkehrend aus} other {# Transaktionen sehen wiederkehrend aus}}.",
+    "setRecurring": "Als wiederkehrend",
+    "weekly": "Wöchentlich",
+    "biweekly": "Alle 2 Wochen",
+    "monthly": "Monatlich",
+    "doneTitle": "Import abgeschlossen",
+    "doneSubtitle": "{count, plural, one {# Transaktion importiert} other {# Transaktionen importiert}}.",
+    "importAnother": "Weitere Datei importieren",
+    "goToDashboard": "Zum Dashboard",
+    "errorEmpty": "Die CSV-Datei scheint leer zu sein.",
+    "errorParse": "Die Datei konnte nicht verarbeitet werden.",
+    "errorMapRequired": "Bitte Datum, Beschreibung und Betrag zuordnen.",
+    "errorNoRows": "Keine Transaktionen in den letzten 3 Monaten gefunden."
   }
 }

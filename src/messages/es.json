@@ -32,7 +32,8 @@
     "menu": "Menú",
     "options": "Opciones",
     "toggleTheme": "Cambiar tema",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "import": "Importar"
   },
   "months": {
     "short": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
@@ -436,5 +437,37 @@
     "confirmWarning": "No se puede deshacer. ¿Estás seguro?",
     "confirmDelete": "Sí, eliminar todo",
     "deleting": "Eliminando…"
+  },
+  "import": {
+    "title": "Importar transacciones",
+    "subtitle": "Sube un extracto CSV — solo se importarán los últimos 3 meses.",
+    "dropzone": "Arrastra tu CSV aquí o haz clic para buscar",
+    "dropzoneHint": "Compatible con la mayoría de formatos bancarios",
+    "mapHint": "Encontramos {count} filas. Asigna las columnas de tu CSV.",
+    "colDate": "Fecha",
+    "colName": "Descripción / Comercio",
+    "colAmount": "Importe",
+    "colCategory": "Débito / Crédito (opcional)",
+    "colNone": "— omitir —",
+    "tag": "Etiqueta",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "categorising": "Categorizando…",
+    "importing": "Importando…",
+    "importBtn": "Importar",
+    "previewHint": "{count} transacciones listas. Desmarca las que quieras omitir.",
+    "recurringHint": "{count, plural, one {# transacción parece recurrente} other {# transacciones parecen recurrentes}}.",
+    "setRecurring": "Marcar recurrente",
+    "weekly": "Semanal",
+    "biweekly": "Cada 2 semanas",
+    "monthly": "Mensual",
+    "doneTitle": "Importación completada",
+    "doneSubtitle": "{count, plural, one {# transacción importada} other {# transacciones importadas}}.",
+    "importAnother": "Importar otro archivo",
+    "goToDashboard": "Ir al panel",
+    "errorEmpty": "El archivo CSV parece estar vacío.",
+    "errorParse": "No se pudo procesar el archivo.",
+    "errorMapRequired": "Asigna las columnas de Fecha, Descripción e Importe.",
+    "errorNoRows": "No se encontraron transacciones en los últimos 3 meses."
   }
 }

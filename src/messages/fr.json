@@ -32,7 +32,8 @@
     "menu": "Menu",
     "options": "Options",
     "toggleTheme": "Changer le thème",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "import": "Importer"
   },
   "months": {
     "short": ["Jan", "Fév", "Mar", "Avr", "Mai", "Jui", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
@@ -436,5 +437,37 @@
     "confirmWarning": "Impossible d'annuler. Êtes-vous sûr ?",
     "confirmDelete": "Oui, tout supprimer",
     "deleting": "Suppression…"
+  },
+  "import": {
+    "title": "Importer des transactions",
+    "subtitle": "Importez un relevé CSV — seuls les 3 derniers mois seront importés.",
+    "dropzone": "Déposez votre CSV ici ou cliquez pour parcourir",
+    "dropzoneHint": "Compatible avec la plupart des formats bancaires",
+    "mapHint": "Nous avons trouvé {count} lignes. Associez vos colonnes CSV ci-dessous.",
+    "colDate": "Date",
+    "colName": "Description / Marchand",
+    "colAmount": "Montant",
+    "colCategory": "Débit / Crédit (optionnel)",
+    "colNone": "— ignorer —",
+    "tag": "Étiquette",
+    "back": "Retour",
+    "next": "Suivant",
+    "categorising": "Catégorisation…",
+    "importing": "Importation…",
+    "importBtn": "Importer",
+    "previewHint": "{count} transactions prêtes. Décochez celles à ignorer.",
+    "recurringHint": "{count, plural, one {# transaction semble récurrente} other {# transactions semblent récurrentes}}.",
+    "setRecurring": "Définir récurrent",
+    "weekly": "Hebdomadaire",
+    "biweekly": "Toutes les 2 semaines",
+    "monthly": "Mensuel",
+    "doneTitle": "Importation terminée",
+    "doneSubtitle": "{count, plural, one {# transaction importée} other {# transactions importées}}.",
+    "importAnother": "Importer un autre fichier",
+    "goToDashboard": "Aller au tableau de bord",
+    "errorEmpty": "Le fichier CSV semble vide.",
+    "errorParse": "Impossible de traiter le fichier.",
+    "errorMapRequired": "Veuillez associer les colonnes Date, Description et Montant.",
+    "errorNoRows": "Aucune transaction trouvée dans les 3 derniers mois."
   }
 }

@@ -32,7 +32,8 @@
     "menu": "Menu",
     "options": "Opcje",
     "toggleTheme": "Zmień motyw",
-    "logout": "Wyloguj"
+    "logout": "Wyloguj",
+    "import": "Importuj"
   },
   "months": {
     "short": ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"],
@@ -436,5 +437,37 @@
     "confirmWarning": "Nie można cofnąć. Jesteś pewny?",
     "confirmDelete": "Tak, usuń wszystko",
     "deleting": "Usuwanie…"
+  },
+  "import": {
+    "title": "Importuj transakcje",
+    "subtitle": "Prześlij wyciąg CSV — importowane będą tylko ostatnie 3 miesiące.",
+    "dropzone": "Upuść CSV tutaj lub kliknij, aby przeglądać",
+    "dropzoneHint": "Obsługuje większość formatów eksportu bankowego",
+    "mapHint": "Znaleziono {count} wierszy. Przypisz kolumny CSV poniżej.",
+    "colDate": "Data",
+    "colName": "Opis / Sprzedawca",
+    "colAmount": "Kwota",
+    "colCategory": "Debet / Kredyt (opcjonalnie)",
+    "colNone": "— pomiń —",
+    "tag": "Kategoria",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "categorising": "Kategoryzowanie…",
+    "importing": "Importowanie…",
+    "importBtn": "Importuj",
+    "previewHint": "{count} transakcji gotowych. Odznacz te, które chcesz pominąć.",
+    "recurringHint": "{count, plural, one {# transakcja wygląda na cykliczną} other {# transakcje wyglądają na cykliczne}}.",
+    "setRecurring": "Ustaw cykliczną",
+    "weekly": "Co tydzień",
+    "biweekly": "Co 2 tygodnie",
+    "monthly": "Co miesiąc",
+    "doneTitle": "Import zakończony",
+    "doneSubtitle": "{count, plural, one {Zaimportowano # transakcję} other {Zaimportowano # transakcji}}.",
+    "importAnother": "Importuj inny plik",
+    "goToDashboard": "Przejdź do panelu",
+    "errorEmpty": "Plik CSV wydaje się być pusty.",
+    "errorParse": "Nie udało się przetworzyć pliku.",
+    "errorMapRequired": "Przypisz kolumny Data, Opis i Kwota.",
+    "errorNoRows": "Nie znaleziono transakcji z ostatnich 3 miesięcy."
   }
 }

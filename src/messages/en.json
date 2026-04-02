@@ -32,7 +32,8 @@
     "menu": "Menu",
     "options": "Options",
     "toggleTheme": "Toggle theme",
-    "logout": "Log out"
+    "logout": "Log out",
+    "import": "Import"
   },
   "months": {
     "short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -436,5 +437,37 @@
     "confirmWarning": "Cannot be undone. Are you sure?",
     "confirmDelete": "Yes, delete all",
     "deleting": "Deleting…"
+  },
+  "import": {
+    "title": "Import Transactions",
+    "subtitle": "Upload a CSV bank statement — only the last 3 months will be imported.",
+    "dropzone": "Drop your CSV here or click to browse",
+    "dropzoneHint": "Supports most bank export formats",
+    "mapHint": "We found {count} rows. Match your CSV columns below.",
+    "colDate": "Date",
+    "colName": "Description / Merchant",
+    "colAmount": "Amount",
+    "colCategory": "Debit / Credit (optional)",
+    "colNone": "— skip —",
+    "tag": "Tag",
+    "back": "Back",
+    "next": "Next",
+    "categorising": "Categorising…",
+    "importing": "Importing…",
+    "importBtn": "Import",
+    "previewHint": "{count} transactions ready to import. Uncheck any you want to skip.",
+    "recurringHint": "{count, plural, one {# transaction looks recurring} other {# transactions look recurring}}. Confirm which to save as recurring.",
+    "setRecurring": "Set recurring",
+    "weekly": "Weekly",
+    "biweekly": "Every 2 weeks",
+    "monthly": "Monthly",
+    "doneTitle": "Import complete",
+    "doneSubtitle": "{count, plural, one {# transaction imported} other {# transactions imported}}.",
+    "importAnother": "Import another file",
+    "goToDashboard": "Go to dashboard",
+    "errorEmpty": "The CSV file appears to be empty.",
+    "errorParse": "Could not parse the file. Make sure it is a valid CSV.",
+    "errorMapRequired": "Please map the Date, Description, and Amount columns.",
+    "errorNoRows": "No transactions found within the last 3 months."
   }
 }
