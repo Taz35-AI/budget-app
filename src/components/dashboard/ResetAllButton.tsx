@@ -19,6 +19,9 @@ export function ResetAllButton() {
       return res.json();
     },
     onSuccess: () => {
+      // Immediately zero the cache so the dashboard clears without waiting for a refetch
+      qc.setQueryData(['transactions'], { transactions: [], exceptions: [] });
+      qc.setQueryData(['balance-reset'], []);
       qc.invalidateQueries({ queryKey: ['transactions'] });
       qc.invalidateQueries({ queryKey: ['balance-reset'] });
       setOpen(false);

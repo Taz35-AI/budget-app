@@ -184,11 +184,13 @@ export function DayBottomSheet({
                   creditLimit={accounts?.find(a => a.id === formAccountId)?.credit_limit}
                   onTransfer={(accounts?.length ?? 0) >= 2 && onTransfer ? () => { cancelDuplicate(); if (isAdding) onCancelAdd(); onTransfer(formAccountId); } : undefined}
                   onSubmit={(values: TransactionFormValues) => {
+                    // Close immediately — optimistic update already shows the entry
                     if (duplicateValues !== null) {
-                      create.submit(values, { onSuccess: cancelDuplicate });
+                      cancelDuplicate();
                     } else {
-                      create.submit(values, { onSuccess: onCancelAdd });
+                      onCancelAdd();
                     }
+                    create.submit(values, {});
                   }}
                 />
               </>

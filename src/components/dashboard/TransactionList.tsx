@@ -133,13 +133,13 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         occurrenceDate={date}
                         onCancel={clearActive}
                         isLoading={update.isPending}
-                        onSubmit={({ editMode, name, amount, category, frequency, end_date, newDate }) => {
+                        onSubmit={({ editMode, name, amount, category, tag, frequency, end_date, newDate }) => {
                           update.mutate(
                             {
                               id: tx.transaction_id,
                               editMode: editMode as EditMode,
                               effectiveFrom: date,
-                              values: { name, amount, category, frequency, end_date, account_id: editAccountId, newDate },
+                              values: { name, amount, category, tag, frequency, end_date, account_id: editAccountId, newDate },
                             },
                             { onSuccess: clearActive },
                           );

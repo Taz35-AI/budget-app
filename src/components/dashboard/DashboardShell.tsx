@@ -744,12 +744,10 @@ export function DashboardShell() {
                       creditLimit={accounts?.find(a => a.id === desktopFormAccountId)?.credit_limit}
                       onTransfer={(accounts?.length ?? 0) >= 2 ? () => { handleCancelAdd(); setTransferDefaultToId(desktopFormAccountId); setShowTransferModal(true); } : undefined}
                       onSubmit={(values: TransactionFormValues) => {
-                        create.submit(values, {
-                          onSuccess: () => {
-                            notification('success');
-                            handleCancelAdd();
-                          },
-                        });
+                        // Close and notify immediately — optimistic update already shows the entry
+                        handleCancelAdd();
+                        notification('success');
+                        create.submit(values, {});
                       }}
                     />
                   </>
