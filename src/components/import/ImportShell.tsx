@@ -102,9 +102,9 @@ function StepIndicator({ step }: { step: Step }) {
       {steps.map((s, i) => (
         <div key={s} className="flex items-center gap-1">
           <div className={`w-2 h-2 rounded-full transition-colors ${
-            i < idx ? 'bg-teal-400' : i === idx ? 'bg-white' : 'bg-white/20'
+            i < idx ? 'bg-teal-500' : i === idx ? 'bg-brand-text dark:bg-white' : 'bg-brand-text/20 dark:bg-white/20'
           }`} />
-          {i < steps.length - 1 && <div className="w-6 h-px bg-white/15" />}
+          {i < steps.length - 1 && <div className="w-6 h-px bg-brand-text/15 dark:bg-white/15" />}
         </div>
       ))}
     </div>
@@ -113,8 +113,8 @@ function StepIndicator({ step }: { step: Step }) {
 
 // ─── Shared classes ───────────────────────────────────────────────────────────
 
-const selectCls = 'h-10 rounded-xl border border-white/15 bg-[#042F2E] px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full';
-const btnSecondary = 'flex-1 h-10 rounded-xl border border-white/15 text-sm text-white/70 hover:bg-white/5 transition-colors';
+const selectCls = 'h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-3 text-sm text-brand-text dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full';
+const btnSecondary = 'flex-1 h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 transition-colors';
 const btnPrimary = 'flex-1 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2';
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -359,13 +359,13 @@ export default function ImportShell() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-xl font-bold text-white mb-1">{t('title')}</h1>
-      <p className="text-sm text-white/50 mb-6">{t('subtitle')}</p>
+      <h1 className="text-xl font-bold text-brand-text dark:text-white mb-1">{t('title')}</h1>
+      <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">{t('subtitle')}</p>
 
       <StepIndicator step={step} />
 
       {error && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+        <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 dark:text-red-400">
           {error}
         </div>
       )}
@@ -373,17 +373,17 @@ export default function ImportShell() {
       {/* ── STEP 1: Upload ── */}
       {step === 'upload' && (
         <div
-          className="border-2 border-dashed border-white/15 rounded-2xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-teal-400/50 transition-colors"
+          className="border-2 border-dashed border-brand-secondary/30 dark:border-white/15 rounded-2xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-teal-500/50 transition-colors"
           onClick={() => fileRef.current?.click()}
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
         >
-          <svg className="w-10 h-10 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-10 h-10 text-brand-text/30 dark:text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
           </svg>
           <div className="text-center">
-            <p className="font-semibold text-white">{t('dropzone')}</p>
-            <p className="text-sm text-white/50 mt-1">{t('dropzoneHint')}</p>
+            <p className="font-semibold text-brand-text dark:text-white">{t('dropzone')}</p>
+            <p className="text-sm text-brand-text/50 dark:text-white/50 mt-1">{t('dropzoneHint')}</p>
           </div>
           <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={onFileChange} />
         </div>
@@ -391,13 +391,12 @@ export default function ImportShell() {
 
       {/* ── STEP 2: Map columns ── */}
       {step === 'map' && (
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6 flex flex-col gap-5">
-          <p className="text-sm text-white/60">{t('mapHint', { count: rows.length })}</p>
+        <div className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-2xl p-6 flex flex-col gap-5">
+          <p className="text-sm text-brand-text/60 dark:text-white/60">{t('mapHint', { count: rows.length })}</p>
 
-          {/* Account picker */}
           {accounts.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-white/80">{t('account')}</label>
+              <label className="text-sm font-medium text-brand-text/80 dark:text-white/80">{t('account')}</label>
               <select value={selectedAccountId} onChange={(e) => setSelectedAccountId(e.target.value)} className={selectCls}>
                 <option value="">{t('noAccount')}</option>
                 {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -412,8 +411,8 @@ export default function ImportShell() {
             { label: t('colCategory'), value: colCategory, set: setColCategory, required: false },
           ].map(({ label, value, set, required }) => (
             <div key={label} className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-white/80">
-                {label}{required && <span className="text-red-400 ml-0.5">*</span>}
+              <label className="text-sm font-medium text-brand-text/80 dark:text-white/80">
+                {label}{required && <span className="text-red-500 ml-0.5">*</span>}
               </label>
               <select value={value} onChange={(e) => set(e.target.value)} className={selectCls}>
                 <option value="">{t('colNone')}</option>
@@ -432,15 +431,15 @@ export default function ImportShell() {
       {step === 'preview' && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
+            <p className="text-sm text-brand-text/60 dark:text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
             <button
               onClick={handleAutoCategorise}
               disabled={categorising}
-              className="flex-shrink-0 flex items-center gap-2 px-4 h-9 rounded-xl border border-teal-500/40 bg-teal-500/10 text-teal-300 text-sm font-medium hover:bg-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 flex items-center gap-2 px-4 h-9 rounded-xl border border-teal-600/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 text-sm font-medium hover:bg-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {categorising ? (
                 <>
-                  <span className="w-3.5 h-3.5 rounded-full border-2 border-teal-400/30 border-t-teal-400 animate-spin" />
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-teal-500/30 border-t-teal-500 animate-spin" />
                   {t('categorising')}
                 </>
               ) : (
@@ -453,40 +452,40 @@ export default function ImportShell() {
               )}
             </button>
           </div>
-          <div className="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden">
+          <div className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-[#042F2E] border-b border-white/10">
+                <thead className="sticky top-0 bg-teal-50 dark:bg-[#042F2E] border-b border-brand-secondary/20 dark:border-white/10">
                   <tr>
-                    <th className="px-4 py-2.5 text-left font-medium text-white/60 w-8"></th>
-                    <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('colDate')}</th>
-                    <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('colName')}</th>
-                    <th className="px-4 py-2.5 text-right font-medium text-white/60">{t('colAmount')}</th>
-                    <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('tag')}</th>
-                    <th className="px-4 py-2.5 text-left font-medium text-white/60">{t('type')}</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-brand-text/60 dark:text-white/60 w-8"></th>
+                    <th className="px-4 py-2.5 text-left font-medium text-brand-text/60 dark:text-white/60">{t('colDate')}</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-brand-text/60 dark:text-white/60">{t('colName')}</th>
+                    <th className="px-4 py-2.5 text-right font-medium text-brand-text/60 dark:text-white/60">{t('colAmount')}</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-brand-text/60 dark:text-white/60">{t('tag')}</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-brand-text/60 dark:text-white/60">{t('type')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((tx) => (
-                    <tr key={tx.id} className={`border-b border-white/[0.06] last:border-0 ${tx.skipped ? 'opacity-30' : ''}`}>
+                    <tr key={tx.id} className={`border-b border-brand-secondary/10 dark:border-white/[0.06] last:border-0 ${tx.skipped ? 'opacity-30' : ''}`}>
                       <td className="px-4 py-2">
                         <input
                           type="checkbox"
                           checked={!tx.skipped}
                           onChange={() => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, skipped: !p.skipped } : p))}
-                          className="accent-teal-500"
+                          className="accent-teal-600"
                         />
                       </td>
-                      <td className="px-4 py-2 text-white/60 whitespace-nowrap">{tx.date}</td>
-                      <td className="px-4 py-2 text-white max-w-[140px] truncate">{tx.name}</td>
-                      <td className={`px-4 py-2 text-right font-mono whitespace-nowrap ${tx.category === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <td className="px-4 py-2 text-brand-text/60 dark:text-white/60 whitespace-nowrap">{tx.date}</td>
+                      <td className="px-4 py-2 text-brand-text dark:text-white max-w-[140px] truncate">{tx.name}</td>
+                      <td className={`px-4 py-2 text-right font-mono whitespace-nowrap ${tx.category === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                         {tx.category === 'income' ? '+' : '−'}{tx.amount.toFixed(2)}
                       </td>
                       <td className="px-4 py-2">
                         <select
                           value={tx.tag}
                           onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, tag: e.target.value } : p))}
-                          className="text-xs rounded-lg border border-white/15 bg-[#042F2E] px-2 py-1 text-white focus:outline-none max-w-[110px]"
+                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none max-w-[110px]"
                         >
                           {allTags.map((tg) => <option key={tg.id} value={tg.id}>{tg.label}</option>)}
                         </select>
@@ -495,7 +494,7 @@ export default function ImportShell() {
                         <select
                           value={tx.category}
                           onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, category: e.target.value as 'income' | 'expense' } : p))}
-                          className="text-xs rounded-lg border border-white/15 bg-[#042F2E] px-2 py-1 text-white focus:outline-none"
+                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none"
                         >
                           <option value="expense">Expense</option>
                           <option value="income">Income</option>
@@ -507,10 +506,9 @@ export default function ImportShell() {
               </table>
             </div>
           </div>
-          {/* Bulk flip button if signs are wrong */}
           <button
             onClick={() => setTransactions((prev) => prev.map((tx) => ({ ...tx, category: tx.category === 'income' ? 'expense' : 'income' })))}
-            className="text-xs text-white/40 hover:text-white/70 transition-colors text-left"
+            className="text-xs text-brand-text/40 dark:text-white/40 hover:text-brand-text/70 dark:hover:text-white/70 transition-colors text-left"
           >
             {t('flipAll')}
           </button>
@@ -524,38 +522,35 @@ export default function ImportShell() {
       {/* ── STEP 4: Recurring suggestions ── */}
       {step === 'recurring' && (
         <div className="flex flex-col gap-4">
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-300">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
             {t('recurringHint', { count: recurringGroups.length })}
           </div>
           <div className="flex flex-col gap-3">
             {recurringGroups.map((g, i) => (
-              <div key={i} className="bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 flex flex-col gap-3">
+              <div key={i} className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-xl px-4 py-3 flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="font-semibold text-white truncate">{g.merchant}</p>
-                    <p className="text-xs text-white/50 mt-0.5">
+                    <p className="font-semibold text-brand-text dark:text-white truncate">{g.merchant}</p>
+                    <p className="text-xs text-brand-text/50 dark:text-white/50 mt-0.5">
                       {g.interval === 'weekly' ? t('weekly') : g.interval === 'biweekly' ? t('biweekly') : t('monthly')}
                       {' · '}{g.amount.toFixed(2)}
                       {' · '}{g.transactionIds.length}×
                     </p>
                   </div>
                   <label className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
-                    <span className="text-sm text-white/70">{t('setRecurring')}</span>
+                    <span className="text-sm text-brand-text/70 dark:text-white/70">{t('setRecurring')}</span>
                     <input
                       type="checkbox"
                       checked={g.confirmed}
                       onChange={() => setRecurringGroups((prev) => prev.map((r, ri) => ri === i ? { ...r, confirmed: !r.confirmed } : r))}
-                      className="accent-teal-500 w-4 h-4"
+                      className="accent-teal-600 w-4 h-4"
                     />
                   </label>
                 </div>
-                {/* Save as quick-fill template */}
-                <div className="flex items-center justify-between border-t border-white/[0.06] pt-2.5">
-                  <div>
-                    <p className="text-xs text-white/60">{t('templateHint')}</p>
-                  </div>
+                <div className="flex items-center justify-between border-t border-brand-secondary/10 dark:border-white/[0.06] pt-2.5">
+                  <p className="text-xs text-brand-text/50 dark:text-white/50">{t('templateHint')}</p>
                   {savedTemplates.has(i) ? (
-                    <span className="text-xs text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
@@ -564,17 +559,10 @@ export default function ImportShell() {
                   ) : (
                     <button
                       onClick={() => {
-                        addTemplate({
-                          name: g.merchant,
-                          amount: g.amount,
-                          category: g.category,
-                          type: 'recurring',
-                          tag: g.tag,
-                          frequency: g.interval,
-                        });
+                        addTemplate({ name: g.merchant, amount: g.amount, category: g.category, type: 'recurring', tag: g.tag, frequency: g.interval });
                         setSavedTemplates((prev) => new Set([...prev, i]));
                       }}
-                      className="text-xs text-teal-400 hover:text-teal-300 transition-colors font-medium"
+                      className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors font-medium"
                     >
                       {t('saveTemplate')}
                     </button>
@@ -593,19 +581,16 @@ export default function ImportShell() {
       {/* ── Importing (progress) ── */}
       {step === 'importing' && (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-teal-400 animate-spin" />
-          <p className="text-white font-medium">{t('importing')}</p>
+          <div className="w-10 h-10 rounded-full border-2 border-brand-text/20 dark:border-white/20 border-t-teal-500 animate-spin" />
+          <p className="text-brand-text dark:text-white font-medium">{t('importing')}</p>
           {importTotal > 0 && (
             <div className="w-full max-w-xs">
-              <div className="flex justify-between text-xs text-white/50 mb-1.5">
+              <div className="flex justify-between text-xs text-brand-text/50 dark:text-white/50 mb-1.5">
                 <span>{importProgress} / {importTotal}</span>
                 <span>{Math.round((importProgress / importTotal) * 100)}%</span>
               </div>
-              <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-teal-400 rounded-full transition-all duration-200"
-                  style={{ width: `${(importProgress / importTotal) * 100}%` }}
-                />
+              <div className="h-1.5 rounded-full bg-brand-text/10 dark:bg-white/10 overflow-hidden">
+                <div className="h-full bg-teal-500 rounded-full transition-all duration-200" style={{ width: `${(importProgress / importTotal) * 100}%` }} />
               </div>
             </div>
           )}
@@ -616,23 +601,20 @@ export default function ImportShell() {
       {step === 'done' && (
         <div className="text-center py-8">
           <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="w-8 h-8 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="text-lg font-semibold text-white mb-1">{t('doneTitle')}</p>
-          <p className="text-sm text-white/50 mb-6">{t('doneSubtitle', { count: importedCount })}</p>
+          <p className="text-lg font-semibold text-brand-text dark:text-white mb-1">{t('doneTitle')}</p>
+          <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">{t('doneSubtitle', { count: importedCount })}</p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); }}
-              className="px-5 h-10 rounded-xl border border-white/15 text-sm text-white/70 hover:bg-white/5 transition-colors"
+              className="px-5 h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 transition-colors"
             >
               {t('importAnother')}
             </button>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-5 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 transition-colors"
-            >
+            <button onClick={() => router.push('/dashboard')} className="px-5 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 transition-colors">
               {t('goToDashboard')}
             </button>
           </div>
