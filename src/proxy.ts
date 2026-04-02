@@ -56,6 +56,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/signup') ||
     pathname.startsWith('/auth/') ||
+    pathname.startsWith('/reset-password') ||
     pathname.startsWith('/preview') ||
     pathname.startsWith('/api/preview-auth') ||
     pathname.startsWith('/terms') ||
