@@ -41,6 +41,16 @@ const jsonLd = {
 
 const posts = [
   {
+    slug: 'stop-guessing-where-your-money-goes',
+    category: 'Personal Finance',
+    date: 'April 2, 2026',
+    dateIso: '2026-04-02',
+    readTime: '15 min read',
+    title: 'Stop Guessing Where Your Money Goes and Start Building Wealth',
+    excerpt: 'Most people earn a reasonable salary and still arrive at the end of the month wondering where it all went. Not because they spent on anything crazy. Just because they never actually looked. This is how to fix that and do something useful with what you find.',
+    tags: ['Expense Tracking', 'Building Wealth', 'Investing', 'Personal Finance'],
+  },
+  {
     slug: 'oil-prices-inflation-budget',
     category: 'Personal Finance',
     date: 'March 31, 2026',
