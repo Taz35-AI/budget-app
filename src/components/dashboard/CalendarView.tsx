@@ -82,10 +82,9 @@ export function CalendarView({
   }, [viewStart, firstDayOfWeek]);
 
   const measureRows = useCallback(() => {
-    const calEl = calendarRef.current?.getApi().el;
     const containerEl = calendarContainerRef.current;
-    if (!calEl || !containerEl) return;
-    const rows = Array.from(calEl.querySelectorAll('.fc-daygrid-body table tbody tr'));
+    if (!containerEl) return;
+    const rows = Array.from(containerEl.querySelectorAll('.fc-daygrid-body table tbody tr'));
     if (!rows.length) return;
     const containerTop = containerEl.getBoundingClientRect().top;
     setRowTops(rows.map((row) => {
