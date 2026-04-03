@@ -156,6 +156,17 @@ export function CalendarView({
     [],
   );
 
+  const handleDatesSet = useCallback((args: DatesSetArg) => {
+    const monthKey = format(args.view.currentStart, 'yyyy-MM');
+    setMonthTitle(`${longMonths[args.view.currentStart.getMonth()]} ${args.view.currentStart.getFullYear()}`);
+    if (onMonthChange && monthKey !== lastReportedMonth.current) {
+      lastReportedMonth.current = monthKey;
+      onMonthChange(args.view.currentStart);
+    }
+    const active = args.view.activeStart;
+    setViewStart((prev) => (prev && prev.getTime() === active.getTime() ? prev : active));
+  }, [longMonths, onMonthChange]);
+
   const maxDate = format(addDays(new Date(), 365 * 7 + 2), 'yyyy-MM-dd');
   const showTabs = (accounts?.length ?? 0) >= 2;
 
@@ -286,15 +297,7 @@ export function CalendarView({
           }}
           events={[]}
           eventContent={(_args: EventContentArg) => null}
-          datesSet={(args: DatesSetArg) => {
-            const monthKey = format(args.view.currentStart, 'yyyy-MM');
-            setMonthTitle(`${longMonths[args.view.currentStart.getMonth()]} ${args.view.currentStart.getFullYear()}`);
-            if (onMonthChange && monthKey !== lastReportedMonth.current) {
-              lastReportedMonth.current = monthKey;
-              onMonthChange(args.view.currentStart);
-            }
-            setViewStart(args.view.activeStart);
-          }}
+          datesSet={handleDatesSet}
           dayCellClassNames={(args) => {
             const dateStr = format(args.date, 'yyyy-MM-dd');
             return selectedDate === dateStr ? 'fc-day-selected' : '';
