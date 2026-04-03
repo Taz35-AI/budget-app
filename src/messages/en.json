@@ -195,7 +195,9 @@
     "insightsOnlyPast": "Insights are available for completed months only.",
     "insightsDownloadPdf": "Download PDF",
     "insightsError": "Failed to generate. Try again.",
-    "insightsRegenerate": "Regenerate"
+    "insightsRegenerate": "Regenerate",
+    "tagDrawerHint": "Tap any tag badge to re-categorise that transaction",
+    "tagDrawerEmpty": "No transactions with this tag"
   },
   "settings": {
     "title": "Settings",

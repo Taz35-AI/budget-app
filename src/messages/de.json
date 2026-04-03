@@ -195,7 +195,9 @@
     "insightsOnlyPast": "Analysen sind nur für abgeschlossene Monate verfügbar.",
     "insightsDownloadPdf": "PDF herunterladen",
     "insightsError": "Erstellung fehlgeschlagen. Erneut versuchen.",
-    "insightsRegenerate": "Neu erstellen"
+    "insightsRegenerate": "Neu erstellen",
+    "tagDrawerHint": "Tag-Badge antippen, um die Transaktion umzukategorisieren",
+    "tagDrawerEmpty": "Keine Transaktionen mit diesem Tag"
   },
   "settings": {
     "title": "Einstellungen",

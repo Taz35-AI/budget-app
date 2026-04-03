@@ -195,7 +195,9 @@
     "insightsOnlyPast": "Analizy dostępne są tylko dla zakończonych miesięcy.",
     "insightsDownloadPdf": "Pobierz PDF",
     "insightsError": "Błąd generowania. Spróbuj ponownie.",
-    "insightsRegenerate": "Wygeneruj ponownie"
+    "insightsRegenerate": "Wygeneruj ponownie",
+    "tagDrawerHint": "Kliknij tag, aby zmienić kategorię transakcji",
+    "tagDrawerEmpty": "Brak transakcji z tym tagiem"
   },
   "settings": {
     "title": "Ustawienia",

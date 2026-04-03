@@ -195,7 +195,9 @@
     "insightsOnlyPast": "Analizele sunt disponibile doar pentru lunile finalizate.",
     "insightsDownloadPdf": "Descarcă PDF",
     "insightsError": "Generare eșuată. Încearcă din nou.",
-    "insightsRegenerate": "Regenerează"
+    "insightsRegenerate": "Regenerează",
+    "tagDrawerHint": "Apasă pe un tag pentru a re-categoriza acea tranzacție",
+    "tagDrawerEmpty": "Nicio tranzacție cu acest tag"
   },
   "settings": {
     "title": "Setări",

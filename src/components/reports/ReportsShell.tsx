@@ -7,6 +7,8 @@ import { useBalances } from '@/hooks/useBalances';
 import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useUpdateTransaction } from '@/hooks/useTransactions';
+import type { DayTransaction } from '@/types';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -61,6 +63,11 @@ export function ReportsShell() {
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(new Date().getMonth());
   const [hoveredTag,       setHoveredTag]       = useState<string | null>(null);
   const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals'>('overview');
+
+  // ── Tag drill-down state ────────────────────────────────────────────────────
+  const [selectedTagKey,  setSelectedTagKey]  = useState<string | null>(null);
+  const [retaggingKey,    setRetaggingKey]    = useState<string | null>(null); // `${transaction_id}-${date}`
+  const updateTx = useUpdateTransaction();
 
   // ── Insights state ──────────────────────────────────────────────────────────
   const [insightsLoading, setInsightsLoading] = useState(false);
@@ -186,6 +193,32 @@ export function ReportsShell() {
     }
     return all.sort((a, b) => b.amount - a.amount).slice(0, 8);
   }, [dayTransactions, selectedYear, selectedMonthIdx]);
+
+  // ── Tag drill-down: all transactions for the selected tag in the selected month ──
+  const tagTransactionsList = useMemo<Array<{ tx: DayTransaction; date: string }>>(() => {
+    if (!selectedTagKey) return [];
+    const prefix = `${selectedYear}-${String(selectedMonthIdx + 1).padStart(2, '0')}`;
+    const results: Array<{ tx: DayTransaction; date: string }> = [];
+    for (const [date, txs] of dayTransactions) {
+      if (!date.startsWith(prefix)) continue;
+      for (const tx of txs) {
+        if (tx.category !== 'expense') continue;
+        const isUuid = tx.tag != null && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag);
+        const k = (tx.tag == null || isUuid) ? '__untagged__' : tx.tag;
+        if (k === selectedTagKey) results.push({ tx, date });
+      }
+    }
+    return results.sort((a, b) => b.date.localeCompare(a.date));
+  }, [selectedTagKey, dayTransactions, selectedYear, selectedMonthIdx]);
+
+  // Tags available for re-tagging (expense + both, excluding hidden)
+  const retagOptions = useMemo(() =>
+    Object.entries(allTags)
+      .filter(([, t]) => t.category === 'expense' || t.category === 'both')
+      .map(([id, t]) => ({ id, label: TAGS[id] ? tTags(id as never) : t.label, color: t.color }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    [allTags, tTags],
+  );
 
   // ── Insights helpers ────────────────────────────────────────────────────────
   const today       = new Date();
@@ -609,19 +642,29 @@ ${savedInsight ? `<h2>AI Insights</h2><div class="advice">${savedInsight.advice.
                     const pct     = Math.round((amount / maxTagAmt) * 100);
                     const ofTotal = selected.expense > 0 ? Math.round((amount / selected.expense) * 100) : 0;
                     return (
-                      <div key={key}>
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => { setSelectedTagKey(key); setRetaggingKey(null); }}
+                        className="group text-left w-full rounded-lg p-1.5 -mx-1.5 hover:bg-brand-primary/[0.05] dark:hover:bg-brand-primary/[0.08] transition-colors"
+                      >
                         <div className="flex justify-between items-center mb-1">
                           <div className="flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                             <span className="text-xs font-semibold text-brand-text/75 dark:text-white/70">{label}</span>
                             <span className="text-[10px] text-brand-text/28 dark:text-white/22">{ofTotal}%</span>
                           </div>
-                          <span className="text-xs font-bold text-brand-text/65 dark:text-white/55 tabular-nums">{formatAmount(amount)}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-brand-text/65 dark:text-white/55 tabular-nums">{formatAmount(amount)}</span>
+                            <svg className="w-3 h-3 text-brand-text/20 dark:text-white/15 group-hover:text-brand-primary/50 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
                         </div>
                         <div className="h-[5px] bg-brand-primary/[0.07] rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: color }} />
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -1082,6 +1125,128 @@ ${savedInsight ? `<h2>AI Insights</h2><div class="advice">${savedInsight.advice.
 
         </div>
       </div>
+
+      {/* ── Tag drill-down drawer ──────────────────────────────────────────── */}
+      {selectedTagKey !== null && (() => {
+        const tagInfo = tagBreakdown.find((t) => t.key === selectedTagKey);
+        const tagLabel = tagInfo?.label ?? selectedTagKey;
+        const tagColor = tagInfo?.color ?? '#6b7280';
+
+        return (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-[150] bg-black/50 backdrop-blur-[2px]"
+              onClick={() => { setSelectedTagKey(null); setRetaggingKey(null); }}
+            />
+
+            {/* Sheet */}
+            <div className="fixed inset-x-0 bottom-0 z-[160] flex flex-col rounded-t-2xl bg-white dark:bg-[#042F2E] shadow-2xl max-h-[82vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-lg sm:rounded-2xl sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2">
+
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
+                <div className="w-9 h-1 rounded-full bg-brand-text/12 dark:bg-white/12" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 px-5 pt-3 pb-3 border-b border-brand-primary/[0.08] flex-shrink-0">
+                <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: tagColor }} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-bold text-brand-text dark:text-white leading-tight truncate">{tagLabel}</p>
+                  <p className="text-[11px] text-brand-text/40 dark:text-white/30">{MONTH_FULL[selectedMonthIdx]} {selectedYear}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedTagKey(null); setRetaggingKey(null); }}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-brand-text/40 hover:text-brand-text/70 dark:text-white/30 dark:hover:text-white/70 hover:bg-brand-primary/8 transition-colors flex-shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Hint */}
+              <p className="px-5 pt-2.5 text-[11px] text-brand-text/35 dark:text-white/25 flex-shrink-0">
+                {t('tagDrawerHint')}
+              </p>
+
+              {/* Transaction list */}
+              <div className="flex-1 overflow-y-auto px-5 pb-6 pt-1">
+                {tagTransactionsList.length === 0 ? (
+                  <p className="text-sm text-brand-text/35 dark:text-white/25 text-center py-10">{t('tagDrawerEmpty')}</p>
+                ) : (
+                  <div className="flex flex-col divide-y divide-brand-primary/[0.06]">
+                    {tagTransactionsList.map(({ tx, date }) => {
+                      const rowKey   = `${tx.transaction_id}-${date}`;
+                      const isOpen   = retaggingKey === rowKey;
+                      const currentTagInfo = tx.tag && allTags[tx.tag] ? allTags[tx.tag] : null;
+                      const currentTagLabel = tx.tag
+                        ? (TAGS[tx.tag] ? tTags(tx.tag as never) : (allTags[tx.tag]?.label ?? tx.tag))
+                        : tTags('untagged' as never);
+
+                      return (
+                        <div key={rowKey} className="py-3">
+                          {/* Transaction row */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-brand-text/85 dark:text-white/80 truncate leading-tight">
+                                {tc('balanceAdjustment') === tx.name ? tc('balanceAdjustment') : tx.name}
+                              </p>
+                              <p className="text-[11px] text-brand-text/35 dark:text-white/28 mt-0.5">{date}</p>
+                            </div>
+                            <span className="text-sm font-bold text-brand-danger tabular-nums flex-shrink-0">
+                              -{formatAmount(tx.amount)}
+                            </span>
+                            {/* Tag chip — click to open picker */}
+                            <button
+                              type="button"
+                              onClick={() => setRetaggingKey(isOpen ? null : rowKey)}
+                              className="flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold transition-all border flex-shrink-0"
+                              style={currentTagInfo
+                                ? { backgroundColor: `${currentTagInfo.color}18`, color: currentTagInfo.color, borderColor: `${currentTagInfo.color}30` }
+                                : { backgroundColor: 'rgba(107,114,128,0.1)', color: '#6b7280', borderColor: 'rgba(107,114,128,0.2)' }}
+                            >
+                              {currentTagLabel}
+                              <svg className={cn('w-3 h-3 transition-transform', isOpen && 'rotate-180')} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* Inline tag picker */}
+                          {isOpen && (
+                            <div className="mt-2.5 flex flex-wrap gap-1.5 pl-0">
+                              {retagOptions.map((opt) => (
+                                <button
+                                  key={opt.id}
+                                  type="button"
+                                  disabled={updateTx.isPending}
+                                  onClick={() => {
+                                    updateTx.mutate(
+                                      { id: tx.transaction_id, editMode: 'all', values: { tag: opt.id } },
+                                      { onSuccess: () => setRetaggingKey(null) },
+                                    );
+                                  }}
+                                  className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all disabled:opacity-50"
+                                  style={{ backgroundColor: `${opt.color}15`, color: opt.color, borderColor: `${opt.color}30` }}
+                                >
+                                  {opt.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
     </AppLayout>
   );
 }

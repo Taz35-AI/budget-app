@@ -195,7 +195,9 @@
     "insightsOnlyPast": "Les analyses sont disponibles uniquement pour les mois terminés.",
     "insightsDownloadPdf": "Télécharger PDF",
     "insightsError": "Échec de la génération. Réessayez.",
-    "insightsRegenerate": "Régénérer"
+    "insightsRegenerate": "Régénérer",
+    "tagDrawerHint": "Appuyez sur un badge de tag pour re-catégoriser cette transaction",
+    "tagDrawerEmpty": "Aucune transaction avec ce tag"
   },
   "settings": {
     "title": "Paramètres",
