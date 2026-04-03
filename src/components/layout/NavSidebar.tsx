@@ -10,6 +10,7 @@ import { useNavStore } from '@/store/navStore';
 import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
 import { ExportButton } from '@/components/dashboard/ExportButton';
 import { UserBadge } from '@/components/layout/UserBadge';
+import { LogoutButton } from '@/components/dashboard/LogoutButton';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -153,6 +154,11 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
         {/* Export */}
         <div className="px-1 [&>button]:w-full [&>button]:justify-start">
           <ExportButton />
+        </div>
+
+        {/* Logout */}
+        <div className="px-1 [&>button]:w-full [&>button]:justify-start">
+          <LogoutButton />
         </div>
       </div>
 
