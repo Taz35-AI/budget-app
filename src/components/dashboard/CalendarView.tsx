@@ -208,6 +208,8 @@ export function CalendarView({
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           firstDay={firstDayOfWeek}
+          weekNumbers={true}
+          weekNumberCalculation={firstDayOfWeek === 1 ? 'ISO' : 'local'}
           headerToolbar={false}
           height={calendarHeight}
           dateClick={handleDateClick}

@@ -233,6 +233,47 @@
   -webkit-user-select: none;
 }
 
+/* Week number column — subtle, narrow, muted */
+.fc .fc-week-number {
+  width: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  vertical-align: middle;
+}
+
+.fc .fc-daygrid-week-number {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(4, 47, 46, 0.22);
+  letter-spacing: 0.02em;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Week number column header (the "W" label) */
+.fc .fc-col-header-cell.fc-week-number {
+  width: 18px !important;
+  min-width: 18px !important;
+  border: none !important;
+  background: transparent !important;
+}
+.fc .fc-col-header-cell.fc-week-number .fc-col-header-cell-cushion {
+  font-size: 0.5rem;
+  color: rgba(4, 47, 46, 0.18);
+  letter-spacing: 0.04em;
+  padding: 0;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Dark mode FullCalendar overrides
    ═══════════════════════════════════════════════════════════════ */
@@ -262,6 +303,14 @@
   color: rgba(94, 234, 212, 0.7);
 }
 
+.dark .fc .fc-daygrid-week-number {
+  color: rgba(94, 234, 212, 0.18);
+}
+
+.dark .fc .fc-col-header-cell.fc-week-number .fc-col-header-cell-cushion {
+  color: rgba(94, 234, 212, 0.15);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    Mobile overrides
@@ -270,6 +319,17 @@
 @media (max-width: 640px) {
   .fc table {
     border-spacing: 2px !important;
+  }
+
+  .fc .fc-week-number,
+  .fc .fc-col-header-cell.fc-week-number {
+    width: 14px !important;
+    min-width: 14px !important;
+    max-width: 14px !important;
+  }
+
+  .fc .fc-daygrid-week-number {
+    font-size: 0.48rem;
   }
 
   .fc .fc-daygrid-day-frame {
