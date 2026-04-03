@@ -257,14 +257,7 @@ export function CalendarView({
               style={{ left: 0, top, width: 20, height }}
             >
               <span
-                style={{
-                  fontSize: '0.5rem',
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  letterSpacing: '0.02em',
-                  color: 'rgba(4, 47, 46, 0.22)',
-                }}
-                className="dark:!text-teal-400/[0.18]"
+                className="text-[0.5rem] font-bold leading-none tracking-wide text-[#042F2E]/70 dark:text-white/80"
               >
                 {weekNumbers[i]}
               </span>
