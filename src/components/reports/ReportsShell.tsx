@@ -388,7 +388,7 @@ export function ReportsShell() {
         </div>
 
         {/* ── Content area — fixed-height scrollable on mobile, normal on desktop ── */}
-        <div className="h-[calc(100dvh-4rem-6.5rem)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
+        <div className="h-[calc(100dvh-4rem-6.5rem-60px)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 pb-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
           <div className={cn("bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]", activeTab === 'subscriptions' && 'hidden sm:block')}>
