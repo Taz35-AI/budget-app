@@ -205,7 +205,21 @@
     "pdfTransactionCount": "Transacciones",
     "pdfTopCategories": "Principales Categorías de Gasto",
     "pdfAiInsights": "Análisis IA",
-    "pdfGeneratedBy": "Generado el {date} · spentum.com"
+    "pdfGeneratedBy": "Generado el {date} · spentum.com",
+    "tabSubscriptions": "Suscripciones",
+    "subsTitle": "Suscripciones activas",
+    "subsSubtitle": "Todos tus gastos recurrentes en un solo lugar",
+    "subsTotalMonthly": "Coste mensual total",
+    "subsNoSubscriptions": "Sin suscripciones activas",
+    "subsNoSubscriptionsHint": "Los gastos recurrentes aparecerán aquí automáticamente",
+    "subsPerMonth": "/mes",
+    "subsIncome": "Ingresos recurrentes",
+    "subsExpense": "Gastos recurrentes",
+    "subsStarted": "Desde {date}",
+    "subsEnds": "Finaliza {date}",
+    "subsOngoing": "En curso",
+    "subsCount": "{count} suscripciones",
+    "subsAnnualCost": "Coste anual"
   },
   "settings": {
     "title": "Ajustes",

@@ -205,7 +205,21 @@
     "pdfTransactionCount": "Transakcje",
     "pdfTopCategories": "Główne Kategorie Wydatków",
     "pdfAiInsights": "Analiza AI",
-    "pdfGeneratedBy": "Wygenerowano {date} · spentum.com"
+    "pdfGeneratedBy": "Wygenerowano {date} · spentum.com",
+    "tabSubscriptions": "Subskrypcje",
+    "subsTitle": "Aktywne subskrypcje",
+    "subsSubtitle": "Wszystkie wydatki cykliczne w jednym miejscu",
+    "subsTotalMonthly": "Łączny koszt miesięczny",
+    "subsNoSubscriptions": "Brak aktywnych subskrypcji",
+    "subsNoSubscriptionsHint": "Wydatki cykliczne pojawią się tutaj automatycznie",
+    "subsPerMonth": "/mies.",
+    "subsIncome": "Przychody cykliczne",
+    "subsExpense": "Wydatki cykliczne",
+    "subsStarted": "Od {date}",
+    "subsEnds": "Do {date}",
+    "subsOngoing": "W toku",
+    "subsCount": "{count} subskrypcji",
+    "subsAnnualCost": "Koszt roczny"
   },
   "settings": {
     "title": "Ustawienia",

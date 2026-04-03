@@ -205,7 +205,21 @@
     "pdfTransactionCount": "Transactions",
     "pdfTopCategories": "Top Spending Categories",
     "pdfAiInsights": "AI Insights",
-    "pdfGeneratedBy": "Generated on {date} · spentum.com"
+    "pdfGeneratedBy": "Generated on {date} · spentum.com",
+    "tabSubscriptions": "Subscriptions",
+    "subsTitle": "Active Subscriptions",
+    "subsSubtitle": "All your recurring expenses in one place",
+    "subsTotalMonthly": "Total monthly cost",
+    "subsNoSubscriptions": "No active subscriptions",
+    "subsNoSubscriptionsHint": "Recurring expenses will appear here automatically",
+    "subsPerMonth": "/mo",
+    "subsIncome": "Recurring Income",
+    "subsExpense": "Recurring Expenses",
+    "subsStarted": "Since {date}",
+    "subsEnds": "Ends {date}",
+    "subsOngoing": "Ongoing",
+    "subsCount": "{count} subscriptions",
+    "subsAnnualCost": "Annual cost"
   },
   "settings": {
     "title": "Settings",

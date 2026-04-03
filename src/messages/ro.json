@@ -205,7 +205,21 @@
     "pdfTransactionCount": "Tranzacții",
     "pdfTopCategories": "Principale Categorii de Cheltuieli",
     "pdfAiInsights": "Analiză AI",
-    "pdfGeneratedBy": "Generat pe {date} · spentum.com"
+    "pdfGeneratedBy": "Generat pe {date} · spentum.com",
+    "tabSubscriptions": "Abonamente",
+    "subsTitle": "Abonamente active",
+    "subsSubtitle": "Toate cheltuielile recurente într-un singur loc",
+    "subsTotalMonthly": "Cost lunar total",
+    "subsNoSubscriptions": "Niciun abonament activ",
+    "subsNoSubscriptionsHint": "Cheltuielile recurente vor apărea aici automat",
+    "subsPerMonth": "/lună",
+    "subsIncome": "Venituri recurente",
+    "subsExpense": "Cheltuieli recurente",
+    "subsStarted": "Din {date}",
+    "subsEnds": "Până la {date}",
+    "subsOngoing": "În curs",
+    "subsCount": "{count} abonamente",
+    "subsAnnualCost": "Cost anual"
   },
   "settings": {
     "title": "Setări",

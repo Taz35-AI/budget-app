@@ -7,8 +7,9 @@ import { useBalances } from '@/hooks/useBalances';
 import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
-import { useUpdateTransaction } from '@/hooks/useTransactions';
-import type { DayTransaction } from '@/types';
+import { useTransactions, useUpdateTransaction } from '@/hooks/useTransactions';
+import { format } from 'date-fns';
+import type { DayTransaction, Frequency } from '@/types';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -54,15 +55,17 @@ export function ReportsShell() {
   const MONTH_FULL = tMonths.raw('long') as string[];
 
   const { dayTransactions, balances, isLoading } = useBalances();
+  const { data: txData } = useTransactions();
   const { allTags, goals, addGoal, updateGoal, deleteGoal } = useSettings();
   const { formatAmount, symbol: currencySymbol } = useCurrency();
+  const tFreq = useTranslations('frequency');
   const { monthlyInsights, setMonthlyInsight } = useSettingsStore();
 
   const currentYear = new Date().getFullYear();
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(new Date().getMonth());
   const [hoveredTag,       setHoveredTag]       = useState<string | null>(null);
-  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals'>('overview');
+  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals' | 'subscriptions'>('overview');
 
   // ── Tag drill-down state ────────────────────────────────────────────────────
   const [selectedTagKey,  setSelectedTagKey]  = useState<string | null>(null);
@@ -126,6 +129,34 @@ export function ReportsShell() {
   const netMonth  = selected.income - selected.expense;
   const savingsRate = selected.income > 0
     ? Math.round((netMonth / selected.income) * 100) : null;
+
+  // ── Subscriptions data ────────────────────────────────────────────────────
+  const MONTHLY_FACTOR: Record<Frequency, number> = {
+    daily: 30.44, weekly: 4.35, biweekly: 2.17,
+    monthly: 1, quarterly: 1 / 3, semiannual: 1 / 6, annual: 1 / 12,
+  };
+  const FREQ_LABEL_KEY: Record<Frequency, string> = {
+    daily: 'daily', weekly: 'weekly', biweekly: 'biweekly',
+    monthly: 'monthly', quarterly: 'quarterly', semiannual: 'quarterly', annual: 'yearly',
+  };
+  const subscriptions = useMemo(() => {
+    if (!txData?.transactions) return [];
+    const today = new Date();
+    return txData.transactions
+      .filter((tx) => tx.type === 'recurring' && tx.frequency && (!tx.end_date || new Date(tx.end_date) >= today))
+      .map((tx) => {
+        const freq = tx.frequency as Frequency;
+        const monthlyCost = tx.amount * (MONTHLY_FACTOR[freq] ?? 1);
+        const tagInfo = tx.tag ? allTags[tx.tag] : null;
+        return { ...tx, freq, monthlyCost, tagInfo };
+      })
+      .sort((a, b) => b.monthlyCost - a.monthlyCost);
+  }, [txData?.transactions, allTags]);
+
+  const subsExpenses = subscriptions.filter((s) => s.category === 'expense');
+  const subsIncome   = subscriptions.filter((s) => s.category === 'income');
+  const totalMonthlyExpense = subsExpenses.reduce((sum, s) => sum + s.monthlyCost, 0);
+  const totalMonthlyIncome  = subsIncome.reduce((sum, s) => sum + s.monthlyCost, 0);
 
   // ── Year totals ─────────────────────────────────────────────────────────────
   const yearTotals = useMemo(() => {
@@ -313,6 +344,7 @@ export function ReportsShell() {
               { id: 'transactions', label: t('tabTransactions')  },
               { id: 'annual',       label: t('tabAnnual')        },
               { id: 'goals',        label: t('tabGoals')         },
+              { id: 'subscriptions', label: t('tabSubscriptions') },
             ] as const).map(({ id, label }) => (
               <button
                 key={id}
@@ -1078,6 +1110,111 @@ export function ReportsShell() {
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* ── Subscriptions ─────────────────────────────────────────── */}
+          <div className={cn(activeTab !== 'subscriptions' && 'hidden sm:block')}>
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+              <div className="h-[3px] w-full bg-gradient-to-r from-violet-500 to-indigo-500" />
+              <div className="px-5 pt-5 pb-4">
+                <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('subsTitle')}</h2>
+                <p className="text-xs text-brand-text/40 dark:text-white/35 mt-0.5">{t('subsSubtitle')}</p>
+              </div>
+
+              {subscriptions.length === 0 ? (
+                <div className="px-5 pb-8 flex flex-col items-center text-center gap-2">
+                  <div className="w-12 h-12 rounded-2xl bg-violet-500/10 dark:bg-violet-500/15 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-violet-500 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-semibold text-brand-text/50 dark:text-white/40">{t('subsNoSubscriptions')}</p>
+                  <p className="text-xs text-brand-text/30 dark:text-white/25">{t('subsNoSubscriptionsHint')}</p>
+                </div>
+              ) : (
+                <div className="px-5 pb-5 flex flex-col gap-4">
+                  {/* ── Summary cards ── */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl bg-brand-danger/8 dark:bg-brand-danger/10 p-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-brand-danger/60 dark:text-brand-danger/50">{t('subsTotalMonthly')}</p>
+                      <p className="text-lg font-extrabold text-brand-danger dark:text-brand-danger/90 mt-1 tabular-nums">{formatAmount(totalMonthlyExpense)}</p>
+                      <p className="text-[10px] text-brand-text/35 dark:text-white/30 mt-0.5">{t('subsAnnualCost')}: {formatAmount(totalMonthlyExpense * 12)}</p>
+                    </div>
+                    <div className="rounded-2xl bg-brand-positive/8 dark:bg-brand-positive/10 p-3.5">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-brand-positive/60 dark:text-brand-positive/50">{t('subsIncome')}</p>
+                      <p className="text-lg font-extrabold text-brand-positive dark:text-brand-positive/90 mt-1 tabular-nums">{formatAmount(totalMonthlyIncome)}</p>
+                      <p className="text-[10px] text-brand-text/35 dark:text-white/30 mt-0.5">{t('subsCount', { count: subsIncome.length })}</p>
+                    </div>
+                  </div>
+
+                  {/* ── Expense subscriptions ── */}
+                  {subsExpenses.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-brand-text/35 dark:text-white/25 mb-2">{t('subsExpense')} ({subsExpenses.length})</p>
+                      <div className="flex flex-col gap-1.5">
+                        {subsExpenses.map((sub) => (
+                          <div key={sub.id} className="native-row flex items-center gap-3 px-3.5 py-3 rounded-2xl">
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: sub.tagInfo?.color ? `${sub.tagInfo.color}18` : 'rgba(220,38,38,0.08)' }}>
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: sub.tagInfo?.color ?? '#DC2626' }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-brand-text dark:text-white truncate">{sub.name}</p>
+                              <p className="text-[11px] text-brand-text/40 dark:text-white/35">
+                                {tFreq(FREQ_LABEL_KEY[sub.freq] as never)}
+                                {sub.start_date && <> &middot; {t('subsStarted', { date: format(new Date(sub.start_date), 'MMM yyyy') })}</>}
+                                {sub.end_date
+                                  ? <> &middot; {t('subsEnds', { date: format(new Date(sub.end_date), 'MMM yyyy') })}</>
+                                  : <> &middot; {t('subsOngoing')}</>}
+                              </p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-sm font-bold text-brand-danger tabular-nums">{formatAmount(sub.amount)}</p>
+                              <p className="text-[10px] text-brand-text/30 dark:text-white/25 tabular-nums">
+                                {formatAmount(sub.monthlyCost)}{t('subsPerMonth')}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Income subscriptions ── */}
+                  {subsIncome.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-brand-text/35 dark:text-white/25 mb-2">{t('subsIncome')} ({subsIncome.length})</p>
+                      <div className="flex flex-col gap-1.5">
+                        {subsIncome.map((sub) => (
+                          <div key={sub.id} className="native-row flex items-center gap-3 px-3.5 py-3 rounded-2xl">
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: sub.tagInfo?.color ? `${sub.tagInfo.color}18` : 'rgba(22,163,74,0.08)' }}>
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: sub.tagInfo?.color ?? '#16A34A' }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-brand-text dark:text-white truncate">{sub.name}</p>
+                              <p className="text-[11px] text-brand-text/40 dark:text-white/35">
+                                {tFreq(FREQ_LABEL_KEY[sub.freq] as never)}
+                                {sub.start_date && <> &middot; {t('subsStarted', { date: format(new Date(sub.start_date), 'MMM yyyy') })}</>}
+                                {sub.end_date
+                                  ? <> &middot; {t('subsEnds', { date: format(new Date(sub.end_date), 'MMM yyyy') })}</>
+                                  : <> &middot; {t('subsOngoing')}</>}
+                              </p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-sm font-bold text-brand-positive tabular-nums">{formatAmount(sub.amount)}</p>
+                              <p className="text-[10px] text-brand-text/30 dark:text-white/25 tabular-nums">
+                                {formatAmount(sub.monthlyCost)}{t('subsPerMonth')}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
