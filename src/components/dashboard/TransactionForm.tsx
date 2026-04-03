@@ -35,7 +35,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
   const ref = React.useRef<HTMLDivElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
-  // Close on outside click
+  // Close on outside click (desktop only — mobile uses overlay)
   React.useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
@@ -50,8 +50,17 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
 
   // Focus search input when dropdown opens
   React.useEffect(() => {
-    if (open) setTimeout(() => searchRef.current?.focus(), 50);
+    if (open) setTimeout(() => searchRef.current?.focus(), 80);
     else setSearch('');
+  }, [open]);
+
+  // Prevent body scroll on mobile when open
+  React.useEffect(() => {
+    if (!open) return;
+    const isMobile = window.innerWidth < 640;
+    if (!isMobile) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
   const allForCategory = Object.entries(allTags).filter(
@@ -67,22 +76,18 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
 
   return (
     <div ref={ref} className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
-      <div className="flex items-center justify-between">
-        <p className={cn('font-medium text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
-          {t('category')}
-        </p>
-        {error && (
-          <p className={cn('text-brand-danger', compact ? 'text-[9px]' : 'text-xs')}>{error}</p>
-        )}
-      </div>
+      {/* Label + error below field (like other fields) */}
+      <p className={cn('font-semibold text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
+        {t('category')}
+      </p>
 
       {/* Trigger button */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'w-full flex items-center gap-2 rounded-2xl border transition-all active:scale-[0.98]',
-          compact ? 'h-7 px-2.5 text-[11px]' : 'h-11 px-3 text-sm',
+          'w-full flex items-center gap-2 rounded-2xl border transition-all duration-100 active:scale-[0.98]',
+          compact ? 'h-7 px-2.5 text-[11px]' : 'h-11 px-3.5 text-sm',
           error
             ? 'border-brand-danger/40 bg-red-50 dark:bg-red-900/10'
             : open
@@ -92,78 +97,117 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
       >
         {selectedTag ? (
           <>
-            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: selectedTag.color }} />
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: selectedTag.color }} />
             <span className="flex-1 text-left font-medium text-brand-text dark:text-white/90 truncate">{selected && TAGS[selected] ? tTags(selected as never) : selectedTag.label}</span>
           </>
         ) : (
-          <span className="flex-1 text-left text-brand-text/40 dark:text-white/35">{t('selectCategory')}</span>
+          <span className="flex-1 text-left text-brand-text/35 dark:text-white/30">{t('selectCategory')}</span>
         )}
         <svg
-          className={cn('w-3.5 h-3.5 text-brand-text/30 dark:text-white/25 flex-shrink-0 transition-transform', open && 'rotate-180')}
+          className={cn('w-3.5 h-3.5 text-brand-text/30 dark:text-white/25 flex-shrink-0 transition-transform duration-100', open && 'rotate-180')}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
-      {/* Dropdown panel */}
+      {/* Error below trigger — same style as other form fields */}
+      {error && (
+        <p className={cn('font-medium text-brand-danger dark:text-brand-danger/90', compact ? 'text-[9px]' : 'text-xs')}>{error}</p>
+      )}
+
+      {/* ── Dropdown: full-screen overlay on mobile, inline on desktop ── */}
       {open && (
-        <div className="rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden min-w-[200px]">
-          {/* Search input */}
-          <div className="px-2.5 py-2 border-b border-brand-primary/[0.06] dark:border-white/[0.04]">
-            <div className="relative">
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-brand-text/30 dark:text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                ref={searchRef}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('searchPlaceholder')}
-                className={cn(
-                  'w-full pl-7 pr-2 rounded-lg bg-brand-primary/5 dark:bg-white/5 border border-transparent focus:border-brand-primary/25 text-brand-text dark:text-white/90 placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none',
-                  compact ? 'h-6 text-[10px]' : 'h-7 text-xs',
-                )}
-              />
+        <>
+          {/* Mobile overlay backdrop */}
+          <div
+            className="sm:hidden fixed inset-0 z-50 native-backdrop"
+            onClick={() => { setOpen(false); setSearch(''); }}
+          />
+          {/* Dropdown panel */}
+          <div className={cn(
+            'bg-white dark:bg-[#042F2E] overflow-hidden',
+            // Mobile: fixed bottom sheet
+            'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)] max-h-[70dvh] flex flex-col',
+            // Desktop: inline dropdown
+            'sm:relative sm:inset-auto sm:z-auto sm:rounded-2xl sm:shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:sm:shadow-[0_4px_24px_rgba(0,0,0,0.4)] sm:max-h-none sm:border sm:border-black/[0.06] dark:sm:border-white/[0.08]',
+          )}>
+            {/* Mobile drag handle */}
+            <div className="sm:hidden flex justify-center pt-2.5 pb-1">
+              <div className="w-10 h-[5px] rounded-full bg-black/15 dark:bg-white/20" />
             </div>
-          </div>
-          <ul className="max-h-40 overflow-y-auto divide-y divide-brand-primary/[0.06] dark:divide-white/[0.04]">
-            {filteredTags.length === 0 && (
-              <li className={cn('px-3 text-brand-text/35 dark:text-white/30 italic', compact ? 'py-2 text-[10px]' : 'py-2.5 text-xs')}>
-                {t('noCategoriesMatch')}
-              </li>
-            )}
-            {filteredTags.map(([key, { label, color }]) => {
-              const isSelected = selected === key;
-              return (
-                <li key={key}>
-                  <button
-                    type="button"
-                    onClick={() => { onSelect(key); setOpen(false); }}
-                    className={cn(
-                      'w-full flex items-center gap-2.5 px-3 transition-colors',
-                      compact ? 'h-8 text-[11px]' : 'h-9 text-sm',
-                      isSelected
-                        ? 'bg-brand-primary/8 dark:bg-brand-primary/12'
-                        : 'hover:bg-brand-primary/5 dark:hover:bg-brand-primary/8',
-                    )}
-                  >
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-                    <span className={cn('flex-1 text-left truncate', isSelected ? 'font-semibold text-brand-primary' : 'font-medium text-brand-text/80 dark:text-white/75')}>
-                      {TAGS[key] ? tTags(key as never) : label}
-                    </span>
-                    {isSelected && (
-                      <svg className="w-3.5 h-3.5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </button>
+            {/* Mobile header */}
+            <div className="sm:hidden flex items-center justify-between px-4 pb-2">
+              <p className="text-sm font-bold text-brand-text dark:text-white">{t('category')}</p>
+              <button
+                type="button"
+                onClick={() => { setOpen(false); setSearch(''); }}
+                className="w-8 h-8 flex items-center justify-center rounded-2xl text-brand-text/40 dark:text-white/40 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] active:scale-[0.90] transition-all duration-100"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {/* Search input */}
+            <div className="px-3 py-2 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-brand-text/30 dark:text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t('searchPlaceholder')}
+                  className={cn(
+                    'w-full pl-8 pr-3 rounded-2xl bg-black/[0.03] dark:bg-white/[0.06] border border-transparent focus:border-brand-primary/30 text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none transition-all duration-100',
+                    compact ? 'h-8 text-[11px]' : 'h-9 text-xs sm:h-8',
+                  )}
+                />
+              </div>
+            </div>
+            {/* Scrollable tag list */}
+            <ul className="flex-1 overflow-y-auto overscroll-contain sm:max-h-48">
+              {filteredTags.length === 0 && (
+                <li className={cn('px-4 text-brand-text/35 dark:text-white/30 italic', compact ? 'py-3 text-[10px]' : 'py-3 text-xs')}>
+                  {t('noCategoriesMatch')}
                 </li>
-              );
-            })}
-          </ul>
-        </div>
+              )}
+              {filteredTags.map(([key, { label, color }]) => {
+                const isSelected = selected === key;
+                return (
+                  <li key={key}>
+                    <button
+                      type="button"
+                      onClick={() => { onSelect(key); setOpen(false); }}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-4 transition-all duration-100 active:bg-black/[0.04] dark:active:bg-white/[0.06]',
+                        compact ? 'h-10 text-[11px]' : 'h-11 text-sm sm:h-10',
+                        isSelected
+                          ? 'bg-brand-primary/8 dark:bg-brand-primary/12'
+                          : '',
+                      )}
+                    >
+                      <span className="w-3 h-3 rounded-full flex-shrink-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)]" style={{ backgroundColor: color }} />
+                      <span className={cn('flex-1 text-left truncate', isSelected ? 'font-bold text-brand-primary' : 'font-medium text-brand-text dark:text-white/80')}>
+                        {TAGS[key] ? tTags(key as never) : label}
+                      </span>
+                      {isSelected && (
+                        <svg className="w-4 h-4 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {/* Safe area spacer for mobile */}
+            <div className="sm:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }} />
+          </div>
+        </>
       )}
     </div>
   );

@@ -89,12 +89,12 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
         {transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center mb-3 shadow-inner">
-              <svg className="w-5 h-5 text-slate-300 dark:text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-slate-300 dark:text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-slate-400 dark:text-white/25">{t('noTransactions')}</p>
-            <p className="text-xs text-slate-300 dark:text-white/15 mt-0.5">{t('tapToAdd')}</p>
+            <p className="text-sm font-medium text-slate-400 dark:text-white/50">{t('noTransactions')}</p>
+            <p className="text-xs text-slate-300 dark:text-white/40 mt-0.5">{t('tapToAdd')}</p>
           </div>
         ) : transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -240,11 +240,32 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
                 // One-off delete
                 return (
-                  <li key={tx.id} className="rounded-2xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-900/20 p-4">
-                    <p className="text-sm text-slate-700 dark:text-white/80 mb-3">
+                  <li key={tx.id} className="rounded-3xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-2xl bg-brand-danger/10 dark:bg-brand-danger/15 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-brand-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-brand-text dark:text-white">{tc('delete')}</p>
+                        <p className="text-xs text-brand-text/50 dark:text-white/40 truncate">
+                          {tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-brand-text/60 dark:text-white/50 mb-4">
                       {t('deleteTitle', { name: tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name })}
                     </p>
                     <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={clearActive}
+                        className="flex-1"
+                      >
+                        {tc('cancel')}
+                      </Button>
                       <Button
                         size="sm"
                         variant="danger"
@@ -254,15 +275,13 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                             { onSuccess: clearActive },
                           )
                         }
+                        className="flex-1"
                       >
                         {tc('delete')}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={clearActive}>
-                        {tc('cancel')}
-                      </Button>
                     </div>
                     {del.isError && (
-                      <p className="mt-2 text-xs text-red-500">
+                      <p className="mt-2 text-xs font-medium text-brand-danger">
                         {(del.error as Error)?.message}
                       </p>
                     )}

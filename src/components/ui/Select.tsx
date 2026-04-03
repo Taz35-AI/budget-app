@@ -22,7 +22,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           className={cn(
             'w-full h-11 rounded-2xl border px-3.5 text-sm font-medium transition-all duration-100 appearance-none',
             'border-black/[0.08] bg-black/[0.02] text-brand-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]',
-            'dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-white dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]',
+            'dark:border-white/[0.1] dark:bg-[#042F2E] dark:text-white dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]',
+            '[&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white',
             'focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/40 focus:bg-white dark:focus:bg-white/[0.06]',
             'disabled:opacity-40 disabled:cursor-not-allowed',
             'bg-[url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%233B7A78\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")] bg-no-repeat bg-[right_0.75rem_center] bg-[length:1.25rem] pr-9',

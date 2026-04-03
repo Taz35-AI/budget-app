@@ -521,7 +521,7 @@ function TemplatesSection() {
             className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {form.type === 'recurring' && (
             <select value={form.frequency} onChange={(e) => setForm((f) => ({ ...f, frequency: e.target.value as Frequency }))}
-              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#042F2E] border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white">
               {Object.entries(FREQUENCIES).map(([val, label]) => <option key={val} value={val}>{label}</option>)}
             </select>
           )}
@@ -601,7 +601,7 @@ function PreferencesSection() {
           <select
             value={dateFormat}
             onChange={(e) => setDateFormat(e.target.value as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD')}
-            className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+            className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#042F2E] text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
           >
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>

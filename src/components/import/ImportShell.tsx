@@ -133,7 +133,7 @@ function StepIndicator({ step }: { step: Step }) {
 
 // ─── Shared classes ───────────────────────────────────────────────────────────
 
-const selectCls = 'h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-3 text-sm text-brand-text dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]';
+const selectCls = 'h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-3 text-sm text-brand-text dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white';
 const btnSecondary = 'flex-1 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100';
 const btnPrimary = 'flex-1 h-11 rounded-2xl bg-teal-600 text-white text-sm font-bold hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] transition-all duration-100 flex items-center justify-center gap-2';
 
@@ -496,7 +496,7 @@ export default function ImportShell() {
                         <select
                           value={tx.tag}
                           onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, tag: e.target.value } : p))}
-                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none max-w-[110px]"
+                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none max-w-[110px] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
                         >
                           {allTags.map((tg) => <option key={tg.id} value={tg.id}>{tg.label}</option>)}
                         </select>
@@ -505,7 +505,7 @@ export default function ImportShell() {
                         <select
                           value={tx.category}
                           onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, category: e.target.value as 'income' | 'expense' } : p))}
-                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none"
+                          className="text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
                         >
                           <option value="expense">Expense</option>
                           <option value="income">Income</option>

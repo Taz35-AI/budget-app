@@ -89,7 +89,7 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
             </div>
           ))}
           {count > 2 && (
-            <span className="text-[7px] text-brand-text/30 dark:text-white/20 pl-2 leading-none">
+            <span className="text-[7px] text-brand-text/30 dark:text-white/40 pl-2 leading-none">
               +{count - 2}
             </span>
           )}
@@ -102,7 +102,7 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
           'mt-auto text-[9px] sm:text-[10px] font-extrabold tabular-nums leading-none',
           isPositive && 'text-brand-primary dark:text-brand-positive',
           isNegative && 'text-brand-danger',
-          isZero && 'text-brand-text/25 dark:text-white/20',
+          isZero && 'text-brand-text/25 dark:text-white/40',
         )}>
           {formatAmount(balance!, { compact: true })}
         </span>
