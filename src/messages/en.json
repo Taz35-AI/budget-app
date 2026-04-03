@@ -197,7 +197,14 @@
     "insightsError": "Failed to generate. Try again.",
     "insightsRegenerate": "Regenerate",
     "tagDrawerHint": "Tap any tag badge to re-categorise that transaction",
-    "tagDrawerEmpty": "No transactions with this tag"
+    "tagDrawerEmpty": "No transactions with this tag",
+    "pdfReportSubtitle": "Financial Report · Spentum",
+    "pdfSummary": "Summary",
+    "pdfNet": "Net",
+    "pdfTransactionCount": "Transactions",
+    "pdfTopCategories": "Top Spending Categories",
+    "pdfAiInsights": "AI Insights",
+    "pdfGeneratedBy": "Generated on {date} · spentum.com"
   },
   "settings": {
     "title": "Settings",

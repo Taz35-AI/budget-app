@@ -197,7 +197,14 @@
     "insightsError": "Błąd generowania. Spróbuj ponownie.",
     "insightsRegenerate": "Wygeneruj ponownie",
     "tagDrawerHint": "Kliknij tag, aby zmienić kategorię transakcji",
-    "tagDrawerEmpty": "Brak transakcji z tym tagiem"
+    "tagDrawerEmpty": "Brak transakcji z tym tagiem",
+    "pdfReportSubtitle": "Raport Finansowy · Spentum",
+    "pdfSummary": "Podsumowanie",
+    "pdfNet": "Netto",
+    "pdfTransactionCount": "Transakcje",
+    "pdfTopCategories": "Główne Kategorie Wydatków",
+    "pdfAiInsights": "Analiza AI",
+    "pdfGeneratedBy": "Wygenerowano {date} · spentum.com"
   },
   "settings": {
     "title": "Ustawienia",

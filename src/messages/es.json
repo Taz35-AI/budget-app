@@ -197,7 +197,14 @@
     "insightsError": "Error al generar. Inténtalo de nuevo.",
     "insightsRegenerate": "Regenerar",
     "tagDrawerHint": "Toca cualquier etiqueta para re-categorizar esa transacción",
-    "tagDrawerEmpty": "Sin transacciones con esta etiqueta"
+    "tagDrawerEmpty": "Sin transacciones con esta etiqueta",
+    "pdfReportSubtitle": "Informe Financiero · Spentum",
+    "pdfSummary": "Resumen",
+    "pdfNet": "Neto",
+    "pdfTransactionCount": "Transacciones",
+    "pdfTopCategories": "Principales Categorías de Gasto",
+    "pdfAiInsights": "Análisis IA",
+    "pdfGeneratedBy": "Generado el {date} · spentum.com"
   },
   "settings": {
     "title": "Ajustes",

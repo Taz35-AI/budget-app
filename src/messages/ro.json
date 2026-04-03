@@ -197,7 +197,14 @@
     "insightsError": "Generare eșuată. Încearcă din nou.",
     "insightsRegenerate": "Regenerează",
     "tagDrawerHint": "Apasă pe un tag pentru a re-categoriza acea tranzacție",
-    "tagDrawerEmpty": "Nicio tranzacție cu acest tag"
+    "tagDrawerEmpty": "Nicio tranzacție cu acest tag",
+    "pdfReportSubtitle": "Raport Financiar · Spentum",
+    "pdfSummary": "Rezumat",
+    "pdfNet": "Net",
+    "pdfTransactionCount": "Tranzacții",
+    "pdfTopCategories": "Principale Categorii de Cheltuieli",
+    "pdfAiInsights": "Analiză AI",
+    "pdfGeneratedBy": "Generat pe {date} · spentum.com"
   },
   "settings": {
     "title": "Setări",

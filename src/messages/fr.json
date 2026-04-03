@@ -197,7 +197,14 @@
     "insightsError": "Échec de la génération. Réessayez.",
     "insightsRegenerate": "Régénérer",
     "tagDrawerHint": "Appuyez sur un badge de tag pour re-catégoriser cette transaction",
-    "tagDrawerEmpty": "Aucune transaction avec ce tag"
+    "tagDrawerEmpty": "Aucune transaction avec ce tag",
+    "pdfReportSubtitle": "Rapport Financier · Spentum",
+    "pdfSummary": "Résumé",
+    "pdfNet": "Net",
+    "pdfTransactionCount": "Transactions",
+    "pdfTopCategories": "Principales Catégories de Dépenses",
+    "pdfAiInsights": "Analyse IA",
+    "pdfGeneratedBy": "Généré le {date} · spentum.com"
   },
   "settings": {
     "title": "Paramètres",

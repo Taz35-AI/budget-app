@@ -197,7 +197,14 @@
     "insightsError": "Erstellung fehlgeschlagen. Erneut versuchen.",
     "insightsRegenerate": "Neu erstellen",
     "tagDrawerHint": "Tag-Badge antippen, um die Transaktion umzukategorisieren",
-    "tagDrawerEmpty": "Keine Transaktionen mit diesem Tag"
+    "tagDrawerEmpty": "Keine Transaktionen mit diesem Tag",
+    "pdfReportSubtitle": "Finanzbericht · Spentum",
+    "pdfSummary": "Zusammenfassung",
+    "pdfNet": "Netto",
+    "pdfTransactionCount": "Transaktionen",
+    "pdfTopCategories": "Top-Ausgabenkategorien",
+    "pdfAiInsights": "KI-Analyse",
+    "pdfGeneratedBy": "Erstellt am {date} · spentum.com"
   },
   "settings": {
     "title": "Einstellungen",
