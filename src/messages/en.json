@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Savings Rate by Month — {year}",
     "tabGoals": "Goals",
     "goalsSubtitle": "Track progress toward savings targets. Link an expense tag to auto-update.",
-    "noGoals": "No goals yet. Add one to start tracking."
+    "noGoals": "No goals yet. Add one to start tracking.",
+    "insightsTitle": "AI Monthly Insights",
+    "insightsGenerate": "Generate Insights",
+    "insightsGenerating": "Generating…",
+    "insightsGeneratedOn": "Generated on {date}",
+    "insightsOnlyPast": "Insights are available for completed months only.",
+    "insightsDownloadPdf": "Download PDF",
+    "insightsError": "Failed to generate. Try again.",
+    "insightsRegenerate": "Regenerate"
   },
   "settings": {
     "title": "Settings",

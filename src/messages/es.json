@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Tasa de ahorro por mes — {year}",
     "tabGoals": "Objetivos",
     "goalsSubtitle": "Sigue el progreso hacia tus metas de ahorro. Vincula una etiqueta para actualización automática.",
-    "noGoals": "Sin objetivos aún. Añade uno para empezar."
+    "noGoals": "Sin objetivos aún. Añade uno para empezar.",
+    "insightsTitle": "Análisis Mensual IA",
+    "insightsGenerate": "Generar Análisis",
+    "insightsGenerating": "Generando…",
+    "insightsGeneratedOn": "Generado el {date}",
+    "insightsOnlyPast": "Los análisis solo están disponibles para meses completados.",
+    "insightsDownloadPdf": "Descargar PDF",
+    "insightsError": "Error al generar. Inténtalo de nuevo.",
+    "insightsRegenerate": "Regenerar"
   },
   "settings": {
     "title": "Ajustes",

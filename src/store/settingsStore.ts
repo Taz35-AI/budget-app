@@ -19,6 +19,7 @@ interface SettingsState {
   hapticsEnabled: boolean;
   notificationSettings: NotificationSettings;
   language: AppLanguage;
+  monthlyInsights: Record<string, { advice: string; generatedAt: string }>;
   // Actions
   _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
   addCustomTag: (tag: Omit<CustomTag, 'id'>) => void;
@@ -41,6 +42,7 @@ interface SettingsState {
   setHapticsEnabled: (enabled: boolean) => void;
   setNotificationSettings: (patch: Partial<NotificationSettings>) => void;
   setLanguage: (lang: AppLanguage) => void;
+  setMonthlyInsight: (monthKey: string, advice: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -57,6 +59,7 @@ export const useSettingsStore = create<SettingsState>()(
       hapticsEnabled: true,
       notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
       language: 'en',
+      monthlyInsights: {},
 
       _hydrate: (data) => set((s) => ({ ...s, ...data })),
 
@@ -121,6 +124,13 @@ export const useSettingsStore = create<SettingsState>()(
       setNotificationSettings: (patch) =>
         set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
       setLanguage: (lang) => set({ language: lang }),
+      setMonthlyInsight: (monthKey, advice) =>
+        set((s) => ({
+          monthlyInsights: {
+            ...s.monthlyInsights,
+            [monthKey]: { advice, generatedAt: new Date().toISOString() },
+          },
+        })),
     }),
     { name: 'budgetapp_settings' },
   ),

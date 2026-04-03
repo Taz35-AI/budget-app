@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Stopa oszczędności według miesiąca — {year}",
     "tabGoals": "Cele",
     "goalsSubtitle": "Śledź postępy w realizacji celów oszczędnościowych. Połącz tag dla automatycznych aktualizacji.",
-    "noGoals": "Brak celów. Dodaj jeden, aby zacząć."
+    "noGoals": "Brak celów. Dodaj jeden, aby zacząć.",
+    "insightsTitle": "Miesięczna analiza AI",
+    "insightsGenerate": "Generuj analizę",
+    "insightsGenerating": "Generowanie…",
+    "insightsGeneratedOn": "Wygenerowano {date}",
+    "insightsOnlyPast": "Analizy dostępne są tylko dla zakończonych miesięcy.",
+    "insightsDownloadPdf": "Pobierz PDF",
+    "insightsError": "Błąd generowania. Spróbuj ponownie.",
+    "insightsRegenerate": "Wygeneruj ponownie"
   },
   "settings": {
     "title": "Ustawienia",

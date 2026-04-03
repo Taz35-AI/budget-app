@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Taux d'épargne par mois — {year}",
     "tabGoals": "Objectifs",
     "goalsSubtitle": "Suivez vos progrès vers vos objectifs d'épargne. Liez un tag pour mise à jour auto.",
-    "noGoals": "Aucun objectif. Ajoutez-en un pour commencer."
+    "noGoals": "Aucun objectif. Ajoutez-en un pour commencer.",
+    "insightsTitle": "Analyse Mensuelle IA",
+    "insightsGenerate": "Générer l'analyse",
+    "insightsGenerating": "Génération…",
+    "insightsGeneratedOn": "Généré le {date}",
+    "insightsOnlyPast": "Les analyses sont disponibles uniquement pour les mois terminés.",
+    "insightsDownloadPdf": "Télécharger PDF",
+    "insightsError": "Échec de la génération. Réessayez.",
+    "insightsRegenerate": "Régénérer"
   },
   "settings": {
     "title": "Paramètres",

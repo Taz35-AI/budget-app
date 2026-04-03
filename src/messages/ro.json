@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Rata de economii pe luni — {year}",
     "tabGoals": "Obiective",
     "goalsSubtitle": "Urmărește progresul spre obiectivele de economii. Leagă un tag pentru actualizare automată.",
-    "noGoals": "Niciun obiectiv încă. Adaugă unul pentru a începe."
+    "noGoals": "Niciun obiectiv încă. Adaugă unul pentru a începe.",
+    "insightsTitle": "Analiză Lunară AI",
+    "insightsGenerate": "Generează analiză",
+    "insightsGenerating": "Se generează…",
+    "insightsGeneratedOn": "Generat pe {date}",
+    "insightsOnlyPast": "Analizele sunt disponibile doar pentru lunile finalizate.",
+    "insightsDownloadPdf": "Descarcă PDF",
+    "insightsError": "Generare eșuată. Încearcă din nou.",
+    "insightsRegenerate": "Regenerează"
   },
   "settings": {
     "title": "Setări",

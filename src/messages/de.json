@@ -187,7 +187,15 @@
     "savingsRateByMonth": "Sparquote nach Monat — {year}",
     "tabGoals": "Ziele",
     "goalsSubtitle": "Fortschritt zu Sparzielen verfolgen. Tag verknüpfen für automatische Updates.",
-    "noGoals": "Noch keine Ziele. Füge eines hinzu, um zu beginnen."
+    "noGoals": "Noch keine Ziele. Füge eines hinzu, um zu beginnen.",
+    "insightsTitle": "KI-Monatsanalyse",
+    "insightsGenerate": "Analyse erstellen",
+    "insightsGenerating": "Wird erstellt…",
+    "insightsGeneratedOn": "Erstellt am {date}",
+    "insightsOnlyPast": "Analysen sind nur für abgeschlossene Monate verfügbar.",
+    "insightsDownloadPdf": "PDF herunterladen",
+    "insightsError": "Erstellung fehlgeschlagen. Erneut versuchen.",
+    "insightsRegenerate": "Neu erstellen"
   },
   "settings": {
     "title": "Einstellungen",

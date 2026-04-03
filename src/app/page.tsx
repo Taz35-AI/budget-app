@@ -28,13 +28,31 @@ const sans  = { fontFamily: "'DM Sans', system-ui, sans-serif" } as const;
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Spentum',
-  applicationCategory: 'FinanceApplication',
-  operatingSystem: 'Web, Android, iOS',
-  url: 'https://www.spentum.com',
-  description: 'Personal finance tracker that forecasts your future balance day by day, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://www.spentum.com/#organization',
+      name: 'Spentum',
+      url: 'https://www.spentum.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.spentum.com/spentum.png',
+        width: 512,
+        height: 512,
+      },
+      sameAs: ['https://www.spentum.com'],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Spentum',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web, Android, iOS',
+      url: 'https://www.spentum.com',
+      description: 'Personal finance tracker that forecasts your future balance day by day, tracks recurring income and expenses, and helps you manage multiple accounts with savings goals.',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@id': 'https://www.spentum.com/#organization' },
+    },
+  ],
 };
 
 export default function LandingPage() {
