@@ -259,54 +259,6 @@ export function ReportsShell() {
     }
   }
 
-  function downloadPdf() {
-    const statsRows: [string, string][] = [
-      [t('totalIncome'),       `${currencySymbol}${selected.income.toFixed(2)}`],
-      [t('totalExpenses'),     `${currencySymbol}${selected.expense.toFixed(2)}`],
-      [t('pdfNet'),            `${currencySymbol}${netMonth.toFixed(2)}`],
-      ...(savingsRate !== null ? [[t('savingsRate'), `${savingsRate}%`]] as [string, string][] : []),
-      [t('pdfTransactionCount'), String(selected.txCount)],
-    ];
-    const topCatsHtml = tagBreakdown.slice(0, 5).map((tag) =>
-      `<tr><td>${tag.label}</td><td style="text-align:right">${currencySymbol}${tag.amount.toFixed(2)}</td></tr>`
-    ).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>${MONTH_FULL[selectedMonthIdx]} ${selectedYear}</title>
-<style>
-  body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; color: #111; line-height: 1.6; }
-  h1 { font-size: 28px; margin-bottom: 4px; }
-  h2 { font-size: 14px; font-weight: 700; margin: 28px 0 8px; text-transform: uppercase; letter-spacing: 0.1em; color: #555; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-  td { padding: 6px 0; border-bottom: 1px solid #eee; font-size: 15px; }
-  td:last-child { font-weight: 700; text-align: right; }
-  .advice { background: #f8fffe; border-left: 3px solid #0D9488; padding: 16px 20px; font-size: 15px; line-height: 1.7; margin-top: 8px; }
-  .meta { color: #888; font-size: 12px; margin-top: 32px; }
-  @media print { body { margin: 20px; } }
-</style></head><body>
-<h1>${MONTH_FULL[selectedMonthIdx]} ${selectedYear}</h1>
-<p style="color:#888;font-size:13px">${t('pdfReportSubtitle')}</p>
-<h2>${t('pdfSummary')}</h2>
-<table>${statsRows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>
-<h2>${t('pdfTopCategories')}</h2>
-<table>${topCatsHtml}</table>
-${savedInsight ? `<h2>${t('pdfAiInsights')}</h2><div class="advice">${savedInsight.advice.replace(/\n/g, '<br>')}</div>` : ''}
-<p class="meta">${t('pdfGeneratedBy', { date: new Date().toLocaleDateString() })}</p>
-</body></html>`;
-
-    // Use a hidden iframe so the print dialog opens in-page without a new tab
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
-    document.body.appendChild(iframe);
-    const doc = iframe.contentDocument ?? iframe.contentWindow?.document;
-    if (!doc) { document.body.removeChild(iframe); return; }
-    doc.write(html);
-    doc.close();
-    setTimeout(() => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-      setTimeout(() => { if (document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
-    }, 300);
-  }
 
   const hasSomeData = yearlyData.some((m) => m.income > 0 || m.expense > 0);
 
@@ -721,17 +673,18 @@ ${savedInsight ? `<h2>${t('pdfAiInsights')}</h2><div class="advice">${savedInsig
           </div>
           )}
 
-          {/* ── AI Monthly Insights ──────────────────────────────────── */}
+          {/* ── Monthly Report ────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'month' && 'hidden sm:block')}>
-            <div className="relative bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(25,27,47,0.05)] overflow-hidden">
+            <div className="relative bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
               {/* Gradient accent */}
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#0D9488] via-[#35C9A5] to-transparent pointer-events-none" />
 
-              <div className="flex items-start justify-between gap-3 mb-3">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-3 px-4 sm:px-5 pt-5 pb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-[#0D9488]/10 dark:bg-[#0D9488]/15 flex items-center justify-center flex-shrink-0">
                     <svg className="w-3.5 h-3.5 text-[#0D9488]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
                   <div>
@@ -740,54 +693,93 @@ ${savedInsight ? `<h2>${t('pdfAiInsights')}</h2><div class="advice">${savedInsig
                   </div>
                 </div>
                 {isPastMonth && (selected.income > 0 || selected.expense > 0) && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {savedInsight && (
-                      <button
-                        type="button"
-                        onClick={downloadPdf}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/14 transition-colors"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  <button
+                    type="button"
+                    onClick={generateInsights}
+                    disabled={insightsLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0D9488] text-white hover:bg-[#0b7c72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  >
+                    {insightsLoading ? (
+                      <>
+                        <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        {t('insightsDownloadPdf')}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={generateInsights}
-                      disabled={insightsLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#0D9488] text-white hover:bg-[#0b7c72] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {insightsLoading ? (
-                        <>
-                          <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                          </svg>
-                          {t('insightsGenerating')}
-                        </>
-                      ) : savedInsight ? t('insightsRegenerate') : t('insightsGenerate')}
-                    </button>
-                  </div>
+                        {t('insightsGenerating')}
+                      </>
+                    ) : savedInsight ? t('insightsRegenerate') : t('insightsGenerate')}
+                  </button>
                 )}
               </div>
 
               {!isPastMonth ? (
-                <p className="text-sm text-brand-text/40 dark:text-white/30 italic">{t('insightsOnlyPast')}</p>
-              ) : insightsError ? (
-                <p className="text-sm text-red-500/70">{t('insightsError')}</p>
-              ) : savedInsight ? (
-                <div>
-                  <p className="text-sm text-brand-text/75 dark:text-white/65 leading-relaxed whitespace-pre-wrap">{savedInsight.advice}</p>
-                  <p className="text-[10px] text-brand-text/25 dark:text-white/18 mt-3">
-                    {t('insightsGeneratedOn', { date: new Date(savedInsight.generatedAt).toLocaleDateString() })}
-                  </p>
-                </div>
+                <p className="px-4 sm:px-5 pb-5 text-sm text-brand-text/40 dark:text-white/30 italic">{t('insightsOnlyPast')}</p>
               ) : !(selected.income > 0 || selected.expense > 0) ? (
-                <p className="text-sm text-brand-text/40 dark:text-white/30 italic">{t('insightsOnlyPast')}</p>
+                <p className="px-4 sm:px-5 pb-5 text-sm text-brand-text/40 dark:text-white/30 italic">{t('insightsOnlyPast')}</p>
               ) : (
-                <p className="text-sm text-brand-text/40 dark:text-white/30">{t('insightsGenerate')}</p>
+                <div>
+                  {/* Stats strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-brand-primary/[0.07] border-t border-brand-primary/[0.07]">
+                    {[
+                      { label: t('totalIncome'),   value: formatAmount(selected.income),  positive: true  },
+                      { label: t('totalExpenses'),  value: formatAmount(selected.expense), positive: false },
+                      { label: t('pdfNet'),         value: (netMonth >= 0 ? '+' : '') + formatAmount(netMonth), positive: netMonth >= 0 },
+                      { label: t('savingsRate'),    value: savingsRate !== null ? `${savingsRate}%` : '—',      positive: savingsRate !== null && savingsRate >= 0 },
+                    ].map(({ label, value, positive }) => (
+                      <div key={label} className="bg-brand-card dark:bg-[#042F2E] px-4 py-3">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/28 dark:text-white/20 mb-0.5">{label}</p>
+                        <p className={cn('text-base font-black tabular-nums leading-tight', positive ? 'text-brand-positive' : 'text-brand-danger')}>
+                          {value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Top spending categories */}
+                  {tagBreakdown.length > 0 && (
+                    <div className="px-4 sm:px-5 pt-4 pb-3 border-t border-brand-primary/[0.06]">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 mb-3">{t('pdfTopCategories')}</p>
+                      <div className="flex flex-col gap-2.5">
+                        {tagBreakdown.slice(0, 5).map(({ key, amount, label, color }) => {
+                          const pct = Math.round((amount / (tagBreakdown[0]?.amount ?? 1)) * 100);
+                          const ofTotal = selected.expense > 0 ? Math.round((amount / selected.expense) * 100) : 0;
+                          return (
+                            <div key={key}>
+                              <div className="flex justify-between items-center mb-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                                  <span className="text-xs font-semibold text-brand-text/70 dark:text-white/65">{label}</span>
+                                  <span className="text-[10px] text-brand-text/28 dark:text-white/22">{ofTotal}%</span>
+                                </div>
+                                <span className="text-xs font-bold text-brand-text/60 dark:text-white/50 tabular-nums">{formatAmount(amount)}</span>
+                              </div>
+                              <div className="h-[4px] bg-brand-primary/[0.07] rounded-full overflow-hidden">
+                                <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI advice */}
+                  <div className="px-4 sm:px-5 pt-3 pb-5 border-t border-brand-primary/[0.06]">
+                    {insightsError ? (
+                      <p className="text-sm text-red-500/70">{t('insightsError')}</p>
+                    ) : savedInsight ? (
+                      <>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 mb-2">{t('pdfAiInsights')}</p>
+                        <p className="text-sm text-brand-text/75 dark:text-white/65 leading-relaxed whitespace-pre-wrap">{savedInsight.advice}</p>
+                        <p className="text-[10px] text-brand-text/22 dark:text-white/16 mt-3">
+                          {t('insightsGeneratedOn', { date: new Date(savedInsight.generatedAt).toLocaleDateString() })}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-brand-text/35 dark:text-white/25">{t('insightsGenerate')}</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           </div>
