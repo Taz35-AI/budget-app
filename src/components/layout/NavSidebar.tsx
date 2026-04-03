@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
@@ -11,6 +10,7 @@ import { ThemeToggle } from '@/components/dashboard/ThemeToggle';
 import { ExportButton } from '@/components/dashboard/ExportButton';
 import { UserBadge } from '@/components/layout/UserBadge';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
+import { SpentumLogo } from '@/components/layout/SpentumLogo';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
       {/* Logo */}
       <div className="flex items-center justify-center px-4 pt-5 pb-4 flex-shrink-0">
         <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
-          <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-full h-auto object-contain" priority />
+          <SpentumLogo width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
       </div>
 
@@ -296,14 +296,7 @@ export function NavMenuButton() {
 export function MobileLogo() {
   return (
     <div className="lg:hidden flex-shrink-0 pointer-events-none">
-      <Image
-        src="/spentum.png"
-        alt="Spentum"
-        width={360}
-        height={144}
-        className="h-[65px] w-auto"
-        priority
-      />
+      <SpentumLogo width={360} height={144} className="h-[65px] w-auto" priority />
     </div>
   );
 }

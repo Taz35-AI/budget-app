@@ -12,6 +12,7 @@
     "today": "Today",
     "combined": "Combined",
     "offline": "Offline",
+    "offlineBanner": "No internet connection",
     "syncing": "Syncing",
     "loading": "Loading…",
     "income": "Income",
