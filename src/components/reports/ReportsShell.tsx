@@ -363,7 +363,7 @@ export function ReportsShell() {
           {/* Month selector — shown on non-overview tabs */}
           <div className={cn(
             'flex items-center justify-between px-4 pb-2 pt-1',
-            activeTab === 'overview' && 'invisible pointer-events-none',
+            (activeTab === 'overview' || activeTab === 'subscriptions') && 'invisible pointer-events-none',
           )}>
             <button
               onClick={() => setSelectedMonthIdx((m) => (m > 0 ? m - 1 : 11))}
@@ -391,7 +391,7 @@ export function ReportsShell() {
         <div className="h-[calc(100dvh-4rem-6.5rem)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
-          <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+          <div className={cn("bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]", activeTab === 'subscriptions' && 'hidden sm:block')}>
             {/* Desktop */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
