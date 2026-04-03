@@ -306,7 +306,7 @@ export function ReportsShell() {
         {/* ── Mobile tab strip + month selector ───────────────────────── */}
         <div className="sm:hidden sticky top-16 z-10 bg-[#F4FDFB]/95 dark:bg-[#011817]/95 backdrop-blur-xl border-b border-brand-primary/[0.08] dark:border-white/[0.05]">
           {/* Tabs */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-none px-3 pt-2 pb-1.5">
+          <div className="flex gap-0.5 overflow-x-auto scrollbar-none px-3 pt-2 pb-1.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl mx-3 p-0.5">
             {([
               { id: 'overview',     label: t('tabOverview')      },
               { id: 'month',        label: t('tabMonth')         },
@@ -318,10 +318,10 @@ export function ReportsShell() {
                 key={id}
                 onClick={() => setActiveTab(id)}
                 className={cn(
-                  'flex-shrink-0 h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
+                  'flex-shrink-0 h-7 px-3 text-[11px] select-none active:scale-[0.96] duration-100 transition-all',
                   activeTab === id
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                    : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10',
+                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white font-bold shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-xl'
+                    : 'bg-transparent font-semibold text-brand-text/55 dark:text-white/45',
                 )}
               >
                 {label}
@@ -359,7 +359,7 @@ export function ReportsShell() {
         <div className="h-[calc(100dvh-4rem-6.5rem)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
-          <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+          <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
             {/* Desktop */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
@@ -420,7 +420,7 @@ export function ReportsShell() {
 
           {/* ── Monthly bar chart ─────────────────────────────────────── */}
           <div className={cn(activeTab !== 'overview' && 'hidden sm:block')}>
-          <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+          <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{t('monthlyOverview')}</p>
               <div className="flex gap-3">
@@ -484,7 +484,7 @@ export function ReportsShell() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
             {/* Month detail */}
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               {/* Mini headline */}
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06] border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex-[1.4] px-4 py-3 min-w-0">
@@ -538,7 +538,7 @@ export function ReportsShell() {
                         </div>
                       );
                     })}
-                    <div className="mt-1.5 h-1.5 rounded-full overflow-hidden bg-brand-primary/[0.07] flex">
+                    <div className="mt-1.5 h-2 rounded-full overflow-hidden bg-brand-primary/[0.07] flex">
                       <div className="h-full bg-brand-danger/55 rounded-l-full" style={{ width: `${selected.expense > 0 ? Math.round((selected.recurringExpense / selected.expense) * 100) : 0}%` }} />
                       <div className="h-full bg-brand-secondary/45" style={{ width: `${selected.expense > 0 ? Math.round((selected.oneOffExpense / selected.expense) * 100) : 0}%` }} />
                     </div>
@@ -591,7 +591,7 @@ export function ReportsShell() {
             </div>
 
             {/* Tag breakdown — selected month */}
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3.5">
                 {t('monthSpendingByCategory', { month: MONTH_LABELS[selectedMonthIdx] })}
               </p>
@@ -622,7 +622,7 @@ export function ReportsShell() {
                             </svg>
                           </div>
                         </div>
-                        <div className="h-[5px] bg-brand-primary/[0.07] rounded-full overflow-hidden">
+                        <div className="h-2 bg-brand-primary/[0.07] rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: color }} />
                         </div>
                       </button>
@@ -637,7 +637,7 @@ export function ReportsShell() {
           {/* ── Top transactions this month ──────────────────────────── */}
           {topTx.length > 0 && (
           <div className={cn(activeTab !== 'transactions' && 'hidden sm:block')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-1">
                 {t('topTransactions', { month: MONTH_FULL[selectedMonthIdx], year: selectedYear })}
               </p>
@@ -645,7 +645,7 @@ export function ReportsShell() {
                 {topTx.map((tx, i) => {
                   const tagInfo = tx.tag ? allTags[tx.tag] : null;
                   return (
-                    <div key={i} className="flex items-center gap-3 py-2.5 border-b border-brand-primary/[0.06] last:border-0">
+                    <div key={i} className="flex items-center gap-3 py-2.5 border-b border-brand-primary/[0.06] last:border-0 native-row rounded-2xl">
                       <span className="text-[10px] font-black text-brand-text/18 dark:text-white/12 w-4 text-right flex-shrink-0 tabular-nums">{i + 1}</span>
                       <div className="flex-1 min-w-0">
                         <span className="text-sm font-semibold text-brand-text/80 dark:text-white/72 truncate block leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</span>
@@ -675,7 +675,7 @@ export function ReportsShell() {
 
           {/* ── Monthly Report ────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'month' && 'hidden sm:block')}>
-            <div className="relative bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="relative bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               {/* Gradient accent */}
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#0D9488] via-[#35C9A5] to-transparent pointer-events-none" />
 
@@ -753,7 +753,7 @@ export function ReportsShell() {
                                 </div>
                                 <span className="text-xs font-bold text-brand-text/60 dark:text-white/50 tabular-nums">{formatAmount(amount)}</span>
                               </div>
-                              <div className="h-[4px] bg-brand-primary/[0.07] rounded-full overflow-hidden">
+                              <div className="h-2 bg-brand-primary/[0.07] rounded-full overflow-hidden">
                                 <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
                               </div>
                             </div>
@@ -787,7 +787,7 @@ export function ReportsShell() {
           {/* ── Annual spending — donut + category bars ──────────────── */}
           {annualTags.length > 0 && (
           <div className={cn(activeTab !== 'annual' && 'hidden sm:block')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">
                   {t('annualSpending', { year: selectedYear })}
@@ -865,7 +865,7 @@ export function ReportsShell() {
                             </div>
                             <span className="text-xs font-bold text-brand-text/65 dark:text-white/55 tabular-nums">{formatAmount(amount)}</span>
                           </div>
-                          <div className="h-[5px] bg-brand-primary/[0.07] rounded-full overflow-hidden">
+                          <div className="h-2 bg-brand-primary/[0.07] rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${barPct}%`, backgroundColor: color }} />
                           </div>
                         </div>
@@ -880,7 +880,7 @@ export function ReportsShell() {
 
           {/* ── Goals ────────────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'goals' && 'hidden sm:block')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-emerald-400 to-teal-500" />
               <div className="px-5 pt-5 pb-4">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabGoals')}</h2>
@@ -910,7 +910,7 @@ export function ReportsShell() {
                   const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
 
                   return (
-                    <div key={goal.id} className="p-4 rounded-xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] bg-[#F4FDFB] dark:bg-[#042F2E]/10">
+                    <div key={goal.id} className="p-4 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-[#F4FDFB] dark:bg-[#042F2E]/10">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
@@ -981,11 +981,11 @@ export function ReportsShell() {
                         <div className="flex gap-2">
                           <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                             placeholder="Amount saved so far" autoFocus
-                            className="flex-1 h-8 px-2 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                            className="flex-1 h-9 px-2 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                           <button type="button" onClick={() => { updateGoal(goal.id, { currentSaved: Number(editSaved) || 0 }); setEditGoalId(null); }}
-                            className="px-3 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">Save</button>
+                            className="px-3 h-9 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100">Save</button>
                           <button type="button" onClick={() => setEditGoalId(null)}
-                            className="px-2 h-8 rounded-lg bg-brand-primary/8 dark:bg-white/5 text-brand-text/50 dark:text-white/50 text-xs transition-colors">✕</button>
+                            className="px-2 h-9 rounded-2xl bg-brand-primary/8 dark:bg-white/5 text-brand-text/50 dark:text-white/50 text-xs active:scale-[0.96] transition-all duration-100">✕</button>
                         </div>
                       ) : (
                         <div className="flex items-center gap-3">
@@ -1006,17 +1006,17 @@ export function ReportsShell() {
 
                 {/* Add goal form */}
                 {showAddGoal ? (
-                  <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
+                  <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
                     <input value={goalForm.name} onChange={(e) => setGoalForm((f) => ({ ...f, name: e.target.value }))}
                       placeholder="Goal name (e.g. Holiday fund)" autoFocus
-                      className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                      className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                     <input type="number" value={goalForm.target} onChange={(e) => setGoalForm((f) => ({ ...f, target: e.target.value }))}
                       placeholder="Target amount" min="0"
-                      className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                      className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                     {!goalForm.linkedTagId && (
                       <input type="number" value={goalForm.currentSaved} onChange={(e) => setGoalForm((f) => ({ ...f, currentSaved: e.target.value }))}
                         placeholder="Already saved (optional)" min="0"
-                        className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400" />
+                        className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                     )}
                     <div>
                       <p className="text-xs text-brand-text/40 dark:text-white/40 mb-1">Deadline (optional)</p>
@@ -1062,18 +1062,18 @@ export function ReportsShell() {
                           setGoalForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
                           setShowAddGoal(false);
                         }}
-                        className="flex-1 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors">
+                        className="flex-1 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100">
                         Add goal
                       </button>
                       <button type="button" onClick={() => setShowAddGoal(false)}
-                        className="px-4 h-9 rounded-xl bg-brand-primary/8 dark:bg-white/5 text-brand-text/60 dark:text-white/60 text-sm font-semibold transition-colors">
+                        className="px-4 h-10 rounded-2xl bg-brand-primary/8 dark:bg-white/5 text-brand-text/60 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
                   <button type="button" onClick={() => setShowAddGoal(true)}
-                    className="w-full h-10 rounded-xl border border-dashed border-brand-primary/20 dark:border-white/10 text-sm text-brand-text/40 dark:text-white/30 hover:border-emerald-400 hover:text-emerald-500 transition-colors">
+                    className="w-full h-11 rounded-2xl border border-dashed border-brand-primary/20 dark:border-white/10 text-sm text-brand-text/40 dark:text-white/30 hover:border-emerald-400 hover:text-emerald-500 active:scale-[0.96] transition-all duration-100">
                     + Add savings goal
                   </button>
                 )}
@@ -1084,7 +1084,7 @@ export function ReportsShell() {
           {/* ── Savings rate trend ───────────────────────────────────── */}
           {hasSomeData && (
           <div className={cn(activeTab !== 'annual' && 'hidden sm:block')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] p-4 sm:p-5 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-4">
                 {t('savingsRateByMonth', { year: selectedYear })}
               </p>
@@ -1142,7 +1142,7 @@ export function ReportsShell() {
             />
 
             {/* Sheet */}
-            <div className="fixed inset-x-0 bottom-0 z-[160] flex flex-col rounded-t-2xl bg-white dark:bg-[#042F2E] shadow-2xl max-h-[82vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-lg sm:rounded-2xl sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2">
+            <div className="fixed inset-x-0 bottom-0 z-[160] flex flex-col rounded-t-3xl bg-white dark:bg-[#042F2E] shadow-2xl max-h-[82vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-lg sm:rounded-3xl sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2">
 
               {/* Handle */}
               <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
@@ -1187,7 +1187,7 @@ export function ReportsShell() {
                         : tTags('untagged' as never);
 
                       return (
-                        <div key={rowKey} className="py-3">
+                        <div key={rowKey} className="py-3 native-row rounded-2xl">
                           {/* Transaction row */}
                           <div className="flex items-center gap-3">
                             <div className="flex-1 min-w-0">

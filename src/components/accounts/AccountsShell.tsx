@@ -146,7 +146,7 @@ function AccountCard({
     : null;
 
   return (
-    <div className="bg-white dark:bg-[#042F2E] rounded-2xl border border-slate-100 dark:border-white/[0.06] overflow-hidden shadow-[0_2px_16px_rgba(25,27,47,0.06)] dark:shadow-none">
+    <div className="bg-white dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
       {/* Account header */}
       <div className={cn(
         'px-3 py-2.5 flex items-center justify-between gap-2',
@@ -214,7 +214,7 @@ function AccountCard({
               <span>{t('creditLimit')}: {formatAmount(account.credit_limit)}</span>
             </div>
             {/* Usage bar */}
-            <div className="h-1 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
               <div
                 className={cn('h-full rounded-full transition-all', isOverLimit ? 'bg-red-500' : 'bg-brand-primary')}
                 style={{ width: `${Math.min(100, (Math.abs(Math.min(0, todayBalance)) / account.credit_limit) * 100)}%` }}
@@ -243,7 +243,7 @@ function AccountCard({
               <div
                 key={i}
                 className={cn(
-                  'grid grid-cols-4 gap-1 px-1 py-1 rounded-md transition-colors',
+                  'grid grid-cols-4 gap-1 px-1 py-1 native-row rounded-2xl transition-colors',
                   isCurrentMonth
                     ? 'bg-brand-primary/[0.05] dark:bg-brand-primary/[0.07]'
                     : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]',
@@ -311,9 +311,9 @@ export function AccountsShell() {
 
           {/* Total balance hero */}
           <div className={cn(
-            'rounded-2xl p-5 text-white',
+            'rounded-3xl p-5 text-white',
             'bg-gradient-to-br from-[#042F2E] via-[#1a3d3b] to-[#0f2928]',
-            'shadow-[0_4px_24px_rgba(25,27,47,0.3)]',
+            'shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]',
           )}>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{hasCredit ? t('netWorth') : t('totalBalance')}</p>
             <p className={cn('text-3xl sm:text-4xl font-black tracking-tight tabular-nums', totalBalance < 0 ? 'text-red-300' : 'text-white')}>
@@ -330,7 +330,7 @@ export function AccountsShell() {
           {isLoading && (
             <div className="flex flex-col gap-3">
               {[1, 2].map((i) => (
-                <div key={i} className="rounded-2xl bg-white dark:bg-[#042F2E] border border-slate-100 dark:border-white/[0.06] overflow-hidden animate-pulse">
+                <div key={i} className="rounded-3xl bg-white dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden animate-pulse shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
                   <div className="px-4 py-3.5 flex items-center justify-between border-b border-slate-100 dark:border-white/[0.06]">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/5" />

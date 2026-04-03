@@ -14,17 +14,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center rounded-2xl font-bold tracking-tight transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed select-none',
           {
-            'bg-brand-primary text-white hover:bg-brand-primary/90 focus-visible:ring-brand-primary shadow-sm': variant === 'primary',
-            'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/18 focus-visible:ring-brand-primary/40 dark:bg-brand-primary/15 dark:text-brand-primary dark:hover:bg-brand-primary/25': variant === 'secondary',
-            'text-brand-text/60 hover:text-brand-text hover:bg-brand-primary/8 focus-visible:ring-brand-primary/30 dark:text-white/50 dark:hover:text-white dark:hover:bg-white/8': variant === 'ghost',
-            'bg-brand-danger/10 text-brand-danger hover:bg-brand-danger/18 focus-visible:ring-brand-danger/40 dark:bg-brand-danger/15 dark:hover:bg-brand-danger/25': variant === 'danger',
+            'bg-brand-primary text-white hover:brightness-110 focus-visible:ring-brand-primary shadow-[0_2px_8px_rgba(13,148,136,0.35),inset_0_1px_0_rgba(255,255,255,0.15)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]': variant === 'primary',
+            'bg-brand-primary/12 text-brand-primary hover:bg-brand-primary/20 focus-visible:ring-brand-primary/40 dark:bg-brand-primary/15 dark:text-teal-200 dark:hover:bg-brand-primary/25 shadow-[0_1px_2px_rgba(0,0,0,0.05)] active:shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)]': variant === 'secondary',
+            'text-brand-text/70 hover:text-brand-text hover:bg-black/[0.04] active:bg-black/[0.08] focus-visible:ring-brand-primary/30 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/[0.06] dark:active:bg-white/[0.1]': variant === 'ghost',
+            'bg-brand-danger text-white hover:brightness-110 focus-visible:ring-brand-danger/40 shadow-[0_2px_8px_rgba(220,38,38,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]': variant === 'danger',
           },
           {
-            'h-8 px-3 text-xs gap-1.5': size === 'sm',
-            'h-10 px-4 text-sm gap-2': size === 'md',
-            'h-12 px-6 text-base gap-2': size === 'lg',
+            'h-9 px-3.5 text-xs gap-1.5': size === 'sm',
+            'h-11 px-5 text-sm gap-2': size === 'md',
+            'h-[3.25rem] px-7 text-base gap-2.5': size === 'lg',
           },
           className,
         )}

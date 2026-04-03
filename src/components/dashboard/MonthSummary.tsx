@@ -33,7 +33,7 @@ function SectionHeader({
       onClick={expandable ? onToggle : undefined}
       className={cn(
         'flex items-center gap-2 mb-2.5 w-full',
-        expandable && 'cursor-pointer group',
+        expandable && 'cursor-pointer group active:bg-black/[0.03] dark:active:bg-white/[0.04] rounded-2xl transition-all duration-100',
         !expandable && 'cursor-default',
       )}
     >
@@ -44,7 +44,7 @@ function SectionHeader({
       {expandable && (
         <svg
           className={cn(
-            'w-3 h-3 text-[#042F2E]/30 dark:text-[#D9DDF0]/25 transition-transform duration-200 flex-shrink-0',
+            'w-3 h-3 text-[#042F2E]/30 dark:text-[#D9DDF0]/25 transition-transform duration-200 flex-shrink-0 active:scale-[0.90] duration-100',
             expanded && 'rotate-180',
           )}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
@@ -56,7 +56,7 @@ function SectionHeader({
   );
 }
 
-const ROW_CLASS = 'flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] hover:bg-[#D9DDF0]/30 dark:hover:bg-[#042F2E]/20 transition-colors';
+const ROW_CLASS = 'flex items-center gap-3 px-3 py-2.5 native-row rounded-2xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] hover:bg-[#D9DDF0]/30 dark:hover:bg-[#042F2E]/20 transition-colors';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -202,14 +202,14 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
       {/* Quick insight row */}
       <div className="grid grid-cols-3 gap-2">
         {/* Daily avg */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
+        <div className="relative rounded-3xl overflow-hidden native-card bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5 shadow-sm">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#042F2E] to-[#042F2E]/50 dark:from-[#0D9488]/60 dark:to-[#35C9A5]/40" />
           <p className="text-[9px] font-bold uppercase tracking-wider text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-1">{t('dailyAvg')}</p>
           <p className="text-sm font-extrabold text-[#042F2E] dark:text-white tabular-nums leading-none truncate">{formatAmount(dailyAvg)}</p>
         </div>
 
         {/* Savings rate */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
+        <div className="relative rounded-3xl overflow-hidden native-card bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5 shadow-sm">
           <div className={cn(
             'absolute top-0 inset-x-0 h-[2px]',
             savingsRate === null ? 'bg-[#D9DDF0]/60 dark:bg-[#042F2E]/40' :
@@ -230,7 +230,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
         </div>
 
         {/* Transactions */}
-        <div className="relative rounded-xl overflow-hidden bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5">
+        <div className="relative rounded-3xl overflow-hidden native-card bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07] px-3 py-2.5 shadow-sm">
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#0D9488] to-[#0D9488]/50" />
           <p className="text-[9px] font-bold uppercase tracking-wider text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-1">{t('count')}</p>
           <p className="text-sm font-extrabold text-[#042F2E] dark:text-white tabular-nums leading-none">{txCount}</p>
@@ -239,7 +239,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
 
       {/* Month-over-month spending insight */}
       {totalExpense > 0 && (
-        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-br from-[#F4FDFB] to-[#f7fafc] dark:from-[#0d1e35]/70 dark:to-[#042F2E]/50 border border-[#D9DDF0]/60 dark:border-[#042F2E]/50">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-3xl shadow-sm bg-gradient-to-br from-[#F4FDFB] to-[#f7fafc] dark:from-[#0d1e35]/70 dark:to-[#042F2E]/50 border border-[#D9DDF0]/60 dark:border-[#042F2E]/50">
           <div className="w-7 h-7 rounded-lg bg-[#042F2E]/8 dark:bg-[#0D9488]/10 flex items-center justify-center flex-shrink-0 text-[#042F2E]/50 dark:text-[#0D9488]">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -368,7 +368,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 const tag = allTags[tagKey];
                 const pct = totalExpense > 0 ? amount / totalExpense : 0;
                 return (
-                  <div key={tagKey} className="flex flex-col gap-1 px-3 py-2 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
+                  <div key={tagKey} className="flex flex-col gap-1 px-3 py-2 native-row rounded-2xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {tag && (
@@ -383,7 +383,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                         <span className="text-xs font-bold text-red-500 dark:text-red-400 tabular-nums">−{formatAmount(amount)}</span>
                       </div>
                     </div>
-                    <div className="h-1 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/30 overflow-hidden">
+                    <div className="h-2 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/30 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct * 100}%`, backgroundColor: tag?.color ?? '#0D9488' }}
@@ -558,7 +558,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                   }
                 }
                 return (
-                  <div key={goal.id} className="flex flex-col gap-1.5 px-3 py-2.5 rounded-xl bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
+                  <div key={goal.id} className="flex flex-col gap-1.5 px-3 py-2.5 rounded-3xl shadow-sm bg-[#F4FDFB] dark:bg-[#042F2E]/10 border border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.07]">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {linkedTag && (
@@ -573,7 +573,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                         {Math.round(pct * 100)}%
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/40 overflow-hidden">
+                    <div className="h-2 rounded-full bg-[#D9DDF0]/50 dark:bg-[#042F2E]/40 overflow-hidden">
                       <div
                         className={cn('h-full rounded-full transition-all duration-700', pct >= 1 ? 'bg-[#0D9488]' : 'bg-gradient-to-r from-[#0D9488] to-[#35C9A5]')}
                         style={{ width: `${pct * 100}%` }}

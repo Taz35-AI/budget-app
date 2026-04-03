@@ -170,7 +170,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
           <label
             key={opt.value}
             className={cn(
-              'flex items-start gap-2 p-1.5 rounded-lg border cursor-pointer transition-all',
+              'flex items-start gap-2 p-1.5 rounded-2xl border cursor-pointer transition-all duration-100 active:bg-black/[0.03] dark:active:bg-white/[0.04]',
               editMode === opt.value
                 ? 'border-brand-primary bg-brand-primary text-white'
                 : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-brand-primary/30 dark:hover:border-white/20',

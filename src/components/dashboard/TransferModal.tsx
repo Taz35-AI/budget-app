@@ -86,14 +86,14 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 native-backdrop"
         onClick={onClose}
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl
+      <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)]
         bg-white dark:bg-[#042F2E]
-        border border-[#D9DDF0]/60 dark:border-[#0D9488]/20">
+        border border-black/[0.06] dark:border-white/[0.1]">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4
@@ -111,7 +111,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-[#D9DDF0]/30 dark:hover:bg-white/[0.08] text-[#042F2E]/40 dark:text-white/30 hover:text-[#042F2E] dark:hover:text-white transition-all"
+            className="p-1.5 rounded-2xl hover:bg-[#D9DDF0]/30 dark:hover:bg-white/[0.08] text-[#042F2E]/40 dark:text-white/30 hover:text-[#042F2E] dark:hover:text-white active:scale-[0.90] transition-all duration-100"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -136,7 +136,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               <select
                 value={fromId}
                 onChange={(e) => setFromId(e.target.value)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
@@ -166,7 +166,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               <select
                 value={toId}
                 onChange={(e) => setToId(e.target.value)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
@@ -180,14 +180,14 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           )}
 
           {/* One-off / Recurring toggle */}
-          <div className="flex rounded-xl overflow-hidden border border-[#D9DDF0]/60 dark:border-white/10">
+          <div className="flex rounded-2xl overflow-hidden border border-[#D9DDF0]/60 dark:border-white/10">
             {(['one_off', 'recurring'] as const).map((type) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => setTxType(type)}
                 className={cn(
-                  'flex-1 h-9 text-xs font-semibold transition-all',
+                  'flex-1 h-10 text-xs font-semibold transition-all duration-100 active:scale-[0.97]',
                   txType === type
                     ? 'bg-brand-primary text-white'
                     : 'bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-[#042F2E]/55 dark:text-white/40 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.07]',
@@ -207,7 +207,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value as Frequency)}
-                className="h-9 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer"
+                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               >
                 {(Object.entries(FREQUENCIES) as [Frequency, string][]).map(([k, label]) => (
                   <option key={k} value={k}>{label}</option>
@@ -233,7 +233,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                 onChange={(e) => setAmount(e.target.value)}
                 required
                 placeholder="0.00"
-                className="w-full h-10 pl-8 pr-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-semibold text-[#042F2E] dark:text-white placeholder:text-[#042F2E]/25 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
+                className="w-full h-11 pl-8 pr-3 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-semibold text-[#042F2E] dark:text-white placeholder:text-[#042F2E]/25 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               />
             </div>
             {overCreditLimit && (
@@ -253,7 +253,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               value={txType === 'recurring' ? startDate : date}
               onChange={(e) => txType === 'recurring' ? setStartDate(e.target.value) : setDate(e.target.value)}
               required
-              className="h-10 px-3 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all"
+              className="h-11 px-3 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-white/[0.04] text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
             />
           </div>
 
@@ -262,14 +262,14 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 h-10 rounded-xl border border-[#D9DDF0]/60 dark:border-white/10 bg-transparent text-sm font-semibold text-[#042F2E]/60 dark:text-white/50 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.06] transition-all"
+              className="flex-1 h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-transparent text-sm font-semibold text-[#042F2E]/60 dark:text-white/50 hover:bg-[#D9DDF0]/20 dark:hover:bg-white/[0.06] active:scale-[0.97] transition-all duration-100"
             >
               {tc('cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || sameAccount || !amount}
-              className="flex-1 h-10 rounded-xl bg-brand-primary text-white text-sm font-semibold hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="flex-1 h-10 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] transition-all duration-100 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

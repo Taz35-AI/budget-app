@@ -81,13 +81,13 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'w-full flex items-center gap-2 rounded-xl border transition-all',
-          compact ? 'h-7 px-2.5 text-[11px]' : 'h-10 px-3 text-sm',
+          'w-full flex items-center gap-2 rounded-2xl border transition-all active:scale-[0.98]',
+          compact ? 'h-7 px-2.5 text-[11px]' : 'h-11 px-3 text-sm',
           error
             ? 'border-brand-danger/40 bg-red-50 dark:bg-red-900/10'
             : open
             ? 'border-brand-primary/40 bg-brand-primary/5 dark:bg-brand-primary/10'
-            : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E]',
+            : 'border-black/[0.08] dark:border-white/[0.1] bg-black/[0.02] dark:bg-white/[0.04] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]',
         )}
       >
         {selectedTag ? (
@@ -376,7 +376,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
                   if (tpl.frequency) setValue('frequency', tpl.frequency);
                 }}
                 className={cn(
-                  'flex-shrink-0 flex items-center gap-1 rounded-lg border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all',
+                  'flex-shrink-0 flex items-center gap-1 rounded-2xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all active:scale-[0.95] duration-100',
                   compact ? 'h-6 px-2 text-[10px]' : 'h-7 px-2.5 text-xs',
                 )}
               >
@@ -395,30 +395,30 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
         {/* Income / Expense toggle */}
         {isCreditAccount ? (
           <div className={cn(
-            'flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20',
+            'flex-1 flex bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5',
           )}>
             <div className={cn(
-              'flex-1 flex items-center justify-center rounded-xl font-semibold',
+              'flex-1 flex items-center justify-center rounded-xl font-bold',
               compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
-              'bg-brand-danger text-white',
+              'bg-white dark:bg-white/15 shadow-[0_1px_3px_rgba(0,0,0,0.1)] text-brand-danger',
             )}>
               <input type="hidden" {...register('category')} value="expense" />
               {t('expense')}
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
+          <div className="flex-1 flex bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
             {(['income', 'expense'] as const).map((cat) => (
               <label
                 key={cat}
                 className={cn(
-                  'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                  'flex-1 flex items-center justify-center cursor-pointer transition-all active:scale-[0.96] duration-100',
                   compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
                   category === cat
                     ? cat === 'income'
-                      ? 'bg-brand-positive text-white shadow-inner'
-                      : 'bg-brand-danger text-white shadow-inner'
-                    : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                      ? 'bg-white dark:bg-white/15 shadow-[0_1px_3px_rgba(0,0,0,0.1)] font-bold rounded-xl text-brand-positive'
+                      : 'bg-white dark:bg-white/15 shadow-[0_1px_3px_rgba(0,0,0,0.1)] font-bold rounded-xl text-brand-danger'
+                    : 'bg-transparent font-semibold text-brand-text/50 dark:text-white/35',
                 )}
               >
                 <input type="radio" value={cat} {...register('category')} className="sr-only" />
@@ -432,16 +432,16 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
         {lockType ? (
           <input type="hidden" {...register('type')} />
         ) : (
-          <div className="flex-1 flex rounded-xl overflow-hidden border border-brand-primary/15 dark:border-brand-primary/20">
+          <div className="flex-1 flex bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
             {(['one_off', 'recurring'] as const).map((txType) => (
               <label
                 key={txType}
                 className={cn(
-                  'flex-1 flex items-center justify-center font-semibold cursor-pointer transition-all',
+                  'flex-1 flex items-center justify-center cursor-pointer transition-all active:scale-[0.96] duration-100',
                   compact ? 'h-8 text-[10px]' : 'h-9 text-xs',
                   type === txType
-                    ? 'bg-brand-primary text-white shadow-inner'
-                    : 'bg-white dark:bg-[#042F2E] text-brand-text/50 dark:text-white/35 hover:bg-brand-primary/5 dark:hover:bg-brand-primary/10',
+                    ? 'bg-white dark:bg-white/15 shadow-[0_1px_3px_rgba(0,0,0,0.1)] font-bold rounded-xl text-brand-primary'
+                    : 'bg-transparent font-semibold text-brand-text/50 dark:text-white/35',
                 )}
               >
                 <input type="radio" value={txType} {...register('type')} className="sr-only" />
@@ -591,7 +591,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
       )}
 
       <div className={cn('flex gap-2', compact ? 'pt-1' : 'pt-2')}>
-        <Button type="submit" size={compact ? 'sm' : 'md'} loading={isLoading} className="flex-1">
+        <Button type="submit" size={compact ? 'sm' : 'md'} loading={isLoading} className={cn('flex-1', !compact && 'h-12')}>
           {initialValues ? tt('saveChanges') : tt('addTransaction')}
         </Button>
         <Button type="button" size={compact ? 'sm' : 'md'} variant="ghost" onClick={onCancel}>

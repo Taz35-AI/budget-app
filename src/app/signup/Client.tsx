@@ -61,7 +61,7 @@ export default function SignupPage() {
           <p className="text-sm text-white/50 mb-6">
             We sent a confirmation link to <span className="text-white/70 font-medium">{email}</span>. Click it to activate your account.
           </p>
-          <Link href="/login" className="text-sm text-white/40 hover:text-white/70 underline transition-colors">
+          <Link href="/login" className="text-sm text-white/40 hover:text-white/70 underline active:opacity-70 transition-all duration-100">
             Back to sign in
           </Link>
         </div>
@@ -79,12 +79,12 @@ export default function SignupPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
+        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-7 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
           <button
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full h-10 rounded-xl bg-white text-slate-800 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2.5 mb-4"
+            className="w-full h-12 rounded-2xl bg-white text-slate-800 text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 flex items-center justify-center gap-2.5 mb-4 shadow-[0_2px_8px_rgba(255,255,255,0.1)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -107,19 +107,19 @@ export default function SignupPage() {
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-white/60">Email</label>
+              <label className="text-sm font-semibold text-white/60">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="you@example.com"
-                className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+                className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-white/60">Password</label>
+              <label className="text-sm font-semibold text-white/60">Password</label>
               <input
                 type="password"
                 value={password}
@@ -127,14 +127,14 @@ export default function SignupPage() {
                 required
                 minLength={6}
                 placeholder="Min. 6 characters"
-                className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+                className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="h-10 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-1"
+              className="h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
             >
               {loading ? 'Creating account…' : 'Create account'}
             </button>

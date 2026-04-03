@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-6">
+        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-7 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
 
           {stage === 'loading' && (
             <div className="flex items-center justify-center py-6 gap-3">
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
               <p className="text-sm text-white/40 mb-5">Request a new password reset link and try again.</p>
               <button
                 onClick={() => router.push('/login')}
-                className="w-full h-10 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-slate-100 transition-all"
+                className="w-full h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 transition-all duration-100 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 Back to sign in
               </button>
@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
                 </div>
               )}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-white/60">New password</label>
+                <label className="text-sm font-semibold text-white/60">New password</label>
                 <input
                   type="password"
                   value={password}
@@ -97,11 +97,11 @@ export default function ResetPasswordPage() {
                   minLength={6}
                   placeholder="••••••••"
                   autoFocus
-                  className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+                  className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-white/60">Confirm password</label>
+                <label className="text-sm font-semibold text-white/60">Confirm password</label>
                 <input
                   type="password"
                   value={confirm}
@@ -109,13 +109,13 @@ export default function ResetPasswordPage() {
                   required
                   minLength={6}
                   placeholder="••••••••"
-                  className="h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+                  className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
                 />
               </div>
               <button
                 type="submit"
                 disabled={saving}
-                className="h-10 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-1"
+                className="h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 {saving ? 'Saving…' : 'Set new password'}
               </button>

@@ -84,7 +84,7 @@ export function ExportButton() {
     <button
       onClick={handleExport}
       disabled={!data?.transactions.length}
-      className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-brand-primary/8 dark:bg-brand-primary/12 hover:bg-brand-primary/15 dark:hover:bg-brand-primary/20 text-brand-primary/80 dark:text-brand-primary hover:text-brand-primary text-sm font-medium transition-all border border-brand-primary/15 dark:border-brand-primary/20 hover:border-brand-primary/30 disabled:opacity-30 disabled:cursor-not-allowed"
+      className="flex items-center gap-1.5 h-9 px-3 rounded-2xl bg-brand-primary/8 dark:bg-brand-primary/12 hover:bg-brand-primary/15 dark:hover:bg-brand-primary/20 text-brand-primary/80 dark:text-brand-primary hover:text-brand-primary text-sm font-medium transition-all duration-100 active:scale-[0.95] border border-brand-primary/15 dark:border-brand-primary/20 hover:border-brand-primary/30 disabled:opacity-30 disabled:cursor-not-allowed"
       title="Export transactions as CSV"
     >
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

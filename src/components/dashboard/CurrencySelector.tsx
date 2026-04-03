@@ -17,7 +17,7 @@ export function CurrencySelector({ value, onChange, className }: Props) {
         value={value}
         onChange={(e) => onChange(e.target.value as CurrencyCode)}
         className={cn(
-          'h-9 pl-3 pr-8 rounded-xl border text-sm font-medium transition-all appearance-none cursor-pointer',
+          'h-9 pl-3 pr-8 rounded-2xl border text-sm font-medium transition-all duration-100 active:scale-[0.97] appearance-none cursor-pointer',
           'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
           'dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10',
           'focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white/30 focus:border-transparent',

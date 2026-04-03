@@ -115,7 +115,7 @@ export function BudgetsShell() {
 
         <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-5">
           {/* Month overview */}
-          <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5">
+          <div className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">{currentMonthLabel}</p>
             <div className="flex items-end gap-6">
               <div>
@@ -143,14 +143,14 @@ export function BudgetsShell() {
 
           {/* Tag picker */}
           {addingForTag === '__pick__' && (
-            <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 flex flex-col gap-3">
+            <div className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
               <p className="text-sm font-bold text-slate-800 dark:text-white">Which category?</p>
               <div className="flex flex-wrap gap-1.5">
                 {availableForBudget.map(([id, tag]) => (
                   <button
                     key={id}
                     onClick={() => { setAddingForTag(id); setBudgetInput(''); }}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 bg-white dark:bg-white/5 transition-all"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-2xl border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-white/60 hover:border-slate-300 dark:hover:border-white/20 bg-white dark:bg-white/5 active:scale-[0.96] transition-all duration-100"
                   >
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }} />
                     {TAGS[id] ? tTags(id as never) : tag.label}
@@ -164,7 +164,7 @@ export function BudgetsShell() {
           {addingForTag && addingForTag !== '__pick__' && (() => {
             const tag = allTags[addingForTag];
             return (
-              <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-5 flex flex-col gap-3">
+              <div className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tag?.color ?? '#6b7280' }} />
                   <p className="text-sm font-bold text-slate-800 dark:text-white">{t('budgetFor', { tag: TAGS[addingForTag] ? tTags(addingForTag as never) : (tag?.label ?? addingForTag) })}</p>
@@ -211,7 +211,7 @@ export function BudgetsShell() {
                 <div className="flex flex-col gap-3">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 px-1">{t('trackedCategories')}</p>
                   {budgetedTags.map((b) => (
-                    <div key={b.tagId} className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-4">
+                    <div key={b.tagId} className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color }} />
@@ -242,7 +242,7 @@ export function BudgetsShell() {
                           </button>
                         </div>
                       </div>
-                      <div className="h-2 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="h-2.5 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -269,7 +269,7 @@ export function BudgetsShell() {
                   {unbudgetedSpend.map((item) => (
                     <div
                       key={item.tagId}
-                      className="bg-white dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/[0.06] p-4 flex items-center justify-between"
+                      className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 flex items-center justify-between native-row shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]"
                     >
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />

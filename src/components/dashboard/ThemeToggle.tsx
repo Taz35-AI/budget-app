@@ -11,10 +11,10 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className={cn(
-        'flex items-center justify-center w-9 h-9 rounded-xl transition-all border',
-        'bg-teal-200 border-teal-300 text-teal-700',
+        'flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-100 border select-none active:scale-[0.90]',
+        'bg-teal-200 border-teal-300 text-teal-700 shadow-[0_1px_3px_rgba(0,0,0,0.06)]',
         'hover:bg-teal-300 hover:text-teal-900',
-        'dark:bg-white/5 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white',
+        'dark:bg-white/5 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)]',
       )}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}

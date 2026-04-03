@@ -57,7 +57,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
     <div className="flex flex-col h-full">
       {/* Balance summary */}
       <div className={cn(
-        'relative rounded-xl p-2.5 mb-2.5 overflow-hidden',
+        'native-card relative rounded-2xl p-2.5 mb-2.5 overflow-hidden',
         isPositive && 'bg-gradient-to-br from-emerald-50 to-teal-50/60 dark:from-emerald-950/30 dark:to-teal-950/10 border border-emerald-100 dark:border-emerald-900/30',
         isNegative && 'bg-gradient-to-br from-red-50 to-rose-50/60 dark:from-red-950/30 dark:to-rose-950/10 border border-red-100 dark:border-red-900/30',
         !isPositive && !isNegative && 'bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.08]',
@@ -110,14 +110,14 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
               if (isEditing) {
                 if (tx.type === 'recurring') {
                   return (
-                    <li key={tx.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4">
+                    <li key={tx.id} className="rounded-2xl border border-slate-200 dark:border-white/10 p-4">
                       {(accounts?.length ?? 0) >= 2 && (
                         <div className="mb-3">
                           <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
                           <div className="flex flex-wrap gap-1.5">
                             {accounts!.map((acct) => (
                               <button key={acct.id} type="button" onClick={() => setEditAccountId(acct.id)}
-                                className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
+                                className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all duration-100',
                                   editAccountId === acct.id
                                     ? 'bg-brand-primary text-white border-brand-primary'
                                     : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
@@ -156,14 +156,14 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
                 // One-off edit
                 return (
-                  <li key={tx.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-4">
+                  <li key={tx.id} className="rounded-2xl border border-slate-200 dark:border-white/10 p-4">
                     {(accounts?.length ?? 0) >= 2 && (
                       <div className="mb-3">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
                         <div className="flex flex-wrap gap-1.5">
                           {accounts!.map((acct) => (
                             <button key={acct.id} type="button" onClick={() => setEditAccountId(acct.id)}
-                              className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all',
+                              className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all duration-100',
                                 editAccountId === acct.id
                                   ? 'bg-brand-primary text-white border-brand-primary'
                                   : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
@@ -212,7 +212,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
               if (isDeleting) {
                 if (tx.type === 'recurring') {
                   return (
-                    <li key={tx.id} className="rounded-xl border border-red-200 dark:border-red-500/30 p-4">
+                    <li key={tx.id} className="rounded-2xl border border-red-200 dark:border-red-500/30 p-4">
                       <RecurringDeleteDialog
                         tx={tx}
                         occurrenceDate={date}
@@ -240,7 +240,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
                 // One-off delete
                 return (
-                  <li key={tx.id} className="rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-900/20 p-4">
+                  <li key={tx.id} className="rounded-2xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-900/20 p-4">
                     <p className="text-sm text-slate-700 dark:text-white/80 mb-3">
                       {t('deleteTitle', { name: tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name })}
                     </p>
@@ -274,7 +274,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
               return (
                 <li
                   key={tx.id}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-transparent hover:border-slate-100 dark:hover:border-white/[0.06] transition-all group"
+                  className="native-row flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-transparent hover:border-slate-100 dark:hover:border-white/[0.06] transition-all duration-100 group"
                 >
                   <div className={cn(
                     'w-[3px] self-stretch rounded-full flex-shrink-0 min-h-[1.75rem]',
@@ -314,7 +314,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                   <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button
                       onClick={() => startEdit(tx)}
-                      className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
+                      className="p-1.5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 active:scale-[0.92] transition-all duration-100"
                       aria-label={t('editAriaLabel')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -324,7 +324,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     {onDuplicate && (
                       <button
                         onClick={() => onDuplicate(tx)}
-                        className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 transition-colors"
+                        className="p-1.5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/70 active:scale-[0.92] transition-all duration-100"
                         aria-label={t('duplicateAriaLabel')}
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -334,7 +334,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     )}
                     <button
                       onClick={() => setActive({ type: 'delete', txId: tx.transaction_id })}
-                      className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                      className="p-1.5 rounded-2xl hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 active:scale-[0.92] transition-all duration-100"
                       aria-label={t('deleteAriaLabel')}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -357,7 +357,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
           </OnboardingTip>
         )}
         <div className={cn('flex gap-2', onTransfer && (accounts?.length ?? 0) >= 2 ? 'flex-col' : '')}>
-          <Button onClick={onAddNew} className="flex-1" size="lg">
+          <Button onClick={onAddNew} className="flex-1 font-bold rounded-2xl shadow-[0_2px_8px_rgba(13,148,136,0.3),inset_0_1px_0_rgba(255,255,255,0.15)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)] active:scale-[0.97]" size="lg">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>

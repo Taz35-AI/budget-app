@@ -56,7 +56,7 @@ export function DayPanel({
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/10 backdrop-blur-[1px] z-20 transition-opacity duration-300',
+          'fixed inset-0 native-backdrop z-20 transition-opacity duration-300',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
           'hidden lg:block',
         )}
@@ -67,7 +67,7 @@ export function DayPanel({
       <aside
         ref={panelRef}
         className={cn(
-          'fixed top-0 right-0 h-full w-full max-w-sm shadow-2xl z-30',
+          'fixed top-0 right-0 h-full w-full max-w-sm rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.5)] z-30',
           'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out',
           'hidden lg:flex',
@@ -87,7 +87,7 @@ export function DayPanel({
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white transition-colors"
+            className="p-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white active:scale-[0.90] transition-all duration-100"
             aria-label="Close panel"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

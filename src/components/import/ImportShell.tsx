@@ -133,9 +133,9 @@ function StepIndicator({ step }: { step: Step }) {
 
 // ─── Shared classes ───────────────────────────────────────────────────────────
 
-const selectCls = 'h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-3 text-sm text-brand-text dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full';
-const btnSecondary = 'flex-1 h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 transition-colors';
-const btnPrimary = 'flex-1 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2';
+const selectCls = 'h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-3 text-sm text-brand-text dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-transparent transition-all w-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]';
+const btnSecondary = 'flex-1 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100';
+const btnPrimary = 'flex-1 h-11 rounded-2xl bg-teal-600 text-white text-sm font-bold hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] transition-all duration-100 flex items-center justify-center gap-2';
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -376,7 +376,7 @@ export default function ImportShell() {
       <StepIndicator step={step} />
 
       {error && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 dark:text-red-400">
+        <div className="mb-4 px-4 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-sm text-red-500 dark:text-red-400">
           {error}
         </div>
       )}
@@ -384,7 +384,7 @@ export default function ImportShell() {
       {/* ── STEP 1: Upload ── */}
       {step === 'upload' && (
         <div
-          className="border-2 border-dashed border-brand-secondary/30 dark:border-white/15 rounded-2xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-teal-500/50 transition-colors"
+          className="border-2 border-dashed border-brand-secondary/30 dark:border-white/15 rounded-3xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-teal-500/50 transition-colors"
           onClick={() => fileRef.current?.click()}
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
@@ -402,7 +402,7 @@ export default function ImportShell() {
 
       {/* ── STEP 2: Map columns ── */}
       {step === 'map' && (
-        <div className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-2xl p-6 flex flex-col gap-5">
+        <div className="bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl p-6 flex flex-col gap-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
           <p className="text-sm text-brand-text/60 dark:text-white/60">{t('mapHint', { count: rows.length })}</p>
 
           {accounts.length > 0 && (
@@ -446,7 +446,7 @@ export default function ImportShell() {
             <button
               onClick={handleAutoCategorise}
               disabled={categorising}
-              className="flex-shrink-0 flex items-center gap-2 px-4 h-9 rounded-xl border border-teal-600/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 text-sm font-medium hover:bg-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 flex items-center gap-2 px-4 h-10 rounded-2xl border border-teal-600/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 text-sm font-bold hover:bg-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] transition-all duration-100"
             >
               {categorising ? (
                 <>
@@ -463,7 +463,7 @@ export default function ImportShell() {
               )}
             </button>
           </div>
-          <div className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-2xl overflow-hidden">
+          <div className="bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-teal-50 dark:bg-[#042F2E] border-b border-brand-secondary/20 dark:border-white/10">
@@ -533,12 +533,12 @@ export default function ImportShell() {
       {/* ── STEP 4: Recurring suggestions ── */}
       {step === 'recurring' && (
         <div className="flex flex-col gap-4">
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
             {t('recurringHint', { count: recurringGroups.length })}
           </div>
           <div className="flex flex-col gap-3">
             {recurringGroups.map((g, i) => (
-              <div key={i} className="bg-brand-card dark:bg-white/[0.04] border border-brand-secondary/20 dark:border-white/10 rounded-xl px-4 py-3 flex flex-col gap-3">
+              <div key={i} className="bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl px-4 py-3 flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0">
                     <p className="font-semibold text-brand-text dark:text-white truncate">{g.merchant}</p>
@@ -610,11 +610,11 @@ export default function ImportShell() {
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); }}
-              className="px-5 h-10 rounded-xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 transition-colors"
+              className="px-5 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100"
             >
               {t('importAnother')}
             </button>
-            <button onClick={() => router.push('/dashboard')} className="px-5 h-10 rounded-xl bg-teal-600 text-white text-sm font-semibold hover:bg-teal-500 transition-colors">
+            <button onClick={() => router.push('/dashboard')} className="px-5 h-11 rounded-2xl bg-teal-600 text-white text-sm font-bold hover:bg-teal-500 active:scale-[0.96] transition-all duration-100">
               {t('goToDashboard')}
             </button>
           </div>

@@ -186,7 +186,7 @@ export function CalendarView({
             Stop touch events propagating to the outer swipe-month listener. */}
         {showTabs && (
           <div
-            className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0"
+            className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5"
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
@@ -194,10 +194,10 @@ export function CalendarView({
             <button
               onClick={() => { selection(); onAccountChange?.('combined'); }}
               className={cn(
-                'flex-shrink-0 h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                'flex-shrink-0 h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all duration-100 active:scale-[0.96] select-none',
                 activeAccountId === 'combined'
-                  ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                  : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
+                  ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
+                  : 'bg-transparent text-brand-text/50 dark:text-white/40',
               )}
             >
               Combined
@@ -207,10 +207,10 @@ export function CalendarView({
                 key={acct.id}
                 onClick={() => { selection(); onAccountChange?.(acct.id); }}
                 className={cn(
-                  'flex-shrink-0 h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                  'flex-shrink-0 h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all duration-100 active:scale-[0.96] select-none',
                   activeAccountId === acct.id
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                    : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
+                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
+                    : 'bg-transparent text-brand-text/50 dark:text-white/40',
                 )}
               >
                 {acct.name}
@@ -224,7 +224,7 @@ export function CalendarView({
           <button
             onClick={() => calendarRef.current?.getApi().prev()}
             aria-label="Previous month"
-            className="hidden sm:flex w-6 h-6 items-center justify-center rounded-lg text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary transition-all"
+            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-2xl text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary active:scale-[0.90] active:bg-black/[0.06] dark:active:bg-white/[0.08] transition-all duration-100"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -236,7 +236,7 @@ export function CalendarView({
           <button
             onClick={() => calendarRef.current?.getApi().next()}
             aria-label="Next month"
-            className="hidden sm:flex w-6 h-6 items-center justify-center rounded-lg text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary transition-all"
+            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-2xl text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary active:scale-[0.90] active:bg-black/[0.06] dark:active:bg-white/[0.08] transition-all duration-100"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

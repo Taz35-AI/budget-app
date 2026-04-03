@@ -122,7 +122,7 @@ export function ProfileShell() {
           </div>
           <button
             onClick={() => router.back()}
-            className="lg:hidden ml-auto flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all"
+            className="lg:hidden ml-auto flex items-center gap-1.5 h-10 px-4 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white active:scale-[0.96] transition-all duration-100"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -136,7 +136,7 @@ export function ProfileShell() {
       <div className="px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
 
         {/* ── Profile header ──────────────────────────────────────────── */}
-        <div className="lg:col-span-2 bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-6 flex flex-row items-center gap-5">
+        <div className="lg:col-span-2 bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] p-6 flex flex-row items-center gap-5">
           <div className="w-16 h-16 rounded-full flex-shrink-0 overflow-hidden bg-brand-primary/30 flex items-center justify-center">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={displayName} width={64} height={64} className="w-full h-full object-cover" unoptimized />
@@ -163,11 +163,11 @@ export function ProfileShell() {
 
         {/* ── Recent transactions ─────────────────────────────────────── */}
         {recentTx.length > 0 && (
-          <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
+          <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] p-5">
             <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3">{t('recentEntries')}</p>
             <div className="flex flex-col divide-y divide-slate-50 dark:divide-white/[0.04]">
               {recentTx.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                <div key={tx.id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 native-row rounded-2xl">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', tx.category === 'income' ? 'bg-emerald-400' : 'bg-red-400')} />
                     <span className="text-sm font-medium text-slate-700 dark:text-white/80 truncate">{tx.name}</span>
@@ -185,7 +185,7 @@ export function ProfileShell() {
         )}
 
         {/* ── Security ────────────────────────────────────────────────── */}
-        <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
+        <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] p-5">
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-4">{t('security')}</p>
 
           {!showPwForm && (
@@ -200,7 +200,7 @@ export function ProfileShell() {
               </div>
               <button
                 onClick={() => setShowPwForm(true)}
-                className="h-8 px-4 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-white/70 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                className="h-10 px-4 rounded-2xl bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-white/70 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/10 active:scale-[0.96] transition-all duration-100"
               >
                 {isGoogle ? t('setPasswordBtn') : t('changePasswordBtn')}
               </button>
@@ -218,7 +218,7 @@ export function ProfileShell() {
                 placeholder={t('newPasswordPlaceholder')}
                 required
                 minLength={6}
-                className="h-10 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-brand-primary/40 transition-all"
+                className="h-11 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-brand-primary/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] transition-all"
               />
               <input
                 type="password"
@@ -226,15 +226,15 @@ export function ProfileShell() {
                 onChange={(e) => setConfirmPw(e.target.value)}
                 placeholder={t('confirmPasswordPlaceholder')}
                 required
-                className="h-10 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-brand-primary/40 transition-all"
+                className="h-11 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-brand-primary/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] transition-all"
               />
               <div className="flex gap-2">
                 <button type="submit" disabled={pwStatus === 'loading'}
-                  className="flex-1 h-9 rounded-xl bg-brand-primary text-white text-sm font-semibold hover:bg-brand-primary/90 disabled:opacity-50 transition-colors">
+                  className="flex-1 h-10 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 disabled:opacity-50 active:scale-[0.96] transition-all duration-100">
                   {pwStatus === 'loading' ? tc('loading') : t('savePassword')}
                 </button>
                 <button type="button" onClick={() => { setShowPwForm(false); setPwError(''); setNewPw(''); setConfirmPw(''); }}
-                  className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">
+                  className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">
                   {tc('cancel')}
                 </button>
               </div>
@@ -243,7 +243,7 @@ export function ProfileShell() {
         </div>
 
         {/* ── Danger zone ─────────────────────────────────────────────── */}
-        <div className="bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-red-200 dark:border-red-500/20 shadow-[0_1px_6px_rgba(25,27,47,0.05)] p-5">
+        <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-red-200 dark:border-red-500/20 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)] p-5">
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-red-400 mb-4">{t('dangerZone')}</p>
 
           {deleteStep === 'idle' && (
@@ -254,7 +254,7 @@ export function ProfileShell() {
               </div>
               <button
                 onClick={() => setDeleteStep('confirm')}
-                className="h-8 px-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-500/30 transition-colors"
+                className="h-10 px-4 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-500 text-xs font-bold hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-500/30 active:scale-[0.96] transition-all duration-100"
               >
                 {tc('delete')}
               </button>
@@ -274,21 +274,21 @@ export function ProfileShell() {
                 value={deleteInput}
                 onChange={(e) => { setDeleteInput(e.target.value); setDeleteError(''); }}
                 placeholder={email}
-                className="h-10 rounded-xl border border-red-200 dark:border-red-500/30 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-red-400 transition-all"
+                className="h-11 rounded-2xl border border-red-200 dark:border-red-500/30 bg-white dark:bg-white/5 px-3 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-red-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] transition-all"
               />
               {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteStep === 'deleting' || deleteInput !== email}
-                  className="flex-1 h-9 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 h-10 rounded-2xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.96] transition-all duration-100"
                 >
                   {deleteStep === 'deleting' ? t('deleting') : t('deleteMyAccount')}
                 </button>
                 <button
                   onClick={() => { setDeleteStep('idle'); setDeleteInput(''); setDeleteError(''); }}
                   disabled={deleteStep === 'deleting'}
-                  className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors"
+                  className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100"
                 >
                   {tc('cancel')}
                 </button>

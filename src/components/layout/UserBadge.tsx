@@ -30,7 +30,7 @@ export function UserBadge() {
     .toUpperCase() || '?';
 
   return (
-    <Link href="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-teal-200/50 dark:bg-white/[0.05] border border-teal-300/70 dark:border-white/[0.06] hover:bg-teal-200 dark:hover:bg-white/[0.09] transition-colors">
+    <Link href="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-teal-200/50 dark:bg-white/[0.05] border border-teal-300/70 dark:border-white/[0.06] hover:bg-teal-200 dark:hover:bg-white/[0.09] transition-all duration-100 active:scale-[0.97]">
       {/* Avatar */}
       <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-teal-600/20 dark:bg-brand-primary/40 flex items-center justify-center">
         {avatarUrl ? (

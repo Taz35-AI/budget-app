@@ -66,7 +66,7 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
             type="button"
             onClick={() => setSelected(opt.value)}
             className={cn(
-              'flex items-start gap-3 p-3 rounded-xl border text-left transition-all w-full',
+              'flex items-start gap-3 p-3 rounded-2xl border text-left transition-all duration-100 active:bg-black/[0.03] dark:active:bg-white/[0.04] w-full',
               selected === opt.value
                 ? opt.danger
                   ? 'border-brand-danger bg-brand-danger text-white'

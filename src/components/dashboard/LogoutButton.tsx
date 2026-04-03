@@ -18,7 +18,7 @@ export function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="flex items-center gap-1.5 h-9 px-3 rounded-xl transition-all border border-brand-danger/15 dark:border-brand-danger/20 bg-brand-danger/6 dark:bg-brand-danger/10 text-brand-danger/70 dark:text-brand-danger/80 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 hover:text-brand-danger text-sm font-medium"
+      className="flex items-center gap-1.5 h-9 px-3 rounded-2xl transition-all duration-100 active:scale-[0.95] border border-brand-danger/15 dark:border-brand-danger/20 bg-brand-danger/6 dark:bg-brand-danger/10 text-brand-danger/70 dark:text-brand-danger/80 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 hover:text-brand-danger text-sm font-bold"
       title="Sign out"
       aria-label="Sign out"
     >

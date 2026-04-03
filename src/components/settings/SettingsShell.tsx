@@ -41,7 +41,7 @@ function SettingsCard({ title, subtitle, accent, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+    <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
       <div className={cn('h-[3px] w-full', accent)} />
       <div className="px-6 pt-5 pb-3">
         <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{title}</h2>
@@ -62,7 +62,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
           key={c}
           type="button"
           onClick={() => onChange(c)}
-          className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0d1629]"
+          className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-[0.85] ring-2 ring-offset-2 ring-offset-white dark:ring-offset-[#0d1629]"
           style={{ backgroundColor: c, ['--tw-ring-color']: value === c ? c : 'transparent' } as React.CSSProperties}
         >
           {value === c && (
@@ -83,7 +83,7 @@ function TrashBtn({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+      className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 active:scale-[0.96] transition-all duration-100 opacity-0 group-hover:opacity-100 flex-shrink-0"
     >
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -98,7 +98,7 @@ function AddRowBtn({ label, accentHover, onClick }: { label: string; accentHover
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 w-full h-10 px-3 rounded-xl border border-dashed border-slate-200 dark:border-white/10 text-sm text-slate-500 dark:text-white/40 transition-colors',
+        'flex items-center gap-2 w-full h-10 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-sm text-slate-500 dark:text-white/40 active:scale-[0.96] transition-all duration-100',
         accentHover,
       )}
     >
@@ -259,7 +259,7 @@ function TagsSection() {
     const entry = isBuiltin ? activeBuiltins.find((e) => e.key === editId) : pureCustomTags.find((t) => t.id === editId);
     if (!entry) return null;
     return (
-      <div className="flex flex-col gap-2.5 p-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
+      <div className="flex flex-col gap-2.5 p-3 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
         <div className="flex gap-2 items-center">
           <input value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && saveEdit()} autoFocus
@@ -284,11 +284,11 @@ function TagsSection() {
           </div>
         )}
         <div className="flex gap-1.5">
-          <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold transition-colors">{tc('save')}</button>
+          <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{tc('save')}</button>
           {isBuiltin && (entry as typeof activeBuiltins[0]).isOverridden && (
-            <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-semibold hover:bg-red-50 hover:text-red-500 transition-colors">{tc('reset')}</button>
+            <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-bold hover:bg-red-50 hover:text-red-500 active:scale-[0.96] transition-all duration-100">{tc('reset')}</button>
           )}
-          <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold transition-colors">{tc('cancel')}</button>
+          <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
         </div>
       </div>
     );
@@ -310,12 +310,12 @@ function TagsSection() {
     const hasEdit = editId && editSection === sec;
 
     return (
-      <div key={sec} className="rounded-xl border border-slate-100 dark:border-white/[0.05] overflow-hidden mb-2">
+      <div key={sec} className="rounded-2xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden mb-2">
         {/* Accordion header */}
         <button
           type="button"
           onClick={() => toggle(sec)}
-          className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-white/[0.03] active:bg-black/[0.03] dark:active:bg-white/[0.04] rounded-2xl transition-all duration-100"
         >
           <span className={cn('w-2 h-2 rounded-full flex-shrink-0', accentClass)} />
           <span className="flex-1 text-left text-xs font-semibold text-slate-700 dark:text-white/80">{label}</span>
@@ -396,11 +396,11 @@ function TagsSection() {
 
       {/* Add custom tag */}
       {showAdd ? (
-        <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
+        <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-indigo-300 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
           <div className="flex gap-2 items-center">
             <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)}
               placeholder="Tag name" autoFocus onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              className="flex-1 h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400" />
+              className="flex-1 h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
             <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: newColor }}>
               {newLabel || 'Preview'}
             </span>
@@ -419,8 +419,8 @@ function TagsSection() {
             ))}
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors">{tc('add')}</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">{tc('cancel')}</button>
+            <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{tc('add')}</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
           </div>
         </div>
       ) : (
@@ -488,7 +488,7 @@ function TemplatesSection() {
       )}
 
       {showAdd ? (
-        <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-900/10">
+        <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-900/10">
           {/* Category */}
           <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
             {(['income', 'expense'] as const).map((cat) => (
@@ -515,13 +515,13 @@ function TemplatesSection() {
           </div>
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Template name (e.g. Monthly Rent)" autoFocus
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400" />
+            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           <input type="number" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
             placeholder="Amount" min="0" step="0.01"
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400" />
+            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {form.type === 'recurring' && (
             <select value={form.frequency} onChange={(e) => setForm((f) => ({ ...f, frequency: e.target.value as Frequency }))}
-              className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400">
+              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
               {Object.entries(FREQUENCIES).map(([val, label]) => <option key={val} value={val}>{label}</option>)}
             </select>
           )}
@@ -547,8 +547,8 @@ function TemplatesSection() {
               ))}
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold transition-colors">Save template</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
+            <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Save template</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
           </div>
         </div>
       ) : (
@@ -601,7 +601,7 @@ function PreferencesSection() {
           <select
             value={dateFormat}
             onChange={(e) => setDateFormat(e.target.value as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD')}
-            className="h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0"
+            className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
           >
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -610,7 +610,7 @@ function PreferencesSection() {
         </div>
 
         {/* Haptic feedback */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="native-row rounded-2xl flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('hapticFeedback')}</p>
             <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('hapticFeedbackDesc')}</p>
@@ -765,8 +765,8 @@ function GoalsSection() {
                     <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                       placeholder="Amount saved so far" autoFocus
                       className="flex-1 h-8 px-2 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
-                    <button type="button" onClick={() => handleUpdateSaved(goal.id)} className="px-3 h-8 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors">Save</button>
-                    <button type="button" onClick={() => setEditId(null)} className="px-2 h-8 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs transition-colors">✕</button>
+                    <button type="button" onClick={() => handleUpdateSaved(goal.id)} className="px-3 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Save</button>
+                    <button type="button" onClick={() => setEditId(null)} className="px-2 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs active:scale-[0.96] transition-all duration-100">✕</button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
@@ -788,22 +788,22 @@ function GoalsSection() {
       )}
 
       {showAdd ? (
-        <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
+        <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Goal name (e.g. Holiday fund)" autoFocus
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           <input type="number" value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
             placeholder="Target amount" min="0"
-            className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {!form.linkedTagId && (
             <input type="number" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
               placeholder="Already saved (optional)" min="0"
-              className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           )}
           <div>
             <p className="text-xs text-slate-500 dark:text-white/40 mb-1">Deadline (optional)</p>
             <input type="date" value={form.deadline} onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
-              className="w-full h-9 px-3 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-emerald-400" />
+              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           </div>
           {/* Tag link picker */}
           <div>
@@ -835,8 +835,8 @@ function GoalsSection() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={handleAdd} className="flex-1 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors">Add goal</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-9 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold transition-colors">Cancel</button>
+            <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Add goal</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
           </div>
         </div>
       ) : (
@@ -937,7 +937,7 @@ function AccountsSection() {
     });
   };
 
-  const inputCls = 'flex-1 min-w-0 h-8 px-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400 placeholder:text-slate-400 dark:placeholder:text-white/30';
+  const inputCls = 'flex-1 min-w-0 h-11 px-2.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400 placeholder:text-slate-400 dark:placeholder:text-white/30 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]';
 
   return (
     <SettingsCard
@@ -985,14 +985,14 @@ function AccountsSection() {
                     type="button"
                     onClick={saveEdit}
                     disabled={updateAccount.isPending}
-                    className="h-8 px-3 rounded-lg bg-teal-500 text-white text-xs font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
+                    className="h-10 px-3 rounded-2xl bg-teal-500 text-white text-xs font-bold hover:bg-teal-600 active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:opacity-50"
                   >
                     {tc('save')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditId(null)}
-                    className="h-8 px-2 rounded-lg text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white text-xs transition-all"
+                    className="h-10 px-2 rounded-2xl text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white text-xs active:scale-[0.96] transition-all duration-100"
                   >
                     {tc('cancel')}
                   </button>
@@ -1005,7 +1005,7 @@ function AccountsSection() {
                   type="button"
                   onClick={() => handleDelete(acct.id)}
                   disabled={deleteAccount.isPending}
-                  className="h-7 px-2.5 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-all disabled:opacity-50"
+                  className="h-10 px-2.5 rounded-2xl bg-red-500 text-white text-xs font-bold hover:bg-red-600 active:scale-[0.96] transition-all duration-100 disabled:opacity-50"
                 >
                   {deleteAccount.isPending ? '…' : tc('delete')}
                 </button>
@@ -1055,7 +1055,7 @@ function AccountsSection() {
       </div>
 
       {showAdd ? (
-        <div className="flex flex-col gap-2 p-3 rounded-xl border border-teal-400/30 bg-teal-50/30 dark:bg-teal-900/10">
+        <div className="flex flex-col gap-2 p-3 rounded-2xl border border-teal-400/30 bg-teal-50/30 dark:bg-teal-900/10">
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -1082,11 +1082,11 @@ function AccountsSection() {
               type="button"
               onClick={handleAdd}
               disabled={createAccount.isPending || !newName.trim()}
-              className="h-9 px-4 rounded-xl bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition-all disabled:opacity-50"
+              className="h-10 px-4 rounded-2xl bg-teal-500 text-white text-sm font-bold hover:bg-teal-600 active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:opacity-50"
             >
               {createAccount.isPending ? '…' : tc('add')}
             </button>
-            <button type="button" onClick={() => { setShowAdd(false); setNewName(''); setNewType('checking'); setNewLimit(''); }} className="h-9 px-3 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
+            <button type="button" onClick={() => { setShowAdd(false); setNewName(''); setNewType('checking'); setNewLimit(''); }} className="h-10 px-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 active:scale-[0.96] transition-all duration-100">
               {tc('cancel')}
             </button>
           </div>
@@ -1191,7 +1191,7 @@ function BackupSection() {
     >
       <div className="flex flex-col gap-3 mt-2">
         {/* Download */}
-        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.07]">
+        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08]">
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-white">{t('downloadBackup')}</p>
             <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Saves all transactions as a JSON file</p>
@@ -1200,10 +1200,10 @@ function BackupSection() {
             onClick={handleDownload}
             disabled={downloadState === 'loading'}
             className={cn(
-              'flex items-center gap-1.5 h-8 px-3 rounded-xl text-xs font-semibold transition-all border',
+              'flex items-center gap-1.5 h-10 px-3 rounded-2xl text-xs font-bold active:scale-[0.96] transition-all duration-100 border shadow-[0_1px_3px_rgba(0,0,0,0.1)]',
               downloadState === 'error'
                 ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-500/30'
-                : 'bg-violet-600 text-white border-transparent hover:bg-violet-700 active:scale-95',
+                : 'bg-violet-600 text-white border-transparent hover:bg-violet-700',
               downloadState === 'loading' && 'opacity-60 cursor-wait',
             )}
           >
@@ -1219,19 +1219,19 @@ function BackupSection() {
         </div>
 
         {/* Restore */}
-        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.07]">
+        <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.08]">
           <div>
             <p className="text-sm font-semibold text-slate-800 dark:text-white">{t('restoreBackup')}</p>
             <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">Upload a previously downloaded JSON file</p>
           </div>
           <label
             className={cn(
-              'flex items-center gap-1.5 h-8 px-3 rounded-xl text-xs font-semibold transition-all border cursor-pointer',
+              'flex items-center gap-1.5 h-10 px-3 rounded-2xl text-xs font-bold active:scale-[0.96] transition-all duration-100 border cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.1)]',
               restoreState === 'success'
                 ? 'bg-emerald-500 text-white border-transparent'
                 : restoreState === 'error'
                 ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-500/30'
-                : 'bg-slate-800 text-white border-transparent hover:bg-slate-700 dark:bg-white/10 dark:hover:bg-white/15 active:scale-95',
+                : 'bg-slate-800 text-white border-transparent hover:bg-slate-700 dark:bg-white/10 dark:hover:bg-white/15',
               restoreState === 'loading' && 'opacity-60 cursor-wait pointer-events-none',
             )}
           >
@@ -1311,7 +1311,7 @@ function NotificationsSection() {
 
         {/* Permission status */}
         {permState !== 'granted' && (
-          <div className="flex items-center justify-between gap-4 p-3 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200/60 dark:border-sky-400/15">
+          <div className="flex items-center justify-between gap-4 p-3 rounded-2xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200/60 dark:border-sky-400/15">
             <div>
               <p className="text-sm font-semibold text-sky-700 dark:text-sky-300">
                 {permState === 'denied' ? t('notifBlocked') : t('notifRequired')}
@@ -1327,7 +1327,7 @@ function NotificationsSection() {
                 type="button"
                 onClick={handleRequestPermission}
                 disabled={checking}
-                className="flex-shrink-0 h-8 px-3 rounded-lg bg-sky-500 text-white text-xs font-semibold hover:bg-sky-600 transition-colors disabled:opacity-50"
+                className="flex-shrink-0 h-10 px-3 rounded-2xl bg-sky-500 text-white text-xs font-bold hover:bg-sky-600 active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)] disabled:opacity-50"
               >
                 {checking ? '…' : t('notifAllow')}
               </button>
@@ -1337,7 +1337,7 @@ function NotificationsSection() {
 
         {/* Toggle rows */}
         {rows.map(({ key, label, desc }) => (
-          <div key={key} className="flex items-center justify-between gap-4">
+          <div key={key} className="native-row rounded-2xl flex items-center justify-between gap-4">
             <div>
               <p className={cn('text-sm font-semibold', permState !== 'granted' ? 'text-slate-400 dark:text-white/30' : 'text-slate-700 dark:text-white/80')}>
                 {label}
@@ -1384,7 +1384,7 @@ function NotificationsSection() {
                   setNotificationSettings({ dailyHour: h, dailyMinute: m });
                 }
               }}
-              className="h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-sky-400 flex-shrink-0"
+              className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-sky-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
             />
           </div>
         )}
@@ -1431,7 +1431,7 @@ export function SettingsShell() {
           </div>
           <Link
             href="/dashboard"
-            className="lg:hidden ml-auto flex items-center gap-1.5 h-9 px-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white transition-all"
+            className="lg:hidden ml-auto flex items-center gap-1.5 h-10 px-4 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white active:scale-[0.96] transition-all duration-100"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -1441,22 +1441,24 @@ export function SettingsShell() {
         </div>
 
         {/* Tab bar */}
-        <div className="flex gap-1 overflow-x-auto scrollbar-none px-4 sm:px-6 pb-2.5">
-          {tabs.map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActiveTab(id)}
-              className={cn(
-                'flex-shrink-0 h-8 px-4 rounded-full text-xs font-semibold transition-all whitespace-nowrap',
-                activeTab === id
-                  ? 'bg-brand-primary text-white shadow-sm'
-                  : 'text-slate-500 dark:text-white/45 hover:bg-slate-100 dark:hover:bg-white/[0.06]',
-              )}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="overflow-x-auto scrollbar-none px-4 sm:px-6 pb-2.5">
+          <div className="inline-flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
+            {tabs.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  'flex-shrink-0 h-8 px-4 rounded-xl text-xs select-none active:scale-[0.96] transition-all duration-100 whitespace-nowrap',
+                  activeTab === id
+                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white font-bold shadow-[0_1px_3px_rgba(0,0,0,0.1)]'
+                    : 'bg-transparent text-brand-text/50 dark:text-white/40 font-semibold',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -1467,7 +1469,7 @@ export function SettingsShell() {
           <>
             <PreferencesSection />
             {/* Language */}
-            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('language')}</h2>
@@ -1487,7 +1489,7 @@ export function SettingsShell() {
                       key={lang}
                       onClick={() => setLanguage(lang)}
                       className={cn(
-                        'h-9 px-4 rounded-xl text-sm font-semibold border transition-all',
+                        'h-10 px-4 rounded-2xl text-sm font-semibold border active:scale-[0.96] transition-all duration-100',
                         language === lang
                           ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
                           : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
@@ -1518,7 +1520,7 @@ export function SettingsShell() {
         {activeTab === 'profile' && (
           <div className="lg:col-span-2 space-y-5">
             {/* Account info */}
-            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabProfile')}</h2>
@@ -1529,7 +1531,7 @@ export function SettingsShell() {
             </div>
 
             {/* Danger zone */}
-            <div className="rounded-2xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-red-200 dark:border-red-900/40 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-red-200 dark:border-red-900/40 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-red-500 to-rose-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('dangerZone')}</h2>

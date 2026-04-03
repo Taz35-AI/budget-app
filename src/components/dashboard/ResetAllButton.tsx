@@ -35,7 +35,7 @@ export function ResetAllButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-brand-danger/6 dark:bg-brand-danger/10 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 text-brand-danger/70 dark:text-brand-danger/80 hover:text-brand-danger text-sm font-medium transition-all border border-brand-danger/15 dark:border-brand-danger/20 hover:border-brand-danger/30"
+        className="flex items-center gap-1.5 h-9 px-3 rounded-2xl bg-brand-danger/6 dark:bg-brand-danger/10 hover:bg-brand-danger/12 dark:hover:bg-brand-danger/18 text-brand-danger/70 dark:text-brand-danger/80 hover:text-brand-danger text-sm font-medium active:scale-[0.95] transition-all duration-100 border border-brand-danger/15 dark:border-brand-danger/20 hover:border-brand-danger/30"
         title="Reset all data"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -46,9 +46,9 @@ export function ResetAllButton() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" onClick={handleClose} />
+          <div className="fixed inset-0 z-50 native-backdrop" onClick={handleClose} />
           <div
-            className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#042F2E] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 p-4"
+            className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#042F2E] rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-3">
@@ -56,7 +56,7 @@ export function ResetAllButton() {
                 <p className="text-sm font-bold text-slate-900 dark:text-white">{t('title')}</p>
                 <p className="text-xs text-slate-400 dark:text-white/40 mt-0.5">{t('desc')}</p>
               </div>
-              <button onClick={handleClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white/70 hover:bg-slate-100 dark:hover:bg-white/8 transition-all flex-shrink-0">
+              <button onClick={handleClose} className="w-7 h-7 flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white/70 hover:bg-slate-100 dark:hover:bg-white/8 active:scale-[0.90] transition-all duration-100 flex-shrink-0">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -65,12 +65,12 @@ export function ResetAllButton() {
 
             {!confirmed ? (
               <div className="flex gap-2 mt-3">
-                <button onClick={handleClose} className="flex-1 h-9 rounded-xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold border border-slate-200 dark:border-white/10 transition-all">
+                <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-slate-200 dark:border-white/10">
                   {tc('cancel')}
                 </button>
                 <button
                   onClick={() => setConfirmed(true)}
-                  className="flex-1 h-9 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-all"
+                  className="flex-1 h-10 rounded-2xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 active:scale-[0.97] transition-all duration-100"
                 >
                   {t('deleteAll')}
                 </button>
@@ -84,14 +84,14 @@ export function ResetAllButton() {
                   <p className="text-xs font-semibold text-red-700 dark:text-red-400">{t('confirmWarning')}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={handleClose} className="flex-1 h-9 rounded-xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold border border-slate-200 dark:border-white/10 transition-all">
+                  <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-slate-200 dark:border-white/10">
                     {tc('cancel')}
                   </button>
                   <button
                     onClick={() => mutation.mutate()}
                     disabled={mutation.isPending}
                     className={cn(
-                      'flex-1 h-9 rounded-xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-all',
+                      'flex-1 h-10 rounded-2xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 active:scale-[0.97] transition-all duration-100',
                       mutation.isPending && 'opacity-60',
                     )}
                   >

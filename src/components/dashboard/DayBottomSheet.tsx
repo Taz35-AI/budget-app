@@ -107,7 +107,7 @@ export function DayBottomSheet({
       {/* Backdrop */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 native-backdrop z-40 transition-opacity duration-300 lg:hidden',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
         onClick={onClose}
@@ -117,7 +117,7 @@ export function DayBottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          'fixed inset-x-0 top-0 z-50 rounded-b-3xl shadow-2xl',
+          'fixed inset-x-0 top-0 z-50 rounded-b-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]',
           'bg-white dark:bg-[#0F0F1A]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
           'max-h-[92dvh]',
@@ -131,7 +131,7 @@ export function DayBottomSheet({
           <div className="w-8" />
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/50 active:bg-slate-200 dark:active:bg-white/20 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/50 active:bg-slate-200 dark:active:bg-white/20 active:scale-[0.96] transition-all duration-100"
             aria-label={tc('close')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -154,23 +154,25 @@ export function DayBottomSheet({
               <>
                 {/* Account picker — only when 2+ accounts */}
                 {showAccountPicker && (
-                  <div className="flex gap-1.5 flex-wrap mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.07]">
-                    <p className="w-full text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{t('addToAccount')}</p>
-                    {accounts!.map((acct) => (
-                      <button
-                        key={acct.id}
-                        type="button"
-                        onClick={() => setFormAccountId(acct.id)}
-                        className={cn(
-                          'h-7 px-3 rounded-lg text-[11px] font-semibold transition-all border',
-                          formAccountId === acct.id
-                            ? 'bg-brand-primary text-white border-brand-primary'
-                            : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
-                        )}
-                      >
-                        {acct.name}
-                      </button>
-                    ))}
+                  <div className="mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.07]">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-1.5">{t('addToAccount')}</p>
+                    <div className="flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
+                      {accounts!.map((acct) => (
+                        <button
+                          key={acct.id}
+                          type="button"
+                          onClick={() => setFormAccountId(acct.id)}
+                          className={cn(
+                            'flex-1 h-7 px-3 rounded-[14px] text-[11px] font-semibold transition-all duration-100 active:scale-[0.96]',
+                            formAccountId === acct.id
+                              ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                              : 'text-slate-500 dark:text-white/40',
+                          )}
+                        >
+                          {acct.name}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
                 <TransactionForm
@@ -218,7 +220,7 @@ export function DayBottomSheet({
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="w-10 h-1 rounded-full bg-slate-200 dark:bg-white/20" />
+          <div className="w-10 h-[5px] rounded-full bg-black/15 dark:bg-white/20" />
         </div>
       </div>
     </>
