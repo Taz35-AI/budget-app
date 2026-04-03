@@ -343,12 +343,18 @@
     "goToSettings": "Ir a Ajustes",
     "step1Title": "Estadísticas en vivo",
     "step1Content": "Estas 4 tarjetas se actualizan en tiempo real — tu saldo hoy, más ingresos, gastos y neto mensual.",
-    "step2Title": "Ajustar saldo",
-    "step2Content": "Escribe tu saldo bancario real y crearemos automáticamente una transacción de corrección.",
+    "step2Title": "Establece tu saldo primero",
+    "step2Content": "Toca el botón resaltado e introduce tu saldo bancario real. Esto ancla todos los cálculos — hazlo antes que nada.",
     "step3Title": "Límite de presupuesto",
     "step3Content": "Establece un tope de gasto mensual. Una barra de progreso se llena al gastar y se pone roja al acercarte al límite.",
     "step4Title": "¡Todo listo!",
-    "step4Content": "Ve a Ajustes para añadir etiquetas personalizadas, plantillas recurrentes y objetivos de ahorro."
+    "step4Content": "Explora Ajustes para configurar cuentas, etiquetas personalizadas, plantillas recurrentes y objetivos de ahorro.",
+    "step5Title": "Importa tu historial bancario",
+    "step5Content": "¿Ya tienes meses de transacciones? Exporta un CSV de tu banco y Spentum lo categorizará todo en segundos.",
+    "step6Title": "Informes mensuales",
+    "step6Content": "Cada mes completado tiene un informe completo — gastos por categoría, principales transacciones, tasa de ahorro y consejos de IA.",
+    "goToImport": "Ir a Importar",
+    "goToReports": "Ir a Informes"
   },
   "notifications": {
     "dailyReminder": "Recordatorio diario",

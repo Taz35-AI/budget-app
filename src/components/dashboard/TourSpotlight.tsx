@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 type Rect = { top: number; left: number; width: number; height: number };
 
 interface Props {
-  step: number; // 2 | 3 | 4 | 5
+  step: number; // 2..7
   onNext: () => void;
   onDone: () => void;
 }
@@ -16,17 +16,31 @@ const PAD = 8;
 
 export function TourSpotlight({ step, onNext, onDone }: Props) {
   const t = useTranslations('tour');
-  const stepIdx = step - 2; // 0..3
-  const isLast = stepIdx === 3;
+  const stepIdx = step - 2; // 0..5
   const [rect, setRect] = useState<Rect | null>(null);
 
-  const STEPS = [
-    { targetId: 'tour-stats',  title: t('step1Title'), content: t('step1Content') },
+  const STEPS: Array<{
+    targetId: string | null;
+    title: string;
+    content: string;
+    link?: string;
+    linkLabel?: string;
+  }> = [
+    // ── 1. Adjust Balance — most important, shown first ──────────────────────
     { targetId: 'tour-adjust', title: t('step2Title'), content: t('step2Content') },
+    // ── 2. Live stats ────────────────────────────────────────────────────────
+    { targetId: 'tour-stats',  title: t('step1Title'), content: t('step1Content') },
+    // ── 3. Budget limit ──────────────────────────────────────────────────────
     { targetId: 'tour-budget', title: t('step3Title'), content: t('step3Content') },
-    { targetId: null,          title: t('step4Title'), content: t('step4Content') },
+    // ── 4. Import CSV (info card) ─────────────────────────────────────────────
+    { targetId: null, title: t('step5Title'), content: t('step5Content'), link: '/import',  linkLabel: t('goToImport')  },
+    // ── 5. Reports (info card) ───────────────────────────────────────────────
+    { targetId: null, title: t('step6Title'), content: t('step6Content'), link: '/reports', linkLabel: t('goToReports') },
+    // ── 6. All set ───────────────────────────────────────────────────────────
+    { targetId: null, title: t('step4Title'), content: t('step4Content') },
   ];
 
+  const isLast  = stepIdx === STEPS.length - 1;
   const current = STEPS[stepIdx];
 
   const measure = useCallback(() => {
@@ -160,12 +174,23 @@ export function TourSpotlight({ step, onNext, onDone }: Props) {
               </Link>
             </div>
           ) : (
-            <button
-              onClick={onNext}
-              className="w-full h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
-            >
-              {t('next')}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={onNext}
+                className="flex-1 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+              >
+                {t('next')}
+              </button>
+              {current.link && current.linkLabel && (
+                <Link
+                  href={current.link}
+                  onClick={onDone}
+                  className="flex-1 h-8 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors flex items-center justify-center"
+                >
+                  {current.linkLabel}
+                </Link>
+              )}
+            </div>
           )}
         </div>
       </div>

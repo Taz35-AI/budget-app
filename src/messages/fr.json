@@ -343,12 +343,18 @@
     "goToSettings": "Aller aux paramètres",
     "step1Title": "Stats en direct",
     "step1Content": "Ces 4 cartes se mettent à jour en temps réel — votre solde aujourd'hui, plus revenus, dépenses et net mensuel.",
-    "step2Title": "Ajuster le solde",
-    "step2Content": "Saisissez votre solde bancaire réel et nous créerons automatiquement une transaction de correction.",
+    "step2Title": "Définissez votre solde en premier",
+    "step2Content": "Appuyez sur le bouton mis en évidence et entrez votre vrai solde bancaire. Cela ancre tous les calculs — faites-le avant tout.",
     "step3Title": "Limite de budget",
     "step3Content": "Définissez un plafond de dépenses mensuel. Une barre de progression se remplit au fil de vos dépenses.",
     "step4Title": "Tout est prêt !",
-    "step4Content": "Allez dans Paramètres pour ajouter des tags personnalisés, des modèles récurrents et des objectifs d'épargne."
+    "step4Content": "Explorez les Paramètres pour configurer comptes, tags personnalisés, modèles récurrents et objectifs d'épargne.",
+    "step5Title": "Importez votre historique",
+    "step5Content": "Vous avez déjà des mois de transactions ? Exportez un CSV depuis votre banque et Spentum catégorisera tout en quelques secondes.",
+    "step6Title": "Rapports mensuels",
+    "step6Content": "Chaque mois terminé obtient un rapport complet — dépenses par catégorie, meilleures transactions, taux d'épargne et conseils IA.",
+    "goToImport": "Aller à l'import",
+    "goToReports": "Voir les rapports"
   },
   "notifications": {
     "dailyReminder": "Rappel quotidien",

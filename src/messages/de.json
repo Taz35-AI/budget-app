@@ -343,12 +343,18 @@
     "goToSettings": "Zu Einstellungen",
     "step1Title": "Live-Statistiken",
     "step1Content": "Diese 4 Karten aktualisieren sich in Echtzeit — Ihr heutiger Kontostand sowie monatliche Einnahmen, Ausgaben und Netto.",
-    "step2Title": "Kontostand anpassen",
-    "step2Content": "Geben Sie Ihren echten Bankkontostand ein und wir erstellen automatisch eine Korrekturtransaktion.",
+    "step2Title": "Erst Kontostand festlegen",
+    "step2Content": "Tippen Sie auf die markierte Schaltfläche und geben Sie Ihren echten Bankkontostand ein. Dies verankert jede Berechnung — tun Sie dies zuerst.",
     "step3Title": "Budgetlimit",
     "step3Content": "Legen Sie eine monatliche Ausgabenobergrenze fest. Ein Fortschrittsbalken füllt sich beim Ausgeben und wird rot, wenn Sie sich dem Limit nähern.",
     "step4Title": "Alles bereit!",
-    "step4Content": "Gehen Sie zu Einstellungen, um benutzerdefinierte Tags, wiederkehrende Vorlagen und Sparziele hinzuzufügen."
+    "step4Content": "Erkunden Sie Einstellungen für Konten, benutzerdefinierte Tags, wiederkehrende Vorlagen und Sparziele.",
+    "step5Title": "Kontohistorie importieren",
+    "step5Content": "Haben Sie bereits Monate an Transaktionen? Exportieren Sie eine CSV-Datei aus Ihrer Bank und Spentum kategorisiert alles in Sekunden.",
+    "step6Title": "Monatsberichte",
+    "step6Content": "Jeder abgeschlossene Monat erhält einen vollständigen Bericht — Ausgaben nach Kategorie, Top-Transaktionen, Sparquote und KI-gestützte Ratschläge.",
+    "goToImport": "Zum Import",
+    "goToReports": "Zu Berichten"
   },
   "notifications": {
     "dailyReminder": "Tägliche Erinnerung",

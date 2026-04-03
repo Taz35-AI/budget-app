@@ -343,12 +343,18 @@
     "goToSettings": "Go to Settings",
     "step1Title": "Live stats",
     "step1Content": "These 4 cards update in real time — your running balance today, plus monthly income, expenses, and net.",
-    "step2Title": "Adjust Balance",
-    "step2Content": "Type your real bank balance and we'll auto-create a correction transaction so the tracker stays accurate.",
+    "step2Title": "Set your balance first",
+    "step2Content": "Tap the highlighted button and enter your real bank balance. This anchors every calculation — do this before anything else.",
     "step3Title": "Budget Limit",
     "step3Content": "Set a monthly spending cap. A progress bar fills as you spend and turns red when you're close to the limit.",
     "step4Title": "You're all set!",
-    "step4Content": "Head to Settings to add custom tags, recurring templates, and savings goals."
+    "step4Content": "Explore Settings to set up accounts, custom tags, recurring templates, and savings goals. Everything is waiting for you.",
+    "step5Title": "Import your bank history",
+    "step5Content": "Already have months of transactions? Export a CSV from your bank and Spentum will auto-categorise everything in seconds.",
+    "step6Title": "Monthly reports",
+    "step6Content": "Every completed month gets a full report — spending by category, top transactions, savings rate, and AI-powered advice tailored to your numbers.",
+    "goToImport": "Go to Import",
+    "goToReports": "Go to Reports"
   },
   "notifications": {
     "dailyReminder": "Daily Reminder",

@@ -343,12 +343,18 @@
     "goToSettings": "Przejdź do ustawień",
     "step1Title": "Statystyki na żywo",
     "step1Content": "Te 4 karty aktualizują się w czasie rzeczywistym — Twoje saldo dziś, plus miesięczne przychody, wydatki i netto.",
-    "step2Title": "Koryguj saldo",
-    "step2Content": "Wpisz swoje rzeczywiste saldo bankowe, a my automatycznie utworzymy transakcję korygującą.",
+    "step2Title": "Najpierw ustaw saldo",
+    "step2Content": "Naciśnij podświetlony przycisk i wpisz rzeczywiste saldo bankowe. To punkt odniesienia dla wszystkich obliczeń — zrób to jako pierwsze.",
     "step3Title": "Limit budżetu",
     "step3Content": "Ustaw miesięczny limit wydatków. Pasek postępu wypełnia się wraz z wydatkami i czerwienieje blisko limitu.",
     "step4Title": "Wszystko gotowe!",
-    "step4Content": "Przejdź do Ustawień, aby dodać niestandardowe tagi, szablony cykliczne i cele oszczędnościowe."
+    "step4Content": "Przejrzyj Ustawienia, aby skonfigurować konta, tagi, szablony cykliczne i cele oszczędnościowe.",
+    "step5Title": "Importuj historię transakcji",
+    "step5Content": "Masz już miesiące transakcji? Wyeksportuj CSV ze swojego banku, a Spentum automatycznie wszystko skategoryzuje.",
+    "step6Title": "Raporty miesięczne",
+    "step6Content": "Każdy zakończony miesiąc otrzymuje pełny raport — wydatki według kategorii, najwyższe transakcje, stopę oszczędności i porady AI.",
+    "goToImport": "Przejdź do importu",
+    "goToReports": "Przejdź do raportów"
   },
   "notifications": {
     "dailyReminder": "Codzienne przypomnienie",

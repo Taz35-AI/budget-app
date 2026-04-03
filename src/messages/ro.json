@@ -343,12 +343,18 @@
     "goToSettings": "Mergi la Setări",
     "step1Title": "Statistici live",
     "step1Content": "Aceste 4 carduri se actualizează în timp real — soldul tău azi, plus venituri, cheltuieli și net lunar.",
-    "step2Title": "Ajustează soldul",
-    "step2Content": "Introdu soldul real din bancă și vom crea automat o tranzacție de corecție.",
+    "step2Title": "Setează-ți soldul mai întâi",
+    "step2Content": "Apasă butonul evidențiat și introdu soldul real din bancă. Acesta ancorează toate calculele — fă asta înainte de orice altceva.",
     "step3Title": "Limită buget",
     "step3Content": "Setează un plafon lunar de cheltuieli. O bară de progres se umple pe măsură ce cheltuiești.",
     "step4Title": "Ești gata!",
-    "step4Content": "Mergi la Setări pentru a adăuga etichete personalizate, șabloane recurente și obiective de economii."
+    "step4Content": "Explorează Setările pentru conturi, etichete personalizate, șabloane recurente și obiective de economii.",
+    "step5Title": "Importă-ți istoricul bancar",
+    "step5Content": "Ai deja luni de tranzacții? Exportă un CSV din bancă și Spentum le va categoriza automat în câteva secunde.",
+    "step6Title": "Rapoarte lunare",
+    "step6Content": "Fiecare lună finalizată primește un raport complet — cheltuieli pe categorii, cele mai mari tranzacții, rata de economii și sfaturi AI.",
+    "goToImport": "Mergi la Import",
+    "goToReports": "Mergi la Rapoarte"
   },
   "notifications": {
     "dailyReminder": "Reminder zilnic",

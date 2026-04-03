@@ -194,16 +194,14 @@ export function DashboardShell() {
     return null;
   }, [balances, visibleMonth]);
 
-  // Onboarding tour: 0=tap day, 1=tap add, 2-5=spotlight tour, done=finished
-  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4 | 5 | 'done'>(() => {
+  // Onboarding tour: 0=tap day, 1=tap add, 2-7=spotlight tour (6 steps), done=finished
+  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 'done'>(() => {
     try { return localStorage.getItem('bt_onboarding') === 'done' ? 'done' : 0; } catch { return 0; }
   });
 
   const advanceTour = useCallback(() => {
     setOnboardingStep((s) => {
-      if (s === 2) return 3;
-      if (s === 3) return 4;
-      if (s === 4) return 5;
+      if (typeof s === 'number' && s >= 2 && s <= 6) return (s + 1) as 3 | 4 | 5 | 6 | 7;
       return s;
     });
   }, []);
@@ -777,7 +775,7 @@ export function DashboardShell() {
 
       {/* Spotlight tour — steps 2-5 */}
       {typeof onboardingStep === 'number' && onboardingStep >= 2 && (
-        <TourSpotlight step={onboardingStep as 2 | 3 | 4 | 5} onNext={advanceTour} onDone={finishTour} />
+        <TourSpotlight step={onboardingStep as 2 | 3 | 4 | 5 | 6 | 7} onNext={advanceTour} onDone={finishTour} />
       )}
 
       {/* Transfer modal */}
