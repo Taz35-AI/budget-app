@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useState } from 'react';
+import { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { format, addDays } from 'date-fns';
+import { format, addDays, getISOWeek, getWeek } from 'date-fns';
 import type { DateClickArg } from '@fullcalendar/interaction';
 import type { DayCellContentArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
 import { DayCellContent } from './DayCellContent';
@@ -65,6 +65,40 @@ export function CalendarView({
 
   const [monthTitle, setMonthTitle] = useState(() => { const n = new Date(); return `${longMonths[n.getMonth()]} ${n.getFullYear()}`; });
   const [showSwipeHint, setShowSwipeHint] = useState(false);
+
+  // Week number sidebar state
+  const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const [viewStart, setViewStart] = useState<Date | null>(null);
+  const [rowTops, setRowTops] = useState<{ top: number; height: number }[]>([]);
+
+  const weekNumbers = useMemo(() => {
+    if (!viewStart) return [];
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = addDays(viewStart, i * 7);
+      return firstDayOfWeek === 1
+        ? getISOWeek(d)
+        : getWeek(d, { weekStartsOn: 0, firstWeekContainsDate: 1 });
+    });
+  }, [viewStart, firstDayOfWeek]);
+
+  const measureRows = useCallback(() => {
+    const calEl = calendarRef.current?.getApi().el;
+    const containerEl = calendarContainerRef.current;
+    if (!calEl || !containerEl) return;
+    const rows = Array.from(calEl.querySelectorAll('.fc-daygrid-body table tbody tr'));
+    if (!rows.length) return;
+    const containerTop = containerEl.getBoundingClientRect().top;
+    setRowTops(rows.map((row) => {
+      const rect = (row as HTMLElement).getBoundingClientRect();
+      return { top: Math.round(rect.top - containerTop), height: Math.round(rect.height) };
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (!viewStart) return;
+    const t = setTimeout(measureRows, 60);
+    return () => clearTimeout(t);
+  }, [viewStart, measureRows]);
 
   // Navigate to today on mount
   useEffect(() => {
@@ -202,14 +236,36 @@ export function CalendarView({
       </div>
 
       {/* ── Calendar grid ────────────────────────────────────────────── */}
-      <div className="relative flex-1 min-h-0">
+      <div ref={calendarContainerRef} className="relative flex-1 min-h-0" style={{ paddingLeft: 22 }}>
+        {/* Week number sidebar — rendered as absolute labels in the left padding strip */}
+        {rowTops.map(({ top, height }, i) => {
+          if (i >= weekNumbers.length) return null;
+          return (
+            <div
+              key={i}
+              className="absolute pointer-events-none flex items-center justify-center"
+              style={{ left: 0, top, width: 20, height }}
+            >
+              <span
+                style={{
+                  fontSize: '0.5rem',
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  letterSpacing: '0.02em',
+                  color: 'rgba(4, 47, 46, 0.22)',
+                }}
+                className="dark:!text-teal-400/[0.18]"
+              >
+                {weekNumbers[i]}
+              </span>
+            </div>
+          );
+        })}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           firstDay={firstDayOfWeek}
-          weekNumbers={true}
-          weekNumberCalculation={firstDayOfWeek === 1 ? 'ISO' : 'local'}
           headerToolbar={false}
           height={calendarHeight}
           dateClick={handleDateClick}
@@ -238,6 +294,7 @@ export function CalendarView({
               lastReportedMonth.current = monthKey;
               onMonthChange(args.view.currentStart);
             }
+            setViewStart(args.view.activeStart);
           }}
           dayCellClassNames={(args) => {
             const dateStr = format(args.date, 'yyyy-MM-dd');
