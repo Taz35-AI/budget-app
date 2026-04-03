@@ -195,8 +195,13 @@ export function DashboardShell() {
   }, [balances, visibleMonth]);
 
   // Onboarding tour: 0=tap day, 1=tap add, 2-7=spotlight tour (6 steps), done=finished
+  // New users start at step 2 immediately so Adjust Balance is the very first thing they see
   const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 'done'>(() => {
-    try { return localStorage.getItem('bt_onboarding') === 'done' ? 'done' : 0; } catch { return 0; }
+    try {
+      const saved = localStorage.getItem('bt_onboarding');
+      if (saved === 'done') return 'done';
+      return 2;
+    } catch { return 2; }
   });
 
   const advanceTour = useCallback(() => {
