@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       .from('household_invites')
       .select('id')
       .eq('household_id', ctx.householdId)
-      .eq('email', email)
+      .eq('invited_email', email)
       .eq('status', 'pending')
       .gt('expires_at', new Date().toISOString())
       .single();
