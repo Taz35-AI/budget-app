@@ -31,7 +31,7 @@ export async function GET() {
     if (!accounts || accounts.length === 0) {
       const { data: created, error: createErr } = await supabase
         .from('budget_accounts')
-        .insert({ user_id: userId, household_id: householdId, created_by: userId, name: 'Main Account' })
+        .insert({ user_id: userId, household_id: householdId, name: 'Main Account' })
         .select()
         .single();
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('budget_accounts')
-      .insert({ user_id: userId, household_id: householdId, created_by: userId, name, type, credit_limit })
+      .insert({ user_id: userId, household_id: householdId, name, type, credit_limit })
       .select()
       .single();
 

@@ -1,41 +1,42 @@
-import { createAdminClient } from './supabase/admin';
-
 /**
- * Sends a broadcast message to all members of a household.
- * Called from API routes AFTER successful mutations.
- * Returns a promise that resolves once the broadcast is sent
- * (or after a timeout), so serverless functions stay alive
- * long enough for the message to actually be delivered.
+ * Sends a broadcast message to all members of a household via Supabase's
+ * Realtime REST API. Plain HTTP POST — no WebSocket handshake, no subscribe
+ * dance. Works reliably in serverless (Vercel) environments because it's
+ * just one fetch that completes before the function terminates.
  *
- * The browser clients subscribe to `household:{id}` and
- * invalidate React Query caches when they receive this.
+ * Browser clients subscribe to the `household:{id}` channel in HouseholdSync
+ * and invalidate React Query caches when the `data_changed` event arrives.
  */
-export function notifyHousehold(householdId: string, table: string): Promise<void> {
-  return new Promise((resolve) => {
-    try {
-      const supabase = createAdminClient();
-      const channel = supabase.channel(`household:${householdId}`);
-      const cleanup = () => {
-        supabase.removeChannel(channel);
-        resolve();
-      };
+export async function notifyHousehold(householdId: string, table: string): Promise<void> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const key = (serviceKey && serviceKey !== 'your-service-role-key-here')
+      ? serviceKey
+      : anonKey;
 
-      channel.subscribe((status) => {
-        if (status !== 'SUBSCRIBED') return;
-        channel
-          .send({
-            type: 'broadcast',
+    if (!url || !key) return;
+
+    await fetch(`${url}/realtime/v1/api/broadcast`, {
+      method: 'POST',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            topic: `household:${householdId}`,
             event: 'data_changed',
             payload: { table, ts: Date.now() },
-          })
-          .then(cleanup)
-          .catch(cleanup);
-      });
-
-      // Safety: don't hang forever if subscribe never fires
-      setTimeout(cleanup, 3000);
-    } catch {
-      resolve();
-    }
-  });
+            private: false,
+          },
+        ],
+      }),
+    });
+  } catch {
+    // best-effort — polling is the fallback
+  }
 }

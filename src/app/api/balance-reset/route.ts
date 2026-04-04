@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
     const insertPayload: Record<string, unknown> = {
       user_id: userId,
       household_id: householdId,
-      created_by: userId,
       reset_date: resetDate,
       account_id: accountId,
     };
