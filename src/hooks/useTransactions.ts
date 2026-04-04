@@ -24,7 +24,7 @@ export function useTransactions(opts?: { hasHousehold?: boolean }) {
     queryKey: QK,
     queryFn: fetchTransactions,
     staleTime: 0,
-    refetchInterval: opts?.hasHousehold ? 30_000 : false,
+    refetchInterval: opts?.hasHousehold ? 3_000 : false,
   });
 }
 
