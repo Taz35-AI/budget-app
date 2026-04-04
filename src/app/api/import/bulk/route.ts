@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 const VALID_CATEGORIES = ['income', 'expense'];
 const VALID_TYPES = ['one_off', 'recurring'];
@@ -11,8 +12,9 @@ const VALID_FREQUENCIES = ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly'
 // Returns: { inserted: number; errors: number }
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const { transactions } = await req.json() as { transactions: Record<string, unknown>[] };
     if (!Array.isArray(transactions) || transactions.length === 0) {
@@ -39,6 +41,8 @@ export async function POST(req: NextRequest) {
 
       rows.push({
         user_id: userId,
+        household_id: householdId,
+        created_by: userId,
         account_id: body.account_id || null,
         parent_id: body.parent_id || null,
         name,
@@ -64,6 +68,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ inserted: data?.length ?? 0, errors: skipped.length }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/import/bulk] unexpected error:', error);

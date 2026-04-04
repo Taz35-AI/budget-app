@@ -575,5 +575,39 @@
     "balance": "Heutiges Saldo",
     "lastTransaction": "Letzte Transaktion",
     "openApp": "Spentum öffnen"
+  },
+  "invite": {
+    "title": "Haushalt beitreten",
+    "subtitle": "Sie wurden eingeladen, einem gemeinsamen Haushalt beizutreten",
+    "yourName": "Ihr Name",
+    "namePlaceholder": "So sehen andere Sie",
+    "bringData": "Meine vorhandenen Daten mitbringen",
+    "bringDataDesc": "Transaktionen und Konten in den neuen Haushalt verschieben",
+    "acceptButton": "Einladung annehmen",
+    "accepting": "Wird angenommen…",
+    "successTitle": "Sie sind dabei!",
+    "redirecting": "Weiterleitung zum Dashboard…",
+    "invalidLink": "Ungültiger oder fehlender Einladungslink",
+    "genericError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "sharing": {
+    "invitationFrom": "Einladung von {name}",
+    "acceptInvitation": "Einladung annehmen",
+    "declineInvitation": "Ablehnen",
+    "shareTitle": "Haushalt teilen",
+    "shareDesc": "Teilen Sie Ihr Budget mit Familie oder Mitbewohnern",
+    "roleOwner": "Eigentümer",
+    "roleMember": "Mitglied",
+    "inviteEmailPlaceholder": "E-Mail-Adresse",
+    "nicknamePlaceholder": "Spitzname (optional)",
+    "invite": "Einladen",
+    "pendingInvitations": "Ausstehende Einladungen",
+    "revoke": "Widerrufen",
+    "members": "Mitglieder",
+    "removeMember": "Entfernen",
+    "removeConfirm": "Dieses Mitglied aus dem Haushalt entfernen?",
+    "inviteSent": "Einladung gesendet",
+    "you": "Du",
+    "noMembers": "Noch keine weiteren Mitglieder"
   }
 }

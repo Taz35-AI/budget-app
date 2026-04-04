@@ -575,5 +575,39 @@
     "balance": "Soldul de azi",
     "lastTransaction": "Ultima tranzacție",
     "openApp": "Deschide Spentum"
+  },
+  "invite": {
+    "title": "Alătură-te gospodăriei",
+    "subtitle": "Ai fost invitat să te alături unei gospodării comune",
+    "yourName": "Numele tău",
+    "namePlaceholder": "Cum te vor vedea ceilalți",
+    "bringData": "Adu datele mele existente",
+    "bringDataDesc": "Mută tranzacțiile și conturile tale în noua gospodărie",
+    "acceptButton": "Acceptă invitația",
+    "accepting": "Se acceptă…",
+    "successTitle": "Ești înăuntru!",
+    "redirecting": "Redirecționare către panou…",
+    "invalidLink": "Link de invitație invalid sau lipsă",
+    "genericError": "Ceva nu a mers bine. Încearcă din nou."
+  },
+  "sharing": {
+    "invitationFrom": "Invitație de la {name}",
+    "acceptInvitation": "Acceptă invitația",
+    "declineInvitation": "Refuză",
+    "shareTitle": "Partajare gospodărie",
+    "shareDesc": "Partajează bugetul cu familia sau colegii de apartament",
+    "roleOwner": "Proprietar",
+    "roleMember": "Membru",
+    "inviteEmailPlaceholder": "Adresă de e-mail",
+    "nicknamePlaceholder": "Poreclă (opțional)",
+    "invite": "Invită",
+    "pendingInvitations": "Invitații în așteptare",
+    "revoke": "Revocă",
+    "members": "Membri",
+    "removeMember": "Elimină",
+    "removeConfirm": "Elimini acest membru din gospodărie?",
+    "inviteSent": "Invitație trimisă",
+    "you": "Tu",
+    "noMembers": "Niciun alt membru încă"
   }
 }

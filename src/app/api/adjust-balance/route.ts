@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { format } from 'date-fns';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 /**
  * POST /api/adjust-balance
@@ -13,8 +14,9 @@ import { getAuthUserId } from '@/lib/auth';
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const { desiredBalance, currentBalance, accountId } = await req.json();
 
@@ -30,6 +32,8 @@ export async function POST(req: NextRequest) {
       .from('transactions')
       .insert({
         user_id: userId,
+        household_id: householdId,
+        created_by: userId,
         account_id: accountId || null,
         name: 'Balance Adjustment',
         amount: Math.abs(delta),
@@ -45,6 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ transaction: data, delta });
   } catch (err) {
     console.error('[POST /api/adjust-balance] unexpected:', err);

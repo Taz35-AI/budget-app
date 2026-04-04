@@ -3,7 +3,7 @@ import { format, addDays } from 'date-fns';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { computeBalances } from '@/engine/balanceEngine';
 import { SEVEN_YEARS_DAYS } from '@/lib/constants';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
 import type { Transaction, TransactionException } from '@/types';
 
 export async function GET(req: NextRequest) {
@@ -17,8 +17,9 @@ export async function GET(req: NextRequest) {
     const fromDate = from ?? format(today, 'yyyy-MM-dd');
     const toDate = to ?? format(addDays(today, SEVEN_YEARS_DAYS), 'yyyy-MM-dd');
 
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const supabase = createAdminClient();
 
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
     const { data: cached } = await supabase
       .from('daily_balance_cache')
       .select('date, balance')
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .gte('date', fromDate)
       .lte('date', toDate)
       .order('date', { ascending: true });
@@ -49,20 +50,20 @@ export async function GET(req: NextRequest) {
       supabase
         .from('transactions')
         .select('*')
-        .eq('user_id', userId),
+        .eq('household_id', householdId),
       supabase
         .from('transaction_exceptions')
         .select('*')
         .in(
           'transaction_id',
           // sub-select would be cleaner but this works for now
-          (await supabase.from('transactions').select('id').eq('user_id', userId))
+          (await supabase.from('transactions').select('id').eq('household_id', householdId))
             .data?.map((t) => t.id) ?? [],
         ),
       supabase
         .from('balance_resets')
         .select('reset_date')
-        .eq('user_id', userId)
+        .eq('household_id', householdId)
         .order('reset_date', { ascending: false })
         .limit(1),
     ]);
@@ -86,7 +87,7 @@ export async function GET(req: NextRequest) {
     });
 
     // ── 3. Write to cache asynchronously (don't block response) ─────────
-    void writeToCache(userId, result);
+    void writeToCache(householdId, result);
 
     return NextResponse.json({ balances: result, source: 'computed' });
   } catch (error) {
@@ -95,11 +96,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-async function writeToCache(userId: string, balances: Record<string, number>) {
+async function writeToCache(householdId: string, balances: Record<string, number>) {
   try {
     const supabase = createAdminClient();
     const rows = Object.entries(balances).map(([date, balance]) => ({
-      user_id: userId,
+      household_id: householdId,
       date,
       balance,
     }));
@@ -109,14 +110,14 @@ async function writeToCache(userId: string, balances: Record<string, number>) {
     for (let i = 0; i < rows.length; i += chunkSize) {
       await supabase
         .from('daily_balance_cache')
-        .upsert(rows.slice(i, i + chunkSize), { onConflict: 'user_id,date' });
+        .upsert(rows.slice(i, i + chunkSize), { onConflict: 'household_id,date' });
     }
 
     await supabase
       .from('balance_cache_status')
       .upsert(
-        { user_id: userId, dirty_from: null, is_computing: false, last_computed: new Date().toISOString() },
-        { onConflict: 'user_id' },
+        { household_id: householdId, dirty_from: null, is_computing: false, last_computed: new Date().toISOString() },
+        { onConflict: 'household_id' },
       );
   } catch (err) {
     console.error('Cache write error:', err);

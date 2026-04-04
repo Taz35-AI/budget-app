@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 export async function GET() {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const supabase = createAdminClient();
 
     const { data: transactions, error: txError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .order('created_at', { ascending: false });
 
     if (txError) {
@@ -41,8 +43,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const body = await req.json();
     const supabase = createAdminClient();
@@ -61,6 +64,8 @@ export async function POST(req: NextRequest) {
 
     const payload = {
       user_id: userId,
+      household_id: householdId,
+      created_by: userId,
       account_id: body.account_id || null,
       parent_id: body.parent_id || null,
       name,
@@ -88,6 +93,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ transaction: data }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/transactions] unexpected error:', error);

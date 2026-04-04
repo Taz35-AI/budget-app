@@ -12,6 +12,8 @@ import {
 } from '@/lib/notificationScheduler';
 import type { NotifPermission } from '@/lib/notificationScheduler';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
+import { useHouseholdMembers, useHouseholdInvites, useCreateInvite, useRevokeInvite, useRemoveMember } from '@/hooks/useHousehold';
+import { memberColor } from '@/lib/memberUtils';
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
@@ -1104,6 +1106,172 @@ function AccountsSection() {
   );
 }
 
+// ─── Household sharing section ────────────────────────────────────────────────
+
+function HouseholdSharingSection() {
+  const t = useTranslations('sharing');
+  const tc = useTranslations('common');
+  const { data: hhData, isLoading: membersLoading } = useHouseholdMembers();
+  const { data: invites, isLoading: invitesLoading } = useHouseholdInvites();
+  const createInvite = useCreateInvite();
+  const revokeInvite = useRevokeInvite();
+  const removeMember = useRemoveMember();
+
+  const [email, setEmail] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
+
+  const members = hhData?.members ?? [];
+  const ownerRole = members.find((m) => m.role === 'owner');
+
+  const handleInvite = () => {
+    if (!email.trim()) return;
+    createInvite.mutate(
+      { email: email.trim(), displayName: displayName.trim() || undefined },
+      {
+        onSuccess: () => {
+          setEmail('');
+          setDisplayName('');
+        },
+      },
+    );
+  };
+
+  const pendingInvites = (invites ?? []).filter((inv) => inv.status === 'pending');
+
+  return (
+    <SettingsCard
+      title={t('shareTitle')}
+      subtitle={t('shareDesc')}
+      accent="bg-gradient-to-r from-violet-500 to-purple-400"
+    >
+      {/* Members list */}
+      <div className="mb-4">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">{t('members')}</p>
+        {membersLoading ? (
+          <div className="h-8 rounded-xl bg-slate-100 dark:bg-white/[0.05] animate-pulse" />
+        ) : members.length <= 1 ? (
+          <p className="text-xs text-slate-400 dark:text-white/35">{t('noMembers')}</p>
+        ) : (
+          <ul className="flex flex-col gap-1.5">
+            {members.map((m) => (
+              <li key={m.user_id} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-100 dark:border-white/[0.06]">
+                <span
+                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                  style={{ backgroundColor: memberColor(m.user_id) }}
+                >
+                  {(m.display_name ?? m.email ?? '?')[0].toUpperCase()}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-brand-text dark:text-white truncate">
+                    {m.display_name ?? m.email}
+                    {m.user_id === ownerRole?.user_id && (
+                      <span className="ml-1.5 text-[9px] font-bold uppercase tracking-wider text-violet-500">{t('roleOwner')}</span>
+                    )}
+                  </p>
+                  {m.display_name && m.email && (
+                    <p className="text-[10px] text-slate-400 dark:text-white/30 truncate">{m.email}</p>
+                  )}
+                </div>
+                {/* Remove button (owner can remove others) */}
+                {ownerRole && m.user_id !== ownerRole.user_id && (
+                  removeConfirmId === m.user_id ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => removeMember.mutate(m.user_id, { onSuccess: () => setRemoveConfirmId(null) })}
+                        className="text-[10px] font-semibold text-red-500 hover:text-red-600 px-2 py-0.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30"
+                      >
+                        {t('removeMember')}
+                      </button>
+                      <button
+                        onClick={() => setRemoveConfirmId(null)}
+                        className="text-[10px] text-slate-400 hover:text-slate-600 px-1.5"
+                      >
+                        {tc('cancel')}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setRemoveConfirmId(m.user_id)}
+                      className="text-[10px] font-medium text-slate-400 dark:text-white/30 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2 py-0.5"
+                    >
+                      {t('removeMember')}
+                    </button>
+                  )
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Invite form */}
+      <div className="mb-4 pb-4 border-b border-slate-100 dark:border-white/[0.07]">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t('inviteEmailPlaceholder')}
+            className="flex-1 h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
+          />
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder={t('nicknamePlaceholder')}
+            className="sm:w-36 h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
+          />
+          <button
+            onClick={handleInvite}
+            disabled={createInvite.isPending || !email.trim()}
+            className={cn(
+              'h-9 px-4 rounded-xl text-sm font-semibold text-white transition-all',
+              createInvite.isPending || !email.trim()
+                ? 'bg-brand-primary/40 cursor-not-allowed'
+                : 'bg-brand-primary hover:bg-brand-primary/90 active:scale-[0.97]',
+            )}
+          >
+            {createInvite.isPending ? '...' : t('invite')}
+          </button>
+        </div>
+        {createInvite.isError && (
+          <p className="mt-2 text-xs text-red-500">{(createInvite.error as Error)?.message}</p>
+        )}
+        {createInvite.isSuccess && (
+          <p className="mt-2 text-xs text-emerald-500 font-medium">{t('inviteSent')}</p>
+        )}
+      </div>
+
+      {/* Pending invitations */}
+      {pendingInvites.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-2">{t('pendingInvitations')}</p>
+          <ul className="flex flex-col gap-1.5">
+            {pendingInvites.map((inv) => (
+              <li key={inv.id} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-amber-50/60 dark:bg-amber-900/10 border border-amber-200/60 dark:border-amber-500/20">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-brand-text dark:text-white truncate">{inv.invited_email}</p>
+                  {inv.display_name && (
+                    <p className="text-[10px] text-slate-400 dark:text-white/30">{inv.display_name}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => revokeInvite.mutate(inv.id)}
+                  disabled={revokeInvite.isPending}
+                  className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2 py-0.5"
+                >
+                  {t('revoke')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </SettingsCard>
+  );
+}
+
 // ─── Notifications section ───────────────────────────────────────────────────
 
 function BackupSection() {
@@ -1504,7 +1672,12 @@ export function SettingsShell() {
           </>
         )}
 
-        {activeTab === 'accounts' && <AccountsSection />}
+        {activeTab === 'accounts' && (
+          <>
+            <AccountsSection />
+            <HouseholdSharingSection />
+          </>
+        )}
 
         {activeTab === 'tags' && <TagsSection />}
 

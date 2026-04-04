@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { format } from 'date-fns';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const body = await req.json().catch(() => ({}));
     const accountId: string | null = body.accountId ?? null;
@@ -18,12 +20,14 @@ export async function POST(req: NextRequest) {
     await supabase
       .from('daily_balance_cache')
       .delete()
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .gte('date', resetDate);
 
     // Insert reset marker (per-account or global)
     const insertPayload: Record<string, unknown> = {
       user_id: userId,
+      household_id: householdId,
+      created_by: userId,
       reset_date: resetDate,
       account_id: accountId,
     };
@@ -36,6 +40,7 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
+    notifyHousehold(householdId, 'balance_resets');
     return NextResponse.json({ reset: data });
   } catch (error) {
     console.error('POST /api/balance-reset error:', error);
@@ -45,8 +50,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const accountId = req.nextUrl.searchParams.get('accountId');
 
@@ -55,7 +61,7 @@ export async function GET(req: NextRequest) {
     let query = supabase
       .from('balance_resets')
       .select('*')
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .order('reset_date', { ascending: false })
       .limit(1);
 

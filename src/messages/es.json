@@ -575,5 +575,39 @@
     "balance": "Saldo de hoy",
     "lastTransaction": "Última transacción",
     "openApp": "Abrir Spentum"
+  },
+  "invite": {
+    "title": "Unirse al hogar",
+    "subtitle": "Has sido invitado a unirte a un hogar compartido",
+    "yourName": "Tu nombre",
+    "namePlaceholder": "Cómo te verán los demás",
+    "bringData": "Traer mis datos existentes",
+    "bringDataDesc": "Mover tus transacciones y cuentas al nuevo hogar",
+    "acceptButton": "Aceptar invitación",
+    "accepting": "Aceptando…",
+    "successTitle": "¡Estás dentro!",
+    "redirecting": "Redirigiendo al panel…",
+    "invalidLink": "Enlace de invitación inválido o faltante",
+    "genericError": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "sharing": {
+    "invitationFrom": "Invitación de {name}",
+    "acceptInvitation": "Aceptar invitación",
+    "declineInvitation": "Rechazar",
+    "shareTitle": "Compartir hogar",
+    "shareDesc": "Comparte tu presupuesto con familia o compañeros de piso",
+    "roleOwner": "Propietario",
+    "roleMember": "Miembro",
+    "inviteEmailPlaceholder": "Correo electrónico",
+    "nicknamePlaceholder": "Apodo (opcional)",
+    "invite": "Invitar",
+    "pendingInvitations": "Invitaciones pendientes",
+    "revoke": "Revocar",
+    "members": "Miembros",
+    "removeMember": "Eliminar",
+    "removeConfirm": "¿Eliminar a este miembro del hogar?",
+    "inviteSent": "Invitación enviada",
+    "you": "Tú",
+    "noMembers": "Aún no hay otros miembros"
   }
 }

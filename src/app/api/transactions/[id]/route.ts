@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 import { nextOccurrenceAfter } from '@/engine/recurringResolver';
 import type { Frequency } from '@/types';
 
@@ -76,7 +77,7 @@ async function getPaired(
   supabase: SupabaseClient,
   transferId: string | null | undefined,
   excludeId: string,
-  userId: string,
+  householdId: string,
 ): Promise<Record<string, unknown> | null> {
   if (!transferId) return null;
   const { data } = await supabase
@@ -84,7 +85,7 @@ async function getPaired(
     .select('*')
     .eq('transfer_id', transferId)
     .neq('id', excludeId)
-    .eq('user_id', userId)
+    .eq('household_id', householdId)
     .limit(1)
     .maybeSingle();
   if (!data) {
@@ -97,8 +98,9 @@ async function getPaired(
 
 export async function PATCH(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const { id } = await context.params;
     const body = await req.json();
@@ -114,7 +116,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       .from('transactions')
       .select('*')
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .single();
 
     if (fetchError || !original) {
@@ -122,7 +124,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     }
 
     // Fetch the paired transfer transaction (if this is part of a transfer pair).
-    const paired = await getPaired(supabase, original.transfer_id as string | null, id, userId);
+    const paired = await getPaired(supabase, original.transfer_id as string | null, id, householdId);
 
     // ── One-off OR edit entire series ─────────────────────────────────────
     if (original.type === 'one_off' || editMode === 'all') {
@@ -190,6 +192,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         }
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ transaction: data });
     }
 
@@ -206,7 +209,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       if ('category'   in updates) rowFields.category   = updates.category;
       if ('frequency'  in updates) rowFields.frequency  = updates.frequency;
       if (Object.keys(rowFields).length > 0) {
-        await supabase.from('transactions').update(rowFields).eq('id', id).eq('user_id', userId);
+        await supabase.from('transactions').update(rowFields).eq('id', id).eq('household_id', householdId);
       }
 
       // Mirror: update paired row-level fields (flipped category, same frequency, skip account_id).
@@ -215,7 +218,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         if ('category'  in updates) pairedRowFields.category  = flipCategory(updates.category as string);
         if ('frequency' in updates) pairedRowFields.frequency = updates.frequency;
         if (Object.keys(pairedRowFields).length > 0) {
-          await supabase.from('transactions').update(pairedRowFields).eq('id', paired.id as string).eq('user_id', userId);
+          await supabase.from('transactions').update(pairedRowFields).eq('id', paired.id as string).eq('household_id', householdId);
         }
       }
 
@@ -250,6 +253,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           .from('transactions')
           .insert({
             user_id: userId,
+            household_id: householdId,
+            created_by: userId,
             account_id: ('account_id' in updates ? updates.account_id : original.account_id) as string | null,
             parent_id: rootId,
             name: (updates.name as string) || original.name,
@@ -292,6 +297,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             .from('transactions')
             .insert({
               user_id: userId,
+              household_id: householdId,
+              created_by: userId,
               account_id: paired.account_id, // paired keeps its own account
               parent_id: pairedRootId,
               name: (updates.name as string) || paired.name,
@@ -312,6 +319,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           }
         }
 
+        notifyHousehold(householdId, 'transactions');
         return NextResponse.json({ success: true, mode: 'all_future_split', newTransaction: newTx });
       }
 
@@ -351,6 +359,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         }
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'all_future' });
     }
 
@@ -361,7 +370,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           .from('transactions')
           .update({ account_id: updates.account_id as string | null })
           .eq('id', id)
-          .eq('user_id', userId);
+          .eq('household_id', householdId);
       }
 
       const newDate = updates.newDate as string | undefined;
@@ -427,6 +436,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           .from('transactions')
           .insert({
             user_id: userId,
+            household_id: householdId,
+            created_by: userId,
             account_id: ('account_id' in updates ? updates.account_id : original.account_id) as string | null,
             parent_id: rootId,
             name: (updates.name as string) || original.name,
@@ -491,6 +502,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             .from('transactions')
             .insert({
               user_id: userId,
+              household_id: householdId,
+              created_by: userId,
               account_id: paired.account_id,
               parent_id: pairedRootId,
               name: (updates.name as string) || paired.name,
@@ -503,6 +516,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             });
         }
 
+        notifyHousehold(householdId, 'transactions');
         return NextResponse.json({ success: true, mode: 'this_only_moved', newTransaction: newTx, movedTo: newDate });
       }
 
@@ -590,6 +604,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           );
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }
 
@@ -604,8 +619,9 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
 export async function DELETE(req: NextRequest, context: RouteContext) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const { id } = await context.params;
     const { searchParams } = new URL(req.url);
@@ -618,7 +634,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       .from('transactions')
       .select('*')
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .single();
 
     if (fetchError || !original) {
@@ -626,7 +642,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
     }
 
     // Fetch the paired transfer transaction (if this is part of a transfer pair).
-    const paired = await getPaired(supabase, original.transfer_id as string | null, id, userId);
+    const paired = await getPaired(supabase, original.transfer_id as string | null, id, householdId);
 
     // ── One-off: simple single delete (even if it has parent_id) ─────────
     if (original.type === 'one_off') {
@@ -639,6 +655,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       if (paired) {
         await supabase.from('transactions').delete().eq('id', paired.id as string);
       }
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'hard_deleted' });
     }
 
@@ -653,7 +670,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         .from('transactions')
         .select('id')
         .or(`id.eq.${rootId},parent_id.eq.${rootId}`)
-        .eq('user_id', userId);
+        .eq('household_id', householdId);
 
       const familyIds = (family ?? []).map((t) => t.id);
       // Safety: make sure the triggered id is included even if query missed it.
@@ -670,7 +687,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         .from('transactions')
         .delete()
         .in('id', familyIds)
-        .eq('user_id', userId);
+        .eq('household_id', householdId);
 
       if (error) {
         console.error('[DELETE] family delete error:', error.message);
@@ -684,7 +701,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
           .from('transactions')
           .select('id')
           .or(`id.eq.${pairedRootId},parent_id.eq.${pairedRootId}`)
-          .eq('user_id', userId);
+          .eq('household_id', householdId);
 
         const pairedFamilyIds = (pairedFamily ?? []).map((t) => t.id as string);
         if (!pairedFamilyIds.includes(paired.id as string)) pairedFamilyIds.push(paired.id as string);
@@ -698,9 +715,10 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
           .from('transactions')
           .delete()
           .in('id', pairedFamilyIds)
-          .eq('user_id', userId);
+          .eq('household_id', householdId);
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'family_deleted', count: familyIds.length });
     }
 
@@ -741,6 +759,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         }
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'all_future' });
     }
 
@@ -829,6 +848,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
           );
       }
 
+      notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }
 

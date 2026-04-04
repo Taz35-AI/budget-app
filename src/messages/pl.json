@@ -575,5 +575,39 @@
     "balance": "Dzisiejsze saldo",
     "lastTransaction": "Ostatnia transakcja",
     "openApp": "Otwórz Spentum"
+  },
+  "invite": {
+    "title": "Dołącz do gospodarstwa",
+    "subtitle": "Zostałeś zaproszony do wspólnego gospodarstwa domowego",
+    "yourName": "Twoje imię",
+    "namePlaceholder": "Jak inni będą Cię widzieć",
+    "bringData": "Przenieś moje istniejące dane",
+    "bringDataDesc": "Przenieś transakcje i konta do nowego gospodarstwa",
+    "acceptButton": "Przyjmij zaproszenie",
+    "accepting": "Przyjmowanie…",
+    "successTitle": "Jesteś w środku!",
+    "redirecting": "Przekierowanie do panelu…",
+    "invalidLink": "Nieprawidłowy lub brakujący link zaproszenia",
+    "genericError": "Coś poszło nie tak. Spróbuj ponownie."
+  },
+  "sharing": {
+    "invitationFrom": "Zaproszenie od {name}",
+    "acceptInvitation": "Przyjmij zaproszenie",
+    "declineInvitation": "Odrzuć",
+    "shareTitle": "Udostępnianie gospodarstwa",
+    "shareDesc": "Udostępnij budżet rodzinie lub współlokatorom",
+    "roleOwner": "Właściciel",
+    "roleMember": "Członek",
+    "inviteEmailPlaceholder": "Adres e-mail",
+    "nicknamePlaceholder": "Pseudonim (opcjonalnie)",
+    "invite": "Zaproś",
+    "pendingInvitations": "Oczekujące zaproszenia",
+    "revoke": "Cofnij",
+    "members": "Członkowie",
+    "removeMember": "Usuń",
+    "removeConfirm": "Usunąć tego członka z gospodarstwa?",
+    "inviteSent": "Zaproszenie wysłane",
+    "you": "Ty",
+    "noMembers": "Brak innych członków"
   }
 }

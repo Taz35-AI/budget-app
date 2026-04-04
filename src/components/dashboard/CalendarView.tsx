@@ -12,7 +12,8 @@ import { DayCellContent } from './DayCellContent';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
-import type { DayTransaction, BudgetAccount } from '@/types';
+import { accountDisplayName } from '@/lib/memberUtils';
+import type { DayTransaction, BudgetAccount, HouseholdMember } from '@/types';
 
 export interface CalendarNavHandle {
   today: () => void;
@@ -37,6 +38,9 @@ interface Props {
   calendarHeight?: string | number;
   // Dates that match the active search query — highlighted amber on the calendar
   matchingDates?: Set<string>;
+  // Household
+  myUserId?: string | null;
+  members?: HouseholdMember[];
 }
 
 export function CalendarView({
@@ -54,6 +58,8 @@ export function CalendarView({
   calendarNavRef,
   calendarHeight = 'auto',
   matchingDates,
+  myUserId,
+  members,
 }: Props) {
   const { selection } = useHaptics();
   const tMonths = useTranslations('months');
@@ -213,7 +219,7 @@ export function CalendarView({
                     : 'bg-transparent text-brand-text/50 dark:text-white/40',
                 )}
               >
-                {acct.name}
+                {accountDisplayName(acct, myUserId, members)}
               </button>
             ))}
           </div>

@@ -575,5 +575,39 @@
     "balance": "Solde du jour",
     "lastTransaction": "Dernière transaction",
     "openApp": "Ouvrir Spentum"
+  },
+  "invite": {
+    "title": "Rejoindre le foyer",
+    "subtitle": "Vous avez été invité à rejoindre un foyer partagé",
+    "yourName": "Votre nom",
+    "namePlaceholder": "Comment les autres vous verront",
+    "bringData": "Apporter mes données existantes",
+    "bringDataDesc": "Déplacer vos transactions et comptes vers le nouveau foyer",
+    "acceptButton": "Accepter l'invitation",
+    "accepting": "Acceptation…",
+    "successTitle": "Vous êtes dedans !",
+    "redirecting": "Redirection vers le tableau de bord…",
+    "invalidLink": "Lien d'invitation invalide ou manquant",
+    "genericError": "Une erreur est survenue. Veuillez réessayer."
+  },
+  "sharing": {
+    "invitationFrom": "Invitation de {name}",
+    "acceptInvitation": "Accepter l'invitation",
+    "declineInvitation": "Refuser",
+    "shareTitle": "Partage du foyer",
+    "shareDesc": "Partagez votre budget avec votre famille ou vos colocataires",
+    "roleOwner": "Propriétaire",
+    "roleMember": "Membre",
+    "inviteEmailPlaceholder": "Adresse e-mail",
+    "nicknamePlaceholder": "Surnom (facultatif)",
+    "invite": "Inviter",
+    "pendingInvitations": "Invitations en attente",
+    "revoke": "Révoquer",
+    "members": "Membres",
+    "removeMember": "Supprimer",
+    "removeConfirm": "Supprimer ce membre du foyer ?",
+    "inviteSent": "Invitation envoyée",
+    "you": "Vous",
+    "noMembers": "Pas encore d'autres membres"
   }
 }

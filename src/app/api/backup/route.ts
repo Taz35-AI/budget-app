@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 // ─── GET — download full backup as JSON ───────────────────────────────────────
 
 export async function GET() {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const supabase = createAdminClient();
 
     const { data: transactions, error: txError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .order('created_at', { ascending: true });
 
     if (txError) return NextResponse.json({ error: txError.message }, { status: 500 });
@@ -49,8 +51,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const body = await req.json();
 
@@ -60,10 +63,12 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Force user_id to the authenticated user — prevents importing another user's data
+    // Stamp household_id + created_by on every imported transaction
     const txPayload = body.transactions.map((tx: Record<string, unknown>) => ({
       ...tx,
       user_id: userId,
+      household_id: householdId,
+      created_by: userId,
     }));
 
     const { error: txError } = await supabase
@@ -78,7 +83,6 @@ export async function POST(req: NextRequest) {
     if (Array.isArray(body.exceptions) && body.exceptions.length > 0) {
       const excPayload = body.exceptions.map((ex: Record<string, unknown>) => ({
         ...ex,
-        user_id: userId,
       }));
       const { error: excError } = await supabase
         .from('transaction_exceptions')
@@ -90,6 +94,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ success: true, imported: txPayload.length });
   } catch (err) {
     console.error('[POST /api/backup]', err);

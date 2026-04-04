@@ -27,6 +27,8 @@ export type CurrencyCode =
 export interface Transaction {
   id: string;
   user_id: string;
+  household_id?: string | null;
+  created_by?: string | null;
   account_id?: string | null;
   parent_id?: string | null;
   transfer_id?: string | null;
@@ -76,6 +78,7 @@ export interface DayTransaction {
   transaction_id: string;
   account_id?: string | null;
   parent_id?: string | null;
+  created_by?: string | null;
   name: string;
   amount: number;
   category: TransactionCategory;
@@ -154,6 +157,7 @@ export interface Account {
 export interface BudgetAccount {
   id: string;
   user_id: string;
+  household_id?: string | null;
   name: string;
   type: AccountType;
   credit_limit?: number | null;
@@ -164,4 +168,27 @@ export interface BudgetAccount {
 export interface TagBudget {
   tagId: string;
   monthlyLimit: number;
+}
+
+// ─── Household types ─────────────────────────────────────────────────────────
+
+export interface HouseholdMember {
+  user_id: string;
+  household_id: string;
+  role: 'owner' | 'member';
+  display_name?: string | null;
+  joined_at: string;
+  email?: string;
+}
+
+export interface HouseholdInvite {
+  id: string;
+  household_id: string;
+  invited_by: string;
+  invited_email: string;
+  token: string;
+  status: 'pending' | 'accepted' | 'revoked';
+  display_name?: string | null;
+  created_at: string;
+  expires_at: string;
 }

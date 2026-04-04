@@ -9,6 +9,9 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useHouseholdMembers } from '@/hooks/useHousehold';
+import { accountDisplayName } from '@/lib/memberUtils';
+import { createClient } from '@/lib/supabase/client';
 import { CalendarView } from './CalendarView';
 import type { CalendarNavHandle } from './CalendarView';
 import { DayBottomSheet } from './DayBottomSheet';
@@ -70,8 +73,23 @@ export function DashboardShell() {
   const tTags = useTranslations('tags');
   const shortMonths = tMonths.raw('short') as string[];
 
+  // ── Auth user ───────────────────────────────────────────────────────────────
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setMyUserId(data.user.id);
+    });
+  }, []);
+
+  // ── Household ──────────────────────────────────────────────────────────────
+  const { data: hhData } = useHouseholdMembers();
+  const householdMembers = hhData?.members;
+  const hasHousehold = (householdMembers?.length ?? 0) > 1;
+
   // ── Accounts ────────────────────────────────────────────────────────────────
   const { data: accounts } = useAccounts();
+  const myAccounts = accounts?.filter((a) => a.user_id === myUserId);
   const [activeAccountId, setActiveAccountId] = useState<string>('combined');
 
   // Once accounts load, default to the first account (not combined) if there's only one account
@@ -86,7 +104,7 @@ export function DashboardShell() {
 
   // ── Balances & transactions ──────────────────────────────────────────────────
   const { balances, dayTransactions, isLoading } = useBalances(activeAccountId);
-  const { data: txData } = useTransactions();
+  const { data: txData } = useTransactions({ hasHousehold });
 
   // isEmpty: true only when the active account has no transactions
   const isEmpty = !isLoading && (
@@ -158,7 +176,7 @@ export function DashboardShell() {
   }, []);
 
   // Which account new transactions go to in the desktop panel
-  const defaultCreateAccountId = activeAccountId !== 'combined' ? activeAccountId : (accounts?.[0]?.id);
+  const defaultCreateAccountId = activeAccountId !== 'combined' ? activeAccountId : (myAccounts?.[0]?.id ?? accounts?.[0]?.id);
   const [desktopFormAccountId, setDesktopFormAccountId] = useState<string | undefined>(defaultCreateAccountId);
 
   // Re-sync when active tab changes or when the add form opens
@@ -657,6 +675,8 @@ export function DashboardShell() {
                   calendarNavRef={calendarNavRef}
                   calendarHeight={calendarHeight}
                   matchingDates={matchingDates}
+                  myUserId={myUserId}
+                  members={householdMembers}
                 />
               </div>
               {/* Step 0 tip — tap a day */}
@@ -733,7 +753,7 @@ export function DashboardShell() {
                                 : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
                             )}
                           >
-                            {acct.name}
+                            {accountDisplayName(acct, myUserId, householdMembers)}
                           </button>
                         ))}
                       </div>
@@ -769,6 +789,8 @@ export function DashboardShell() {
                     onTransfer={() => { setTransferDefaultToId(undefined); setShowTransferModal(true); }}
                     showTip={isEmpty && onboardingStep === 1}
                     accounts={accounts}
+                    members={householdMembers}
+                    myUserId={myUserId}
                   />
                 )}
               </div>
@@ -794,6 +816,8 @@ export function DashboardShell() {
           symbol={symbol}
           defaultToId={transferDefaultToId}
           onClose={() => { setShowTransferModal(false); setTransferDefaultToId(undefined); }}
+          myUserId={myUserId}
+          members={householdMembers}
         />
       )}
 
@@ -812,6 +836,8 @@ export function DashboardShell() {
         showTip={isEmpty && onboardingStep === 1}
         accountId={activeAccountId !== 'combined' ? activeAccountId : undefined}
         accounts={accounts}
+        members={householdMembers}
+        myUserId={myUserId}
       />
     </div>
     </AppLayout>

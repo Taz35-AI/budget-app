@@ -19,11 +19,12 @@ async function fetchTransactions(): Promise<TransactionsData> {
   return res.json();
 }
 
-export function useTransactions() {
+export function useTransactions(opts?: { hasHousehold?: boolean }) {
   return useQuery<TransactionsData>({
     queryKey: QK,
     queryFn: fetchTransactions,
     staleTime: 0,
+    refetchInterval: opts?.hasHousehold ? 30_000 : false,
   });
 }
 

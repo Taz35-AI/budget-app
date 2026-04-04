@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 /**
  * GET /api/accounts
- * Returns the user's accounts. Auto-creates a default "Main Account" if none exist,
+ * Returns the household's accounts. Auto-creates a default "Main Account" if none exist,
  * and backfills any un-assigned transactions to it.
  */
 export async function GET() {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const supabase = createAdminClient();
 
     let { data: accounts, error } = await supabase
       .from('budget_accounts')
       .select('*')
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -25,11 +27,11 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Auto-create a default account if the user has none
+    // Auto-create a default account if the household has none
     if (!accounts || accounts.length === 0) {
       const { data: created, error: createErr } = await supabase
         .from('budget_accounts')
-        .insert({ user_id: userId, name: 'Main Account' })
+        .insert({ user_id: userId, household_id: householdId, created_by: userId, name: 'Main Account' })
         .select()
         .single();
 
@@ -44,14 +46,14 @@ export async function GET() {
       await supabase
         .from('transactions')
         .update({ account_id: created.id })
-        .eq('user_id', userId)
+        .eq('household_id', householdId)
         .is('account_id', null);
 
       // Backfill balance_resets too
       await supabase
         .from('balance_resets')
         .update({ account_id: created.id })
-        .eq('user_id', userId)
+        .eq('household_id', householdId)
         .is('account_id', null);
     }
 
@@ -65,12 +67,13 @@ export async function GET() {
 /**
  * POST /api/accounts
  * Body: { name: string }
- * Creates a new account. Max 5 per user.
+ * Creates a new account. Max 5 per household.
  */
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const supabase = createAdminClient();
     const body = await req.json();
@@ -81,11 +84,11 @@ export async function POST(req: NextRequest) {
     const type = validTypes.includes(body.type) ? body.type : 'checking';
     const credit_limit = type === 'credit' && body.credit_limit > 0 ? Number(body.credit_limit) : null;
 
-    // Enforce max 5 accounts
+    // Enforce max 5 accounts per household
     const { count } = await supabase
       .from('budget_accounts')
       .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId);
+      .eq('household_id', householdId);
 
     if ((count ?? 0) >= 5) {
       return NextResponse.json({ error: 'Maximum of 5 accounts allowed' }, { status: 400 });
@@ -93,7 +96,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('budget_accounts')
-      .insert({ user_id: userId, name, type, credit_limit })
+      .insert({ user_id: userId, household_id: householdId, created_by: userId, name, type, credit_limit })
       .select()
       .single();
 
@@ -102,6 +105,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ account: data }, { status: 201 });
   } catch (err) {
     console.error('[POST /api/accounts] unexpected:', err);

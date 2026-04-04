@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 import { randomUUID } from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const body = await req.json();
     const { fromAccountId, toAccountId, amount, txType, date, startDate, frequency, expenseName, incomeName } = body;
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const transferId = randomUUID();
 
-    const sharedFields = { user_id: userId, transfer_id: transferId, amount: amt };
+    const sharedFields = { user_id: userId, household_id: householdId, created_by: userId, transfer_id: transferId, amount: amt };
     const dateFields = isRecurring
       ? { type: 'recurring', start_date: startDate, frequency }
       : { type: 'one_off', date };
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: incErr.message }, { status: 500 });
     }
 
+    notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ expense: expTx, income: incTx }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/transfers] unexpected error:', error);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthUserId } from '@/lib/auth';
+import { getAuthContext } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 /**
  * PATCH /api/accounts/[id]
@@ -9,8 +10,9 @@ import { getAuthUserId } from '@/lib/auth';
  */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { householdId } = ctx;
 
     const { id } = await params;
     const supabase = createAdminClient();
@@ -31,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       .from('budget_accounts')
       .update(updatePayload)
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('household_id', householdId)
       .select()
       .single();
 
@@ -41,6 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
+    notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ account: data });
   } catch (err) {
     console.error('[PATCH /api/accounts] unexpected:', err);
@@ -52,25 +55,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
  * DELETE /api/accounts/[id]
  * Deletes an account. Cascades to transactions and balance_resets via FK.
  * Prevented if this is the last account.
+ * Uses user_id check — only delete own accounts.
  */
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const userId = await getAuthUserId();
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const ctx = await getAuthContext();
+    if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { userId, householdId } = ctx;
 
     const { id } = await params;
     const supabase = createAdminClient();
 
-    // Prevent deleting the last account
+    // Prevent deleting the last account in the household
     const { count } = await supabase
       .from('budget_accounts')
       .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId);
+      .eq('household_id', householdId);
 
     if ((count ?? 0) <= 1) {
       return NextResponse.json({ error: 'Cannot delete your only account' }, { status: 400 });
     }
 
+    // Only delete own accounts (user_id = userId)
     const { error } = await supabase
       .from('budget_accounts')
       .delete()
@@ -82,6 +88,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[DELETE /api/accounts] unexpected:', err);

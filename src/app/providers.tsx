@@ -6,6 +6,7 @@ import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
 import { CapacitorAuthHandler } from '@/components/CapacitorAuthHandler';
+import { HouseholdSync } from '@/components/HouseholdSync';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 
@@ -119,6 +120,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <I18nProvider>
           <RealtimeSyncProvider>
             <SettingsSyncProvider>
+              <HouseholdSync />
               <RecoveryRedirectHandler />
               <KeyboardProvider />
               <CapacitorAuthHandler />

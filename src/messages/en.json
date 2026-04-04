@@ -575,5 +575,39 @@
     "balance": "Today's Balance",
     "lastTransaction": "Last Transaction",
     "openApp": "Open Spentum"
+  },
+  "invite": {
+    "title": "Join Household",
+    "subtitle": "You've been invited to join a shared household",
+    "yourName": "Your name",
+    "namePlaceholder": "How others will see you",
+    "bringData": "Bring my existing data",
+    "bringDataDesc": "Move your transactions and accounts to the new household",
+    "acceptButton": "Accept Invitation",
+    "accepting": "Accepting…",
+    "successTitle": "You're in!",
+    "redirecting": "Redirecting to dashboard…",
+    "invalidLink": "Invalid or missing invite link",
+    "genericError": "Something went wrong. Please try again."
+  },
+  "sharing": {
+    "invitationFrom": "Invitation from {name}",
+    "acceptInvitation": "Accept Invitation",
+    "declineInvitation": "Decline",
+    "shareTitle": "Household Sharing",
+    "shareDesc": "Share your budget with family or housemates",
+    "roleOwner": "Owner",
+    "roleMember": "Member",
+    "inviteEmailPlaceholder": "Email address",
+    "nicknamePlaceholder": "Nickname (optional)",
+    "invite": "Invite",
+    "pendingInvitations": "Pending Invitations",
+    "revoke": "Revoke",
+    "members": "Members",
+    "removeMember": "Remove",
+    "removeConfirm": "Remove this member from the household?",
+    "inviteSent": "Invite sent",
+    "you": "You",
+    "noMembers": "No other members yet"
   }
 }

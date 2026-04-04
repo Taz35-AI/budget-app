@@ -6,7 +6,8 @@ import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { cn } from '@/lib/utils';
-import type { BudgetAccount, DayTransaction, Transaction, TransactionFormValues } from '@/types';
+import { accountDisplayName } from '@/lib/memberUtils';
+import type { BudgetAccount, DayTransaction, HouseholdMember, Transaction, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string | null;
@@ -22,6 +23,8 @@ interface Props {
   showTip?: boolean;
   accountId?: string;
   accounts?: BudgetAccount[];
+  members?: HouseholdMember[];
+  myUserId?: string | null;
 }
 
 export function DayBottomSheet({
@@ -38,6 +41,8 @@ export function DayBottomSheet({
   showTip,
   accountId,
   accounts,
+  members,
+  myUserId,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef<number | null>(null);
@@ -169,7 +174,7 @@ export function DayBottomSheet({
                               : 'text-slate-500 dark:text-white/40',
                           )}
                         >
-                          {acct.name}
+                          {accountDisplayName(acct, myUserId, members)}
                         </button>
                       ))}
                     </div>
@@ -208,6 +213,8 @@ export function DayBottomSheet({
                 onTransfer={onTransfer}
                 showTip={showTip}
                 accounts={accounts}
+                members={members}
+                myUserId={myUserId}
               />
             )
           )}

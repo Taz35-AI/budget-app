@@ -5,7 +5,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import type { BudgetAccount, Frequency } from '@/types';
+import { accountDisplayName } from '@/lib/memberUtils';
+import type { BudgetAccount, Frequency, HouseholdMember } from '@/types';
 import { FREQUENCIES } from '@/lib/constants';
 
 interface Props {
@@ -14,9 +15,11 @@ interface Props {
   symbol: string;
   onClose: () => void;
   defaultToId?: string;
+  myUserId?: string | null;
+  members?: HouseholdMember[];
 }
 
-export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultToId }: Props) {
+export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultToId, myUserId, members }: Props) {
   const t = useTranslations('transfer');
   const tc = useTranslations('common');
   const qc = useQueryClient();
@@ -139,7 +142,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                 className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
               >
                 {accounts.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
+                  <option key={a.id} value={a.id}>{accountDisplayName(a, myUserId, members)}</option>
                 ))}
               </select>
             </div>
@@ -169,7 +172,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                 className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
               >
                 {accounts.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
+                  <option key={a.id} value={a.id}>{accountDisplayName(a, myUserId, members)}</option>
                 ))}
               </select>
             </div>

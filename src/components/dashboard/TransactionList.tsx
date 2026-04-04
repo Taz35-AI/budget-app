@@ -13,7 +13,8 @@ import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
 import { OnboardingTip } from './OnboardingTip';
-import type { BudgetAccount, DayTransaction, TransactionFormValues } from '@/types';
+import { memberColor } from '@/lib/memberUtils';
+import type { BudgetAccount, DayTransaction, HouseholdMember, TransactionFormValues } from '@/types';
 
 interface Props {
   date: string;
@@ -26,6 +27,8 @@ interface Props {
   onTransfer?: (defaultToId?: string) => void;
   showTip?: boolean;
   accounts?: BudgetAccount[];
+  members?: HouseholdMember[];
+  myUserId?: string | null;
 }
 
 type ActiveAction =
@@ -33,7 +36,7 @@ type ActiveAction =
   | { type: 'delete'; txId: string }
   | null;
 
-export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, onDuplicate, onTransfer, showTip, accounts }: Props) {
+export function TransactionList({ date, transactions, balance, formatAmount, symbol, onAddNew, onDuplicate, onTransfer, showTip, accounts, members, myUserId }: Props) {
   const t = useTranslations('transactions');
   const tc = useTranslations('common');
   const tTags = useTranslations('tags');
@@ -299,6 +302,23 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     'w-[3px] self-stretch rounded-full flex-shrink-0 min-h-[1.75rem]',
                     tx.category === 'income' ? 'bg-emerald-400' : 'bg-red-400',
                   )} />
+
+                  {/* Household member avatar badge */}
+                  {(members?.length ?? 0) > 1 && tx.created_by && (() => {
+                    const isMe = tx.created_by === myUserId;
+                    const member = members?.find((m) => m.user_id === tx.created_by);
+                    const initial = isMe ? 'Me' : (member?.display_name ?? member?.email ?? '?')[0].toUpperCase();
+                    const bg = isMe ? '#14b8a6' : memberColor(tx.created_by);
+                    return (
+                      <span
+                        className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+                        style={{ backgroundColor: bg }}
+                        title={isMe ? 'Me' : (member?.display_name ?? member?.email ?? undefined)}
+                      >
+                        {initial}
+                      </span>
+                    );
+                  })()}
 
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-800 dark:text-white/90 truncate">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
