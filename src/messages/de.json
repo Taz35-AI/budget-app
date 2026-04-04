@@ -73,6 +73,8 @@
     "duplicateAriaLabel": "Transaktion duplizieren",
     "deleteAriaLabel": "Transaktion löschen",
     "addToAccount": "Zum Konto hinzufügen",
+    "showAll": "Alle zeigen",
+    "showMineOnly": "Nur meine",
     "failedToSave": "Speichern fehlgeschlagen: {message}"
   },
   "transactionForm": {

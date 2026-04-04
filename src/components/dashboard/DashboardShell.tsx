@@ -180,10 +180,26 @@ export function DashboardShell() {
   const defaultCreateAccountId = activeAccountId !== 'combined' ? activeAccountId : (myAccounts?.[0]?.id ?? accounts?.[0]?.id);
   const [desktopFormAccountId, setDesktopFormAccountId] = useState<string | undefined>(defaultCreateAccountId);
 
+  // In a shared household, default to showing only the user's own accounts in the
+  // add-transaction picker. Toggle reveals other members' accounts when needed.
+  const [showAllAddAccounts, setShowAllAddAccounts] = useState(false);
+  const hasOtherAccounts = (accounts ?? []).some((a) => a.user_id !== myUserId);
+  const addPickerAccounts = (showAllAddAccounts || !hasHousehold || (myAccounts?.length ?? 0) === 0)
+    ? accounts
+    : myAccounts;
+
   // Re-sync when active tab changes or when the add form opens
   useEffect(() => {
     setDesktopFormAccountId(activeAccountId !== 'combined' ? activeAccountId : accounts?.[0]?.id);
   }, [activeAccountId, accounts, isAdding]);
+
+  // If the form's selected account got filtered out, switch to the first visible one
+  useEffect(() => {
+    if (!addPickerAccounts || addPickerAccounts.length === 0) return;
+    if (!addPickerAccounts.find((a) => a.id === desktopFormAccountId)) {
+      setDesktopFormAccountId(addPickerAccounts[0].id);
+    }
+  }, [addPickerAccounts, desktopFormAccountId]);
 
   const create = useOfflineCreate(desktopFormAccountId);
 
@@ -743,23 +759,36 @@ export function DashboardShell() {
                   <>
                     {/* Account picker — desktop, only when 2+ accounts */}
                     {(accounts?.length ?? 0) >= 2 && (
-                      <div className="flex gap-1 flex-wrap mb-2 pb-2 border-b border-slate-100 dark:border-white/[0.07]">
-                        <p className="w-full text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-0.5">{tt('addToAccount')}</p>
-                        {accounts!.map((acct) => (
-                          <button
-                            key={acct.id}
-                            type="button"
-                            onClick={() => setDesktopFormAccountId(acct.id)}
-                            className={cn(
-                              'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
-                              desktopFormAccountId === acct.id
-                                ? 'bg-brand-primary text-white border-brand-primary'
-                                : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
-                            )}
-                          >
-                            {accountDisplayName(acct, myUserId, householdMembers)}
-                          </button>
-                        ))}
+                      <div className="mb-2 pb-2 border-b border-slate-100 dark:border-white/[0.07]">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/30">{tt('addToAccount')}</p>
+                          {hasHousehold && hasOtherAccounts && (
+                            <button
+                              type="button"
+                              onClick={() => setShowAllAddAccounts((v) => !v)}
+                              className="text-[9px] font-bold uppercase tracking-wider text-brand-primary hover:text-brand-primary/80 transition-colors"
+                            >
+                              {showAllAddAccounts ? tt('showMineOnly') : tt('showAll')}
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex gap-1 flex-wrap">
+                          {(addPickerAccounts ?? []).map((acct) => (
+                            <button
+                              key={acct.id}
+                              type="button"
+                              onClick={() => setDesktopFormAccountId(acct.id)}
+                              className={cn(
+                                'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                                desktopFormAccountId === acct.id
+                                  ? 'bg-brand-primary text-white border-brand-primary'
+                                  : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                              )}
+                            >
+                              {accountDisplayName(acct, myUserId, householdMembers)}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                     <TransactionForm

@@ -61,6 +61,23 @@ export function DayBottomSheet({
   const t = useTranslations('transactions');
   const tc = useTranslations('common');
 
+  // Filter the account picker: default to my accounts in shared households,
+  // toggle to reveal all members' accounts.
+  const [showAllAddAccounts, setShowAllAddAccounts] = useState(false);
+  const hasHousehold = (members?.length ?? 0) > 1;
+  const myAccounts = (accounts ?? []).filter((a) => a.user_id === myUserId);
+  const hasOtherAccounts = (accounts ?? []).some((a) => a.user_id !== myUserId);
+  const addPickerAccounts = (showAllAddAccounts || !hasHousehold || myAccounts.length === 0)
+    ? accounts
+    : myAccounts;
+
+  useEffect(() => {
+    if (!addPickerAccounts || addPickerAccounts.length === 0) return;
+    if (!addPickerAccounts.find((a) => a.id === formAccountId)) {
+      setFormAccountId(addPickerAccounts[0].id);
+    }
+  }, [addPickerAccounts, formAccountId]);
+
   const create = useOfflineCreate(formAccountId);
   const showAccountPicker = (accounts?.length ?? 0) >= 2;
   const isOpen = date !== null;
@@ -160,9 +177,20 @@ export function DayBottomSheet({
                 {/* Account picker — only when 2+ accounts */}
                 {showAccountPicker && (
                   <div className="mb-3 pb-3 border-b border-slate-100 dark:border-white/[0.07]">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30 mb-1.5">{t('addToAccount')}</p>
-                    <div className="flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
-                      {accounts!.map((acct) => (
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-white/30">{t('addToAccount')}</p>
+                      {hasHousehold && hasOtherAccounts && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllAddAccounts((v) => !v)}
+                          className="text-[10px] font-bold uppercase tracking-wider text-brand-primary active:opacity-70 transition-opacity"
+                        >
+                          {showAllAddAccounts ? t('showMineOnly') : t('showAll')}
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5 flex-wrap">
+                      {(addPickerAccounts ?? []).map((acct) => (
                         <button
                           key={acct.id}
                           type="button"

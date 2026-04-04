@@ -73,6 +73,8 @@
     "duplicateAriaLabel": "Duplicar transacción",
     "deleteAriaLabel": "Eliminar transacción",
     "addToAccount": "Añadir a cuenta",
+    "showAll": "Mostrar todo",
+    "showMineOnly": "Solo míos",
     "failedToSave": "Error al guardar: {message}"
   },
   "transactionForm": {

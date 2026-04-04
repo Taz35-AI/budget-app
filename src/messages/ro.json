@@ -73,6 +73,8 @@
     "duplicateAriaLabel": "Duplică tranzacția",
     "deleteAriaLabel": "Șterge tranzacția",
     "addToAccount": "Adaugă la cont",
+    "showAll": "Arată toate",
+    "showMineOnly": "Doar ale mele",
     "failedToSave": "Eroare la salvare: {message}"
   },
   "transactionForm": {
