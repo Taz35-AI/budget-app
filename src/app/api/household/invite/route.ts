@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       .insert({
         household_id: ctx.householdId,
         invited_by: ctx.userId,
-        email,
+        invited_email: email,
         display_name: displayName,
         token,
         status: 'pending',
