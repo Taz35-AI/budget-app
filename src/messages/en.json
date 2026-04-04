@@ -313,6 +313,8 @@
     "totalBalance": "Total balance",
     "netWorth": "Net worth",
     "acrossAccounts": "{count, plural, one {Across # account} other {Across # accounts}}",
+    "groupMine": "Mine",
+    "groupOwner": "{name}'s accounts",
     "monthlyProjection": "Monthly projection",
     "typeChecking": "Debit Card",
     "typeSavings": "Savings",

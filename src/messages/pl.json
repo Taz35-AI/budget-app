@@ -313,6 +313,8 @@
     "totalBalance": "Łączne saldo",
     "netWorth": "Wartość netto",
     "acrossAccounts": "{count, plural, one {Na # koncie} few {Na # kontach} other {Na # kontach}}",
+    "groupMine": "Moje",
+    "groupOwner": "Konta {name}",
     "monthlyProjection": "Prognoza miesięczna",
     "typeChecking": "Karta debetowa",
     "typeSavings": "Oszczędnościowe",

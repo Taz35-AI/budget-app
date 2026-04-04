@@ -313,6 +313,8 @@
     "totalBalance": "Saldo total",
     "netWorth": "Patrimonio neto",
     "acrossAccounts": "{count, plural, one {# cuenta} other {# cuentas}}",
+    "groupMine": "Míos",
+    "groupOwner": "Cuentas de {name}",
     "monthlyProjection": "Proyección mensual",
     "typeChecking": "Tarjeta de débito",
     "typeSavings": "Ahorros",

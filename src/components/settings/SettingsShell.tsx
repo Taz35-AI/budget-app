@@ -13,7 +13,7 @@ import {
 import type { NotifPermission } from '@/lib/notificationScheduler';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 import { useHouseholdMembers, useHouseholdInvites, useCreateInvite, useRevokeInvite, useRemoveMember } from '@/hooks/useHousehold';
-import { memberColor, accountDisplayName } from '@/lib/memberUtils';
+import { memberColor, groupAccountsByOwner, memberShortName } from '@/lib/memberUtils';
 import { createClient } from '@/lib/supabase/client';
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -968,8 +968,10 @@ function AccountsSection() {
         <p className="text-xs text-red-500 mb-2">{error}</p>
       )}
 
-      <div className="flex flex-col gap-2 mb-3">
-        {accounts?.map((acct) => (
+      {(() => {
+        const groups = groupAccountsByOwner(accounts ?? [], myUserId, members);
+        const showHeaders = (members?.length ?? 0) > 1 && groups.some((g) => !g.isMine);
+        const rowsForGroup = (group: typeof groups[number]) => group.items.map((acct) => (
           <div key={acct.id} className="group rounded-xl border border-slate-100 dark:border-white/[0.06] bg-slate-50/50 dark:bg-white/[0.02] overflow-hidden">
             {editId === acct.id ? (
               <div className="p-2.5 flex flex-col gap-2">
@@ -1035,7 +1037,7 @@ function AccountsSection() {
                   acct.type === 'credit' ? 'bg-purple-400' : acct.type === 'savings' ? 'bg-emerald-400' : 'bg-teal-400',
                 )} />
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-slate-800 dark:text-white/90 truncate block">{accountDisplayName(acct, myUserId, members)}</span>
+                  <span className="text-sm font-medium text-slate-800 dark:text-white/90 truncate block">{acct.name}</span>
                   <span className="text-[10px] text-slate-400 dark:text-white/30">
                     {ta(`type${((acct.type ?? 'checking').charAt(0).toUpperCase() + (acct.type ?? 'checking').slice(1))}` as 'typeChecking')}
                     {acct.type === 'credit' && acct.credit_limit != null && ` · ${ta('creditLimit')} set`}
@@ -1064,8 +1066,26 @@ function AccountsSection() {
               </div>
             )}
           </div>
-        ))}
-      </div>
+        ));
+        return showHeaders ? (
+          <div className="flex flex-col gap-4 mb-3">
+            {groups.map((group) => (
+              <div key={group.userId || 'mine'} className="flex flex-col gap-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-white/40 px-1">
+                  {group.isMine ? ta('groupMine') : ta('groupOwner', { name: memberShortName(group.userId, members) ?? '—' })}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {rowsForGroup(group)}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 mb-3">
+            {groups.flatMap((g) => rowsForGroup(g))}
+          </div>
+        );
+      })()}
 
       {showAdd ? (
         <div className="flex flex-col gap-2 p-3 rounded-2xl border border-teal-400/30 bg-teal-50/30 dark:bg-teal-900/10">

@@ -10,7 +10,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { computeBalances } from '@/engine/balanceEngine';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
-import { accountDisplayName } from '@/lib/memberUtils';
+import { groupAccountsByOwner, memberShortName } from '@/lib/memberUtils';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import type { BudgetAccount, HouseholdMember } from '@/types';
@@ -420,6 +420,11 @@ export function AccountsShell() {
   const hasCredit = summaries.some(s => s.account.type === 'credit');
   const selectedSummary = summaries.find((s) => s.account.id === selectedId) ?? null;
 
+  // Group summaries by account owner
+  const summariesWithUser = summaries.map((s) => ({ ...s, user_id: s.account.user_id }));
+  const grouped = groupAccountsByOwner(summariesWithUser, myUserId, members);
+  const showGroupHeaders = (members?.length ?? 0) > 1 && grouped.length > 0 && grouped.some((g) => !g.isMine);
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
@@ -487,19 +492,47 @@ export function AccountsShell() {
             </div>
           )}
 
-          {/* Account cards */}
+          {/* Account cards — grouped by owner in shared households */}
           {!isLoading && summaries.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
-              {summaries.map((summary) => (
-                <AccountCard
-                  key={summary.account.id}
-                  summary={summary}
-                  formatAmount={formatAmount}
-                  displayName={accountDisplayName(summary.account, myUserId, members)}
-                  onClick={() => setSelectedId(summary.account.id)}
-                />
-              ))}
-            </div>
+            showGroupHeaders ? (
+              <div className="flex flex-col gap-5">
+                {grouped.map((group) => {
+                  const headerLabel = group.isMine
+                    ? t('groupMine')
+                    : t('groupOwner', { name: memberShortName(group.userId, members) ?? '—' });
+                  return (
+                    <div key={group.userId || 'mine'} className="flex flex-col gap-2">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-white/40 px-1">
+                        {headerLabel}
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+                        {group.items.map((summary) => (
+                          <AccountCard
+                            key={summary.account.id}
+                            summary={summary}
+                            formatAmount={formatAmount}
+                            displayName={summary.account.name}
+                            onClick={() => setSelectedId(summary.account.id)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+                {summaries.map((summary) => (
+                  <AccountCard
+                    key={summary.account.id}
+                    summary={summary}
+                    formatAmount={formatAmount}
+                    displayName={summary.account.name}
+                    onClick={() => setSelectedId(summary.account.id)}
+                  />
+                ))}
+              </div>
+            )
           )}
 
         </div>
@@ -509,7 +542,7 @@ export function AccountsShell() {
           <AccountDetailModal
             summary={selectedSummary}
             formatAmount={formatAmount}
-            displayName={accountDisplayName(selectedSummary.account, myUserId, members)}
+            displayName={selectedSummary.account.name}
             onClose={() => setSelectedId(null)}
           />
         )}

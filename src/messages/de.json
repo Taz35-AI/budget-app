@@ -313,6 +313,8 @@
     "totalBalance": "Gesamtkontostand",
     "netWorth": "Nettovermögen",
     "acrossAccounts": "{count, plural, one {Über # Konto} other {Über # Konten}}",
+    "groupMine": "Meine",
+    "groupOwner": "Konten von {name}",
     "monthlyProjection": "Monatliche Prognose",
     "typeChecking": "Debitkarte",
     "typeSavings": "Sparkonto",

@@ -313,6 +313,8 @@
     "totalBalance": "Sold total",
     "netWorth": "Avere netă",
     "acrossAccounts": "{count, plural, one {# cont} few {# conturi} other {# conturi}}",
+    "groupMine": "Ale mele",
+    "groupOwner": "Conturile lui {name}",
     "monthlyProjection": "Proiecție lunară",
     "typeChecking": "Card de debit",
     "typeSavings": "Economii",
