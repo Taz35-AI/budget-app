@@ -1093,7 +1093,7 @@ function AccountsSection() {
             </button>
           </div>
         </div>
-      ) : (accounts?.length ?? 0) < 5 ? (
+      ) : (accounts?.length ?? 0) < 10 ? (
         <AddRowBtn
           label={t('addAccount')}
           accentHover="hover:border-teal-400/60 hover:text-teal-600 dark:hover:text-teal-400"

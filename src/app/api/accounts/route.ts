@@ -84,14 +84,14 @@ export async function POST(req: NextRequest) {
     const type = validTypes.includes(body.type) ? body.type : 'checking';
     const credit_limit = type === 'credit' && body.credit_limit > 0 ? Number(body.credit_limit) : null;
 
-    // Enforce max 5 accounts per household
+    // Enforce max 10 accounts per household
     const { count } = await supabase
       .from('budget_accounts')
       .select('id', { count: 'exact', head: true })
       .eq('household_id', householdId);
 
-    if ((count ?? 0) >= 5) {
-      return NextResponse.json({ error: 'Maximum of 5 accounts allowed' }, { status: 400 });
+    if ((count ?? 0) >= 10) {
+      return NextResponse.json({ error: 'Maximum of 10 accounts allowed' }, { status: 400 });
     }
 
     const { data, error } = await supabase
