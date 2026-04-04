@@ -11,14 +11,20 @@ import { createAdminClient } from './supabase/admin';
 export function notifyHousehold(householdId: string, table: string) {
   try {
     const supabase = createAdminClient();
-    supabase
-      .channel(`household:${householdId}`)
-      .send({
-        type: 'broadcast',
-        event: 'data_changed',
-        payload: { table, ts: Date.now() },
-      })
-      .catch(() => {}); // best-effort, never throw
+    const channel = supabase.channel(`household:${householdId}`);
+    channel.subscribe((status) => {
+      if (status !== 'SUBSCRIBED') return;
+      channel
+        .send({
+          type: 'broadcast',
+          event: 'data_changed',
+          payload: { table, ts: Date.now() },
+        })
+        .then(() => supabase.removeChannel(channel))
+        .catch(() => supabase.removeChannel(channel));
+    });
+    // Safety: clean up if subscribe never fires
+    setTimeout(() => supabase.removeChannel(channel), 5000);
   } catch {
     // ignore — sync is best-effort, polling is the fallback
   }
