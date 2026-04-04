@@ -18,6 +18,15 @@ import { cn } from '@/lib/utils';
 // Max bar height in px — leaves room for net indicator above + label below
 const BAR_MAX_H = 128;
 
+const GOAL_PRESETS = [
+  { name: 'New Vehicle', icon: '\u{1F697}', color: '#3b82f6' },
+  { name: 'New Home', icon: '\u{1F3E0}', color: '#f97316' },
+  { name: 'Holiday Trip', icon: '\u2708\uFE0F', color: '#22c55e' },
+  { name: 'Education', icon: '\u{1F393}', color: '#6366f1' },
+  { name: 'Emergency Fund', icon: '\u{1F6E1}\uFE0F', color: '#a855f7' },
+  { name: 'Health Care', icon: '\u2764\uFE0F', color: '#ef4444' },
+];
+
 // ── Donut chart helpers ────────────────────────────────────────────────────────
 
 const CX = 90; const CY = 90; const R_OUT = 78; const R_IN = 52;
@@ -70,6 +79,7 @@ export function ReportsShell() {
   // ── Tag drill-down state ────────────────────────────────────────────────────
   const [selectedTagKey,  setSelectedTagKey]  = useState<string | null>(null);
   const [retaggingKey,    setRetaggingKey]    = useState<string | null>(null); // `${transaction_id}-${date}`
+  const [annualDrillTag,  setAnnualDrillTag]  = useState<string | null>(null);
   const updateTx = useUpdateTransaction();
 
   // ── Insights state ──────────────────────────────────────────────────────────
@@ -845,6 +855,7 @@ export function ReportsShell() {
                           onMouseEnter={() => setHoveredTag(seg.key)}
                           onMouseLeave={() => setHoveredTag(null)}
                           onTouchStart={() => setHoveredTag(seg.key === hoveredTag ? null : seg.key)}
+                          onClick={() => setAnnualDrillTag(seg.key)}
                         />
                       );
                     })}
@@ -872,6 +883,25 @@ export function ReportsShell() {
                         </text>
                       </>
                     )}
+
+                    {/* Percentage labels on outer edge */}
+                    {donutSegments.filter(s => s.pct >= 5).map((seg) => {
+                      const midAngle = (seg.startDeg + seg.endDeg) / 2;
+                      const labelR = R_OUT + 14;
+                      const pos = polar(CX, CY, labelR, midAngle);
+                      return (
+                        <text
+                          key={`lbl-${seg.key}`}
+                          x={pos.x}
+                          y={pos.y}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          style={{ fontSize: 9, fontWeight: 800, fill: seg.color, fontFamily: 'inherit' }}
+                        >
+                          {seg.pct}%
+                        </text>
+                      );
+                    })}
                   </svg>
                 </div>
 
@@ -885,9 +915,10 @@ export function ReportsShell() {
                       return (
                         <div
                           key={key}
-                          className={cn('cursor-default transition-opacity duration-150', hoveredTag !== null && !isH && 'opacity-40')}
+                          className={cn('cursor-pointer transition-opacity duration-150', hoveredTag !== null && !isH && 'opacity-40')}
                           onMouseEnter={() => setHoveredTag(key)}
                           onMouseLeave={() => setHoveredTag(null)}
+                          onClick={() => setAnnualDrillTag(key)}
                         >
                           <div className="flex justify-between items-center mb-1">
                             <div className="flex items-center gap-1.5">
@@ -943,40 +974,40 @@ export function ReportsShell() {
 
                   return (
                     <div key={goal.id} className="p-4 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-[#F4FDFB] dark:bg-[#042F2E]/10">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            {linkedTag && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />}
-                            <p className="text-sm font-semibold text-brand-text dark:text-white/90 truncate">{goal.name}</p>
+                      <div className="flex items-center gap-4 mb-2">
+                        {/* Circular progress */}
+                        <div className="relative flex-shrink-0 w-14 h-14">
+                          <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                            <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeWidth="3" className="text-brand-primary/10 dark:text-brand-primary/15" />
+                            <circle cx="18" cy="18" r="15.5" fill="none" strokeWidth="3" strokeLinecap="round"
+                              style={{ stroke: pct >= 1 ? '#16A34A' : '#0D9488', strokeDasharray: `${pct * 97.4} 97.4` }}
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-[11px] font-black text-brand-text dark:text-white tabular-nums">{Math.round(pct * 100)}%</span>
                           </div>
+                        </div>
+                        {/* Goal info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            {linkedTag && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />}
+                            <p className="text-sm font-bold text-brand-text dark:text-white truncate">{goal.name}</p>
+                          </div>
+                          <p className="text-xs text-brand-text/50 dark:text-white/40 tabular-nums">{formatAmount(savedAmount)} / {formatAmount(goal.targetAmount)}</p>
                           {goal.deadline && (
-                            <p className="text-xs text-brand-text/40 dark:text-white/35 mt-0.5">
+                            <p className="text-[11px] text-brand-text/35 dark:text-white/30 mt-0.5">
                               {new Date(goal.deadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                               {daysLeft !== null ? (daysLeft > 0 ? ` · ${daysLeft}d left` : ' · Overdue') : ''}
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className={cn('text-xs font-bold tabular-nums', pct >= 1 ? 'text-brand-positive' : 'text-brand-text/40 dark:text-white/40')}>
-                            {Math.round(pct * 100)}%
-                          </span>
-                          <button type="button" onClick={() => deleteGoal(goal.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-brand-text/30 hover:text-red-500 transition-colors">
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                        {/* Actions */}
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          {pct < 1 && <span className="text-[10px] text-brand-text/30 dark:text-white/25">{formatAmount(remaining)} left</span>}
+                          <button type="button" onClick={() => deleteGoal(goal.id)} className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-brand-text/25 hover:text-red-500 transition-colors">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </button>
                         </div>
-                      </div>
-                      <div className="h-2 rounded-full bg-brand-primary/[0.08] dark:bg-brand-primary/[0.12] overflow-hidden mb-1.5">
-                        <div
-                          className={cn('h-full rounded-full transition-all duration-700', pct >= 1 ? 'bg-brand-positive' : 'bg-gradient-to-r from-[#0D9488] to-[#35C9A5]')}
-                          style={{ width: `${pct * 100}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-brand-text/40 dark:text-white/35 mb-2">
-                        <span>{formatAmount(savedAmount)} / {formatAmount(goal.targetAmount)}</span>
-                        {pct < 1 && <span>{formatAmount(remaining)} remaining</span>}
                       </div>
 
                       {/* Linked tag or manual controls */}
@@ -1039,6 +1070,21 @@ export function ReportsShell() {
                 {/* Add goal form */}
                 {showAddGoal ? (
                   <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
+                    {!goalForm.name && (
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {GOAL_PRESETS.map((preset) => (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => setGoalForm((f) => ({ ...f, name: preset.name }))}
+                            className="flex flex-col items-center gap-2 p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] hover:border-brand-primary/30 active:scale-[0.96] transition-all duration-100"
+                          >
+                            <span className="text-2xl">{preset.icon}</span>
+                            <span className="text-[10px] font-semibold text-brand-text/60 dark:text-white/50 text-center leading-tight">{preset.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <input value={goalForm.name} onChange={(e) => setGoalForm((f) => ({ ...f, name: e.target.value }))}
                       placeholder="Goal name (e.g. Holiday fund)" autoFocus
                       className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
@@ -1377,6 +1423,101 @@ export function ReportsShell() {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
+      {/* ── Annual tag drill-down drawer ───────────────────────────────────── */}
+      {annualDrillTag !== null && (() => {
+        const tagInfo = annualTags.find((t) => t.key === annualDrillTag);
+        const tagLabel = tagInfo?.label ?? annualDrillTag;
+        const tagColor = tagInfo?.color ?? '#6b7280';
+        const tagTotal = tagInfo?.amount ?? 0;
+
+        // Collect all transactions for this tag in the selected year
+        const yearPrefix = `${selectedYear}-`;
+        const annualDrillTxs: Array<{ tx: DayTransaction; date: string }> = [];
+        for (const [date, txs] of dayTransactions) {
+          if (!date.startsWith(yearPrefix)) continue;
+          for (const tx of txs) {
+            const txTag = tx.tag ?? '__untagged__';
+            if (txTag === annualDrillTag && tx.category === 'expense') {
+              annualDrillTxs.push({ tx, date });
+            }
+          }
+        }
+        annualDrillTxs.sort((a, b) => b.date.localeCompare(a.date));
+
+        return (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-[150] bg-black/50 backdrop-blur-[2px]"
+              onClick={() => setAnnualDrillTag(null)}
+            />
+
+            {/* Sheet */}
+            <div className="fixed inset-x-0 bottom-0 z-[160] flex flex-col rounded-t-3xl bg-white dark:bg-[#042F2E] shadow-2xl max-h-[82vh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-lg sm:rounded-3xl sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2">
+
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
+                <div className="w-9 h-1 rounded-full bg-brand-text/12 dark:bg-white/12" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 px-5 pt-3 pb-3 border-b border-brand-primary/[0.08] flex-shrink-0">
+                <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: tagColor }} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-base font-bold text-brand-text dark:text-white leading-tight truncate">{tagLabel}</p>
+                  <p className="text-[11px] text-brand-text/40 dark:text-white/30">{selectedYear} &middot; {formatAmount(tagTotal)}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAnnualDrillTag(null)}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-brand-text/40 hover:text-brand-text/70 dark:text-white/30 dark:hover:text-white/70 hover:bg-brand-primary/8 transition-colors flex-shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Transaction list */}
+              <div className="flex-1 overflow-y-auto px-5 pb-6 pt-2">
+                {annualDrillTxs.length === 0 ? (
+                  <p className="text-sm text-brand-text/35 dark:text-white/25 text-center py-10">{t('tagDrawerEmpty')}</p>
+                ) : (
+                  <div className="flex flex-col divide-y divide-brand-primary/[0.06]">
+                    {annualDrillTxs.map(({ tx, date }, i) => (
+                      <div key={`${tx.transaction_id}-${date}-${i}`} className="py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-brand-text/85 dark:text-white/80 truncate leading-tight">
+                              {tc('balanceAdjustment') === tx.name ? tc('balanceAdjustment') : tx.name}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[11px] text-brand-text/35 dark:text-white/28">{date}</span>
+                              {tx.frequency ? (
+                                <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-500 dark:bg-violet-400/15 dark:text-violet-400">
+                                  {tFreq(tx.frequency as never)}
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-brand-primary/8 text-brand-text/30 dark:bg-white/8 dark:text-white/25">
+                                  {tFreq('once' as never)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-brand-danger tabular-nums flex-shrink-0">
+                            -{formatAmount(tx.amount)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
