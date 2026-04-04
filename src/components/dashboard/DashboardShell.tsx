@@ -27,6 +27,7 @@ import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { TransferModal } from './TransferModal';
+import { BillCalendar } from './BillCalendar';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -586,6 +587,8 @@ export function DashboardShell() {
             </div>
 
           </div>
+
+          <BillCalendar dayTransactions={dayTransactions} formatAmount={formatAmount} />
 
           {/* Running-low warning — hidden on mobile when stats panel is open */}
           {runningLowDate && !showMobileStats && (

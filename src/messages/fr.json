@@ -546,5 +546,34 @@
     "errorParse": "Impossible de traiter le fichier.",
     "errorMapRequired": "Veuillez associer les colonnes Date, Description et Montant.",
     "errorNoRows": "Aucune transaction trouvée dans les 3 derniers mois."
+  },
+  "forecast": {
+    "title": "Prévision de solde",
+    "subtitle": "Solde prévu pour les 6 prochains mois",
+    "warningNegative": "Le solde devient négatif le {date}",
+    "today": "Aujourd'hui",
+    "noData": "Ajoutez des transactions récurrentes pour voir votre prévision"
+  },
+  "bills": {
+    "title": "Factures à venir",
+    "tomorrow": "Demain",
+    "today": "Aujourd'hui",
+    "inDays": "Dans {days} jours",
+    "noBills": "Aucune facture à venir",
+    "thisWeek": "Cette semaine",
+    "viewAll": "Voir tout"
+  },
+  "heatmap": {
+    "title": "Carte des dépenses",
+    "subtitle": "Intensité quotidienne des dépenses",
+    "low": "Faible",
+    "high": "Élevé",
+    "noSpend": "Aucune dépense"
+  },
+  "widget": {
+    "title": "Vue rapide",
+    "balance": "Solde du jour",
+    "lastTransaction": "Dernière transaction",
+    "openApp": "Ouvrir Spentum"
   }
 }

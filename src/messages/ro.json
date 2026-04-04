@@ -546,5 +546,34 @@
     "errorParse": "Nu s-a putut procesa fișierul.",
     "errorMapRequired": "Asociază coloanele Dată, Descriere și Sumă.",
     "errorNoRows": "Nu s-au găsit tranzacții din ultimele 3 luni."
+  },
+  "forecast": {
+    "title": "Prognoza soldului",
+    "subtitle": "Soldul prevăzut pentru următoarele 6 luni",
+    "warningNegative": "Soldul devine negativ pe {date}",
+    "today": "Astăzi",
+    "noData": "Adaugă tranzacții recurente pentru a vedea prognoza"
+  },
+  "bills": {
+    "title": "Facturi viitoare",
+    "tomorrow": "Mâine",
+    "today": "Astăzi",
+    "inDays": "Peste {days} zile",
+    "noBills": "Nicio factură viitoare",
+    "thisWeek": "Săptămâna aceasta",
+    "viewAll": "Vezi toate"
+  },
+  "heatmap": {
+    "title": "Harta cheltuielilor",
+    "subtitle": "Intensitatea zilnică a cheltuielilor",
+    "low": "Scăzut",
+    "high": "Ridicat",
+    "noSpend": "Fără cheltuieli"
+  },
+  "widget": {
+    "title": "Vizualizare rapidă",
+    "balance": "Soldul de azi",
+    "lastTransaction": "Ultima tranzacție",
+    "openApp": "Deschide Spentum"
   }
 }

@@ -68,6 +68,8 @@ export function ReportsShell() {
   const { allTags, goals, addGoal, updateGoal, deleteGoal } = useSettings();
   const { formatAmount, symbol: currencySymbol } = useCurrency();
   const tFreq = useTranslations('frequency');
+  const tForecast = useTranslations('forecast');
+  const tHeatmap = useTranslations('heatmap');
   const { monthlyInsights, setMonthlyInsight } = useSettingsStore();
 
   const currentYear = new Date().getFullYear();
@@ -260,6 +262,42 @@ export function ReportsShell() {
       .sort((a, b) => a.label.localeCompare(b.label)),
     [allTags, tTags],
   );
+
+  // ── Balance forecast data (next 180 days) ───────────────────────────────────
+  const forecastData = useMemo(() => {
+    const today = new Date();
+    const points: { date: string; balance: number; label: string }[] = [];
+    let firstNegativeDate: string | null = null;
+    for (let i = 0; i < 180; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const dateStr = d.toISOString().slice(0, 10);
+      const bal = balances.get(dateStr);
+      if (bal !== undefined) {
+        points.push({ date: dateStr, balance: bal, label: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) });
+        if (bal < 0 && !firstNegativeDate) firstNegativeDate = dateStr;
+      }
+    }
+    return { points, firstNegativeDate };
+  }, [balances]);
+
+  // ── Spending heatmap data (selected month) ─────────────────────────────────
+  const heatmapData = useMemo(() => {
+    const year = selectedYear;
+    const month = selectedMonthIdx;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+    const days: { date: string; amount: number; day: number }[] = [];
+    let maxSpend = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const txs = dayTransactions.get(dateStr) ?? [];
+      const spent = txs.filter(t => t.category === 'expense').reduce((s, t) => s + t.amount, 0);
+      days.push({ date: dateStr, amount: spent, day: d });
+      if (spent > maxSpend) maxSpend = spent;
+    }
+    return { days, maxSpend, firstDow, daysInMonth };
+  }, [selectedYear, selectedMonthIdx, dayTransactions]);
 
   // ── Insights helpers ────────────────────────────────────────────────────────
   const today       = new Date();
@@ -521,6 +559,73 @@ export function ReportsShell() {
           </div>
           </div>
 
+          {/* ── Balance Forecast Graph ─────────────────────────────── */}
+          {forecastData.points.length > 10 && (
+          <div className={cn(activeTab !== 'overview' && 'hidden sm:block')}>
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+              <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-2">
+                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{tForecast('title')}</p>
+                <p className="text-[11px] text-brand-text/40 dark:text-white/30 mt-0.5">{tForecast('subtitle')}</p>
+              </div>
+              {forecastData.firstNegativeDate && (
+                <div className="mx-4 sm:mx-5 mb-2 px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20">
+                  <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                    {tForecast('warningNegative', { date: new Date(forecastData.firstNegativeDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) })}
+                  </p>
+                </div>
+              )}
+              <div className="px-2 sm:px-3 pb-4">
+                <svg viewBox="0 0 720 160" className="w-full h-[140px] sm:h-[180px]" preserveAspectRatio="none">
+                  {(() => {
+                    const pts = forecastData.points;
+                    const minBal = Math.min(...pts.map(p => p.balance), 0);
+                    const maxBal = Math.max(...pts.map(p => p.balance), 100);
+                    const range = maxBal - minBal || 1;
+                    const padTop = 10, padBot = 10, h = 160 - padTop - padBot;
+                    const w = 720;
+                    const toX = (i: number) => (i / (pts.length - 1)) * w;
+                    const toY = (bal: number) => padTop + h - ((bal - minBal) / range) * h;
+                    const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${toX(i).toFixed(1)},${toY(p.balance).toFixed(1)}`).join(' ');
+                    const fillPath = `${linePath} L${toX(pts.length - 1)},${toY(minBal)} L${toX(0)},${toY(minBal)} Z`;
+                    const zeroY = toY(0);
+                    return (
+                      <>
+                        <defs>
+                          <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#0D9488" />
+                            <stop offset="100%" stopColor="#0D9488" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                        {/* Fill under line */}
+                        <path d={fillPath} fill="url(#forecastGrad)" opacity="0.15" />
+                        {/* Zero line */}
+                        {minBal < 0 && <line x1="0" y1={zeroY} x2={w} y2={zeroY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" className="text-brand-text/20 dark:text-white/15" />}
+                        {/* Red zone below zero */}
+                        {minBal < 0 && (
+                          <rect x="0" y={zeroY} width={w} height={padTop + h - zeroY + padBot} fill="#DC2626" opacity="0.06" />
+                        )}
+                        {/* Line */}
+                        <path d={linePath} fill="none" stroke="#0D9488" strokeWidth="2" strokeLinejoin="round" />
+                        {/* Today marker */}
+                        <circle cx={toX(0)} cy={toY(pts[0].balance)} r="3" fill="#0D9488" />
+                        {/* Month labels */}
+                        {[0, 30, 60, 90, 120, 150].map((dayIdx) => {
+                          if (dayIdx >= pts.length) return null;
+                          return (
+                            <text key={dayIdx} x={toX(dayIdx)} y={156} textAnchor="middle" style={{ fontSize: 8, fontWeight: 600, fill: 'currentColor', opacity: 0.3, fontFamily: 'inherit' }}>
+                              {pts[dayIdx].label}
+                            </text>
+                          );
+                        })}
+                      </>
+                    );
+                  })()}
+                </svg>
+              </div>
+            </div>
+          </div>
+          )}
+
           {/* ── Selected month deep dive + tag breakdown ──────────────── */}
           <div className={cn(activeTab !== 'month' && 'hidden sm:block')}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -674,6 +779,65 @@ export function ReportsShell() {
               )}
             </div>
           </div>
+          </div>
+
+          {/* ── Spending Heatmap ────────────────────────────────────── */}
+          <div className={cn(activeTab !== 'month' && 'hidden sm:block')}>
+            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+              <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
+                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{tHeatmap('title')}</p>
+                <p className="text-[11px] text-brand-text/40 dark:text-white/30 mt-0.5">{tHeatmap('subtitle')}</p>
+              </div>
+              <div className="px-4 sm:px-5 pb-4 sm:pb-5">
+                {/* 7-column grid (Mon-Sun) */}
+                <div className="grid grid-cols-7 gap-1.5">
+                  {/* Day of week headers */}
+                  {['M','T','W','T','F','S','S'].map((d, i) => (
+                    <div key={i} className="text-center text-[8px] font-bold text-brand-text/25 dark:text-white/20 pb-1">{d}</div>
+                  ))}
+                  {/* Empty cells for offset (Monday-based: adjust firstDow) */}
+                  {Array.from({ length: (heatmapData.firstDow + 6) % 7 }).map((_, i) => (
+                    <div key={`empty-${i}`} />
+                  ))}
+                  {/* Day cells */}
+                  {heatmapData.days.map(({ date, amount, day }) => {
+                    const intensity = heatmapData.maxSpend > 0 ? amount / heatmapData.maxSpend : 0;
+                    const bg = amount === 0
+                      ? 'bg-brand-primary/[0.04] dark:bg-white/[0.03]'
+                      : intensity > 0.75 ? 'bg-red-500'
+                      : intensity > 0.5 ? 'bg-orange-400'
+                      : intensity > 0.25 ? 'bg-amber-400'
+                      : 'bg-emerald-400';
+                    const textColor = amount > 0 && intensity > 0.5 ? 'text-white' : 'text-brand-text/50 dark:text-white/40';
+                    return (
+                      <div
+                        key={date}
+                        className={cn('aspect-square rounded-lg flex flex-col items-center justify-center transition-all', bg, amount > 0 && intensity > 0.25 && 'shadow-sm')}
+                        style={amount > 0 && intensity <= 0.75 ? { opacity: 0.5 + intensity * 0.5 } : undefined}
+                        title={`${day}: ${formatAmount(amount)}`}
+                      >
+                        <span className={cn('text-[9px] font-bold', textColor)}>{day}</span>
+                        {amount > 0 && (
+                          <span className={cn('text-[7px] font-semibold', textColor)}>{formatAmount(amount, { compact: true })}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Legend */}
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <span className="text-[8px] text-brand-text/30 dark:text-white/20">{tHeatmap('noSpend')}</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-3 h-3 rounded-sm bg-brand-primary/[0.06]" />
+                    <div className="w-3 h-3 rounded-sm bg-emerald-400/60" />
+                    <div className="w-3 h-3 rounded-sm bg-amber-400/80" />
+                    <div className="w-3 h-3 rounded-sm bg-orange-400" />
+                    <div className="w-3 h-3 rounded-sm bg-red-500" />
+                  </div>
+                  <span className="text-[8px] text-brand-text/30 dark:text-white/20">{tHeatmap('high')}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── Top transactions this month ──────────────────────────── */}

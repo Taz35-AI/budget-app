@@ -546,5 +546,34 @@
     "errorParse": "Die Datei konnte nicht verarbeitet werden.",
     "errorMapRequired": "Bitte Datum, Beschreibung und Betrag zuordnen.",
     "errorNoRows": "Keine Transaktionen in den letzten 3 Monaten gefunden."
+  },
+  "forecast": {
+    "title": "Saldoprognose",
+    "subtitle": "Voraussichtliches Saldo für die nächsten 6 Monate",
+    "warningNegative": "Saldo wird negativ am {date}",
+    "today": "Heute",
+    "noData": "Fügen Sie wiederkehrende Transaktionen hinzu, um Ihre Prognose zu sehen"
+  },
+  "bills": {
+    "title": "Anstehende Rechnungen",
+    "tomorrow": "Morgen",
+    "today": "Heute",
+    "inDays": "In {days} Tagen",
+    "noBills": "Keine anstehenden Rechnungen",
+    "thisWeek": "Diese Woche",
+    "viewAll": "Alle anzeigen"
+  },
+  "heatmap": {
+    "title": "Ausgaben-Heatmap",
+    "subtitle": "Tägliche Ausgabenintensität",
+    "low": "Niedrig",
+    "high": "Hoch",
+    "noSpend": "Keine Ausgaben"
+  },
+  "widget": {
+    "title": "Schnellansicht",
+    "balance": "Heutiges Saldo",
+    "lastTransaction": "Letzte Transaktion",
+    "openApp": "Spentum öffnen"
   }
 }

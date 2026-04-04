@@ -546,5 +546,34 @@
     "errorParse": "Nie udało się przetworzyć pliku.",
     "errorMapRequired": "Przypisz kolumny Data, Opis i Kwota.",
     "errorNoRows": "Nie znaleziono transakcji z ostatnich 3 miesięcy."
+  },
+  "forecast": {
+    "title": "Prognoza salda",
+    "subtitle": "Przewidywane saldo na najbliższe 6 miesięcy",
+    "warningNegative": "Saldo spadnie poniżej zera {date}",
+    "today": "Dziś",
+    "noData": "Dodaj transakcje cykliczne, aby zobaczyć prognozę"
+  },
+  "bills": {
+    "title": "Nadchodzące rachunki",
+    "tomorrow": "Jutro",
+    "today": "Dziś",
+    "inDays": "Za {days} dni",
+    "noBills": "Brak nadchodzących rachunków",
+    "thisWeek": "Ten tydzień",
+    "viewAll": "Zobacz wszystkie"
+  },
+  "heatmap": {
+    "title": "Mapa wydatków",
+    "subtitle": "Dzienna intensywność wydatków",
+    "low": "Niski",
+    "high": "Wysoki",
+    "noSpend": "Bez wydatków"
+  },
+  "widget": {
+    "title": "Szybki podgląd",
+    "balance": "Dzisiejsze saldo",
+    "lastTransaction": "Ostatnia transakcja",
+    "openApp": "Otwórz Spentum"
   }
 }

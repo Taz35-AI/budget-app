@@ -546,5 +546,34 @@
     "errorParse": "Could not parse the file. Make sure it is a valid CSV.",
     "errorMapRequired": "Please map the Date, Description, and Amount columns.",
     "errorNoRows": "No transactions found within the last 3 months."
+  },
+  "forecast": {
+    "title": "Balance Forecast",
+    "subtitle": "Predicted balance for the next 6 months",
+    "warningNegative": "Balance goes negative on {date}",
+    "today": "Today",
+    "noData": "Add recurring transactions to see your forecast"
+  },
+  "bills": {
+    "title": "Upcoming Bills",
+    "tomorrow": "Tomorrow",
+    "today": "Today",
+    "inDays": "In {days} days",
+    "noBills": "No upcoming bills",
+    "thisWeek": "This week",
+    "viewAll": "View all"
+  },
+  "heatmap": {
+    "title": "Spending Heatmap",
+    "subtitle": "Daily spending intensity",
+    "low": "Low",
+    "high": "High",
+    "noSpend": "No spend"
+  },
+  "widget": {
+    "title": "Quick View",
+    "balance": "Today's Balance",
+    "lastTransaction": "Last Transaction",
+    "openApp": "Open Spentum"
   }
 }
