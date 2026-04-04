@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: incErr.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ expense: expTx, income: incTx }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/transfers] unexpected error:', error);

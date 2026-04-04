@@ -28,7 +28,7 @@ export async function DELETE() {
       return NextResponse.json({ error: errors[0]!.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('[DELETE /api/reset-all] unexpected:', err);

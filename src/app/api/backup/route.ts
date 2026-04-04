@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ success: true, imported: txPayload.length });
   } catch (err) {
     console.error('[POST /api/backup]', err);

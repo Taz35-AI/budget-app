@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    notifyHousehold(householdId, 'balance_resets');
+    await notifyHousehold(householdId, 'balance_resets');
     return NextResponse.json({ reset: data });
   } catch (error) {
     console.error('POST /api/balance-reset error:', error);

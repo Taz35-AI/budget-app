@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ transaction: data }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/transactions] unexpected error:', error);

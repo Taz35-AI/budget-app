@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ transaction: data, delta });
   } catch (err) {
     console.error('[POST /api/adjust-balance] unexpected:', err);

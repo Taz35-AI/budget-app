@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'transactions');
+    await notifyHousehold(householdId, 'transactions');
     return NextResponse.json({ inserted: data?.length ?? 0, errors: skipped.length }, { status: 201 });
   } catch (error) {
     console.error('[POST /api/import/bulk] unexpected error:', error);

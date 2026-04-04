@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'accounts');
+    await notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ account: data }, { status: 201 });
   } catch (err) {
     console.error('[POST /api/accounts] unexpected:', err);

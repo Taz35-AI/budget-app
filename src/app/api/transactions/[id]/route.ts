@@ -192,7 +192,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         }
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ transaction: data });
     }
 
@@ -319,7 +319,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           }
         }
 
-        notifyHousehold(householdId, 'transactions');
+        await notifyHousehold(householdId, 'transactions');
         return NextResponse.json({ success: true, mode: 'all_future_split', newTransaction: newTx });
       }
 
@@ -359,7 +359,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         }
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'all_future' });
     }
 
@@ -516,7 +516,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             });
         }
 
-        notifyHousehold(householdId, 'transactions');
+        await notifyHousehold(householdId, 'transactions');
         return NextResponse.json({ success: true, mode: 'this_only_moved', newTransaction: newTx, movedTo: newDate });
       }
 
@@ -604,7 +604,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           );
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }
 
@@ -655,7 +655,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       if (paired) {
         await supabase.from('transactions').delete().eq('id', paired.id as string);
       }
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'hard_deleted' });
     }
 
@@ -718,7 +718,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
           .eq('household_id', householdId);
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'family_deleted', count: familyIds.length });
     }
 
@@ -759,7 +759,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         }
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'all_future' });
     }
 
@@ -848,7 +848,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
           );
       }
 
-      notifyHousehold(householdId, 'transactions');
+      await notifyHousehold(householdId, 'transactions');
       return NextResponse.json({ success: true, mode: 'this_only', restoreAt: nextDate });
     }
 

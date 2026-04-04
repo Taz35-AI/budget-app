@@ -43,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    notifyHousehold(householdId, 'accounts');
+    await notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ account: data });
   } catch (err) {
     console.error('[PATCH /api/accounts] unexpected:', err);
@@ -88,7 +88,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    notifyHousehold(householdId, 'accounts');
+    await notifyHousehold(householdId, 'accounts');
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[DELETE /api/accounts] unexpected:', err);
