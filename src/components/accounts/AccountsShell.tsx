@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { format, addMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useHouseholdMembers } from '@/hooks/useHousehold';
 import { useCurrency } from '@/hooks/useCurrency';
 import { computeBalances } from '@/engine/balanceEngine';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -123,9 +124,11 @@ function AccountTypeIcon({ type, className }: { type: import('@/types').AccountT
 function AccountCard({
   summary,
   formatAmount,
+  ownerLabel,
 }: {
   summary: AccountSummary;
   formatAmount: (n: number) => string;
+  ownerLabel: string | null;
 }) {
   const { account, todayBalance, monthlySummaries } = summary;
   const isCredit = account.type === 'credit';
@@ -185,8 +188,8 @@ function AccountCard({
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-slate-400 dark:text-white/35">
-              {isCredit ? t('debtBalance') : t('todayBalance')}
+            <p className="text-[10px] text-slate-400 dark:text-white/35 truncate">
+              {ownerLabel ? `${ownerLabel} · ` : ''}{isCredit ? t('debtBalance') : t('todayBalance')}
             </p>
           </div>
         </div>
@@ -283,9 +286,25 @@ function AccountCard({
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
+function ownerNameFor(
+  userId: string,
+  members: import('@/types').HouseholdMember[] | undefined,
+): string | null {
+  if (!members || members.length <= 1) return null;
+  const member = members.find((m) => m.user_id === userId);
+  if (!member) return null;
+  const name = member.display_name ?? member.email?.split('@')[0] ?? null;
+  if (!name) return null;
+  // "Taz" → "Taz's account"
+  const possessive = name.endsWith('s') ? `${name}'` : `${name}'s`;
+  return `${possessive} account`;
+}
+
 export function AccountsShell() {
   const { summaries, isLoading } = useAccountSummaries();
   const { formatAmount } = useCurrency();
+  const { data: householdData } = useHouseholdMembers();
+  const members = householdData?.members;
   const t = useTranslations('accounts');
   const tc = useTranslations('common');
 
@@ -368,7 +387,12 @@ export function AccountsShell() {
           {!isLoading && summaries.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
               {summaries.map((summary) => (
-                <AccountCard key={summary.account.id} summary={summary} formatAmount={formatAmount} />
+                <AccountCard
+                  key={summary.account.id}
+                  summary={summary}
+                  formatAmount={formatAmount}
+                  ownerLabel={ownerNameFor(summary.account.user_id, members)}
+                />
               ))}
             </div>
           )}
