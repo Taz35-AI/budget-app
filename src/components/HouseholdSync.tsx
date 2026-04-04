@@ -33,6 +33,9 @@ export function HouseholdSync() {
           qc.invalidateQueries({ queryKey: ['accounts'] });
           qc.invalidateQueries({ queryKey: ['transactions'] });
         }
+        if (table === 'mortgages') {
+          qc.invalidateQueries({ queryKey: ['mortgages'] });
+        }
       })
       .subscribe();
     return () => {

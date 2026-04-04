@@ -22,7 +22,7 @@ interface SettingsState {
   monthlyInsights: Record<string, { advice: string; generatedAt: string }>;
   // Actions
   _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
-  addCustomTag: (tag: Omit<CustomTag, 'id'>) => void;
+  addCustomTag: (tag: Omit<CustomTag, 'id'> & { id?: string }) => void;
   updateCustomTag: (id: string, patch: Partial<Omit<CustomTag, 'id'>>) => void;
   deleteCustomTag: (id: string) => void;
   overrideBuiltinTag: (id: string, patch: { label: string; color: string }) => void;
@@ -64,7 +64,7 @@ export const useSettingsStore = create<SettingsState>()(
       _hydrate: (data) => set((s) => ({ ...s, ...data })),
 
       addCustomTag: (tag) =>
-        set((s) => ({ customTags: [...s.customTags, { ...tag, id: crypto.randomUUID() }] })),
+        set((s) => ({ customTags: [...s.customTags, { ...tag, id: tag.id ?? crypto.randomUUID() }] })),
       updateCustomTag: (id, patch) =>
         set((s) => ({ customTags: s.customTags.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
       deleteCustomTag: (id) =>

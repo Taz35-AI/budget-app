@@ -12,6 +12,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { accountDisplayName } from '@/lib/memberUtils';
 import { createClient } from '@/lib/supabase/client';
+import { AddMortgageModal } from '@/components/mortgages/AddMortgageModal';
 import { cn } from '@/lib/utils';
 import type { BudgetAccount, HouseholdMember } from '@/types';
 
@@ -402,12 +403,14 @@ function AccountDetailModal({
 
 export function AccountsShell() {
   const { summaries, isLoading } = useAccountSummaries();
-  const { formatAmount } = useCurrency();
+  const { formatAmount, symbol } = useCurrency();
   const { data: householdData } = useHouseholdMembers();
   const members: HouseholdMember[] | undefined = householdData?.members;
   const t = useTranslations('accounts');
+  const tm = useTranslations('mortgages');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [showAddMortgage, setShowAddMortgage] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -452,6 +455,20 @@ export function AccountsShell() {
                 ? t('noAccounts')
                 : t('acrossAccounts', { count: summaries.length })}
             </p>
+          </div>
+
+          {/* Add mortgage action */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setShowAddMortgage(true)}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-2xl text-[11px] font-semibold bg-purple-100 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-500/25 active:scale-[0.97] transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              {tm('addMortgage')}
+            </button>
           </div>
 
           {/* Loading skeleton */}
@@ -511,6 +528,13 @@ export function AccountsShell() {
             formatAmount={formatAmount}
             displayName={accountDisplayName(selectedSummary.account, myUserId, members)}
             onClose={() => setSelectedId(null)}
+          />
+        )}
+
+        {showAddMortgage && (
+          <AddMortgageModal
+            symbol={symbol}
+            onClose={() => setShowAddMortgage(false)}
           />
         )}
       </div>

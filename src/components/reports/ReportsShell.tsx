@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { TAGS } from '@/lib/constants';
 import { useBalances } from '@/hooks/useBalances';
@@ -8,10 +8,12 @@ import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTransactions, useUpdateTransaction } from '@/hooks/useTransactions';
+import { createClient } from '@/lib/supabase/client';
 import { format } from 'date-fns';
 import type { DayTransaction, Frequency } from '@/types';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
+import { MortgagesTab } from '@/components/mortgages/MortgagesTab';
 import { cn } from '@/lib/utils';
 
 
@@ -76,7 +78,12 @@ export function ReportsShell() {
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
   const [selectedMonthIdx, setSelectedMonthIdx] = useState(new Date().getMonth());
   const [hoveredTag,       setHoveredTag]       = useState<string | null>(null);
-  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals' | 'subscriptions'>('overview');
+  const [activeTab,        setActiveTab]        = useState<'overview' | 'month' | 'transactions' | 'annual' | 'goals' | 'subscriptions' | 'mortgages'>('overview');
+  const [myUserId,         setMyUserId]         = useState<string | null>(null);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => { if (data.user) setMyUserId(data.user.id); });
+  }, []);
 
   // ── Tag drill-down state ────────────────────────────────────────────────────
   const [selectedTagKey,  setSelectedTagKey]  = useState<string | null>(null);
@@ -393,6 +400,7 @@ export function ReportsShell() {
               { id: 'annual',       label: t('tabAnnual')        },
               { id: 'goals',        label: t('tabGoals')         },
               { id: 'subscriptions', label: t('tabSubscriptions') },
+              { id: 'mortgages',    label: t('tabMortgages')     },
             ] as const).map(({ id, label }) => (
               <button
                 key={id}
@@ -411,7 +419,7 @@ export function ReportsShell() {
           {/* Month selector — shown on non-overview tabs */}
           <div className={cn(
             'flex items-center justify-between px-4 pb-2 pt-1',
-            (activeTab === 'overview' || activeTab === 'subscriptions') && 'invisible pointer-events-none',
+            (activeTab === 'overview' || activeTab === 'subscriptions' || activeTab === 'mortgages') && 'invisible pointer-events-none',
           )}>
             <button
               onClick={() => setSelectedMonthIdx((m) => (m > 0 ? m - 1 : 11))}
@@ -439,7 +447,7 @@ export function ReportsShell() {
         <div className="h-[calc(100dvh-4rem-6.5rem-60px)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 pb-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
-          <div className={cn("bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]", activeTab === 'subscriptions' && 'hidden sm:block')}>
+          <div className={cn("bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]", (activeTab === 'subscriptions' || activeTab === 'mortgages') && 'hidden sm:block')}>
             {/* Desktop */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
@@ -1470,6 +1478,11 @@ export function ReportsShell() {
             </div>
           </div>
           )}
+
+          {/* ── Mortgages ─────────────────────────────────────────────── */}
+          <div className={cn(activeTab !== 'mortgages' && 'hidden sm:block')}>
+            <MortgagesTab formatAmount={formatAmount} myUserId={myUserId} />
+          </div>
 
         </div>
       </div>
