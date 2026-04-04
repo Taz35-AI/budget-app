@@ -10,8 +10,10 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { computeBalances } from '@/engine/balanceEngine';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
+import { accountDisplayName } from '@/lib/memberUtils';
+import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-import type { BudgetAccount } from '@/types';
+import type { BudgetAccount, HouseholdMember } from '@/types';
 
 // ─── Per-account summary computation ─────────────────────────────────────────
 
@@ -124,12 +126,12 @@ function AccountTypeIcon({ type, className }: { type: import('@/types').AccountT
 function AccountCard({
   summary,
   formatAmount,
-  ownerLabel,
+  displayName,
   onClick,
 }: {
   summary: AccountSummary;
   formatAmount: (n: number) => string;
-  ownerLabel: string | null;
+  displayName: string;
   onClick: () => void;
 }) {
   const { account, todayBalance } = summary;
@@ -167,7 +169,7 @@ function AccountCard({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{account.name}</p>
+              <p className="text-sm font-bold text-slate-800 dark:text-white truncate">{displayName}</p>
               <span className={cn(
                 'text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md flex-shrink-0',
                 account.type === 'credit'
@@ -179,11 +181,6 @@ function AccountCard({
                 {t(`type${((account.type ?? 'checking').charAt(0).toUpperCase() + (account.type ?? 'checking').slice(1))}` as 'typeChecking')}
               </span>
             </div>
-            {ownerLabel && (
-              <p className="text-[10px] text-slate-400 dark:text-white/35 truncate mt-0.5">
-                {ownerLabel}
-              </p>
-            )}
           </div>
         </div>
         <div className="text-right flex-shrink-0">
@@ -207,12 +204,12 @@ function AccountCard({
 function AccountDetailModal({
   summary,
   formatAmount,
-  ownerLabel,
+  displayName,
   onClose,
 }: {
   summary: AccountSummary;
   formatAmount: (n: number) => string;
-  ownerLabel: string | null;
+  displayName: string;
   onClose: () => void;
 }) {
   const { account, todayBalance, monthlySummaries } = summary;
@@ -290,7 +287,7 @@ function AccountDetailModal({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <p className="text-base font-bold text-slate-800 dark:text-white truncate">{account.name}</p>
+                <p className="text-base font-bold text-slate-800 dark:text-white truncate">{displayName}</p>
                 <span className={cn(
                   'text-[8px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md flex-shrink-0',
                   account.type === 'credit'
@@ -307,9 +304,6 @@ function AccountDetailModal({
                   </span>
                 )}
               </div>
-              {ownerLabel && (
-                <p className="text-[11px] text-slate-400 dark:text-white/35 mt-0.5 truncate">{ownerLabel}</p>
-              )}
             </div>
           </div>
           <div>
@@ -406,27 +400,21 @@ function AccountDetailModal({
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
-function ownerNameFor(
-  userId: string,
-  members: import('@/types').HouseholdMember[] | undefined,
-): string | null {
-  if (!members || members.length <= 1) return null;
-  const member = members.find((m) => m.user_id === userId);
-  if (!member) return null;
-  const name = member.display_name ?? member.email?.split('@')[0] ?? null;
-  if (!name) return null;
-  // "Taz" → "Taz's account"
-  const possessive = name.endsWith('s') ? `${name}'` : `${name}'s`;
-  return `${possessive} account`;
-}
-
 export function AccountsShell() {
   const { summaries, isLoading } = useAccountSummaries();
   const { formatAmount } = useCurrency();
   const { data: householdData } = useHouseholdMembers();
-  const members = householdData?.members;
+  const members: HouseholdMember[] | undefined = householdData?.members;
   const t = useTranslations('accounts');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setMyUserId(data.user.id);
+    });
+  }, []);
 
   const totalBalance = summaries.reduce((sum, s) => sum + s.todayBalance, 0);
   const hasCredit = summaries.some(s => s.account.type === 'credit');
@@ -507,7 +495,7 @@ export function AccountsShell() {
                   key={summary.account.id}
                   summary={summary}
                   formatAmount={formatAmount}
-                  ownerLabel={ownerNameFor(summary.account.user_id, members)}
+                  displayName={accountDisplayName(summary.account, myUserId, members)}
                   onClick={() => setSelectedId(summary.account.id)}
                 />
               ))}
@@ -521,7 +509,7 @@ export function AccountsShell() {
           <AccountDetailModal
             summary={selectedSummary}
             formatAmount={formatAmount}
-            ownerLabel={ownerNameFor(selectedSummary.account.user_id, members)}
+            displayName={accountDisplayName(selectedSummary.account, myUserId, members)}
             onClose={() => setSelectedId(null)}
           />
         )}

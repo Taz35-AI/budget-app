@@ -13,7 +13,8 @@ import {
 import type { NotifPermission } from '@/lib/notificationScheduler';
 import { useAccounts, useCreateAccount, useUpdateAccount, useDeleteAccount } from '@/hooks/useAccounts';
 import { useHouseholdMembers, useHouseholdInvites, useCreateInvite, useRevokeInvite, useRemoveMember } from '@/hooks/useHousehold';
-import { memberColor } from '@/lib/memberUtils';
+import { memberColor, accountDisplayName } from '@/lib/memberUtils';
+import { createClient } from '@/lib/supabase/client';
 import { useSettingsStore } from '@/store/settingsStore';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
@@ -882,9 +883,19 @@ function AccountsSection() {
   const ta = useTranslations('accounts');
   const tc = useTranslations('common');
   const { data: accounts, isLoading } = useAccounts();
+  const { data: hhData } = useHouseholdMembers();
+  const members = hhData?.members;
   const createAccount = useCreateAccount();
   const updateAccount = useUpdateAccount();
   const deleteAccount = useDeleteAccount();
+
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setMyUserId(data.user.id);
+    });
+  }, []);
 
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -1024,7 +1035,7 @@ function AccountsSection() {
                   acct.type === 'credit' ? 'bg-purple-400' : acct.type === 'savings' ? 'bg-emerald-400' : 'bg-teal-400',
                 )} />
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-slate-800 dark:text-white/90 truncate block">{acct.name}</span>
+                  <span className="text-sm font-medium text-slate-800 dark:text-white/90 truncate block">{accountDisplayName(acct, myUserId, members)}</span>
                   <span className="text-[10px] text-slate-400 dark:text-white/30">
                     {ta(`type${((acct.type ?? 'checking').charAt(0).toUpperCase() + (acct.type ?? 'checking').slice(1))}` as 'typeChecking')}
                     {acct.type === 'credit' && acct.credit_limit != null && ` · ${ta('creditLimit')} set`}
