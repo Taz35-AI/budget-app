@@ -192,17 +192,3 @@ export interface HouseholdInvite {
   created_at: string;
   expires_at: string;
 }
-
-export interface Mortgage {
-  id: string;
-  user_id: string;
-  household_id: string;
-  name: string;
-  principal: number;       // initial loan amount
-  interest_rate: number;   // annual rate as decimal, e.g. 0.045 for 4.5%
-  term_months: number;     // total term in months, e.g. 300 for 25 years
-  start_date: string;      // YYYY-MM-DD, first payment date
-  tag_id: string;          // customTag id in the owner's settings
-  created_at: string;
-  updated_at: string;
-}
