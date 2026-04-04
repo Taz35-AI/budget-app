@@ -78,6 +78,42 @@ export function useCreateInvite() {
   });
 }
 
+// ─── Pending invites (addressed to ME) ──────────────────────────────────────
+
+export function usePendingInvites() {
+  return useQuery<(HouseholdInvite & { inviter_name?: string })[]>({
+    queryKey: ['pending-invites'],
+    queryFn: async () => {
+      const res = await fetch('/api/household/invite/pending');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.invites ?? [];
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useAcceptInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { token: string; displayName?: string; mergeData?: boolean }) => {
+      const res = await fetch('/api/household/invite/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error((await res.json()).error ?? 'Failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pending-invites'] });
+      qc.invalidateQueries({ queryKey: ['household-members'] });
+      qc.invalidateQueries({ queryKey: ['accounts'] });
+      qc.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+}
+
 export function useRevokeInvite() {
   const qc = useQueryClient();
   return useMutation({

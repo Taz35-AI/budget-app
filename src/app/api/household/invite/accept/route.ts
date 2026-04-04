@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const { data: { user: currentUser } } = await supabase.auth.admin.getUserById(ctx.userId);
     const userEmail = currentUser?.email?.toLowerCase();
 
-    if (!userEmail || userEmail !== invite.email.toLowerCase()) {
+    if (!userEmail || userEmail !== invite.invited_email.toLowerCase()) {
       return NextResponse.json(
         { error: 'This invite was sent to a different email address' },
         { status: 403 },

@@ -31,6 +31,7 @@ import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { TransferModal } from './TransferModal';
 import { BillCalendar } from './BillCalendar';
+import { InvitationsBanner } from './InvitationsBanner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
@@ -329,6 +330,9 @@ export function DashboardShell() {
 
         {/* Left: stats + calendar */}
         <div className="flex-1 min-w-0 min-h-0 flex flex-col gap-3">
+
+          {/* Pending household invitations */}
+          <InvitationsBanner />
 
           {/* Stats bar — typographic headline style */}
           <div id="tour-stats"

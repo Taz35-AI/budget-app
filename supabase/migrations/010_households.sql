@@ -147,6 +147,7 @@ CREATE POLICY "hi_select" ON household_invites
   FOR SELECT USING (
     household_id = (SELECT household_id FROM household_members WHERE user_id = auth.uid())
     OR invited_by = auth.uid()
+    OR invited_email = lower((SELECT email FROM auth.users WHERE id = auth.uid()))
   );
 
 -- budget_accounts
