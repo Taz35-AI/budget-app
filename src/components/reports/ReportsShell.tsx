@@ -92,6 +92,7 @@ export function ReportsShell() {
   // ── Goals management state ──────────────────────────────────────────────────
   const [showAddGoal,    setShowAddGoal]    = useState(false);
   const [goalForm,       setGoalForm]       = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '', icon: '' });
+  const [newTagName,     setNewTagName]     = useState('');
   const [editGoalId,     setEditGoalId]     = useState<string | null>(null);
   const [editSaved,      setEditSaved]      = useState('');
   const [linkingGoalId,  setLinkingGoalId]  = useState<string | null>(null);
@@ -1285,14 +1286,43 @@ export function ReportsShell() {
                         selected={goalForm.linkedTagId}
                         onSelect={(key) => setGoalForm((f) => ({ ...f, linkedTagId: key }))}
                         hideLabel
-                        onCreateNew={(name) => {
-                          const newId = crypto.randomUUID();
-                          // Goal contributions are technically expenses (money set aside),
-                          // so the tag is created as an 'expense' tag with a goal-green color.
-                          addCustomTag({ id: newId, label: name, color: '#10b981', category: 'expense' });
-                          setGoalForm((f) => ({ ...f, linkedTagId: newId }));
-                        }}
                       />
+
+                      {/* Inline 'create new tag' — separate from the dropdown so
+                          it works even if the dropdown UI misbehaves on mobile */}
+                      <div className="mt-2 flex gap-2">
+                        <input
+                          type="text"
+                          value={newTagName}
+                          onChange={(e) => setNewTagName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newTagName.trim()) {
+                              e.preventDefault();
+                              const newId = crypto.randomUUID();
+                              addCustomTag({ id: newId, label: newTagName.trim(), color: '#10b981', category: 'expense' });
+                              setGoalForm((f) => ({ ...f, linkedTagId: newId }));
+                              setNewTagName('');
+                            }
+                          }}
+                          placeholder="Or type a new tag name…"
+                          className="flex-1 min-w-0 h-9 px-3 rounded-xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-xs text-brand-text dark:text-white placeholder:text-brand-text/35 dark:placeholder:text-white/25 outline-none focus:border-emerald-400"
+                        />
+                        <button
+                          type="button"
+                          disabled={!newTagName.trim()}
+                          onClick={() => {
+                            const trimmed = newTagName.trim();
+                            if (!trimmed) return;
+                            const newId = crypto.randomUUID();
+                            addCustomTag({ id: newId, label: trimmed, color: '#10b981', category: 'expense' });
+                            setGoalForm((f) => ({ ...f, linkedTagId: newId }));
+                            setNewTagName('');
+                          }}
+                          className="flex-shrink-0 h-9 px-3 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.96] transition-all"
+                        >
+                          + Create
+                        </button>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button type="button"
@@ -1308,6 +1338,7 @@ export function ReportsShell() {
                             icon: goalForm.icon || undefined,
                           });
                           setGoalForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '', icon: '' });
+                          setNewTagName('');
                           setShowAddGoal(false);
                         }}
                         className="flex-1 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100">
