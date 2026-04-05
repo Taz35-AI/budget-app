@@ -84,6 +84,8 @@
     "category": "Categorie",
     "selectCategory": "Selectează categoria…",
     "noCategoriesMatch": "Nicio categorie găsită",
+    "createTag": "Creează tag-ul \"{name}\"",
+    "createTagHint": "Scrie pentru a crea un tag",
     "income": "+ Venit",
     "expense": "− Cheltuială",
     "oneOff": "Unic",

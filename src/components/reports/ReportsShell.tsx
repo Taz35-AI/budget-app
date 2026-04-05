@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import type { DayTransaction, Frequency } from '@/types';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
+import { TagDropdown } from '@/components/dashboard/TransactionForm';
 import { cn } from '@/lib/utils';
 
 
@@ -70,7 +71,7 @@ export function ReportsShell() {
   const tFreq = useTranslations('frequency');
   const tForecast = useTranslations('forecast');
   const tHeatmap = useTranslations('heatmap');
-  const { monthlyInsights, setMonthlyInsight } = useSettingsStore();
+  const { monthlyInsights, setMonthlyInsight, addCustomTag } = useSettingsStore();
 
   const currentYear = new Date().getFullYear();
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
@@ -1268,7 +1269,7 @@ export function ReportsShell() {
                     </div>
                     <div>
                       <p className="text-xs text-brand-text/40 dark:text-white/40 mb-1.5">Link to expense tag — matching transactions auto-update progress</p>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex items-center gap-2 mb-2">
                         <button type="button" onClick={() => setGoalForm((f) => ({ ...f, linkedTagId: '' }))}
                           className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
                             !goalForm.linkedTagId
@@ -1276,19 +1277,22 @@ export function ReportsShell() {
                               : 'border-brand-primary/15 dark:border-white/10 text-brand-text/50 dark:text-white/40 bg-white dark:bg-white/5')}>
                           Manual
                         </button>
-                        {Object.entries(allTags).filter(([, tag]) => tag.category === 'expense' || tag.category === 'both').map(([key, { label, color }]) => (
-                          <button key={key} type="button"
-                            onClick={() => setGoalForm((f) => ({ ...f, linkedTagId: f.linkedTagId === key ? '' : key }))}
-                            className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
-                              goalForm.linkedTagId === key
-                                ? 'text-white border-transparent'
-                                : 'border-brand-primary/15 dark:border-white/10 bg-white dark:bg-white/5 text-brand-text/60 dark:text-white/60')}
-                            style={goalForm.linkedTagId === key ? { backgroundColor: color } : undefined}>
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: goalForm.linkedTagId === key ? 'rgba(255,255,255,0.7)' : color }} />
-                            {TAGS[key] ? tTags(key as never) : label}
-                          </button>
-                        ))}
+                        <span className="text-xs text-brand-text/30 dark:text-white/25">or pick / create a tag</span>
                       </div>
+                      <TagDropdown
+                        allTags={allTags}
+                        category="expense"
+                        selected={goalForm.linkedTagId}
+                        onSelect={(key) => setGoalForm((f) => ({ ...f, linkedTagId: key }))}
+                        hideLabel
+                        onCreateNew={(name) => {
+                          const newId = crypto.randomUUID();
+                          // Goal contributions are technically expenses (money set aside),
+                          // so the tag is created as an 'expense' tag with a goal-green color.
+                          addCustomTag({ id: newId, label: name, color: '#10b981', category: 'expense' });
+                          setGoalForm((f) => ({ ...f, linkedTagId: newId }));
+                        }}
+                      />
                     </div>
                     <div className="flex gap-2">
                       <button type="button"

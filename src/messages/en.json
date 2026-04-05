@@ -84,6 +84,8 @@
     "category": "Category",
     "selectCategory": "Select category…",
     "noCategoriesMatch": "No categories match",
+    "createTag": "Create tag \"{name}\"",
+    "createTagHint": "Type to create a new tag",
     "income": "+ Income",
     "expense": "− Expense",
     "oneOff": "One-off",

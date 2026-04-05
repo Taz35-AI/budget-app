@@ -84,6 +84,8 @@
     "category": "Categoría",
     "selectCategory": "Selecciona categoría…",
     "noCategoriesMatch": "Sin categorías coincidentes",
+    "createTag": "Crear etiqueta \"{name}\"",
+    "createTagHint": "Escribe para crear una etiqueta",
     "income": "+ Ingreso",
     "expense": "− Gasto",
     "oneOff": "Único",

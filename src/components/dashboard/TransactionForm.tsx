@@ -25,9 +25,16 @@ interface TagDropdownProps {
   onSelect: (key: string) => void;
   error?: string;
   compact?: boolean;
+  /** If provided, shows a "+ Create '{searchTerm}'" row at the bottom of the
+   *  dropdown that lets the user create a new tag inline. */
+  onCreateNew?: (suggestedName: string) => void;
+  /** Custom label shown in the trigger + dropdown header (defaults to "Category"). */
+  label?: string;
+  /** Hides the label text entirely (useful when wrapped in another form field). */
+  hideLabel?: boolean;
 }
 
-export function TagDropdown({ allTags, category, selected, onSelect, error, compact }: TagDropdownProps) {
+export function TagDropdown({ allTags, category, selected, onSelect, error, compact, onCreateNew, label, hideLabel }: TagDropdownProps) {
   const t = useTranslations('transactionForm');
   const tTags = useTranslations('tags');
   const [open, setOpen] = React.useState(false);
@@ -77,9 +84,11 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
   return (
     <div ref={ref} className={cn('flex flex-col', compact ? 'gap-1' : 'gap-1.5')}>
       {/* Label + error below field (like other fields) */}
-      <p className={cn('font-semibold text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
-        {t('category')}
-      </p>
+      {!hideLabel && (
+        <p className={cn('font-semibold text-brand-text/80 dark:text-white/70', compact ? 'text-[10px]' : 'text-sm')}>
+          {label ?? t('category')}
+        </p>
+      )}
 
       {/* Trigger button */}
       <button
@@ -170,7 +179,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
             </div>
             {/* Scrollable tag list */}
             <ul className="flex-1 overflow-y-auto overscroll-contain sm:max-h-48">
-              {filteredTags.length === 0 && (
+              {filteredTags.length === 0 && !onCreateNew && (
                 <li className={cn('px-4 text-brand-text/35 dark:text-white/30 italic', compact ? 'py-3 text-[10px]' : 'py-3 text-xs')}>
                   {t('noCategoriesMatch')}
                 </li>
@@ -203,6 +212,35 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
                   </li>
                 );
               })}
+              {onCreateNew && (
+                <li className={filteredTags.length > 0 ? 'border-t border-black/[0.06] dark:border-white/[0.06]' : ''}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const suggested = search.trim();
+                      if (!suggested) return;
+                      onCreateNew(suggested);
+                      setSearch('');
+                      setOpen(false);
+                    }}
+                    disabled={!search.trim()}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 transition-all duration-100 active:bg-brand-primary/10',
+                      compact ? 'h-10 text-[11px]' : 'h-11 text-sm sm:h-10',
+                      'disabled:opacity-40 disabled:cursor-not-allowed',
+                    )}
+                  >
+                    <span className="w-5 h-5 rounded-full bg-brand-primary/10 dark:bg-brand-primary/15 flex items-center justify-center text-brand-primary flex-shrink-0">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </span>
+                    <span className="flex-1 text-left font-medium text-brand-primary truncate">
+                      {search.trim() ? t('createTag', { name: search.trim() }) : t('createTagHint')}
+                    </span>
+                  </button>
+                </li>
+              )}
             </ul>
             {/* Safe area spacer for mobile */}
             <div className="sm:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }} />

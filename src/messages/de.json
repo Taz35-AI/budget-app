@@ -84,6 +84,8 @@
     "category": "Kategorie",
     "selectCategory": "Kategorie auswählen…",
     "noCategoriesMatch": "Keine passenden Kategorien",
+    "createTag": "Tag \"{name}\" erstellen",
+    "createTagHint": "Tippen, um einen neuen Tag zu erstellen",
     "income": "+ Einnahme",
     "expense": "− Ausgabe",
     "oneOff": "Einmalig",

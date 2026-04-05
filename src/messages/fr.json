@@ -84,6 +84,8 @@
     "category": "Catégorie",
     "selectCategory": "Sélectionner une catégorie…",
     "noCategoriesMatch": "Aucune catégorie correspondante",
+    "createTag": "Créer le tag \"{name}\"",
+    "createTagHint": "Tapez pour créer un tag",
     "income": "+ Revenu",
     "expense": "− Dépense",
     "oneOff": "Ponctuel",
