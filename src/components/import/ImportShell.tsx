@@ -567,7 +567,8 @@ export default function ImportShell() {
               )}
             </button>
           </div>
-          <div className="bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+          {/* Desktop: table view */}
+          <div className="hidden sm:block bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
             <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-teal-50 dark:bg-[#042F2E] border-b border-brand-secondary/20 dark:border-white/10">
@@ -620,6 +621,51 @@ export default function ImportShell() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Mobile: card list */}
+          <div className="sm:hidden flex flex-col gap-2 max-h-[60dvh] overflow-y-auto pb-1">
+            {transactions.map((tx) => (
+              <div
+                key={tx.id}
+                className={`rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-brand-card dark:bg-white/[0.04] px-3 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)] ${tx.skipped ? 'opacity-40' : ''}`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <input
+                    type="checkbox"
+                    checked={!tx.skipped}
+                    onChange={() => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, skipped: !p.skipped } : p))}
+                    className="accent-teal-600 mt-0.5 flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-sm font-medium text-brand-text dark:text-white truncate">{tx.name}</p>
+                      <p className={`text-sm font-bold font-mono tabular-nums whitespace-nowrap flex-shrink-0 ${tx.category === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {tx.category === 'income' ? '+' : '−'}{tx.amount.toFixed(2)}
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-brand-text/50 dark:text-white/50 mt-0.5">{tx.date}</p>
+                    <div className="flex gap-1.5 mt-2">
+                      <select
+                        value={tx.tag}
+                        onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, tag: e.target.value } : p))}
+                        className="flex-1 min-w-0 text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-500/40 truncate [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+                      >
+                        {allTags.map((tg) => <option key={tg.id} value={tg.id}>{tg.label}</option>)}
+                      </select>
+                      <select
+                        value={tx.category}
+                        onChange={(e) => setTransactions((prev) => prev.map((p) => p.id === tx.id ? { ...p, category: e.target.value as 'income' | 'expense' } : p))}
+                        className="flex-shrink-0 text-xs rounded-lg border border-brand-secondary/25 dark:border-white/15 bg-brand-bg dark:bg-[#042F2E] px-2 py-1 text-brand-text dark:text-white focus:outline-none focus:ring-1 focus:ring-teal-500/40 [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+                      >
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           <button
             onClick={() => setTransactions((prev) => prev.map((tx) => ({ ...tx, category: tx.category === 'income' ? 'expense' : 'income' })))}
