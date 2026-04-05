@@ -12,6 +12,7 @@ import { useSettingsStore } from '@/store/settingsStore';
  */
 export function SettingsSyncProvider({ children }: { children: React.ReactNode }) {
   const hydrate = useSettingsStore((s) => s._hydrate);
+  const reset = useSettingsStore((s) => s._reset);
 
   useEffect(() => {
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -32,11 +33,27 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
       };
     };
 
-    // Load settings from server, hydrate store once
+    // Load settings from server, hydrate store once.
+    // If the server has no record for the logged-in user (brand-new account),
+    // reset the store to defaults so we don't inherit a previous account's
+    // localStorage (e.g. a different user's language preference on the same
+    // device).
     fetch('/api/settings')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data) hydrate(data);
+      .then(async (r) => {
+        if (!r.ok) return { ok: false as const };
+        const data = await r.json();
+        return { ok: true as const, data };
+      })
+      .then((result) => {
+        if (result.ok) {
+          if (result.data) {
+            hydrate(result.data);
+          } else {
+            // Request succeeded but server has no settings for this user →
+            // brand-new account. Reset localStorage-carried state.
+            reset();
+          }
+        }
         hydrated = true;
       })
       .catch(() => {
@@ -88,7 +105,7 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
       if (saveTimer) clearTimeout(saveTimer);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [hydrate]);
+  }, [hydrate, reset]);
 
   return <>{children}</>;
 }
