@@ -14,20 +14,45 @@ interface Props {
 export function BillCalendar({ dayTransactions, formatAmount }: Props) {
   const t = useTranslations('bills');
 
+  // Group the next 8 days of recurring expenses by transaction_id so that
+  // a daily recurring shows once (at its next occurrence) with a ×N pill,
+  // rather than taking up 8 rows on its own.
   const upcomingBills = useMemo(() => {
-    const bills: { name: string; amount: number; date: string; daysAway: number; tag?: string | null }[] = [];
+    type Bill = {
+      name: string;
+      amount: number;
+      date: string;
+      daysAway: number;
+      occurrences: number;
+      tag?: string | null;
+    };
+    const byTx = new Map<string, Bill>();
     const today = new Date();
     for (let i = 0; i <= 7; i++) {
       const d = addDays(today, i);
       const dateStr = format(d, 'yyyy-MM-dd');
       const txs = dayTransactions.get(dateStr) ?? [];
       for (const tx of txs) {
-        if (tx.type === 'recurring' && tx.category === 'expense') {
-          bills.push({ name: tx.name, amount: tx.amount, date: dateStr, daysAway: i, tag: tx.tag });
+        if (tx.type !== 'recurring' || tx.category !== 'expense') continue;
+        const existing = byTx.get(tx.transaction_id);
+        if (existing) {
+          existing.occurrences += 1;
+        } else {
+          byTx.set(tx.transaction_id, {
+            name: tx.name,
+            amount: tx.amount,
+            date: dateStr,
+            daysAway: i,
+            occurrences: 1,
+            tag: tx.tag,
+          });
         }
       }
     }
-    return bills;
+    // Sort by soonest first, then by amount descending for same day
+    return [...byTx.values()].sort((a, b) =>
+      a.daysAway - b.daysAway || b.amount - a.amount,
+    );
   }, [dayTransactions]);
 
   if (upcomingBills.length === 0) return null;
@@ -52,7 +77,7 @@ export function BillCalendar({ dayTransactions, formatAmount }: Props) {
         </svg>
         <p className="text-xs font-bold text-brand-text/60 dark:text-white/50">{t('title')}</p>
       </div>
-      <div className="px-4 pb-3.5">
+      <div className="px-4 pb-3.5 max-h-[280px] overflow-y-auto overscroll-contain">
         {upcomingBills.map((bill, i) => (
           <div
             key={`${bill.date}-${bill.name}-${i}`}
@@ -64,6 +89,11 @@ export function BillCalendar({ dayTransactions, formatAmount }: Props) {
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
               <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
               <span className="text-sm font-medium text-brand-text dark:text-white truncate">{bill.name}</span>
+              {bill.occurrences > 1 && (
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary tabular-nums flex-shrink-0">
+                  ×{bill.occurrences}
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
               <span className="text-sm font-bold text-brand-danger tabular-nums">{formatAmount(bill.amount)}</span>
