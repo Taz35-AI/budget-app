@@ -169,6 +169,15 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Enter → fast-path to create a new tag with the typed name.
+                    if (e.key === 'Enter' && onCreateNew && search.trim()) {
+                      e.preventDefault();
+                      onCreateNew(search.trim());
+                      setSearch('');
+                      setOpen(false);
+                    }
+                  }}
                   placeholder={t('searchPlaceholder')}
                   className={cn(
                     'w-full pl-8 pr-3 rounded-2xl bg-black/[0.03] dark:bg-white/[0.06] border border-transparent focus:border-brand-primary/30 text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none transition-all duration-100',
@@ -218,16 +227,18 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
                     type="button"
                     onClick={() => {
                       const suggested = search.trim();
-                      if (!suggested) return;
+                      if (!suggested) {
+                        // No search text → focus the search box so the user can type
+                        searchRef.current?.focus();
+                        return;
+                      }
                       onCreateNew(suggested);
                       setSearch('');
                       setOpen(false);
                     }}
-                    disabled={!search.trim()}
                     className={cn(
-                      'w-full flex items-center gap-3 px-4 transition-all duration-100 active:bg-brand-primary/10',
+                      'w-full flex items-center gap-3 px-4 transition-all duration-100 active:bg-brand-primary/10 hover:bg-brand-primary/5',
                       compact ? 'h-10 text-[11px]' : 'h-11 text-sm sm:h-10',
-                      'disabled:opacity-40 disabled:cursor-not-allowed',
                     )}
                   >
                     <span className="w-5 h-5 rounded-full bg-brand-primary/10 dark:bg-brand-primary/15 flex items-center justify-center text-brand-primary flex-shrink-0">
