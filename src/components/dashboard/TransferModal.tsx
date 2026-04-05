@@ -132,14 +132,14 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           {/* From → To */}
           <div className="flex items-center gap-2">
             {/* From */}
-            <div className="flex-1 flex flex-col gap-1.5">
+            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
               <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
                 {t('from')}
               </label>
               <select
                 value={fromId}
                 onChange={(e) => setFromId(e.target.value)}
-                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+                className="w-full min-w-0 h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] truncate [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{accountDisplayName(a, myUserId, members)}</option>
@@ -162,14 +162,14 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
             </div>
 
             {/* To */}
-            <div className="flex-1 flex flex-col gap-1.5">
+            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
               <label className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#042F2E]/40 dark:text-white/30">
                 {t('to')}
               </label>
               <select
                 value={toId}
                 onChange={(e) => setToId(e.target.value)}
-                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+                className="w-full min-w-0 h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] truncate [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
               >
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>{accountDisplayName(a, myUserId, members)}</option>
@@ -210,7 +210,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value as Frequency)}
-                className="h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+                className="w-full min-w-0 h-10 rounded-2xl border border-[#D9DDF0]/60 dark:border-white/10 bg-[#D9DDF0]/10 dark:bg-[#042F2E] px-2.5 text-sm font-medium text-[#042F2E] dark:text-white outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40 transition-all appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] truncate [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
               >
                 {(Object.entries(FREQUENCIES) as [Frequency, string][]).map(([k, label]) => (
                   <option key={k} value={k}>{label}</option>
