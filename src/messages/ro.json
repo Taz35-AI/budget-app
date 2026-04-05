@@ -69,6 +69,7 @@
     "filterExpense": "− Cheltuială",
     "balance": "Sold · {date}",
     "deleteTitle": "Ștergi \"{name}\"?",
+    "deleteHint": "Această acțiune nu poate fi anulată.",
     "editAriaLabel": "Editează tranzacția",
     "duplicateAriaLabel": "Duplică tranzacția",
     "deleteAriaLabel": "Șterge tranzacția",

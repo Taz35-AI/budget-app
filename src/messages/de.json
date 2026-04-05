@@ -69,6 +69,7 @@
     "filterExpense": "− Ausgabe",
     "balance": "Kontostand · {date}",
     "deleteTitle": "\"{name}\" löschen?",
+    "deleteHint": "Dies kann nicht rückgängig gemacht werden.",
     "editAriaLabel": "Transaktion bearbeiten",
     "duplicateAriaLabel": "Transaktion duplizieren",
     "deleteAriaLabel": "Transaktion löschen",

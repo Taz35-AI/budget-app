@@ -69,6 +69,7 @@
     "filterExpense": "− Expense",
     "balance": "Balance · {date}",
     "deleteTitle": "Delete \"{name}\"?",
+    "deleteHint": "This can't be undone.",
     "editAriaLabel": "Edit transaction",
     "duplicateAriaLabel": "Duplicate transaction",
     "deleteAriaLabel": "Delete transaction",

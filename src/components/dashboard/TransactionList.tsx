@@ -242,54 +242,65 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                 }
 
                 // One-off delete
-                return (
-                  <li key={tx.id} className="rounded-3xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-9 h-9 rounded-2xl bg-brand-danger/10 dark:bg-brand-danger/15 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-brand-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-brand-text dark:text-white">{tc('delete')}</p>
-                        <p className="text-xs text-brand-text/50 dark:text-white/40 truncate">
-                          {tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}
+                {
+                  const displayName = tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name;
+                  return (
+                    <li
+                      key={tx.id}
+                      className={cn(
+                        'rounded-3xl px-5 pt-5 pb-4 overflow-hidden',
+                        'bg-gradient-to-b from-red-50/60 via-white to-white dark:from-red-500/[0.06] dark:via-white/[0.02] dark:to-white/[0.02]',
+                        'border border-red-100 dark:border-red-500/20',
+                        'shadow-[0_4px_20px_rgba(239,68,68,0.08),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4),0_1px_3px_rgba(0,0,0,0.3)]',
+                      )}
+                    >
+                      {/* Icon + Title + Hint, stacked and centered */}
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 rounded-2xl bg-brand-danger/10 dark:bg-brand-danger/15 flex items-center justify-center mb-3 ring-4 ring-red-500/[0.04] dark:ring-red-500/[0.06]">
+                          <svg className="w-5 h-5 text-brand-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </div>
+                        <p className="text-base font-extrabold text-brand-text dark:text-white tracking-tight px-2 break-words">
+                          {t('deleteTitle', { name: displayName })}
+                        </p>
+                        <p className="text-xs text-brand-text/45 dark:text-white/35 mt-1">
+                          {t('deleteHint')}
                         </p>
                       </div>
-                    </div>
-                    <p className="text-xs text-brand-text/60 dark:text-white/50 mb-4">
-                      {t('deleteTitle', { name: tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name })}
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={clearActive}
-                        className="flex-1"
-                      >
-                        {tc('cancel')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onClick={() =>
-                          del.mutate(
-                            { id: tx.transaction_id, deleteMode: 'all' },
-                            { onSuccess: clearActive },
-                          )
-                        }
-                        className="flex-1"
-                      >
-                        {tc('delete')}
-                      </Button>
-                    </div>
-                    {del.isError && (
-                      <p className="mt-2 text-xs font-medium text-brand-danger">
-                        {(del.error as Error)?.message}
-                      </p>
-                    )}
-                  </li>
-                );
+
+                      {/* Buttons */}
+                      <div className="flex gap-2 mt-4">
+                        <button
+                          type="button"
+                          onClick={clearActive}
+                          className="flex-1 h-10 rounded-2xl text-sm font-semibold text-brand-text/60 dark:text-white/60 bg-white dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.10] active:scale-[0.98] transition-all"
+                        >
+                          {tc('cancel')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            del.mutate(
+                              { id: tx.transaction_id, deleteMode: 'all' },
+                              { onSuccess: clearActive },
+                            )
+                          }
+                          disabled={del.isPending}
+                          className="flex-1 h-10 rounded-2xl text-sm font-semibold text-white bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 active:scale-[0.98] transition-all shadow-[0_2px_8px_rgba(239,68,68,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {del.isPending ? '…' : tc('delete')}
+                        </button>
+                      </div>
+
+                      {del.isError && (
+                        <p className="mt-3 text-xs font-medium text-center text-brand-danger">
+                          {(del.error as Error)?.message}
+                        </p>
+                      )}
+                    </li>
+                  );
+                }
               }
 
               // ── Default row ───────────────────────────────────────────

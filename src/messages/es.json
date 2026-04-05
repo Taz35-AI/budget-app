@@ -69,6 +69,7 @@
     "filterExpense": "− Gasto",
     "balance": "Saldo · {date}",
     "deleteTitle": "¿Eliminar \"{name}\"?",
+    "deleteHint": "Esta acción no se puede deshacer.",
     "editAriaLabel": "Editar transacción",
     "duplicateAriaLabel": "Duplicar transacción",
     "deleteAriaLabel": "Eliminar transacción",

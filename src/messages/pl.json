@@ -69,6 +69,7 @@
     "filterExpense": "− Wydatek",
     "balance": "Saldo · {date}",
     "deleteTitle": "Usunąć \"{name}\"?",
+    "deleteHint": "Tej operacji nie można cofnąć.",
     "editAriaLabel": "Edytuj transakcję",
     "duplicateAriaLabel": "Duplikuj transakcję",
     "deleteAriaLabel": "Usuń transakcję",

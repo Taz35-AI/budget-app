@@ -69,6 +69,7 @@
     "filterExpense": "− Dépense",
     "balance": "Solde · {date}",
     "deleteTitle": "Supprimer \"{name}\" ?",
+    "deleteHint": "Cette action est irréversible.",
     "editAriaLabel": "Modifier la transaction",
     "duplicateAriaLabel": "Dupliquer la transaction",
     "deleteAriaLabel": "Supprimer la transaction",
