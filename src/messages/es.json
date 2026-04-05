@@ -555,7 +555,8 @@
     "doneSkipped": "{count, plural, one {# fila omitida} other {# filas omitidas}}",
     "doneDuplicates": "{count, plural, one {# duplicado omitido} other {# duplicados omitidos}}",
     "sampleLabel": "Ejemplo",
-    "previewCount": "Vista previa — {count} filas"
+    "previewCount": "Vista previa — {count} filas",
+    "recurringNameLabel": "Nombre del recurrente"
   },
   "forecast": {
     "title": "Previsión de saldo",

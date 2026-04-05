@@ -555,7 +555,8 @@
     "doneSkipped": "{count, plural, one {# row skipped} other {# rows skipped}}",
     "doneDuplicates": "{count, plural, one {# duplicate skipped} other {# duplicates skipped}}",
     "sampleLabel": "Sample",
-    "previewCount": "Preview — {count} rows"
+    "previewCount": "Preview — {count} rows",
+    "recurringNameLabel": "Recurring name"
   },
   "forecast": {
     "title": "Balance Forecast",

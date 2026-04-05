@@ -644,8 +644,14 @@ export default function ImportShell() {
             {recurringGroups.map((g, i) => (
               <div key={i} className="bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl px-4 py-3 flex flex-col gap-3 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-brand-text dark:text-white truncate">{g.merchant}</p>
+                  <div className="min-w-0 flex-1">
+                    <input
+                      type="text"
+                      value={g.merchant}
+                      onChange={(e) => setRecurringGroups((prev) => prev.map((r, ri) => ri === i ? { ...r, merchant: e.target.value } : r))}
+                      aria-label={t('recurringNameLabel')}
+                      className="w-full font-semibold text-brand-text dark:text-white bg-transparent border border-transparent hover:border-brand-primary/20 focus:border-brand-primary/40 focus:bg-white dark:focus:bg-white/[0.04] rounded-lg px-2 -mx-2 py-0.5 outline-none transition-colors truncate"
+                    />
                     <p className="text-xs text-brand-text/50 dark:text-white/50 mt-0.5">
                       {g.interval === 'weekly' ? t('weekly') : g.interval === 'biweekly' ? t('biweekly') : t('monthly')}
                       {' · '}{g.amount.toFixed(2)}

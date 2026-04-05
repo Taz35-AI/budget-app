@@ -555,7 +555,8 @@
     "doneSkipped": "{count, plural, one {# ligne ignorée} other {# lignes ignorées}}",
     "doneDuplicates": "{count, plural, one {# doublon ignoré} other {# doublons ignorés}}",
     "sampleLabel": "Exemple",
-    "previewCount": "Aperçu — {count} lignes"
+    "previewCount": "Aperçu — {count} lignes",
+    "recurringNameLabel": "Nom du paiement récurrent"
   },
   "forecast": {
     "title": "Prévision de solde",

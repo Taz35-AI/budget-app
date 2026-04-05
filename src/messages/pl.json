@@ -555,7 +555,8 @@
     "doneSkipped": "{count, plural, one {# wiersz pominięty} few {# wiersze pominięte} other {# wierszy pominiętych}}",
     "doneDuplicates": "{count, plural, one {# duplikat pominięty} few {# duplikaty pominięte} other {# duplikatów pominiętych}}",
     "sampleLabel": "Przykład",
-    "previewCount": "Podgląd — {count} wierszy"
+    "previewCount": "Podgląd — {count} wierszy",
+    "recurringNameLabel": "Nazwa płatności cyklicznej"
   },
   "forecast": {
     "title": "Prognoza salda",
