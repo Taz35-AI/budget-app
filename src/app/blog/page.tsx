@@ -41,6 +41,16 @@ const jsonLd = {
 
 const posts = [
   {
+    slug: 'budgeting-is-not-restriction-its-control',
+    category: 'Mindset',
+    date: 'April 5, 2026',
+    dateIso: '2026-04-05',
+    readTime: '7 min read',
+    title: 'Budgeting Is Not Restriction. It Is Control.',
+    excerpt: 'Most of us think a budget is a cage. The research says the opposite. Here is why money anxiety is so common, what actually reduces it, and the mindset shift that makes budgeting feel like freedom instead of punishment.',
+    tags: ['Mindset', 'Financial Anxiety', 'Psychology', 'Budgeting'],
+  },
+  {
     slug: 'stop-guessing-where-your-money-goes',
     category: 'Personal Finance',
     date: 'April 2, 2026',
