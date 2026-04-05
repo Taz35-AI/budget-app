@@ -23,6 +23,16 @@ export interface AuthContext {
 const householdCache = new Map<string, string>();
 
 /**
+ * Drop a user's cached household mapping. MUST be called whenever a user's
+ * household_id changes in the database (e.g. after accepting an invite,
+ * leaving a household, or being removed). Otherwise getAuthContext() keeps
+ * returning the stale household and the user sees wrong data.
+ */
+export function clearHouseholdCache(userId: string): void {
+  householdCache.delete(userId);
+}
+
+/**
  * Returns userId + householdId for the authenticated user.
  * Auto-creates a household on first call using the database-level
  * ensure_household() function which is race-condition-proof.

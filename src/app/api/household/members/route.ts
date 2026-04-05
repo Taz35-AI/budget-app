@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthContext } from '@/lib/auth';
+import { getAuthContext, clearHouseholdCache } from '@/lib/auth';
 
 /**
  * GET /api/household/members
@@ -91,6 +91,11 @@ export async function DELETE(req: NextRequest) {
       console.error('[DELETE /api/household/members]', error.message);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Removed member now has no household — clear their cache so the next
+    // getAuthContext() call auto-creates them a fresh solo household via
+    // ensure_household().
+    clearHouseholdCache(memberUserId);
 
     return NextResponse.json({ ok: true });
   } catch (err) {

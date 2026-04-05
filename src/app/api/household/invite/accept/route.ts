@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getAuthContext } from '@/lib/auth';
+import { getAuthContext, clearHouseholdCache } from '@/lib/auth';
 
 /**
  * POST /api/household/invite/accept
@@ -118,6 +118,11 @@ export async function POST(req: NextRequest) {
       .from('household_invites')
       .update({ status: 'accepted' })
       .eq('id', invite.id);
+
+    // CRITICAL: drop the invitee's cached household mapping, otherwise the
+    // next getAuthContext() call returns the stale (pre-migration) household
+    // and the user can't see their new household's data.
+    clearHouseholdCache(ctx.userId);
 
     return NextResponse.json({ ok: true });
   } catch (err) {
