@@ -586,7 +586,11 @@
     "subtitle": "Dzienna intensywność wydatków",
     "low": "Niski",
     "high": "Wysoki",
-    "noSpend": "Bez wydatków"
+    "noSpend": "Bez wydatków",
+    "totalSpent": "Łącznie wydano",
+    "avgDay": "Śr. / dzień aktywny",
+    "biggestDay": "Największy dzień",
+    "activeDays": "Dni aktywne"
   },
   "widget": {
     "title": "Szybki podgląd",

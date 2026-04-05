@@ -586,7 +586,11 @@
     "subtitle": "Daily spending intensity",
     "low": "Low",
     "high": "High",
-    "noSpend": "No spend"
+    "noSpend": "No spend",
+    "totalSpent": "Total spent",
+    "avgDay": "Avg / active day",
+    "biggestDay": "Biggest day",
+    "activeDays": "Active days"
   },
   "widget": {
     "title": "Quick View",

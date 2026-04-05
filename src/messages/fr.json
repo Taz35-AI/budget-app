@@ -586,7 +586,11 @@
     "subtitle": "Intensité quotidienne des dépenses",
     "low": "Faible",
     "high": "Élevé",
-    "noSpend": "Aucune dépense"
+    "noSpend": "Aucune dépense",
+    "totalSpent": "Total dépensé",
+    "avgDay": "Moyenne / jour actif",
+    "biggestDay": "Plus gros jour",
+    "activeDays": "Jours actifs"
   },
   "widget": {
     "title": "Vue rapide",

@@ -586,7 +586,11 @@
     "subtitle": "Intensitatea zilnică a cheltuielilor",
     "low": "Scăzut",
     "high": "Ridicat",
-    "noSpend": "Fără cheltuieli"
+    "noSpend": "Fără cheltuieli",
+    "totalSpent": "Total cheltuit",
+    "avgDay": "Med. / zi activă",
+    "biggestDay": "Cea mai mare zi",
+    "activeDays": "Zile active"
   },
   "widget": {
     "title": "Vizualizare rapidă",

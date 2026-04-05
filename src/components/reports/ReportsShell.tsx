@@ -291,14 +291,20 @@ export function ReportsShell() {
     const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
     const days: { date: string; amount: number; day: number }[] = [];
     let maxSpend = 0;
+    let maxDay = 0;
+    let totalSpend = 0;
+    let activeDays = 0;
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const txs = dayTransactions.get(dateStr) ?? [];
       const spent = txs.filter(t => t.category === 'expense').reduce((s, t) => s + t.amount, 0);
       days.push({ date: dateStr, amount: spent, day: d });
-      if (spent > maxSpend) maxSpend = spent;
+      totalSpend += spent;
+      if (spent > 0) activeDays += 1;
+      if (spent > maxSpend) { maxSpend = spent; maxDay = d; }
     }
-    return { days, maxSpend, firstDow, daysInMonth };
+    const avgDaily = activeDays > 0 ? totalSpend / activeDays : 0;
+    return { days, maxSpend, maxDay, firstDow, daysInMonth, totalSpend, avgDaily, activeDays };
   }, [selectedYear, selectedMonthIdx, dayTransactions]);
 
   // ── Insights helpers ────────────────────────────────────────────────────────
@@ -791,52 +797,101 @@ export function ReportsShell() {
                 <p className="text-[11px] text-brand-text/40 dark:text-white/30 mt-0.5">{tHeatmap('subtitle')}</p>
               </div>
               <div className="px-4 sm:px-5 pb-4 sm:pb-5">
-                {/* 7-column grid (Mon-Sun) */}
-                <div className="grid grid-cols-7 gap-1.5">
-                  {/* Day of week headers */}
-                  {['M','T','W','T','F','S','S'].map((d, i) => (
-                    <div key={i} className="text-center text-[8px] font-bold text-brand-text/25 dark:text-white/20 pb-1">{d}</div>
-                  ))}
-                  {/* Empty cells for offset (Monday-based: adjust firstDow) */}
-                  {Array.from({ length: (heatmapData.firstDow + 6) % 7 }).map((_, i) => (
-                    <div key={`empty-${i}`} />
-                  ))}
-                  {/* Day cells */}
-                  {heatmapData.days.map(({ date, amount, day }) => {
-                    const intensity = heatmapData.maxSpend > 0 ? amount / heatmapData.maxSpend : 0;
-                    const bg = amount === 0
-                      ? 'bg-brand-primary/[0.04] dark:bg-white/[0.03]'
-                      : intensity > 0.75 ? 'bg-red-500'
-                      : intensity > 0.5 ? 'bg-orange-400'
-                      : intensity > 0.25 ? 'bg-amber-400'
-                      : 'bg-emerald-400';
-                    const textColor = amount > 0 && intensity > 0.5 ? 'text-white' : 'text-brand-text/50 dark:text-white/40';
-                    return (
-                      <div
-                        key={date}
-                        className={cn('aspect-square rounded-lg flex flex-col items-center justify-center transition-all', bg, amount > 0 && intensity > 0.25 && 'shadow-sm')}
-                        style={amount > 0 && intensity <= 0.75 ? { opacity: 0.5 + intensity * 0.5 } : undefined}
-                        title={`${day}: ${formatAmount(amount)}`}
-                      >
-                        <span className={cn('text-[9px] font-bold', textColor)}>{day}</span>
-                        {amount > 0 && (
-                          <span className={cn('text-[7px] font-semibold', textColor)}>{formatAmount(amount, { compact: true })}</span>
+                <div className="flex flex-col md:flex-row md:items-start md:gap-6">
+                  {/* Grid — capped to a sensible max size */}
+                  <div className="w-full md:w-auto md:flex-shrink-0">
+                    <div className="grid grid-cols-7 gap-1 max-w-[336px] mx-auto md:mx-0">
+                      {/* Day of week headers */}
+                      {['M','T','W','T','F','S','S'].map((d, i) => (
+                        <div key={i} className="text-center text-[9px] font-bold text-brand-text/25 dark:text-white/20 pb-1">{d}</div>
+                      ))}
+                      {/* Empty cells for offset (Monday-based) */}
+                      {Array.from({ length: (heatmapData.firstDow + 6) % 7 }).map((_, i) => (
+                        <div key={`empty-${i}`} />
+                      ))}
+                      {/* Day cells — single-hue intensity ramp for premium feel */}
+                      {heatmapData.days.map(({ date, amount, day }) => {
+                        const intensity = heatmapData.maxSpend > 0 ? amount / heatmapData.maxSpend : 0;
+                        const isZero = amount === 0;
+                        // Single red-amber ramp driven by opacity (clean, GitHub-style)
+                        const opacity = isZero ? 0 : 0.15 + intensity * 0.85;
+                        const isDark = intensity > 0.45;
+                        return (
+                          <div
+                            key={date}
+                            className={cn(
+                              'aspect-square rounded-lg flex flex-col items-center justify-center transition-all relative',
+                              isZero
+                                ? 'bg-brand-primary/[0.04] dark:bg-white/[0.04] border border-dashed border-brand-primary/10 dark:border-white/[0.08]'
+                                : 'shadow-[0_1px_2px_rgba(220,38,38,0.08)]',
+                            )}
+                            style={isZero ? undefined : { backgroundColor: `rgba(220, 38, 38, ${opacity})` }}
+                            title={`${day}: ${formatAmount(amount)}`}
+                          >
+                            <span className={cn(
+                              'text-[10px] font-bold tabular-nums',
+                              isZero
+                                ? 'text-brand-text/30 dark:text-white/25'
+                                : isDark
+                                ? 'text-white'
+                                : 'text-brand-text/70 dark:text-white/70',
+                            )}>
+                              {day}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Legend */}
+                    <div className="flex items-center justify-center md:justify-start gap-2 mt-3">
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-brand-text/30 dark:text-white/25">{tHeatmap('noSpend')}</span>
+                      <div className="flex gap-0.5">
+                        {[0, 0.2, 0.4, 0.6, 0.8, 1].map((lvl) => (
+                          <div
+                            key={lvl}
+                            className="w-3 h-3 rounded"
+                            style={lvl === 0
+                              ? { backgroundColor: 'rgba(13, 148, 136, 0.06)' }
+                              : { backgroundColor: `rgba(220, 38, 38, ${0.15 + lvl * 0.85})` }
+                            }
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-brand-text/30 dark:text-white/25">{tHeatmap('high')}</span>
+                    </div>
+                  </div>
+
+                  {/* Stats side panel — desktop only */}
+                  <div className="hidden md:flex flex-col gap-3 flex-1 min-w-0 pt-1">
+                    <div className="rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.06] bg-brand-primary/[0.03] dark:bg-white/[0.02] p-4">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/35 dark:text-white/25 mb-1">{tHeatmap('totalSpent')}</p>
+                      <p className="text-2xl font-black tabular-nums text-brand-text dark:text-white tracking-tight">
+                        {formatAmount(heatmapData.totalSpend)}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-2xl border border-black/[0.04] dark:border-white/[0.04] bg-slate-50/60 dark:bg-white/[0.02] p-3">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-brand-text/30 dark:text-white/25 mb-0.5">{tHeatmap('avgDay')}</p>
+                        <p className="text-sm font-bold tabular-nums text-brand-text dark:text-white">{formatAmount(heatmapData.avgDaily)}</p>
+                      </div>
+                      <div className="rounded-2xl border border-black/[0.04] dark:border-white/[0.04] bg-slate-50/60 dark:bg-white/[0.02] p-3">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-brand-text/30 dark:text-white/25 mb-0.5">{tHeatmap('biggestDay')}</p>
+                        <p className="text-sm font-bold tabular-nums text-brand-danger">
+                          {heatmapData.maxSpend > 0 ? formatAmount(heatmapData.maxSpend) : '—'}
+                        </p>
+                        {heatmapData.maxDay > 0 && (
+                          <p className="text-[9px] text-brand-text/30 dark:text-white/25 mt-0.5">{MONTH_LABELS[selectedMonthIdx]} {heatmapData.maxDay}</p>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <span className="text-[8px] text-brand-text/30 dark:text-white/20">{tHeatmap('noSpend')}</span>
-                  <div className="flex gap-0.5">
-                    <div className="w-3 h-3 rounded-sm bg-brand-primary/[0.06]" />
-                    <div className="w-3 h-3 rounded-sm bg-emerald-400/60" />
-                    <div className="w-3 h-3 rounded-sm bg-amber-400/80" />
-                    <div className="w-3 h-3 rounded-sm bg-orange-400" />
-                    <div className="w-3 h-3 rounded-sm bg-red-500" />
+                      <div className="rounded-2xl border border-black/[0.04] dark:border-white/[0.04] bg-slate-50/60 dark:bg-white/[0.02] p-3 col-span-2">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-brand-text/30 dark:text-white/25 mb-0.5">{tHeatmap('activeDays')}</p>
+                        <div className="flex items-baseline gap-1.5">
+                          <p className="text-sm font-bold tabular-nums text-brand-text dark:text-white">{heatmapData.activeDays}</p>
+                          <p className="text-[10px] text-brand-text/35 dark:text-white/30 tabular-nums">/ {heatmapData.daysInMonth}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <span className="text-[8px] text-brand-text/30 dark:text-white/20">{tHeatmap('high')}</span>
                 </div>
               </div>
             </div>

@@ -586,7 +586,11 @@
     "subtitle": "Tägliche Ausgabenintensität",
     "low": "Niedrig",
     "high": "Hoch",
-    "noSpend": "Keine Ausgaben"
+    "noSpend": "Keine Ausgaben",
+    "totalSpent": "Gesamt ausgegeben",
+    "avgDay": "Ø / Aktivtag",
+    "biggestDay": "Größter Tag",
+    "activeDays": "Aktive Tage"
   },
   "widget": {
     "title": "Schnellansicht",
