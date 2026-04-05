@@ -1603,7 +1603,7 @@ function NotificationsSection() {
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 
-type SettingsTab = 'general' | 'accounts' | 'tags' | 'notifications' | 'data' | 'profile';
+type SettingsTab = 'general' | 'accounts' | 'household' | 'tags' | 'notifications' | 'data' | 'profile';
 
 export function SettingsShell() {
   const t = useTranslations('settings');
@@ -1613,6 +1613,7 @@ export function SettingsShell() {
   const tabs: { id: SettingsTab; label: string }[] = [
     { id: 'general',       label: t('tabGeneral') },
     { id: 'accounts',      label: t('tabAccounts') },
+    { id: 'household',     label: t('tabHousehold') },
     { id: 'tags',          label: t('tabTags') },
     { id: 'notifications', label: t('tabNotifications') },
     { id: 'data',          label: t('tabData') },
@@ -1711,12 +1712,9 @@ export function SettingsShell() {
           </>
         )}
 
-        {activeTab === 'accounts' && (
-          <>
-            <AccountsSection />
-            <HouseholdSharingSection />
-          </>
-        )}
+        {activeTab === 'accounts' && <AccountsSection />}
+
+        {activeTab === 'household' && <HouseholdSharingSection />}
 
         {activeTab === 'tags' && <TagsSection />}
 
