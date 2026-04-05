@@ -20,12 +20,47 @@ import { cn } from '@/lib/utils';
 const BAR_MAX_H = 128;
 
 const GOAL_PRESETS = [
+  // Lifestyle & big purchases
   { name: 'New Vehicle', icon: '\u{1F697}', color: '#3b82f6' },
+  { name: 'Car Repairs', icon: '\u{1F527}', color: '#f59e0b' },
+  { name: 'New Phone', icon: '\u{1F4F1}', color: '#0ea5e9' },
+  { name: 'New Laptop', icon: '\u{1F4BB}', color: '#475569' },
+  { name: 'New Gadget', icon: '\u{1F3AE}', color: '#8b5cf6' },
+  { name: 'New Hoover', icon: '\u{1F9F9}', color: '#0d9488' },
+  { name: 'New Furniture', icon: '\u{1F6CB}\uFE0F', color: '#d97706' },
+  { name: 'New Wardrobe', icon: '\u{1F457}', color: '#ec4899' },
+  // Home & living
   { name: 'New Home', icon: '\u{1F3E0}', color: '#f97316' },
+  { name: 'Home Deposit', icon: '\u{1F3E1}', color: '#f97316' },
+  { name: 'House Renovation', icon: '\u{1F528}', color: '#d97706' },
+  { name: 'Home Repairs', icon: '\u{1F6E0}\uFE0F', color: '#f59e0b' },
+  { name: 'Home Improvement', icon: '\u{1FA9A}', color: '#a16207' },
+  // Travel & experiences
   { name: 'Holiday Trip', icon: '\u2708\uFE0F', color: '#22c55e' },
+  { name: 'New Trip', icon: '\u{1F5FA}\uFE0F', color: '#10b981' },
+  { name: 'Travel Fund', icon: '\u{1F9F3}', color: '#059669' },
+  { name: 'Family Vacation', icon: '\u{1F3D6}\uFE0F', color: '#06b6d4' },
+  { name: 'Save for a Boat', icon: '\u26F5', color: '#0284c7' },
+  // Life events
+  { name: 'Dream Wedding', icon: '\u{1F48D}', color: '#f43f5e' },
+  { name: 'Save for Baby', icon: '\u{1F476}', color: '#ec4899' },
+  { name: 'Buy a Pet', icon: '\u{1F436}', color: '#d97706' },
+  { name: 'Holiday Gifts', icon: '\u{1F381}', color: '#dc2626' },
+  // Education & growth
   { name: 'Education', icon: '\u{1F393}', color: '#6366f1' },
-  { name: 'Emergency Fund', icon: '\u{1F6E1}\uFE0F', color: '#a855f7' },
+  { name: 'Start a Business', icon: '\u{1F4BC}', color: '#4f46e5' },
+  // Health & wellbeing
   { name: 'Health Care', icon: '\u2764\uFE0F', color: '#ef4444' },
+  { name: 'Health & Fitness', icon: '\u{1F4AA}', color: '#dc2626' },
+  // Financial stability
+  { name: 'Emergency Fund', icon: '\u{1F6E1}\uFE0F', color: '#a855f7' },
+  { name: 'Pay Off Debt', icon: '\u{1F4B3}', color: '#dc2626' },
+  { name: 'Pay Off Student Loan', icon: '\u{1F4DA}', color: '#7c3aed' },
+  { name: 'Debt Free', icon: '\u{1F3AF}', color: '#16a34a' },
+  { name: 'Retirement Fund', icon: '\u{1FAB4}', color: '#15803d' },
+  // Giving & treats
+  { name: 'Charity Donation', icon: '\u{1F49D}', color: '#db2777' },
+  { name: 'Luxury Treat', icon: '\u2728', color: '#eab308' },
 ];
 
 // ── Donut chart helpers ────────────────────────────────────────────────────────
@@ -1294,7 +1329,7 @@ export function ReportsShell() {
                 {showAddGoal ? (
                   <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
                     {!goalForm.name && (
-                      <div className="grid grid-cols-3 gap-2 mb-3">
+                      <div className="grid grid-cols-3 gap-2 mb-3 max-h-[260px] overflow-y-auto overscroll-contain pr-1">
                         {GOAL_PRESETS.map((preset) => (
                           <button
                             key={preset.name}
