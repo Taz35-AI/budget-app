@@ -32,13 +32,16 @@ export function BudgetsShell() {
   const [budgetInput, setBudgetInput] = useState('');
   const [budgetError, setBudgetError] = useState('');
 
-  // Compute actual spending per tag for current month
+  // Compute actual spending per tag for current month.
+  // Excludes inter-account transfers — they're internal money movements,
+  // not spending, so they shouldn't inflate 'untracked' or any budget.
   const monthlySpend = useMemo<Record<string, number>>(() => {
     const spend: Record<string, number> = {};
     for (const [date, txs] of dayTransactions) {
       if (date.slice(0, 7) !== currentMonth) continue;
       for (const tx of txs) {
         if (tx.category !== 'expense') continue;
+        if (tx.transfer_id) continue; // skip transfer legs
         const key = tx.tag ?? '__untagged__';
         spend[key] = (spend[key] ?? 0) + tx.amount;
       }

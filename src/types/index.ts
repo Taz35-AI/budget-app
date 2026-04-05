@@ -78,6 +78,7 @@ export interface DayTransaction {
   transaction_id: string;
   account_id?: string | null;
   parent_id?: string | null;
+  transfer_id?: string | null;
   created_by?: string | null;
   name: string;
   amount: number;
