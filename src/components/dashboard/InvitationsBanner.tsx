@@ -23,20 +23,7 @@ export function InvitationsBanner() {
         >
           {/* Family illustration band */}
           <div className="bg-gradient-to-r from-teal-50 via-teal-100/60 to-transparent dark:from-teal-900/25 dark:via-teal-800/15 dark:to-transparent px-4 pt-3 pb-2 flex items-center justify-center">
-            <div
-              aria-hidden
-              className="w-[220px] h-[70px] bg-teal-700/70 dark:bg-teal-300/60"
-              style={{
-                maskImage: "url('/household-family.svg')",
-                WebkitMaskImage: "url('/household-family.svg')",
-                maskRepeat: 'no-repeat',
-                WebkitMaskRepeat: 'no-repeat',
-                maskPosition: 'center',
-                WebkitMaskPosition: 'center',
-                maskSize: 'contain',
-                WebkitMaskSize: 'contain',
-              }}
-            />
+            <img src="/shared-household.svg" alt="" aria-hidden className="w-full max-w-[220px] h-auto" />
           </div>
           {/* Invitation content */}
           <div className="flex items-center gap-3 px-4 py-3 border-t border-slate-100 dark:border-white/[0.06]">
