@@ -96,8 +96,11 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
   return (
     <div className="flex flex-col h-full">
 
-      {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-5 pb-4 flex-shrink-0">
+      {/* Logo + theme toggle */}
+      <div className="relative flex items-center justify-center px-4 pt-5 pb-4 flex-shrink-0">
+        <div className="absolute left-3 top-3">
+          <ThemeToggle />
+        </div>
         <Link href="/dashboard" onClick={onLinkClick} className="block w-1/2">
           <SpentumLogo width={200} height={200} className="w-full h-auto object-contain" priority />
         </Link>
@@ -144,11 +147,6 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
         <div className="px-1 mb-2">
           <UserBadge />
-        </div>
-
-        <div className="flex items-center gap-2 px-1">
-          <ThemeToggle />
-          <span className="text-xs text-teal-900 dark:text-teal-400 font-semibold">{t('toggleTheme')}</span>
         </div>
 
         <div className="px-1 [&>button]:w-full [&>button]:justify-start">
