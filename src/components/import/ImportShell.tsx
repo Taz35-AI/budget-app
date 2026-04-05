@@ -276,11 +276,20 @@ export default function ImportShell() {
       if (isNaN(rawNum) || rawNum === 0) continue;
       const amt = Math.abs(rawNum);
 
+      // Category detection — trust the amount sign as the primary signal.
+      // Only override with the type column when it contains an explicit
+      // debit/credit keyword; ambiguous types ("Transfer", "Faster Payment",
+      // etc.) should NOT flip a positive amount to expense.
       let category: 'income' | 'expense';
-      if (colCategory) {
-        const v = (row[colCategory] ?? '').toLowerCase().trim();
-        category = /^cr$|credit|^c$|^in$/.test(v) ? 'income' : 'expense';
+      const typeValue = colCategory ? (row[colCategory] ?? '').toLowerCase().trim() : '';
+      const isTypeIncome = typeValue && /(^cr$|^c$|^credit$|^in$|deposit|receipt|inbound|received|refund|income|interest|dividend|salary|wage|paid.?in|credit.?in|direct.?credit|bacs.?credit|faster.?payment.?in|cheque.?in)/.test(typeValue);
+      const isTypeExpense = typeValue && /(^dr$|^d$|^debit$|^deb$|^out$|^wd$|^dd$|^so$|withdrawal|direct.?debit|standing.?order|atm|bacs.?debit|card.?payment|paid.?out|outbound|purchase|debit.?card)/.test(typeValue);
+      if (isTypeIncome) {
+        category = 'income';
+      } else if (isTypeExpense) {
+        category = 'expense';
       } else {
+        // No explicit type hit — trust the amount sign
         category = rawNum >= 0 ? 'income' : 'expense';
       }
 
