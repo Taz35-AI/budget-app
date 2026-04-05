@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { format, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useBalances } from '@/hooks/useBalances';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -30,7 +30,6 @@ import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
 import { TransferModal } from './TransferModal';
-import { BillCalendar } from './BillCalendar';
 import { InvitationsBanner } from './InvitationsBanner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
@@ -217,18 +216,6 @@ export function DashboardShell() {
   const budgetProgress = budgetLimit ? monthExpense / budgetLimit : undefined;
   const clampedBudgetPct = budgetProgress !== undefined ? Math.min(budgetProgress, 1) * 100 : undefined;
   const budgetDanger = budgetProgress !== undefined && budgetProgress >= 0.85;
-
-  // Warn when balance is predicted to go negative within the next 7 days
-  const runningLowDate = useMemo(() => {
-    const isCurrentMonth = format(visibleMonth, 'yyyy-MM') === format(new Date(), 'yyyy-MM');
-    if (!isCurrentMonth || balances.size === 0) return null;
-    for (let i = 1; i <= 7; i++) {
-      const d = format(addDays(new Date(), i), 'yyyy-MM-dd');
-      const bal = balances.get(d);
-      if (bal !== undefined && bal < 0) return { date: d, balance: bal };
-    }
-    return null;
-  }, [balances, visibleMonth]);
 
   // Onboarding tour: 0=tap day, 1=tap add, 2-7=spotlight tour (6 steps), done=finished
   // New users start at step 2 immediately so Adjust Balance is the very first thing they see
@@ -625,34 +612,6 @@ export function DashboardShell() {
             </div>
 
           </div>
-
-          <BillCalendar dayTransactions={dayTransactions} formatAmount={formatAmount} />
-
-          {/* Running-low warning — hidden on mobile when stats panel is open */}
-          {runningLowDate && !showMobileStats && (
-            <div className="flex-shrink-0 flex items-start gap-3 px-4 py-3 rounded-2xl
-              bg-amber-50 border border-amber-200 shadow-[0_1px_6px_rgba(245,158,11,0.1)]
-              dark:bg-amber-950/40 dark:border-amber-500/30 dark:shadow-[0_1px_8px_rgba(245,158,11,0.08)]">
-              <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0 text-amber-500 dark:text-amber-400 mt-0.5">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-amber-700 dark:text-amber-300 leading-tight">
-                  {t('runningLowTitle')}
-                </p>
-                <p className="text-xs text-amber-600/80 dark:text-amber-400/70 mt-0.5">
-                  {t('runningLow', {
-                    date: new Date(runningLowDate.date + 'T12:00:00').toLocaleDateString('en-GB', {
-                      weekday: 'short', day: 'numeric', month: 'short',
-                    }),
-                    amount: formatAmount(runningLowDate.balance),
-                  })}
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* Mobile stats panel — shown instead of calendar when toggle is active */}
           {showMobileStats && (
