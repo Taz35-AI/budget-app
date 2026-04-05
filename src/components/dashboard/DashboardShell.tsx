@@ -10,7 +10,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useHouseholdMembers } from '@/hooks/useHousehold';
-import { accountDisplayName } from '@/lib/memberUtils';
+import { accountDisplayName, groupAccountsByOwner, memberShortName } from '@/lib/memberUtils';
 import { createClient } from '@/lib/supabase/client';
 import { CalendarView } from './CalendarView';
 import type { CalendarNavHandle } from './CalendarView';
@@ -731,23 +731,54 @@ export function DashboardShell() {
                             </button>
                           )}
                         </div>
-                        <div className="flex gap-1 flex-wrap">
-                          {(addPickerAccounts ?? []).map((acct) => (
-                            <button
-                              key={acct.id}
-                              type="button"
-                              onClick={() => setDesktopFormAccountId(acct.id)}
-                              className={cn(
-                                'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
-                                desktopFormAccountId === acct.id
-                                  ? 'bg-brand-primary text-white border-brand-primary'
-                                  : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
-                              )}
-                            >
-                              {accountDisplayName(acct, myUserId, householdMembers)}
-                            </button>
-                          ))}
-                        </div>
+                        {showAllAddAccounts && hasHousehold ? (
+                          // Grouped view — cleaner when there are many accounts across members
+                          <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto overscroll-contain pr-1">
+                            {groupAccountsByOwner(addPickerAccounts ?? [], myUserId, householdMembers).map((group) => (
+                              <div key={group.userId || 'mine'} className="flex flex-col gap-0.5">
+                                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/25 px-0.5">
+                                  {group.isMine ? tt('showMineOnly') : memberShortName(group.userId, householdMembers) ?? '—'}
+                                </p>
+                                <div className="flex gap-1 flex-wrap">
+                                  {group.items.map((acct) => (
+                                    <button
+                                      key={acct.id}
+                                      type="button"
+                                      onClick={() => setDesktopFormAccountId(acct.id)}
+                                      className={cn(
+                                        'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                                        desktopFormAccountId === acct.id
+                                          ? 'bg-brand-primary text-white border-brand-primary'
+                                          : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                                      )}
+                                    >
+                                      {acct.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          // Flat pills — fine for "mine only" or solo household
+                          <div className="flex gap-1 flex-wrap">
+                            {(addPickerAccounts ?? []).map((acct) => (
+                              <button
+                                key={acct.id}
+                                type="button"
+                                onClick={() => setDesktopFormAccountId(acct.id)}
+                                className={cn(
+                                  'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
+                                  desktopFormAccountId === acct.id
+                                    ? 'bg-brand-primary text-white border-brand-primary'
+                                    : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                                )}
+                              >
+                                {accountDisplayName(acct, myUserId, householdMembers)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                     <TransactionForm

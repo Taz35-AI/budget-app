@@ -6,7 +6,7 @@ import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useOfflineCreate } from '@/hooks/useOfflineCreate';
 import { cn } from '@/lib/utils';
-import { accountDisplayName } from '@/lib/memberUtils';
+import { accountDisplayName, groupAccountsByOwner, memberShortName } from '@/lib/memberUtils';
 import type { BudgetAccount, DayTransaction, HouseholdMember, Transaction, TransactionFormValues } from '@/types';
 
 interface Props {
@@ -189,23 +189,54 @@ export function DayBottomSheet({
                         </button>
                       )}
                     </div>
-                    <div className="flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5 flex-wrap">
-                      {(addPickerAccounts ?? []).map((acct) => (
-                        <button
-                          key={acct.id}
-                          type="button"
-                          onClick={() => setFormAccountId(acct.id)}
-                          className={cn(
-                            'flex-1 h-7 px-3 rounded-[14px] text-[11px] font-semibold transition-all duration-100 active:scale-[0.96]',
-                            formAccountId === acct.id
-                              ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
-                              : 'text-slate-500 dark:text-white/40',
-                          )}
-                        >
-                          {accountDisplayName(acct, myUserId, members)}
-                        </button>
-                      ))}
-                    </div>
+                    {showAllAddAccounts && hasHousehold ? (
+                      // Grouped view — scrollable, keeps the picker compact with many accounts
+                      <div className="flex flex-col gap-1.5 max-h-[140px] overflow-y-auto overscroll-contain">
+                        {groupAccountsByOwner(addPickerAccounts ?? [], myUserId, members).map((group) => (
+                          <div key={group.userId || 'mine'} className="flex flex-col gap-1">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400 dark:text-white/25 px-1">
+                              {group.isMine ? t('showMineOnly') : memberShortName(group.userId, members) ?? '—'}
+                            </p>
+                            <div className="flex gap-1 flex-wrap">
+                              {group.items.map((acct) => (
+                                <button
+                                  key={acct.id}
+                                  type="button"
+                                  onClick={() => setFormAccountId(acct.id)}
+                                  className={cn(
+                                    'h-7 px-3 rounded-xl text-[11px] font-semibold transition-all duration-100 active:scale-[0.96] border',
+                                    formAccountId === acct.id
+                                      ? 'bg-brand-primary text-white border-brand-primary'
+                                      : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10',
+                                  )}
+                                >
+                                  {acct.name}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      // Flat pills for "mine only" / solo
+                      <div className="flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5 flex-wrap">
+                        {(addPickerAccounts ?? []).map((acct) => (
+                          <button
+                            key={acct.id}
+                            type="button"
+                            onClick={() => setFormAccountId(acct.id)}
+                            className={cn(
+                              'flex-1 h-7 px-3 rounded-[14px] text-[11px] font-semibold transition-all duration-100 active:scale-[0.96]',
+                              formAccountId === acct.id
+                                ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                                : 'text-slate-500 dark:text-white/40',
+                            )}
+                          >
+                            {accountDisplayName(acct, myUserId, members)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 <TransactionForm
