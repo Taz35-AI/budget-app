@@ -7,6 +7,7 @@ import Papa from 'papaparse';
 import { useTranslations } from 'next-intl';
 import { useSettings } from '@/hooks/useSettings';
 import { useAccounts } from '@/hooks/useAccounts';
+import { useTransactions } from '@/hooks/useTransactions';
 import { useSettingsStore } from '@/store/settingsStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -96,6 +97,39 @@ function uid() {
 }
 
 /**
+ * Builds a lookup of normalized merchant name → most-common (tag, category)
+ * from the user's existing transactions. Used to auto-tag new imports using
+ * the user's own prior choices — no AI round-trip needed for merchants the
+ * user has already categorised.
+ */
+interface HistoryMatch { tag: string; category: 'income' | 'expense' }
+function buildHistoryTagMap(
+  transactions: Array<{ name?: string | null; tag?: string | null; category: 'income' | 'expense' }>,
+): Record<string, HistoryMatch> {
+  const buckets: Record<string, Record<string, { count: number; category: 'income' | 'expense' }>> = {};
+  for (const tx of transactions) {
+    if (!tx.name || !tx.tag) continue;
+    const key = normalizeMerchant(tx.name);
+    if (!key) continue;
+    const tagKey = `${tx.tag}|${tx.category}`;
+    const bucket = buckets[key] ?? (buckets[key] = {});
+    const entry = bucket[tagKey] ?? { count: 0, category: tx.category };
+    entry.count += 1;
+    bucket[tagKey] = entry;
+  }
+  const out: Record<string, HistoryMatch> = {};
+  for (const [key, bucket] of Object.entries(buckets)) {
+    let best: { tag: string; category: 'income' | 'expense'; count: number } | null = null;
+    for (const [tagKey, { count, category }] of Object.entries(bucket)) {
+      const tag = tagKey.split('|')[0];
+      if (!best || count > best.count) best = { tag, category, count };
+    }
+    if (best) out[key] = { tag: best.tag, category: best.category };
+  }
+  return out;
+}
+
+/**
  * Strips bank-statement noise from a merchant name so that entries like
  * "NETFLIX.COM 12345" and "NETFLIX.COM 67890" resolve to the same key.
  * Only used for grouping — the original name is kept for display.
@@ -149,6 +183,7 @@ export default function ImportShell() {
   const t = useTranslations('import');
   const { allTags: allTagsMap } = useSettings();
   const { data: accounts = [] } = useAccounts();
+  const { data: txData } = useTransactions();
   const allTags = Object.entries(allTagsMap).map(([id, v]) => ({ id, label: v.label, category: v.category }));
 
   const addTemplate = useSettingsStore((s) => s.addTemplate);
@@ -220,6 +255,10 @@ export default function ImportShell() {
         ?? allTags[0]?.id
         ?? '';
 
+    // Pre-tag from the user's own prior choices. Free — no AI round-trip needed
+    // for merchants they have already categorised in past transactions.
+    const historyMap = buildHistoryTagMap(txData?.transactions ?? []);
+
     const parsed: ParsedTransaction[] = [];
     for (const row of rows) {
       const date = toYMD(row[colDate] ?? '');
@@ -241,7 +280,11 @@ export default function ImportShell() {
         category = rawNum >= 0 ? 'income' : 'expense';
       }
 
-      parsed.push({ id: uid(), name: nameRaw, amount: amt, category, tag: defaultTag, date, skipped: false });
+      // Apply historical match if we have one, overriding the parsed category
+      const historyHit = historyMap[normalizeMerchant(nameRaw)];
+      const finalTag = historyHit?.tag ?? defaultTag;
+      const finalCategory = historyHit?.category ?? category;
+      parsed.push({ id: uid(), name: nameRaw, amount: amt, category: finalCategory, tag: finalTag, date, skipped: false });
     }
 
     if (!parsed.length) { setError(t('errorNoRows')); return; }
@@ -253,7 +296,18 @@ export default function ImportShell() {
   const handleAutoCategorise = async () => {
     setCategorising(true);
     setError('');
-    const uniqueMerchants = [...new Set(transactions.map((tx) => tx.name))];
+    // Only send merchants that weren't already matched from the user's history.
+    // Those rows still carry the default tag, so we filter by tag === defaultTag.
+    const historyMap = buildHistoryTagMap(txData?.transactions ?? []);
+    const uniqueMerchants = [...new Set(
+      transactions
+        .filter((tx) => !historyMap[normalizeMerchant(tx.name)])
+        .map((tx) => tx.name),
+    )];
+    if (uniqueMerchants.length === 0) {
+      setCategorising(false);
+      return;
+    }
     try {
       const res = await fetch('/api/import/categorise', {
         method: 'POST',
