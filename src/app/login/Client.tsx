@@ -78,20 +78,20 @@ export default function LoginPage() {
 
   if (mode === 'forgot-sent') {
     return (
-      <div className="min-h-screen bg-[#011817] flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-[#F4FDFB] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-sm text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Check your email</h2>
-          <p className="text-sm text-white/50 mb-6">
-            We sent a reset link to <span className="text-white/70 font-medium">{email}</span>. Follow it to set a new password.
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Check your email</h2>
+          <p className="text-sm text-slate-500 mb-6">
+            We sent a reset link to <span className="text-slate-700 font-medium">{email}</span>. Follow it to set a new password.
           </p>
           <button
             onClick={() => { setMode('login'); setError(''); }}
-            className="text-sm text-white/40 hover:text-white/70 underline active:opacity-70 transition-all duration-100"
+            className="text-sm text-slate-500 hover:text-slate-700 underline active:opacity-70 transition-all duration-100"
           >
             Back to sign in
           </button>
@@ -101,25 +101,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#011817] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F4FDFB] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-slate-500">
             {mode === 'login' ? 'Sign in to your account' : 'Reset your password'}
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-7 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+        <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-[0_4px_24px_rgba(13,148,136,0.08)]">
           {mode === 'login' && (
             <>
               <button
                 type="button"
                 onClick={handleGoogle}
                 disabled={loading}
-                className="w-full h-12 rounded-2xl bg-white text-slate-800 text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 flex items-center justify-center gap-2.5 mb-4 shadow-[0_2px_8px_rgba(255,255,255,0.1)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                className="w-full h-12 rounded-2xl bg-white border border-slate-200 text-slate-800 text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 flex items-center justify-center gap-2.5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -130,39 +130,39 @@ export default function LoginPage() {
                 Continue with Google
               </button>
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-xs text-white/25">or</span>
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-slate-100" />
+                <span className="text-xs text-slate-400">or</span>
+                <div className="flex-1 h-px bg-slate-100" />
               </div>
             </>
           )}
           <form onSubmit={mode === 'login' ? handleLogin : handleForgot} className="flex flex-col gap-4">
             {error && (
-              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+              <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
                 {error}
               </div>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-white/60">Email</label>
+              <label className="text-sm font-semibold text-slate-600">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="you@example.com"
-                className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+                className="h-12 rounded-2xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
               />
             </div>
 
             {mode === 'login' && (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-white/60">Password</label>
+                  <label className="text-sm font-semibold text-slate-600">Password</label>
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError(''); }}
-                    className="text-xs text-white/30 hover:text-white/60 active:opacity-70 transition-all duration-100"
+                    className="text-xs text-slate-400 hover:text-slate-600 active:opacity-70 transition-all duration-100"
                   >
                     Forgot password?
                   </button>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+                  className="h-12 rounded-2xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
                 />
               </div>
             )}
@@ -181,7 +181,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+              className="h-12 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(13,148,136,0.25)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
             >
               {loading
                 ? mode === 'login' ? 'Signing in…' : 'Sending…'
@@ -192,7 +192,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => { setMode('login'); setError(''); }}
-                className="text-sm text-white/30 hover:text-white/60 active:opacity-70 transition-all duration-100 text-center"
+                className="text-sm text-slate-400 hover:text-slate-600 active:opacity-70 transition-all duration-100 text-center"
               >
                 Back to sign in
               </button>
@@ -201,18 +201,18 @@ export default function LoginPage() {
         </div>
 
         {mode === 'login' && (
-          <p className="text-center text-sm text-white/30 mt-4">
+          <p className="text-center text-sm text-slate-400 mt-4">
             No account?{' '}
-            <Link href="/signup" className="text-white/60 hover:text-white underline transition-colors">
+            <Link href="/signup" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Create one
             </Link>
           </p>
         )}
 
-        <p className="text-center text-xs text-white/40 mt-6">
-          <Link href="/terms" className="hover:text-white/70 underline transition-colors">Terms</Link>
+        <p className="text-center text-xs text-slate-500 mt-6">
+          <Link href="/terms" className="hover:text-slate-700 underline transition-colors">Terms</Link>
           {' · '}
-          <Link href="/privacy" className="hover:text-white/70 underline transition-colors">Privacy</Link>
+          <Link href="/privacy" className="hover:text-slate-700 underline transition-colors">Privacy</Link>
         </p>
       </div>
     </div>

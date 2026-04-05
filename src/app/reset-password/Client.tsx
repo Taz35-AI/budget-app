@@ -43,37 +43,37 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#011817] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F4FDFB] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-slate-500">
             {stage === 'form' ? 'Choose a new password' : stage === 'success' ? 'All done' : 'Reset password'}
           </p>
         </div>
 
-        <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-7 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+        <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-[0_4px_24px_rgba(13,148,136,0.08)]">
 
           {stage === 'loading' && (
             <div className="flex items-center justify-center py-6 gap-3">
               <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
-              <p className="text-sm text-white/40">Verifying link…</p>
+              <p className="text-sm text-slate-500">Verifying link…</p>
             </div>
           )}
 
           {stage === 'invalid' && (
             <div className="text-center py-2">
-              <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
               </div>
-              <p className="text-white/80 font-semibold mb-1">Link expired or invalid</p>
-              <p className="text-sm text-white/40 mb-5">Request a new password reset link and try again.</p>
+              <p className="text-slate-900 font-semibold mb-1">Link expired or invalid</p>
+              <p className="text-sm text-slate-500 mb-5">Request a new password reset link and try again.</p>
               <button
                 onClick={() => router.push('/login')}
-                className="w-full h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 transition-all duration-100 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                className="w-full h-12 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-[#0F766E] transition-all duration-100 shadow-[0_2px_8px_rgba(13,148,136,0.25)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 Back to sign in
               </button>
@@ -83,12 +83,12 @@ export default function ResetPasswordPage() {
           {stage === 'form' && (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {error && (
-                <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+                <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
                   {error}
                 </div>
               )}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-white/60">New password</label>
+                <label className="text-sm font-semibold text-slate-600">New password</label>
                 <input
                   type="password"
                   value={password}
@@ -97,11 +97,11 @@ export default function ResetPasswordPage() {
                   minLength={6}
                   placeholder="••••••••"
                   autoFocus
-                  className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+                  className="h-12 rounded-2xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-white/60">Confirm password</label>
+                <label className="text-sm font-semibold text-slate-600">Confirm password</label>
                 <input
                   type="password"
                   value={confirm}
@@ -109,13 +109,13 @@ export default function ResetPasswordPage() {
                   required
                   minLength={6}
                   placeholder="••••••••"
-                  className="h-12 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 text-sm font-medium text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+                  className="h-12 rounded-2xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-transparent transition-all duration-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
                 />
               </div>
               <button
                 type="submit"
                 disabled={saving}
-                className="h-12 rounded-2xl bg-white text-brand-text text-sm font-bold hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
+                className="h-12 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(13,148,136,0.25)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 {saving ? 'Saving…' : 'Set new password'}
               </button>
@@ -124,22 +124,22 @@ export default function ResetPasswordPage() {
 
           {stage === 'success' && (
             <div className="text-center py-2">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <div className="w-12 h-12 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-white/80 font-semibold mb-1">Password updated</p>
-              <p className="text-sm text-white/40">Taking you to your dashboard…</p>
+              <p className="text-slate-900 font-semibold mb-1">Password updated</p>
+              <p className="text-sm text-slate-500">Taking you to your dashboard…</p>
             </div>
           )}
 
         </div>
 
-        <p className="text-center text-xs text-white/40 mt-6">
-          <Link href="/terms" className="hover:text-white/70 underline transition-colors">Terms</Link>
+        <p className="text-center text-xs text-slate-500 mt-6">
+          <Link href="/terms" className="hover:text-slate-700 underline transition-colors">Terms</Link>
           {' · '}
-          <Link href="/privacy" className="hover:text-white/70 underline transition-colors">Privacy</Link>
+          <Link href="/privacy" className="hover:text-slate-700 underline transition-colors">Privacy</Link>
         </p>
       </div>
     </div>
