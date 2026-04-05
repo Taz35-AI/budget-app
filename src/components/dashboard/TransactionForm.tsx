@@ -48,16 +48,10 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  // Focus search input when dropdown opens — DESKTOP ONLY.
-  // On mobile the user just taps the list directly; auto-focusing the
-  // search would force the keyboard open/close during the sheet
-  // animation and cause visible layout jitter.
+  // Focus search input when dropdown opens
   React.useEffect(() => {
-    if (!open) { setSearch(''); return; }
-    if (typeof window === 'undefined') return;
-    if (window.innerWidth < 640) return; // mobile: skip auto-focus
-    const id = window.setTimeout(() => searchRef.current?.focus(), 80);
-    return () => window.clearTimeout(id);
+    if (open) setTimeout(() => searchRef.current?.focus(), 80);
+    else setSearch('');
   }, [open]);
 
   // Prevent body scroll on mobile when open
@@ -90,16 +84,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
       {/* Trigger button */}
       <button
         type="button"
-        onClick={() => {
-          // On mobile, blur the currently-focused input first so the keyboard
-          // animates out *before* the dropdown sheet animates in. Avoids the
-          // flicker where the keyboard fights the sheet for viewport space.
-          if (typeof window !== 'undefined' && window.innerWidth < 640) {
-            const active = document.activeElement as HTMLElement | null;
-            if (active && typeof active.blur === 'function') active.blur();
-          }
-          setOpen((v) => !v);
-        }}
+        onClick={() => setOpen((v) => !v)}
         className={cn(
           'w-full flex items-center gap-2 rounded-2xl border transition-all duration-100 active:scale-[0.98]',
           compact ? 'h-7 px-2.5 text-[11px]' : 'h-11 px-3.5 text-sm',
