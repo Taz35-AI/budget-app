@@ -7,9 +7,27 @@ const VALID_CATEGORIES = ['income', 'expense'];
 const VALID_TYPES = ['one_off', 'recurring'];
 const VALID_FREQUENCIES = ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'];
 
+/**
+ * Signature used for duplicate detection. Narrows to the fields a bank CSV
+ * can reasonably identify a transaction by — amount, name, date, account.
+ */
+function signatureFor(r: {
+  type?: string; name?: string; amount?: number;
+  date?: string | null; start_date?: string | null;
+  frequency?: string | null; account_id?: string | null;
+}): string {
+  const name = String(r.name ?? '').trim().toLowerCase();
+  const amount = typeof r.amount === 'number' ? r.amount.toFixed(2) : String(r.amount ?? '');
+  const acct = r.account_id ?? '';
+  if (r.type === 'recurring') {
+    return `recurring|${r.start_date ?? ''}|${amount}|${name}|${r.frequency ?? ''}|${acct}`;
+  }
+  return `one_off|${r.date ?? ''}|${amount}|${name}|${acct}`;
+}
+
 // POST /api/import/bulk
 // Body: { transactions: TransactionInput[] }
-// Returns: { inserted: number; errors: number }
+// Returns: { inserted, errors, duplicates }
 export async function POST(req: NextRequest) {
   try {
     const ctx = await getAuthContext();
@@ -22,8 +40,18 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createAdminClient();
+
+    // Load existing transactions for this household so we can skip duplicates.
+    // Scoped to the household — all members' imports dedup against the shared set.
+    const { data: existing } = await supabase
+      .from('transactions')
+      .select('type, name, amount, date, start_date, frequency, account_id')
+      .eq('household_id', householdId);
+    const existingSigs = new Set((existing ?? []).map((r) => signatureFor(r as never)));
+
     const rows = [];
-    const skipped = [];
+    const skipped: Record<string, unknown>[] = [];
+    let duplicates = 0;
 
     for (const body of transactions) {
       const name = String(body.name ?? '').trim().slice(0, 200);
@@ -39,26 +67,42 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      const candidate = {
+        type: body.type as string,
+        name,
+        amount,
+        date: (body.date as string) ?? null,
+        start_date: (body.start_date as string) ?? null,
+        frequency: (body.frequency as string) ?? null,
+        account_id: (body.account_id as string) ?? null,
+      };
+      const sig = signatureFor(candidate);
+      if (existingSigs.has(sig)) {
+        duplicates += 1;
+        continue;
+      }
+      existingSigs.add(sig); // dedup within the incoming batch too
+
       rows.push({
         user_id: userId,
         household_id: householdId,
         created_by: userId,
-        account_id: body.account_id || null,
-        parent_id: body.parent_id || null,
+        account_id: candidate.account_id,
+        parent_id: (body.parent_id as string) || null,
         name,
         amount,
         category: body.category,
         type: body.type,
         tag: body.tag || null,
-        date: body.date || null,
-        start_date: body.start_date || null,
-        end_date: body.end_date || null,
-        frequency: body.frequency || null,
+        date: candidate.date,
+        start_date: candidate.start_date,
+        end_date: (body.end_date as string) || null,
+        frequency: candidate.frequency,
       });
     }
 
     if (rows.length === 0) {
-      return NextResponse.json({ inserted: 0, errors: skipped.length });
+      return NextResponse.json({ inserted: 0, errors: skipped.length, duplicates });
     }
 
     const { data, error } = await supabase.from('transactions').insert(rows).select('id');
@@ -69,7 +113,10 @@ export async function POST(req: NextRequest) {
     }
 
     await notifyHousehold(householdId, 'transactions');
-    return NextResponse.json({ inserted: data?.length ?? 0, errors: skipped.length }, { status: 201 });
+    return NextResponse.json(
+      { inserted: data?.length ?? 0, errors: skipped.length, duplicates },
+      { status: 201 },
+    );
   } catch (error) {
     console.error('[POST /api/import/bulk] unexpected error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });

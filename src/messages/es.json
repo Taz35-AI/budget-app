@@ -553,6 +553,7 @@
     "errorNoRows": "No se encontraron transacciones en los últimos 3 meses.",
     "errorImport": "Error al importar",
     "doneSkipped": "{count, plural, one {# fila omitida} other {# filas omitidas}}",
+    "doneDuplicates": "{count, plural, one {# duplicado omitido} other {# duplicados omitidos}}",
     "sampleLabel": "Ejemplo",
     "previewCount": "Vista previa — {count} filas"
   },

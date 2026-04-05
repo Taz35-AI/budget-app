@@ -553,6 +553,7 @@
     "errorNoRows": "Aucune transaction trouvée dans les 3 derniers mois.",
     "errorImport": "Échec de l'importation",
     "doneSkipped": "{count, plural, one {# ligne ignorée} other {# lignes ignorées}}",
+    "doneDuplicates": "{count, plural, one {# doublon ignoré} other {# doublons ignorés}}",
     "sampleLabel": "Exemple",
     "previewCount": "Aperçu — {count} lignes"
   },

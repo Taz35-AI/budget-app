@@ -553,6 +553,7 @@
     "errorNoRows": "Keine Transaktionen in den letzten 3 Monaten gefunden.",
     "errorImport": "Import fehlgeschlagen",
     "doneSkipped": "{count, plural, one {# Zeile übersprungen} other {# Zeilen übersprungen}}",
+    "doneDuplicates": "{count, plural, one {# Duplikat übersprungen} other {# Duplikate übersprungen}}",
     "sampleLabel": "Beispiel",
     "previewCount": "Vorschau — {count} Zeilen"
   },

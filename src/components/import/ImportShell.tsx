@@ -201,6 +201,7 @@ export default function ImportShell() {
   const [categorising, setCategorising] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
   const [importErrorCount, setImportErrorCount] = useState(0);
+  const [importDupCount, setImportDupCount] = useState(0);
   const [importError, setImportError] = useState('');
   const [savedTemplates, setSavedTemplates] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
@@ -413,6 +414,7 @@ export default function ImportShell() {
 
     let count = 0;
     let errorCount = 0;
+    let dupCount = 0;
     let errMessage = '';
     try {
       const res = await fetch('/api/import/bulk', {
@@ -420,10 +422,11 @@ export default function ImportShell() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transactions: rows }),
       });
-      const data = await res.json() as { inserted?: number; errors?: number; error?: string };
+      const data = await res.json() as { inserted?: number; errors?: number; duplicates?: number; error?: string };
       if (res.ok) {
         count = data.inserted ?? 0;
         errorCount = data.errors ?? 0;
+        dupCount = data.duplicates ?? 0;
       } else {
         errMessage = data.error ?? `HTTP ${res.status}`;
       }
@@ -437,6 +440,7 @@ export default function ImportShell() {
 
     setImportedCount(count);
     setImportErrorCount(errorCount);
+    setImportDupCount(dupCount);
     setImportError(errMessage);
     setStep('done');
   }, [selectedAccountId, qc]);
@@ -721,12 +725,13 @@ export default function ImportShell() {
           ) : (
             <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">
               {t('doneSubtitle', { count: importedCount })}
+              {importDupCount > 0 && ` · ${t('doneDuplicates', { count: importDupCount })}`}
               {importErrorCount > 0 && ` · ${t('doneSkipped', { count: importErrorCount })}`}
             </p>
           )}
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); setImportErrorCount(0); setImportError(''); }}
+              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); setImportErrorCount(0); setImportDupCount(0); setImportError(''); }}
               className="px-5 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100"
             >
               {t('importAnother')}

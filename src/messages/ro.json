@@ -553,6 +553,7 @@
     "errorNoRows": "Nu s-au găsit tranzacții din ultimele 3 luni.",
     "errorImport": "Import eșuat",
     "doneSkipped": "{count, plural, one {# rând omis} few {# rânduri omise} other {# de rânduri omise}}",
+    "doneDuplicates": "{count, plural, one {# duplicat omis} few {# duplicate omise} other {# de duplicate omise}}",
     "sampleLabel": "Exemplu",
     "previewCount": "Previzualizare — {count} rânduri"
   },

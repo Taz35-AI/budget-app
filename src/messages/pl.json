@@ -553,6 +553,7 @@
     "errorNoRows": "Nie znaleziono transakcji z ostatnich 3 miesięcy.",
     "errorImport": "Import nie powiódł się",
     "doneSkipped": "{count, plural, one {# wiersz pominięty} few {# wiersze pominięte} other {# wierszy pominiętych}}",
+    "doneDuplicates": "{count, plural, one {# duplikat pominięty} few {# duplikaty pominięte} other {# duplikatów pominiętych}}",
     "sampleLabel": "Przykład",
     "previewCount": "Podgląd — {count} wierszy"
   },

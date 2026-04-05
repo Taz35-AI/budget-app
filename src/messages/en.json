@@ -553,6 +553,7 @@
     "errorNoRows": "No transactions found within the last 3 months.",
     "errorImport": "Import failed",
     "doneSkipped": "{count, plural, one {# row skipped} other {# rows skipped}}",
+    "doneDuplicates": "{count, plural, one {# duplicate skipped} other {# duplicates skipped}}",
     "sampleLabel": "Sample",
     "previewCount": "Preview — {count} rows"
   },
