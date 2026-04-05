@@ -366,7 +366,8 @@ export default function ImportShell() {
       if (txs.length < 2) continue;
 
       const amounts = txs.map((t) => t.amount);
-      const avg = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+      // Round to 2 decimals so templates don't end up with floats like 23.78333…
+      const avg = Math.round((amounts.reduce((a, b) => a + b, 0) / amounts.length) * 100) / 100;
       // Allow 20% tolerance — subscriptions can vary, and FX fluctuations happen
       if (!amounts.every((a) => avg === 0 || Math.abs(a - avg) / avg < 0.20)) continue;
 
