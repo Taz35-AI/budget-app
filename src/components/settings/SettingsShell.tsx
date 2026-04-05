@@ -1182,7 +1182,23 @@ function HouseholdSharingSection() {
         {membersLoading ? (
           <div className="h-8 rounded-xl bg-slate-100 dark:bg-white/[0.05] animate-pulse" />
         ) : members.length <= 1 ? (
-          <p className="text-xs text-slate-400 dark:text-white/35">{t('noMembers')}</p>
+          <div className="flex flex-col items-center gap-2 py-3">
+            <div
+              aria-hidden
+              className="w-[200px] h-[65px] bg-brand-primary/50 dark:bg-brand-primary/45"
+              style={{
+                maskImage: "url('/household-family.svg')",
+                WebkitMaskImage: "url('/household-family.svg')",
+                maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                WebkitMaskPosition: 'center',
+                maskSize: 'contain',
+                WebkitMaskSize: 'contain',
+              }}
+            />
+            <p className="text-xs text-slate-500 dark:text-white/40">{t('noMembers')}</p>
+          </div>
         ) : (
           <ul className="flex flex-col gap-1.5">
             {members.map((m) => (

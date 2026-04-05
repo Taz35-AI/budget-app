@@ -17,19 +17,29 @@ export function InvitationsBanner() {
         <div
           key={inv.id}
           className={cn(
-            'native-card rounded-3xl p-4 overflow-hidden',
-            'border-l-4 border-l-indigo-500 dark:border-l-indigo-400',
+            'native-card rounded-3xl overflow-hidden',
+            'border-l-4 border-l-teal-500 dark:border-l-teal-400',
           )}
         >
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-9 h-9 rounded-2xl bg-indigo-100 dark:bg-indigo-500/15 flex items-center justify-center">
-              <svg className="w-[18px] h-[18px] text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
+          {/* Family illustration band */}
+          <div className="bg-gradient-to-r from-teal-50 via-teal-100/60 to-transparent dark:from-teal-900/25 dark:via-teal-800/15 dark:to-transparent px-4 pt-3 pb-2 flex items-center justify-center">
+            <div
+              aria-hidden
+              className="w-[220px] h-[70px] bg-teal-700/70 dark:bg-teal-300/60"
+              style={{
+                maskImage: "url('/household-family.svg')",
+                WebkitMaskImage: "url('/household-family.svg')",
+                maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                WebkitMaskPosition: 'center',
+                maskSize: 'contain',
+                WebkitMaskSize: 'contain',
+              }}
+            />
+          </div>
+          {/* Invitation content */}
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-slate-100 dark:border-white/[0.06]">
             <div className="flex-1 min-w-0">
               <p className="text-sm text-slate-700 dark:text-white/75 leading-snug">
                 <span className="font-semibold text-slate-900 dark:text-white">{inv.inviter_name ?? 'Someone'}</span>
