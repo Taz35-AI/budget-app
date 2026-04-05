@@ -550,7 +550,11 @@
     "errorEmpty": "Le fichier CSV semble vide.",
     "errorParse": "Impossible de traiter le fichier.",
     "errorMapRequired": "Veuillez associer les colonnes Date, Description et Montant.",
-    "errorNoRows": "Aucune transaction trouvée dans les 3 derniers mois."
+    "errorNoRows": "Aucune transaction trouvée dans les 3 derniers mois.",
+    "errorImport": "Échec de l'importation",
+    "doneSkipped": "{count, plural, one {# ligne ignorée} other {# lignes ignorées}}",
+    "sampleLabel": "Exemple",
+    "previewCount": "Aperçu — {count} lignes"
   },
   "forecast": {
     "title": "Prévision de solde",

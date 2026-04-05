@@ -550,7 +550,11 @@
     "errorEmpty": "El archivo CSV parece estar vacío.",
     "errorParse": "No se pudo procesar el archivo.",
     "errorMapRequired": "Asigna las columnas de Fecha, Descripción e Importe.",
-    "errorNoRows": "No se encontraron transacciones en los últimos 3 meses."
+    "errorNoRows": "No se encontraron transacciones en los últimos 3 meses.",
+    "errorImport": "Error al importar",
+    "doneSkipped": "{count, plural, one {# fila omitida} other {# filas omitidas}}",
+    "sampleLabel": "Ejemplo",
+    "previewCount": "Vista previa — {count} filas"
   },
   "forecast": {
     "title": "Previsión de saldo",

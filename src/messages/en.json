@@ -550,7 +550,11 @@
     "errorEmpty": "The CSV file appears to be empty.",
     "errorParse": "Could not parse the file. Make sure it is a valid CSV.",
     "errorMapRequired": "Please map the Date, Description, and Amount columns.",
-    "errorNoRows": "No transactions found within the last 3 months."
+    "errorNoRows": "No transactions found within the last 3 months.",
+    "errorImport": "Import failed",
+    "doneSkipped": "{count, plural, one {# row skipped} other {# rows skipped}}",
+    "sampleLabel": "Sample",
+    "previewCount": "Preview — {count} rows"
   },
   "forecast": {
     "title": "Balance Forecast",

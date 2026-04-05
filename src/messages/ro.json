@@ -550,7 +550,11 @@
     "errorEmpty": "Fișierul CSV pare gol.",
     "errorParse": "Nu s-a putut procesa fișierul.",
     "errorMapRequired": "Asociază coloanele Dată, Descriere și Sumă.",
-    "errorNoRows": "Nu s-au găsit tranzacții din ultimele 3 luni."
+    "errorNoRows": "Nu s-au găsit tranzacții din ultimele 3 luni.",
+    "errorImport": "Import eșuat",
+    "doneSkipped": "{count, plural, one {# rând omis} few {# rânduri omise} other {# de rânduri omise}}",
+    "sampleLabel": "Exemplu",
+    "previewCount": "Previzualizare — {count} rânduri"
   },
   "forecast": {
     "title": "Prognoza soldului",

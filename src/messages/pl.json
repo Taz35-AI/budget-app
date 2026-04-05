@@ -550,7 +550,11 @@
     "errorEmpty": "Plik CSV wydaje się być pusty.",
     "errorParse": "Nie udało się przetworzyć pliku.",
     "errorMapRequired": "Przypisz kolumny Data, Opis i Kwota.",
-    "errorNoRows": "Nie znaleziono transakcji z ostatnich 3 miesięcy."
+    "errorNoRows": "Nie znaleziono transakcji z ostatnich 3 miesięcy.",
+    "errorImport": "Import nie powiódł się",
+    "doneSkipped": "{count, plural, one {# wiersz pominięty} few {# wiersze pominięte} other {# wierszy pominiętych}}",
+    "sampleLabel": "Przykład",
+    "previewCount": "Podgląd — {count} wierszy"
   },
   "forecast": {
     "title": "Prognoza salda",

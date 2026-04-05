@@ -550,7 +550,11 @@
     "errorEmpty": "Die CSV-Datei scheint leer zu sein.",
     "errorParse": "Die Datei konnte nicht verarbeitet werden.",
     "errorMapRequired": "Bitte Datum, Beschreibung und Betrag zuordnen.",
-    "errorNoRows": "Keine Transaktionen in den letzten 3 Monaten gefunden."
+    "errorNoRows": "Keine Transaktionen in den letzten 3 Monaten gefunden.",
+    "errorImport": "Import fehlgeschlagen",
+    "doneSkipped": "{count, plural, one {# Zeile übersprungen} other {# Zeilen übersprungen}}",
+    "sampleLabel": "Beispiel",
+    "previewCount": "Vorschau — {count} Zeilen"
   },
   "forecast": {
     "title": "Saldoprognose",

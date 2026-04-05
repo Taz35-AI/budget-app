@@ -165,6 +165,8 @@ export default function ImportShell() {
   const [recurringGroups, setRecurringGroups] = useState<RecurringGroup[]>([]);
   const [categorising, setCategorising] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
+  const [importErrorCount, setImportErrorCount] = useState(0);
+  const [importError, setImportError] = useState('');
   const [savedTemplates, setSavedTemplates] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -356,23 +358,32 @@ export default function ImportShell() {
     ];
 
     let count = 0;
+    let errorCount = 0;
+    let errMessage = '';
     try {
       const res = await fetch('/api/import/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transactions: rows }),
       });
+      const data = await res.json() as { inserted?: number; errors?: number; error?: string };
       if (res.ok) {
-        const { inserted } = await res.json() as { inserted: number };
-        count = inserted;
+        count = data.inserted ?? 0;
+        errorCount = data.errors ?? 0;
+      } else {
+        errMessage = data.error ?? `HTTP ${res.status}`;
       }
-    } catch { /* count stays 0 */ }
+    } catch (err) {
+      errMessage = err instanceof Error ? err.message : String(err);
+    }
 
     // Tell React Query the transactions cache is stale so the dashboard
     // shows the newly imported data immediately
     await qc.invalidateQueries({ queryKey: ['transactions'] });
 
     setImportedCount(count);
+    setImportErrorCount(errorCount);
+    setImportError(errMessage);
     setStep('done');
   }, [selectedAccountId, qc]);
 
@@ -433,17 +444,39 @@ export default function ImportShell() {
             { label: t('colName'), value: colName, set: setColName, required: true },
             { label: t('colAmount'), value: colAmount, set: setColAmount, required: true },
             { label: t('colCategory'), value: colCategory, set: setColCategory, required: false },
-          ].map(({ label, value, set, required }) => (
-            <div key={label} className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-brand-text/80 dark:text-white/80">
-                {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-              </label>
-              <select value={value} onChange={(e) => set(e.target.value)} className={selectCls}>
-                <option value="">{t('colNone')}</option>
-                {headers.map((h) => <option key={h} value={h}>{h}</option>)}
-              </select>
-            </div>
-          ))}
+          ].map(({ label, value, set, required }) => {
+            // Pull up to 3 non-empty sample values from the selected column
+            const samples = value
+              ? rows.map((r) => (r[value] ?? '').trim()).filter(Boolean).slice(0, 3)
+              : [];
+            return (
+              <div key={label} className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-brand-text/80 dark:text-white/80">
+                  {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+                </label>
+                <select value={value} onChange={(e) => set(e.target.value)} className={selectCls}>
+                  <option value="">{t('colNone')}</option>
+                  {headers.map((h) => <option key={h} value={h}>{h}</option>)}
+                </select>
+                {samples.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-text/35 dark:text-white/25">
+                      {t('sampleLabel')}
+                    </span>
+                    {samples.map((s, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-0.5 rounded-lg bg-brand-secondary/10 dark:bg-white/[0.06] text-[11px] font-mono text-brand-text/70 dark:text-white/65 max-w-[160px] truncate"
+                        title={s}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
           <div className="flex gap-3 mt-2">
             <button onClick={() => setStep('upload')} className={btnSecondary}>{t('back')}</button>
             <button onClick={handleMap} className={btnPrimary}>{t('next')}</button>
@@ -613,16 +646,33 @@ export default function ImportShell() {
       {/* ── Done ── */}
       {step === 'done' && (
         <div className="text-center py-8">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
-            <svg className="w-8 h-8 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 ${importError ? 'bg-red-500/10 border border-red-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'}`}>
+            {importError ? (
+              <svg className="w-8 h-8 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            ) : (
+              <svg className="w-8 h-8 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
           </div>
-          <p className="text-lg font-semibold text-brand-text dark:text-white mb-1">{t('doneTitle')}</p>
-          <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">{t('doneSubtitle', { count: importedCount })}</p>
+          <p className="text-lg font-semibold text-brand-text dark:text-white mb-1">
+            {importError ? t('errorImport') : t('doneTitle')}
+          </p>
+          {importError ? (
+            <div className="text-sm text-red-500 dark:text-red-400 mb-6 max-w-md mx-auto break-words">
+              {importError}
+            </div>
+          ) : (
+            <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">
+              {t('doneSubtitle', { count: importedCount })}
+              {importErrorCount > 0 && ` · ${t('doneSkipped', { count: importErrorCount })}`}
+            </p>
+          )}
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); }}
+              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); setImportErrorCount(0); setImportError(''); }}
               className="px-5 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100"
             >
               {t('importAnother')}
