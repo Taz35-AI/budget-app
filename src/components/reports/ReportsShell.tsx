@@ -90,7 +90,7 @@ export function ReportsShell() {
 
   // ── Goals management state ──────────────────────────────────────────────────
   const [showAddGoal,    setShowAddGoal]    = useState(false);
-  const [goalForm,       setGoalForm]       = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
+  const [goalForm,       setGoalForm]       = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '', icon: '' });
   const [editGoalId,     setEditGoalId]     = useState<string | null>(null);
   const [editSaved,      setEditSaved]      = useState('');
   const [linkingGoalId,  setLinkingGoalId]  = useState<string | null>(null);
@@ -1154,6 +1154,7 @@ export function ReportsShell() {
                         {/* Goal info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 mb-0.5">
+                            {goal.icon && <span className="text-base flex-shrink-0 leading-none">{goal.icon}</span>}
                             {linkedTag && <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: linkedTag.color }} />}
                             <p className="text-sm font-bold text-brand-text dark:text-white truncate">{goal.name}</p>
                           </div>
@@ -1240,7 +1241,7 @@ export function ReportsShell() {
                           <button
                             key={preset.name}
                             type="button"
-                            onClick={() => setGoalForm((f) => ({ ...f, name: preset.name }))}
+                            onClick={() => setGoalForm((f) => ({ ...f, name: preset.name, icon: preset.icon }))}
                             className="flex flex-col items-center gap-2 p-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] hover:border-brand-primary/30 active:scale-[0.96] transition-all duration-100"
                           >
                             <span className="text-2xl">{preset.icon}</span>
@@ -1300,8 +1301,9 @@ export function ReportsShell() {
                             currentSaved: goalForm.linkedTagId ? 0 : (Number(goalForm.currentSaved) || 0),
                             deadline: goalForm.deadline || undefined,
                             linkedTagId: goalForm.linkedTagId || undefined,
+                            icon: goalForm.icon || undefined,
                           });
-                          setGoalForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
+                          setGoalForm({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '', icon: '' });
                           setShowAddGoal(false);
                         }}
                         className="flex-1 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100">

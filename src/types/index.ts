@@ -142,6 +142,7 @@ export interface SavingsGoal {
   currentSaved: number;
   deadline?: string;     // YYYY-MM-DD
   linkedTagId?: string;  // when set, progress is computed from matching income transactions
+  icon?: string;         // emoji carried from a preset (e.g. "🚗" for New Vehicle)
 }
 
 export type AccountType = 'checking' | 'savings' | 'credit';
