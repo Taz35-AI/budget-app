@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,20 +32,8 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
   const tTags = useTranslations('tags');
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
-  const [isMobile, setIsMobile] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
-
-  // Track viewport so we can portal the mobile sheet (escapes transformed
-  // ancestors like DayBottomSheet) while keeping the desktop dropdown inline.
-  React.useEffect(() => {
-    setMounted(true);
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
 
   // Close on outside click (desktop only — mobile uses overlay)
   React.useEffect(() => {
@@ -145,19 +132,18 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
       )}
 
       {/* ── Dropdown: full-screen overlay on mobile, inline on desktop ── */}
-      {open && (() => {
-        const panelContent = (
+      {open && (
         <>
           {/* Mobile overlay backdrop */}
           <div
-            className="sm:hidden fixed inset-0 z-[70] native-backdrop"
+            className="sm:hidden fixed inset-0 z-50 native-backdrop"
             onClick={() => { setOpen(false); setSearch(''); }}
           />
           {/* Dropdown panel */}
           <div className={cn(
             'bg-white dark:bg-[#042F2E] overflow-hidden',
-            // Mobile: fixed bottom sheet (portaled to body → truly viewport-fixed)
-            'fixed inset-x-0 bottom-0 z-[70] rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)] max-h-[70dvh] flex flex-col',
+            // Mobile: fixed bottom sheet
+            'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)] max-h-[70dvh] flex flex-col',
             // Desktop: inline dropdown
             'sm:relative sm:inset-auto sm:z-auto sm:rounded-2xl sm:shadow-[0_4px_24px_rgba(0,0,0,0.12)] dark:sm:shadow-[0_4px_24px_rgba(0,0,0,0.4)] sm:max-h-none sm:border sm:border-black/[0.06] dark:sm:border-white/[0.08]',
           )}>
@@ -237,13 +223,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
             <div className="sm:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 8px)' }} />
           </div>
         </>
-        );
-        // On mobile, portal the sheet to <body> so it escapes any transformed
-        // ancestor (e.g. DayBottomSheet uses translateY + willChange:transform
-        // which would otherwise hijack position:fixed).
-        if (mounted && isMobile) return createPortal(panelContent, document.body);
-        return panelContent;
-      })()}
+      )}
     </div>
   );
 }
