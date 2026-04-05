@@ -1,4 +1,4 @@
-package com.budgetapp.app;
+package com.spentum.app;
 
 import com.getcapacitor.BridgeActivity;
 
