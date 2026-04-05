@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# duplicate skipped} other {# duplicates skipped}}",
     "sampleLabel": "Sample",
     "previewCount": "Preview — {count} rows",
-    "recurringNameLabel": "Recurring name"
+    "recurringNameLabel": "Recurring name",
+    "undoImport": "Undo this import",
+    "undoneTitle": "Import undone",
+    "undoneSubtitle": "{count, plural, one {# transaction removed} other {# transactions removed}}."
   },
   "forecast": {
     "title": "Balance Forecast",

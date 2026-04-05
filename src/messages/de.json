@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# Duplikat übersprungen} other {# Duplikate übersprungen}}",
     "sampleLabel": "Beispiel",
     "previewCount": "Vorschau — {count} Zeilen",
-    "recurringNameLabel": "Name der wiederkehrenden Zahlung"
+    "recurringNameLabel": "Name der wiederkehrenden Zahlung",
+    "undoImport": "Diesen Import rückgängig machen",
+    "undoneTitle": "Import rückgängig gemacht",
+    "undoneSubtitle": "{count, plural, one {# Transaktion entfernt} other {# Transaktionen entfernt}}."
   },
   "forecast": {
     "title": "Saldoprognose",

@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# duplikat pominięty} few {# duplikaty pominięte} other {# duplikatów pominiętych}}",
     "sampleLabel": "Przykład",
     "previewCount": "Podgląd — {count} wierszy",
-    "recurringNameLabel": "Nazwa płatności cyklicznej"
+    "recurringNameLabel": "Nazwa płatności cyklicznej",
+    "undoImport": "Cofnij ten import",
+    "undoneTitle": "Import cofnięty",
+    "undoneSubtitle": "{count, plural, one {# transakcja usunięta} few {# transakcje usunięte} other {# transakcji usuniętych}}."
   },
   "forecast": {
     "title": "Prognoza salda",

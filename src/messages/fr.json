@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# doublon ignoré} other {# doublons ignorés}}",
     "sampleLabel": "Exemple",
     "previewCount": "Aperçu — {count} lignes",
-    "recurringNameLabel": "Nom du paiement récurrent"
+    "recurringNameLabel": "Nom du paiement récurrent",
+    "undoImport": "Annuler cette importation",
+    "undoneTitle": "Importation annulée",
+    "undoneSubtitle": "{count, plural, one {# transaction supprimée} other {# transactions supprimées}}."
   },
   "forecast": {
     "title": "Prévision de solde",

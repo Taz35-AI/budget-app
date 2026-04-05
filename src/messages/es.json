@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# duplicado omitido} other {# duplicados omitidos}}",
     "sampleLabel": "Ejemplo",
     "previewCount": "Vista previa — {count} filas",
-    "recurringNameLabel": "Nombre del recurrente"
+    "recurringNameLabel": "Nombre del recurrente",
+    "undoImport": "Deshacer esta importación",
+    "undoneTitle": "Importación deshecha",
+    "undoneSubtitle": "{count, plural, one {# transacción eliminada} other {# transacciones eliminadas}}."
   },
   "forecast": {
     "title": "Previsión de saldo",

@@ -203,6 +203,9 @@ export default function ImportShell() {
   const [importErrorCount, setImportErrorCount] = useState(0);
   const [importDupCount, setImportDupCount] = useState(0);
   const [importError, setImportError] = useState('');
+  const [importBatchId, setImportBatchId] = useState<string | null>(null);
+  const [undoing, setUndoing] = useState(false);
+  const [undone, setUndone] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState<Set<number>>(new Set());
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -415,6 +418,7 @@ export default function ImportShell() {
     let count = 0;
     let errorCount = 0;
     let dupCount = 0;
+    let batchId: string | null = null;
     let errMessage = '';
     try {
       const res = await fetch('/api/import/bulk', {
@@ -422,11 +426,12 @@ export default function ImportShell() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transactions: rows }),
       });
-      const data = await res.json() as { inserted?: number; errors?: number; duplicates?: number; error?: string };
+      const data = await res.json() as { inserted?: number; errors?: number; duplicates?: number; batchId?: string | null; error?: string };
       if (res.ok) {
         count = data.inserted ?? 0;
         errorCount = data.errors ?? 0;
         dupCount = data.duplicates ?? 0;
+        batchId = data.batchId ?? null;
       } else {
         errMessage = data.error ?? `HTTP ${res.status}`;
       }
@@ -441,12 +446,32 @@ export default function ImportShell() {
     setImportedCount(count);
     setImportErrorCount(errorCount);
     setImportDupCount(dupCount);
+    setImportBatchId(batchId);
+    setUndone(false);
     setImportError(errMessage);
     setStep('done');
   }, [selectedAccountId, qc]);
 
   const handleRecurringNext = () => {
     doImport(transactions.filter((tx) => !tx.skipped), recurringGroups);
+  };
+
+  const handleUndo = async () => {
+    if (!importBatchId || undoing) return;
+    setUndoing(true);
+    try {
+      const res = await fetch('/api/import/undo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batchId: importBatchId }),
+      });
+      if (res.ok) {
+        await qc.invalidateQueries({ queryKey: ['transactions'] });
+        setUndone(true);
+      }
+    } finally {
+      setUndoing(false);
+    }
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -768,12 +793,16 @@ export default function ImportShell() {
             )}
           </div>
           <p className="text-lg font-semibold text-brand-text dark:text-white mb-1">
-            {importError ? t('errorImport') : t('doneTitle')}
+            {undone ? t('undoneTitle') : importError ? t('errorImport') : t('doneTitle')}
           </p>
           {importError ? (
             <div className="text-sm text-red-500 dark:text-red-400 mb-6 max-w-md mx-auto break-words">
               {importError}
             </div>
+          ) : undone ? (
+            <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">
+              {t('undoneSubtitle', { count: importedCount })}
+            </p>
           ) : (
             <p className="text-sm text-brand-text/50 dark:text-white/50 mb-6">
               {t('doneSubtitle', { count: importedCount })}
@@ -781,9 +810,18 @@ export default function ImportShell() {
               {importErrorCount > 0 && ` · ${t('doneSkipped', { count: importErrorCount })}`}
             </p>
           )}
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center flex-wrap">
+            {importBatchId && importedCount > 0 && !undone && (
+              <button
+                onClick={handleUndo}
+                disabled={undoing}
+                className="px-5 h-11 rounded-2xl border border-red-500/30 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 active:scale-[0.96] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {undoing ? '…' : t('undoImport')}
+              </button>
+            )}
             <button
-              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); setImportErrorCount(0); setImportDupCount(0); setImportError(''); }}
+              onClick={() => { setStep('upload'); setRows([]); setTransactions([]); setRecurringGroups([]); setError(''); setImportedCount(0); setImportErrorCount(0); setImportDupCount(0); setImportError(''); setImportBatchId(null); setUndone(false); }}
               className="px-5 h-11 rounded-2xl border border-brand-secondary/25 dark:border-white/15 text-sm text-brand-text/70 dark:text-white/70 hover:bg-brand-secondary/8 dark:hover:bg-white/5 active:scale-[0.96] transition-all duration-100"
             >
               {t('importAnother')}

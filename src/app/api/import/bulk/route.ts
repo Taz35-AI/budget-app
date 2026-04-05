@@ -27,7 +27,7 @@ function signatureFor(r: {
 
 // POST /api/import/bulk
 // Body: { transactions: TransactionInput[] }
-// Returns: { inserted, errors, duplicates }
+// Returns: { inserted, errors, duplicates, batchId }
 export async function POST(req: NextRequest) {
   try {
     const ctx = await getAuthContext();
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     const rows = [];
     const skipped: Record<string, unknown>[] = [];
     let duplicates = 0;
+    const batchId = crypto.randomUUID();
 
     for (const body of transactions) {
       const name = String(body.name ?? '').trim().slice(0, 200);
@@ -98,11 +99,12 @@ export async function POST(req: NextRequest) {
         start_date: candidate.start_date,
         end_date: (body.end_date as string) || null,
         frequency: candidate.frequency,
+        import_batch_id: batchId,
       });
     }
 
     if (rows.length === 0) {
-      return NextResponse.json({ inserted: 0, errors: skipped.length, duplicates });
+      return NextResponse.json({ inserted: 0, errors: skipped.length, duplicates, batchId: null });
     }
 
     const { data, error } = await supabase.from('transactions').insert(rows).select('id');
@@ -114,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     await notifyHousehold(householdId, 'transactions');
     return NextResponse.json(
-      { inserted: data?.length ?? 0, errors: skipped.length, duplicates },
+      { inserted: data?.length ?? 0, errors: skipped.length, duplicates, batchId },
       { status: 201 },
     );
   } catch (error) {

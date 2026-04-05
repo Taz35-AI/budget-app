@@ -556,7 +556,10 @@
     "doneDuplicates": "{count, plural, one {# duplicat omis} few {# duplicate omise} other {# de duplicate omise}}",
     "sampleLabel": "Exemplu",
     "previewCount": "Previzualizare — {count} rânduri",
-    "recurringNameLabel": "Numele plății recurente"
+    "recurringNameLabel": "Numele plății recurente",
+    "undoImport": "Anulează importul",
+    "undoneTitle": "Import anulat",
+    "undoneSubtitle": "{count, plural, one {# tranzacție eliminată} few {# tranzacții eliminate} other {# de tranzacții eliminate}}."
   },
   "forecast": {
     "title": "Prognoza soldului",
