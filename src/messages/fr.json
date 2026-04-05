@@ -575,7 +575,9 @@
     "inDays": "Dans {days} jours",
     "noBills": "Aucune facture à venir",
     "thisWeek": "Cette semaine",
-    "viewAll": "Voir tout"
+    "viewAll": "Voir tout",
+    "summary": "{count, plural, one {# facture cette semaine} other {# factures cette semaine}}",
+    "nextUp": "{name} {when}"
   },
   "heatmap": {
     "title": "Carte des dépenses",

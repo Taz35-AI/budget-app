@@ -575,7 +575,9 @@
     "inDays": "In {days} Tagen",
     "noBills": "Keine anstehenden Rechnungen",
     "thisWeek": "Diese Woche",
-    "viewAll": "Alle anzeigen"
+    "viewAll": "Alle anzeigen",
+    "summary": "{count, plural, one {# Rechnung diese Woche} other {# Rechnungen diese Woche}}",
+    "nextUp": "{name} {when}"
   },
   "heatmap": {
     "title": "Ausgaben-Heatmap",

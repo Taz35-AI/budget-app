@@ -575,7 +575,9 @@
     "inDays": "In {days} days",
     "noBills": "No upcoming bills",
     "thisWeek": "This week",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "summary": "{count, plural, one {# bill this week} other {# bills this week}}",
+    "nextUp": "{name} {when}"
   },
   "heatmap": {
     "title": "Spending Heatmap",

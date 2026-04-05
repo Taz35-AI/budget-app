@@ -575,7 +575,9 @@
     "inDays": "Peste {days} zile",
     "noBills": "Nicio factură viitoare",
     "thisWeek": "Săptămâna aceasta",
-    "viewAll": "Vezi toate"
+    "viewAll": "Vezi toate",
+    "summary": "{count, plural, one {# factură săptămâna asta} few {# facturi săptămâna asta} other {# de facturi săptămâna asta}}",
+    "nextUp": "{name} {when}"
   },
   "heatmap": {
     "title": "Harta cheltuielilor",

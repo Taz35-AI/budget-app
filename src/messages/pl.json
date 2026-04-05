@@ -575,7 +575,9 @@
     "inDays": "Za {days} dni",
     "noBills": "Brak nadchodzących rachunków",
     "thisWeek": "Ten tydzień",
-    "viewAll": "Zobacz wszystkie"
+    "viewAll": "Zobacz wszystkie",
+    "summary": "{count, plural, one {# rachunek w tym tygodniu} few {# rachunki w tym tygodniu} other {# rachunków w tym tygodniu}}",
+    "nextUp": "{name} {when}"
   },
   "heatmap": {
     "title": "Mapa wydatków",
