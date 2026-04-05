@@ -39,28 +39,26 @@ interface RecurringGroup {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+/**
+ * Parse a bank date string into YYYY-MM-DD. Handles ISO, plus slash/dash/dot
+ * separated forms. When the two numbers are ambiguous (both ≤ 12), defaults
+ * to day-first (dd/mm/yyyy). If one of them is > 12 the format is inferred
+ * unambiguously — so "13/04/2025" → 13 Apr and "04/13/2025" → 13 Apr.
+ */
 function toYMD(raw: string): string | null {
   const clean = raw.trim();
   if (clean.match(/^(\d{4})-(\d{2})-(\d{2})$/)) return clean;
-  const dmySlash = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (dmySlash) {
-    const [, d, m, y] = dmySlash;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-  const mdySlash = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (mdySlash) {
-    const [, m, d, y] = mdySlash;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-  const dmyDash = clean.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-  if (dmyDash) {
-    const [, d, m, y] = dmyDash;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-  const dmyDot = clean.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-  if (dmyDot) {
-    const [, d, m, y] = dmyDot;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  const sep = clean.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+  if (sep) {
+    const [, aStr, bStr, y] = sep;
+    const a = parseInt(aStr, 10);
+    const b = parseInt(bStr, 10);
+    let d: number, m: number;
+    if (a > 12) { d = a; m = b; }
+    else if (b > 12) { m = a; d = b; }
+    else { d = a; m = b; } // ambiguous → default to day-first
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+    return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   }
   const d = new Date(clean);
   if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
@@ -81,6 +79,12 @@ function detectInterval(dates: string[]): 'weekly' | 'biweekly' | 'monthly' | nu
     gaps.push((new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86_400_000);
   }
   const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  // Reject noisy sequences: every gap must be within 40% of the average.
+  // Without this, runs like [3, 45, 3, 45] average to 24 and get called 'monthly'.
+  if (avg === 0) return null;
+  for (const gap of gaps) {
+    if (Math.abs(gap - avg) / avg > 0.4) return null;
+  }
   if (avg >= 5 && avg <= 10) return 'weekly';
   if (avg >= 11 && avg <= 20) return 'biweekly';
   if (avg >= 21 && avg <= 45) return 'monthly'; // wide — covers 28-31 day months + some drift
@@ -205,6 +209,15 @@ export default function ImportShell() {
     setError('');
     const cutoff = threeMthsAgo();
 
+    // Default tag: prefer 'other' if available, else the first expense tag we find.
+    // Prevents orphaned tag IDs if the user deleted/hid the 'other' builtin.
+    const defaultTag =
+      allTagsMap['other']
+        ? 'other'
+        : allTags.find((tg) => tg.category === 'expense' || tg.category === 'both')?.id
+        ?? allTags[0]?.id
+        ?? '';
+
     const parsed: ParsedTransaction[] = [];
     for (const row of rows) {
       const date = toYMD(row[colDate] ?? '');
@@ -226,7 +239,7 @@ export default function ImportShell() {
         category = rawNum >= 0 ? 'income' : 'expense';
       }
 
-      parsed.push({ id: uid(), name: nameRaw, amount: amt, category, tag: 'other', date, skipped: false });
+      parsed.push({ id: uid(), name: nameRaw, amount: amt, category, tag: defaultTag, date, skipped: false });
     }
 
     if (!parsed.length) { setError(t('errorNoRows')); return; }
