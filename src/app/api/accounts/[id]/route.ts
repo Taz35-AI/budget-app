@@ -76,12 +76,37 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: 'Cannot delete your only account' }, { status: 400 });
     }
 
-    // Only delete own accounts (user_id = userId)
+    // Allow deleting own accounts, OR orphaned accounts whose owner
+    // is no longer in the household (left behind after member removal).
+    const { data: account } = await supabase
+      .from('budget_accounts')
+      .select('user_id')
+      .eq('id', id)
+      .eq('household_id', householdId)
+      .single();
+
+    if (!account) {
+      return NextResponse.json({ error: 'Account not found' }, { status: 404 });
+    }
+
+    const isOwn = account.user_id === userId;
+    const { data: memberCheck } = await supabase
+      .from('household_members')
+      .select('user_id')
+      .eq('user_id', account.user_id)
+      .eq('household_id', householdId)
+      .maybeSingle();
+    const isOrphaned = !memberCheck;
+
+    if (!isOwn && !isOrphaned) {
+      return NextResponse.json({ error: 'Cannot delete another member\'s account' }, { status: 403 });
+    }
+
     const { error } = await supabase
       .from('budget_accounts')
       .delete()
       .eq('id', id)
-      .eq('user_id', userId);
+      .eq('household_id', householdId);
 
     if (error) {
       console.error('[DELETE /api/accounts]', error.message);
