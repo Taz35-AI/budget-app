@@ -411,8 +411,8 @@ export function AccountsShell() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user) setMyUserId(data.session.user.id);
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setMyUserId(data.user.id);
     });
   }, []);
 
