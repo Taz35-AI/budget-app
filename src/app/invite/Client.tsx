@@ -40,11 +40,11 @@ export default function InviteClient() {
         mergeData,
       });
       setStatus('success');
-      // Wipe all cached queries so the dashboard fetches everything fresh
-      // for the new household. The accept response also sets a cookie that
-      // tells the server to bypass its in-memory household cache.
-      qc.clear();
-      setTimeout(() => router.push('/dashboard'), 2000);
+      // Full page reload (not client-side nav) destroys all JS state and
+      // forces every query to fetch fresh. The accept response also set a
+      // household_changed cookie that tells the server to bypass its
+      // in-memory household cache on whichever instance handles the request.
+      setTimeout(() => { window.location.href = '/dashboard'; }, 2000);
     } catch (err) {
       setStatus('error');
       setErrorMsg(err instanceof Error ? err.message : t('genericError'));
