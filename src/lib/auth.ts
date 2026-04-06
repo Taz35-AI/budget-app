@@ -20,8 +20,11 @@ export interface AuthContext {
   householdId: string;
 }
 
-// In-memory cache: userId → householdId (survives for the serverless function lifetime)
-const householdCache = new Map<string, string>();
+// In-memory cache: userId → { householdId, timestamp }.
+// 30s TTL ensures revoked users stop seeing stale data quickly — we can't
+// set a cookie on their browser since the removal is done by another user.
+const CACHE_TTL_MS = 30_000;
+const householdCache = new Map<string, { id: string; ts: number }>();
 
 /**
  * Drop a user's cached household mapping. MUST be called whenever a user's
@@ -51,7 +54,9 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   } catch { /* outside request context */ }
 
   const cached = householdCache.get(userId);
-  if (cached && !skipCache) return { userId, householdId: cached };
+  if (cached && !skipCache && (Date.now() - cached.ts < CACHE_TTL_MS)) {
+    return { userId, householdId: cached.id };
+  }
 
   const supabase = createAdminClient();
 
@@ -67,13 +72,13 @@ export async function getAuthContext(): Promise<AuthContext | null> {
       .eq('user_id', userId)
       .single();
     if (row) {
-      householdCache.set(userId, row.household_id);
+      householdCache.set(userId, { id: row.household_id, ts: Date.now() });
       return { userId, householdId: row.household_id };
     }
     return null;
   }
 
   const householdId = data as string;
-  householdCache.set(userId, householdId);
+  householdCache.set(userId, { id: householdId, ts: Date.now() });
   return { userId, householdId };
 }
