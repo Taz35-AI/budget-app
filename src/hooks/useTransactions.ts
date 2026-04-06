@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Capacitor } from '@capacitor/core';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
 
 export type EditMode = 'all' | 'all_future' | 'this_only';
@@ -19,12 +20,16 @@ async function fetchTransactions(): Promise<TransactionsData> {
   return res.json();
 }
 
+// Capacitor WebViews can drop Supabase Realtime WebSocket connections,
+// so always poll on native as a reliable fallback.
+const isNative = Capacitor.isNativePlatform();
+
 export function useTransactions(opts?: { hasHousehold?: boolean }) {
   return useQuery<TransactionsData>({
     queryKey: QK,
     queryFn: fetchTransactions,
     staleTime: 0,
-    refetchInterval: opts?.hasHousehold ? 3_000 : false,
+    refetchInterval: (opts?.hasHousehold || isNative) ? 3_000 : false,
   });
 }
 

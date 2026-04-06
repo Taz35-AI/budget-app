@@ -19,14 +19,17 @@ export interface AuthContext {
   householdId: string;
 }
 
-// In-memory cache: userId → householdId (survives for the serverless function lifetime)
-const householdCache = new Map<string, string>();
+// In-memory cache: userId → { householdId, timestamp }.
+// TTL prevents stale entries on server instances that didn't process the
+// invite-accept/leave/remove — those instances never see clearHouseholdCache().
+const CACHE_TTL_MS = 60_000; // 60 seconds
+const householdCache = new Map<string, { householdId: string; ts: number }>();
 
 /**
  * Drop a user's cached household mapping. MUST be called whenever a user's
  * household_id changes in the database (e.g. after accepting an invite,
- * leaving a household, or being removed). Otherwise getAuthContext() keeps
- * returning the stale household and the user sees wrong data.
+ * leaving a household, or being removed). Only affects this server instance;
+ * other instances rely on the TTL to expire stale entries.
  */
 export function clearHouseholdCache(userId: string): void {
   householdCache.delete(userId);
@@ -41,9 +44,11 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   const userId = await getAuthUserId();
   if (!userId) return null;
 
-  // Check in-memory cache first
+  // Check in-memory cache first (with TTL)
   const cached = householdCache.get(userId);
-  if (cached) return { userId, householdId: cached };
+  if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+    return { userId, householdId: cached.householdId };
+  }
 
   const supabase = createAdminClient();
 
@@ -59,13 +64,13 @@ export async function getAuthContext(): Promise<AuthContext | null> {
       .eq('user_id', userId)
       .single();
     if (row) {
-      householdCache.set(userId, row.household_id);
+      householdCache.set(userId, { householdId: row.household_id, ts: Date.now() });
       return { userId, householdId: row.household_id };
     }
     return null;
   }
 
   const householdId = data as string;
-  householdCache.set(userId, householdId);
+  householdCache.set(userId, { householdId, ts: Date.now() });
   return { userId, householdId };
 }
