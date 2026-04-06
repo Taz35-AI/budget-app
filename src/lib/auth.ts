@@ -19,25 +19,31 @@ export interface AuthContext {
   householdId: string;
 }
 
+// In-memory cache: userId → householdId (survives for the serverless function lifetime)
+const householdCache = new Map<string, string>();
+
 /**
- * No-op kept for backwards compatibility — callers in the invite-accept
- * flow still reference it. Previously cleared an in-memory cache that
- * caused stale-household bugs across serverless instances.
+ * Drop a user's cached household mapping. MUST be called whenever a user's
+ * household_id changes in the database (e.g. after accepting an invite,
+ * leaving a household, or being removed). Otherwise getAuthContext() keeps
+ * returning the stale household and the user sees wrong data.
  */
-export function clearHouseholdCache(_userId: string): void {}
+export function clearHouseholdCache(userId: string): void {
+  householdCache.delete(userId);
+}
 
 /**
  * Returns userId + householdId for the authenticated user.
  * Auto-creates a household on first call using the database-level
  * ensure_household() function which is race-condition-proof.
- *
- * Always queries the DB — no in-memory cache. The DB call adds ~10ms
- * on top of the ~100ms getUser() call and eliminates an entire class
- * of stale-household bugs in multi-instance serverless environments.
  */
 export async function getAuthContext(): Promise<AuthContext | null> {
   const userId = await getAuthUserId();
   if (!userId) return null;
+
+  // Check in-memory cache first
+  const cached = householdCache.get(userId);
+  if (cached) return { userId, householdId: cached };
 
   const supabase = createAdminClient();
 
@@ -52,9 +58,14 @@ export async function getAuthContext(): Promise<AuthContext | null> {
       .select('household_id')
       .eq('user_id', userId)
       .single();
-    if (row) return { userId, householdId: row.household_id };
+    if (row) {
+      householdCache.set(userId, row.household_id);
+      return { userId, householdId: row.household_id };
+    }
     return null;
   }
 
-  return { userId, householdId: data as string };
+  const householdId = data as string;
+  householdCache.set(userId, householdId);
+  return { userId, householdId };
 }
