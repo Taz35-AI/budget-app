@@ -344,7 +344,7 @@ export function DashboardShell() {
 
           {/* Stats bar — typographic headline style */}
           <div id="tour-stats"
-            className="flex-shrink-0 bg-brand-card dark:bg-[#042F2E] rounded-2xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.07] overflow-hidden shadow-[0_1px_6px_rgba(25,27,47,0.05)] dark:shadow-none">
+            className="flex-shrink-0 bg-gradient-to-br from-white via-white to-teal-50/80 dark:from-[#0F3332] dark:via-[#0F3332] dark:to-[#0D9488]/[0.08] rounded-2xl sm:rounded-3xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.10] overflow-hidden shadow-[0_2px_12px_rgba(13,148,136,0.08),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
 
             {/* Desktop: single horizontal row */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
@@ -484,7 +484,7 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
-              <div className="px-3 pt-3 pb-2 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
+              <div className="px-3.5 pt-3.5 pb-2.5 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (mobile) ── */
@@ -515,7 +515,7 @@ export function DashboardShell() {
                     </div>
                   ) : (
                     <>
-                      <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">{t('balanceToday')}</span>
+                      <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-brand-text/35 dark:text-white/25">{t('balanceToday')}</span>
                       <div className="flex items-center gap-1.5">
                         {/* Search icon */}
                         <button
@@ -579,7 +579,7 @@ export function DashboardShell() {
                   </div>
                 )}
                 <span className={cn(
-                  'text-[1.35rem] font-black tabular-nums leading-none tracking-tight block',
+                  'text-[1.6rem] font-black tabular-nums leading-none tracking-tight block',
                   todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                 )}>
                   {formatAmount(todayBalance)}
@@ -591,23 +591,23 @@ export function DashboardShell() {
                 )}
               </div>
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
-                <div className="flex-1 px-2.5 py-2 min-w-0">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                  <span className="text-sm font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
+                <div className="flex-1 px-3 py-2.5 min-w-0">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                  <span className="text-[15px] font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
                 </div>
-                <div className="flex-1 px-2.5 py-2 min-w-0 relative">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                  <span className="text-sm font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
+                <div className="flex-1 px-3 py-2.5 min-w-0 relative">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                  <span className="text-[15px] font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
                   {clampedBudgetPct !== undefined && (
                     <div className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-primary/8">
                       <div className={cn('h-full', budgetDanger ? 'bg-brand-danger' : 'bg-brand-positive')} style={{ width: `${clampedBudgetPct}%` }} />
                     </div>
                   )}
                 </div>
-                <div className="flex-1 px-2.5 py-2 min-w-0">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.10em] text-brand-text/25 dark:text-white/16 block mb-0.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <div className="flex-1 px-3 py-2.5 min-w-0">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className={cn(
-                    'text-sm font-black tabular-nums truncate block',
+                    'text-[15px] font-black tabular-nums truncate block',
                     monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
                   )}>
                     {(monthNet >= 0 ? '+' : '') + formatAmount(monthNet)}
@@ -622,7 +622,7 @@ export function DashboardShell() {
           {showMobileStats && (
             <div className="sm:hidden flex-1 min-h-0 overflow-y-auto rounded-3xl
               bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]
-              dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
+              dark:bg-[#0F3332] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
               <MonthSummary month={visibleMonth} dayTransactions={dayTransactions} formatAmount={formatAmount} />
             </div>
           )}
