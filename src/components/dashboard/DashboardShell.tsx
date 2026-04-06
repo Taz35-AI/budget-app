@@ -92,13 +92,15 @@ export function DashboardShell() {
   const myAccounts = accounts?.filter((a) => a.user_id === myUserId);
   const [activeAccountId, setActiveAccountId] = useState<string>('combined');
 
-  // Once accounts load, default to the first account (not combined) if there's only one account
+  // Auto-select only when the user is solo (not in a household) and has
+  // exactly one account. In a shared household, always default to 'combined'
+  // so all members' transactions are visible.
   useEffect(() => {
     if (!accounts || accounts.length === 0) return;
-    if (activeAccountId === 'combined' && accounts.length === 1) {
+    if (activeAccountId === 'combined' && accounts.length === 1 && !hasHousehold) {
       setActiveAccountId(accounts[0].id);
     }
-  }, [accounts, activeAccountId]);
+  }, [accounts, activeAccountId, hasHousehold]);
 
   const calendarNavRef = useRef<CalendarNavHandle | null>(null);
 

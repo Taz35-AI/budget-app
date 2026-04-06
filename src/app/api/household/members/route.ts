@@ -97,6 +97,30 @@ export async function DELETE(req: NextRequest) {
     // ensure_household().
     clearHouseholdCache(memberUserId);
 
+    // Move the removed member's accounts and transactions out of this
+    // household so the owner no longer sees them.
+    const { data: newHouseholdId } = await supabase.rpc('ensure_household', { p_user_id: memberUserId });
+
+    if (newHouseholdId) {
+      await Promise.all([
+        supabase
+          .from('budget_accounts')
+          .update({ household_id: newHouseholdId })
+          .eq('household_id', ctx.householdId)
+          .eq('user_id', memberUserId),
+        supabase
+          .from('transactions')
+          .update({ household_id: newHouseholdId })
+          .eq('household_id', ctx.householdId)
+          .eq('user_id', memberUserId),
+        supabase
+          .from('balance_resets')
+          .update({ household_id: newHouseholdId })
+          .eq('household_id', ctx.householdId)
+          .eq('user_id', memberUserId),
+      ]);
+    }
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[DELETE /api/household/members] unexpected:', err);
