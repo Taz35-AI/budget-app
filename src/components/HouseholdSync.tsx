@@ -12,7 +12,7 @@ export function HouseholdSync() {
   const memberCount = data?.members?.length ?? 0;
 
   useEffect(() => {
-    if (!householdId || memberCount <= 1) return; // single user, no need
+    if (!householdId) return;
     const supabase = createClient();
     const channel = supabase
       .channel(`household:${householdId}`)

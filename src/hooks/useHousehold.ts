@@ -18,7 +18,7 @@ export function useHouseholdMembers() {
       if (!res.ok) throw new Error('Failed to fetch household members');
       return res.json();
     },
-    staleTime: 60_000,
+    staleTime: 15_000,
   });
 }
 
