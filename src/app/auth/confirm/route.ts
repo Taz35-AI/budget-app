@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const cookieStore = await cookies();
 
+    // Collect cookies so we can set them on the redirect response
+    const pendingCookies: Array<{ name: string; value: string; options: Record<string, unknown> }> = [];
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,13 +24,11 @@ export async function GET(request: NextRequest) {
             return cookieStore.getAll();
           },
           setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options),
-              );
-            } catch {
-              // no-op in Server Component
-            }
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // Update the cookie store so later reads see the new values
+              try { cookieStore.set(name, value, options); } catch { /* no-op */ }
+              pendingCookies.push({ name, value, options: options as Record<string, unknown> });
+            });
           },
         },
       },
@@ -35,7 +36,12 @@ export async function GET(request: NextRequest) {
 
     const { error } = await supabase.auth.verifyOtp({ type, token_hash });
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const response = NextResponse.redirect(`${origin}${next}`);
+      // Attach session cookies to the redirect so the browser is logged in
+      pendingCookies.forEach(({ name, value, options }) =>
+        response.cookies.set(name, value, options),
+      );
+      return response;
     }
   }
 

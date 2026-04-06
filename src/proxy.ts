@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Inactivity timeout: 7 days in seconds
+const SESSION_TIMEOUT_S = 7 * 24 * 60 * 60;
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -29,6 +32,32 @@ export async function proxy(request: NextRequest) {
   // Refresh session
   const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
+
+  // ── Session inactivity timeout ──────────────────────────────────────────────
+  if (user) {
+    const lastActive = request.cookies.get('spentum_last_active')?.value;
+    const now = Math.floor(Date.now() / 1000);
+
+    if (lastActive && now - Number(lastActive) > SESSION_TIMEOUT_S) {
+      // Session expired due to inactivity — sign out
+      await supabase.auth.signOut();
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('reason', 'timeout');
+      const redirectResponse = NextResponse.redirect(url);
+      redirectResponse.cookies.delete('spentum_last_active');
+      return redirectResponse;
+    }
+
+    // Refresh the activity timestamp
+    response.cookies.set('spentum_last_active', String(now), {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: SESSION_TIMEOUT_S,
+    });
+  }
 
   // ── Preview password gate ──────────────────────────────────────────────────
   const previewPassword = process.env.PREVIEW_PASSWORD;

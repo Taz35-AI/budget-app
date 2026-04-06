@@ -43,7 +43,7 @@ export function ProfileShell() {
   const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
   }, []);
 
   if (!user) {

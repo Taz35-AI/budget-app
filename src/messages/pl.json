@@ -632,5 +632,8 @@
     "inviteSent": "Zaproszenie wysłane",
     "you": "Ty",
     "noMembers": "Brak innych członków"
+  },
+  "auth": {
+    "sessionTimeout": "Twoja sesja wygasła z powodu braku aktywności. Zaloguj się ponownie."
   }
 }

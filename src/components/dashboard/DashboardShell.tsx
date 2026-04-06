@@ -74,11 +74,14 @@ export function DashboardShell() {
   const shortMonths = tMonths.raw('short') as string[];
 
   // ── Auth user ───────────────────────────────────────────────────────────────
+  // Use getSession() (reads from local cookies, no network call) instead of
+  // getUser() (round-trip to Supabase auth server). The proxy already validated
+  // the user on this request, so the local JWT is trustworthy here.
   const [myUserId, setMyUserId] = useState<string | null>(null);
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setMyUserId(data.user.id);
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) setMyUserId(data.session.user.id);
     });
   }, []);
 

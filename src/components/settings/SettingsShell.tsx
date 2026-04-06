@@ -892,8 +892,8 @@ function AccountsSection() {
   const [myUserId, setMyUserId] = useState<string | null>(null);
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) setMyUserId(data.user.id);
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) setMyUserId(data.session.user.id);
     });
   }, []);
 

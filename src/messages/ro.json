@@ -632,5 +632,8 @@
     "inviteSent": "Invitație trimisă",
     "you": "Tu",
     "noMembers": "Niciun alt membru încă"
+  },
+  "auth": {
+    "sessionTimeout": "Sesiunea ta a expirat din cauza inactivității. Te rugăm să te autentifici din nou."
   }
 }

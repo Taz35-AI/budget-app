@@ -632,5 +632,8 @@
     "inviteSent": "Invitación enviada",
     "you": "Tú",
     "noMembers": "Aún no hay otros miembros"
+  },
+  "auth": {
+    "sessionTimeout": "Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo."
   }
 }

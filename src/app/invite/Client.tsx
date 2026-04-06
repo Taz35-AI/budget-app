@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useAcceptInvite } from '@/hooks/useHousehold';
 
 export default function InviteClient() {
   const t = useTranslations('invite');
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
+  const acceptInvite = useAcceptInvite();
 
   const [displayName, setDisplayName] = useState('');
   const [mergeData, setMergeData] = useState(true);
@@ -30,25 +32,18 @@ export default function InviteClient() {
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/household/invite/accept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, displayName: displayName.trim(), mergeData }),
+      await acceptInvite.mutateAsync({
+        token: token!,
+        displayName: displayName.trim(),
+        mergeData,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setStatus('error');
-        setErrorMsg(data.error || t('genericError'));
-        return;
-      }
-
+      // onSuccess in useAcceptInvite invalidates household-members,
+      // accounts, and transactions caches so the dashboard loads fresh data.
       setStatus('success');
       setTimeout(() => router.push('/dashboard'), 2000);
-    } catch {
+    } catch (err) {
       setStatus('error');
-      setErrorMsg(t('genericError'));
+      setErrorMsg(err instanceof Error ? err.message : t('genericError'));
     }
   }
 

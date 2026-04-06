@@ -632,5 +632,8 @@
     "inviteSent": "Invite sent",
     "you": "You",
     "noMembers": "No other members yet"
+  },
+  "auth": {
+    "sessionTimeout": "Your session expired due to inactivity. Please sign in again."
   }
 }
