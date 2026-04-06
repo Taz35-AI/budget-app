@@ -95,12 +95,15 @@ export function DashboardShell() {
   // Auto-select only when the user is solo (not in a household) and has
   // exactly one account. In a shared household, always default to 'combined'
   // so all members' transactions are visible.
+  // Wait for hhData to load before deciding — otherwise accounts can resolve
+  // first while hasHousehold is still false, causing a wrong auto-select.
   useEffect(() => {
     if (!accounts || accounts.length === 0) return;
+    if (hhData === undefined) return; // household status still loading
     if (activeAccountId === 'combined' && accounts.length === 1 && !hasHousehold) {
       setActiveAccountId(accounts[0].id);
     }
-  }, [accounts, activeAccountId, hasHousehold]);
+  }, [accounts, activeAccountId, hasHousehold, hhData]);
 
   const calendarNavRef = useRef<CalendarNavHandle | null>(null);
 
