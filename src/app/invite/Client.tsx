@@ -37,10 +37,10 @@ export default function InviteClient() {
         displayName: displayName.trim(),
         mergeData,
       });
-      // onSuccess in useAcceptInvite invalidates household-members,
-      // accounts, and transactions caches so the dashboard loads fresh data.
       setStatus('success');
-      setTimeout(() => router.push('/dashboard'), 2000);
+      // Hard navigation (not router.push) destroys the entire React Query
+      // cache so the dashboard fetches everything fresh for the new household.
+      setTimeout(() => { window.location.href = '/dashboard'; }, 2000);
     } catch (err) {
       setStatus('error');
       setErrorMsg(err instanceof Error ? err.message : t('genericError'));
