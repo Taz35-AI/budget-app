@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,11 +17,15 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>('login');
+  const [isTimeout, setIsTimeout] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const tAuth = useTranslations('auth');
   const supabase = createClient();
-  const isTimeout = searchParams.get('reason') === 'timeout';
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setIsTimeout(params.get('reason') === 'timeout');
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
