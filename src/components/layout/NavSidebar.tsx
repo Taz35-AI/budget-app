@@ -108,7 +108,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Menu section label */}
       <div className="px-3 pt-2 pb-1">
-        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-teal-700/80 dark:text-teal-400/70 px-2 mb-1">{t('menu')}</p>
+        <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal-700/60 dark:text-teal-400/50 px-2 mb-1">{t('menu')}</p>
       </div>
 
       {/* Nav links */}
@@ -129,7 +129,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
             >
               {/* Active indicator bar */}
               {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3.5px] h-5 bg-teal-700 dark:bg-teal-400 rounded-r-full" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[5px] h-6 bg-brand-primary dark:bg-teal-400 rounded-r-full" />
               )}
               <span className="flex-shrink-0">{icon}</span>
               {label}
@@ -143,7 +143,7 @@ function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
 
       {/* Utility section */}
       <div className="flex-shrink-0 px-2 pb-4 pt-1 space-y-1">
-        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-teal-700/80 dark:text-teal-400/70 px-3 mb-2">{t('options')}</p>
+        <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-teal-700/60 dark:text-teal-400/50 px-3 mb-2">{t('options')}</p>
 
         <div className="px-1 mb-2">
           <UserBadge />

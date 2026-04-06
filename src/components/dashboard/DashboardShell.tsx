@@ -280,14 +280,14 @@ export function DashboardShell() {
 
   return (
     <AppLayout>
-    <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
+    <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#0A1F1E]">
 
       {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#042F2E]/15 dark:to-transparent pointer-events-none -z-10" />
+      <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#0F3332]/20 dark:to-transparent pointer-events-none -z-10" />
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20
-        bg-white/95 dark:bg-[#011817]/95
+        bg-white/95 dark:bg-[#0A1F1E]/95
         backdrop-blur-2xl
         border-b border-[#D9DDF0]/70 dark:border-[#0D9488]/[0.08]
         shadow-[0_1px_0_rgba(25,27,47,0.06),0_4px_16px_rgba(25,27,47,0.04)]
@@ -303,7 +303,7 @@ export function DashboardShell() {
 
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-xl font-extrabold text-[#042F2E] dark:text-white tracking-tight">{t('title')}</h1>
+            <h1 className="text-[1.35rem] text-[#042F2E] dark:text-white tracking-tight" style={{ fontFamily: '"Instrument Serif", serif' }}>{t('title')}</h1>
           </div>
 
           {/* Controls */}

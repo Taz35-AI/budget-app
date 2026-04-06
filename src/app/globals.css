@@ -22,9 +22,12 @@
   --teal-700: #0D9488;
   --teal-900: #042F2E;
 
+  /* Accent — premium highlight for badges, pro features */
+  --brand-accent:    #F59E0B;
+
   /* Dark mode variants */
-  --brand-dark-bg:   #011817;
-  --brand-dark-card: #042F2E;
+  --brand-dark-bg:   #0A1F1E;
+  --brand-dark-card: #0F3332;
 
   /* Legacy aliases — keeps FullCalendar CSS overrides working */
   --brand-navy:   var(--brand-text);
@@ -82,11 +85,11 @@
     0 4px 12px rgba(0, 0, 0, 0.04);
 }
 .dark .native-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.2);
+    0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* Solid modal overlay with native depth */
@@ -99,7 +102,7 @@
     0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .dark .native-modal {
-  background: #042F2E;
+  background: #0F3332;
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
@@ -229,7 +232,7 @@
 
 .fc table {
   border-collapse: separate !important;
-  border-spacing: 4px !important;
+  border-spacing: 5px !important;
 }
 
 /* Day cells */

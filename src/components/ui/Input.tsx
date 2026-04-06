@@ -27,8 +27,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={id}
             className={cn(
               'w-full h-11 rounded-2xl border px-3.5 text-sm font-medium transition-all duration-100',
-              'border-black/[0.08] bg-black/[0.02] text-brand-text placeholder:text-brand-text/30 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]',
-              'dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/25 dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]',
+              'border-black/[0.08] bg-black/[0.03] text-brand-text placeholder:text-brand-text/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]',
+              'dark:border-white/[0.1] dark:bg-white/[0.05] dark:text-white dark:placeholder:text-white/30 dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]',
               'focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary/40 focus:bg-white dark:focus:bg-white/[0.06]',
               'disabled:opacity-40 disabled:cursor-not-allowed',
               prefix && 'pl-8',
