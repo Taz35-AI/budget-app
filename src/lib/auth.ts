@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { cookies } from 'next/headers';
 
 /**
  * Gets the authenticated user's ID from the session.
@@ -41,9 +42,16 @@ export async function getAuthContext(): Promise<AuthContext | null> {
   const userId = await getAuthUserId();
   if (!userId) return null;
 
-  // Check in-memory cache first
+  // If the user just changed households (invite accept/leave), a cookie
+  // tells us to bypass the in-memory cache — it may be stale on this instance.
+  let skipCache = false;
+  try {
+    const cookieStore = await cookies();
+    skipCache = cookieStore.get('household_changed')?.value === '1';
+  } catch { /* outside request context */ }
+
   const cached = householdCache.get(userId);
-  if (cached) return { userId, householdId: cached };
+  if (cached && !skipCache) return { userId, householdId: cached };
 
   const supabase = createAdminClient();
 

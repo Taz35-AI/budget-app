@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAcceptInvite } from '@/hooks/useHousehold';
 
 export default function InviteClient() {
   const t = useTranslations('invite');
   const searchParams = useSearchParams();
   const router = useRouter();
+  const qc = useQueryClient();
   const token = searchParams.get('token');
   const acceptInvite = useAcceptInvite();
 
@@ -38,9 +40,11 @@ export default function InviteClient() {
         mergeData,
       });
       setStatus('success');
-      // Hard navigation (not router.push) destroys the entire React Query
-      // cache so the dashboard fetches everything fresh for the new household.
-      setTimeout(() => { window.location.href = '/dashboard'; }, 2000);
+      // Wipe all cached queries so the dashboard fetches everything fresh
+      // for the new household. The accept response also sets a cookie that
+      // tells the server to bypass its in-memory household cache.
+      qc.clear();
+      setTimeout(() => router.push('/dashboard'), 2000);
     } catch (err) {
       setStatus('error');
       setErrorMsg(err instanceof Error ? err.message : t('genericError'));

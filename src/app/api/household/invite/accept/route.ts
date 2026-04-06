@@ -124,7 +124,17 @@ export async function POST(req: NextRequest) {
     // and the user can't see their new household's data.
     clearHouseholdCache(ctx.userId);
 
-    return NextResponse.json({ ok: true });
+    // Set a short-lived cookie so that OTHER server instances (which still
+    // have the old household cached) bypass the cache on the next few requests.
+    const response = NextResponse.json({ ok: true });
+    response.cookies.set('household_changed', '1', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 120, // 2 minutes, plenty of time for the dashboard to load
+    });
+    return response;
   } catch (err) {
     console.error('[POST /api/household/invite/accept] unexpected:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
