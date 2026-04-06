@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Capacitor } from '@capacitor/core';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
 
 export type EditMode = 'all' | 'all_future' | 'this_only';
@@ -20,16 +19,15 @@ async function fetchTransactions(): Promise<TransactionsData> {
   return res.json();
 }
 
-// Capacitor WebViews can drop Supabase Realtime WebSocket connections,
-// so always poll on native as a reliable fallback.
-const isNative = Capacitor.isNativePlatform();
-
-export function useTransactions(opts?: { hasHousehold?: boolean }) {
+export function useTransactions() {
   return useQuery<TransactionsData>({
     queryKey: QK,
     queryFn: fetchTransactions,
     staleTime: 0,
-    refetchInterval: (opts?.hasHousehold || isNative) ? 3_000 : false,
+    // Always poll. Supabase Realtime postgres_changes delivers DELETE events
+    // reliably but INSERT events are inconsistent (especially on Capacitor).
+    // 5s polling ensures all users see changes regardless of Realtime status.
+    refetchInterval: 5_000,
   });
 }
 

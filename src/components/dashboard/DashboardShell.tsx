@@ -104,7 +104,7 @@ export function DashboardShell() {
 
   // ── Balances & transactions ──────────────────────────────────────────────────
   const { balances, dayTransactions, isLoading } = useBalances(activeAccountId);
-  const { data: txData } = useTransactions({ hasHousehold });
+  const { data: txData } = useTransactions();
 
   // isEmpty: true only when the active account has no transactions
   const isEmpty = !isLoading && (
