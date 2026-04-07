@@ -35,7 +35,14 @@ export function InvitationsBanner() {
             </div>
             <div className="flex-shrink-0 flex items-center gap-2">
               <button
-                onClick={() => acceptMutation.mutate({ token: inv.token, mergeData: true })}
+                onClick={() => acceptMutation.mutate({ token: inv.token, mergeData: true }, {
+                  onSuccess: () => {
+                    // Full page reload to reset all state for the new household.
+                    // The accept response sets a household_changed cookie that
+                    // tells the server to bypass its in-memory household cache.
+                    window.location.reload();
+                  },
+                })}
                 disabled={acceptMutation.isPending}
                 className="h-8 px-3.5 rounded-2xl text-xs font-semibold bg-teal-600 dark:bg-teal-500 text-white hover:bg-teal-700 dark:hover:bg-teal-400 active:scale-[0.96] transition-all duration-100 disabled:opacity-50"
               >

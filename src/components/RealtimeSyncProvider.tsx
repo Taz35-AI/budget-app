@@ -46,6 +46,15 @@ export function RealtimeSyncProvider({ children }: { children: React.ReactNode }
           qc.invalidateQueries({ queryKey: ['transactions'] });
         },
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'household_members' },
+        () => {
+          qc.invalidateQueries({ queryKey: ['household-members'] });
+          qc.invalidateQueries({ queryKey: ['accounts'] });
+          qc.invalidateQueries({ queryKey: ['transactions'] });
+        },
+      )
       .subscribe();
 
     return () => {

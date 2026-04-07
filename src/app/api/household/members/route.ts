@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthContext, clearHouseholdCache } from '@/lib/auth';
+import { notifyHousehold } from '@/lib/household-sync';
 
 /**
  * GET /api/household/members
@@ -120,6 +121,9 @@ export async function DELETE(req: NextRequest) {
           .eq('user_id', memberUserId),
       ]);
     }
+
+    // Notify remaining household members so their UI updates immediately
+    await notifyHousehold(ctx.householdId, 'household_members');
 
     return NextResponse.json({ ok: true });
   } catch (err) {
