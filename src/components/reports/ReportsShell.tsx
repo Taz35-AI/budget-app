@@ -386,22 +386,18 @@ export function ReportsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
+      <div className="min-h-screen bg-brand-bg dark:bg-[#0A1F1E]">
 
         {/* Ambient glow */}
-        <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#042F2E]/15 dark:to-transparent pointer-events-none -z-10" />
+        <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-teal-100/30 via-teal-50/10 to-transparent dark:from-teal-900/15 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
 
         {/* ── Header ──────────────────────────────────────────────────── */}
-        <header className="sticky top-0 z-20
-          bg-white/95 dark:bg-[#011817]/95 backdrop-blur-2xl
-          border-b border-[#D9DDF0]/70 dark:border-[#0D9488]/[0.08]
-          shadow-[0_1px_0_rgba(25,27,47,0.06),0_4px_16px_rgba(25,27,47,0.04)]
-          dark:shadow-[0_1px_0_rgba(59,122,120,0.06)]">
-          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#0D9488]/40 to-transparent" />
+        <header className="sticky top-0 z-20 glass-header">
+          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent" />
           <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
-            <h1 className="text-xl font-extrabold text-[#042F2E] dark:text-white tracking-tight hidden lg:block">{t('title')}</h1>
+            <h1 className="text-xl font-extrabold text-brand-text dark:text-white tracking-tight hidden lg:block">{t('title')}</h1>
             <div className="flex items-center gap-1.5 ml-auto">
               <button
                 onClick={() => setSelectedYear((y) => y - 1)}
@@ -426,9 +422,9 @@ export function ReportsShell() {
         </header>
 
         {/* ── Tab strip + month selector (mobile + desktop) ───────────── */}
-        <div className="sticky top-16 sm:top-14 z-10 bg-[#F4FDFB]/95 dark:bg-[#011817]/95 backdrop-blur-xl border-b border-brand-primary/[0.08] dark:border-white/[0.05]">
+        <div className="sticky top-16 sm:top-14 z-10 glass-header border-t-0">
           {/* Tabs */}
-          <div className="flex gap-0.5 overflow-x-auto scrollbar-none bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl mx-3 my-2 p-0.5 sm:mx-5 sm:my-3">
+          <div className="flex gap-0.5 overflow-x-auto scrollbar-none bg-brand-primary/[0.04] dark:bg-white/[0.04] rounded-2xl mx-3 my-2 p-0.5 sm:mx-5 sm:my-3 backdrop-blur-sm">
             {([
               { id: 'overview',     label: t('tabOverview')      },
               { id: 'month',        label: t('tabMonth')         },
@@ -441,11 +437,11 @@ export function ReportsShell() {
                 key={id}
                 onClick={() => setActiveTab(id)}
                 className={cn(
-                  'flex-shrink-0 h-7 px-3 text-[11px] select-none active:scale-[0.96] duration-100 transition-all',
-                  'sm:h-9 sm:px-4 sm:text-xs',
+                  'flex-shrink-0 h-7 px-3 text-[11px] select-none active:scale-[0.95] duration-200 transition-all font-display rounded-full',
+                  'sm:h-9 sm:px-5 sm:text-xs',
                   activeTab === id
-                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white font-bold shadow-[0_1px_3px_rgba(0,0,0,0.1)] rounded-xl'
-                    : 'bg-transparent font-semibold text-brand-text/55 dark:text-white/45',
+                    ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold shadow-[0_2px_10px_rgba(13,148,136,0.3)]'
+                    : 'bg-transparent font-semibold text-brand-text/45 dark:text-white/35 hover:bg-brand-primary/[0.06] dark:hover:bg-white/[0.06]',
                 )}
               >
                 {label}
@@ -483,7 +479,7 @@ export function ReportsShell() {
         <div className="h-[calc(100dvh-4rem-6.5rem-60px)] overflow-y-auto sm:h-auto sm:overflow-visible px-3 sm:px-5 py-3 sm:py-4 pb-4 flex flex-col gap-4">
 
           {/* ── Headline bar ──────────────────────────────────────────── */}
-          <div className={cn("bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]", activeTab !== 'overview' && activeTab !== 'annual' && 'hidden')}>
+          <div className={cn("glass-card rounded-3xl overflow-hidden", activeTab !== 'overview' && activeTab !== 'annual' && 'hidden')}>
             {/* Desktop */}
             <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
               <div className="flex-[1.6] px-5 py-3.5 min-w-0">
@@ -544,7 +540,7 @@ export function ReportsShell() {
 
           {/* ── Monthly bar chart ─────────────────────────────────────── */}
           <div className={cn(activeTab !== 'overview' && 'hidden')}>
-          <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+          <div className="glass-card rounded-3xl p-4 sm:p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{t('monthlyOverview')}</p>
               <div className="flex gap-3">
@@ -606,7 +602,7 @@ export function ReportsShell() {
           {/* ── Balance Forecast Graph ─────────────────────────────── */}
           {forecastData.points.length > 10 && (
           <div className={cn(activeTab !== 'overview' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-2">
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{tForecast('title')}</p>
                 <p className="text-[11px] text-brand-text/40 dark:text-white/30 mt-0.5">{tForecast('subtitle')}</p>
@@ -675,7 +671,7 @@ export function ReportsShell() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
             {/* Month detail */}
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               {/* Mini headline */}
               <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06] border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
                 <div className="flex-[1.4] px-4 py-3 min-w-0">
@@ -782,7 +778,7 @@ export function ReportsShell() {
             </div>
 
             {/* Tag breakdown — selected month */}
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl p-4 sm:p-5">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-3.5">
                 {t('monthSpendingByCategory', { month: MONTH_LABELS[selectedMonthIdx] })}
               </p>
@@ -827,7 +823,7 @@ export function ReportsShell() {
 
           {/* ── Spending Heatmap ────────────────────────────────────── */}
           <div className={cn(activeTab !== 'month' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">{tHeatmap('title')}</p>
                 <p className="text-[11px] text-brand-text/40 dark:text-white/30 mt-0.5">{tHeatmap('subtitle')}</p>
@@ -936,7 +932,7 @@ export function ReportsShell() {
           {/* ── Top transactions this month ──────────────────────────── */}
           {topTx.length > 0 && (
           <div className={cn(activeTab !== 'transactions' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl p-4 sm:p-5">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-1">
                 {t('topTransactions', { month: MONTH_FULL[selectedMonthIdx], year: selectedYear })}
               </p>
@@ -974,7 +970,7 @@ export function ReportsShell() {
 
           {/* ── Monthly Report ────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'month' && 'hidden')}>
-            <div className="relative bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="relative glass-card rounded-3xl overflow-hidden">
               {/* Gradient accent */}
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#0D9488] via-[#35C9A5] to-transparent pointer-events-none" />
 
@@ -1025,7 +1021,7 @@ export function ReportsShell() {
                       { label: t('pdfNet'),         value: (netMonth >= 0 ? '+' : '') + formatAmount(netMonth), positive: netMonth >= 0 },
                       { label: t('savingsRate'),    value: savingsRate !== null ? `${savingsRate}%` : '—',      positive: savingsRate !== null && savingsRate >= 0 },
                     ].map(({ label, value, positive }) => (
-                      <div key={label} className="bg-brand-card dark:bg-[#042F2E] px-4 py-3">
+                      <div key={label} className="bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm px-4 py-3">
                         <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-brand-text/28 dark:text-white/20 mb-0.5">{label}</p>
                         <p className={cn('text-base font-black tabular-nums leading-tight', positive ? 'text-brand-positive' : 'text-brand-danger')}>
                           {value}
@@ -1086,7 +1082,7 @@ export function ReportsShell() {
           {/* ── Annual spending — donut + category bars ──────────────── */}
           {annualTags.length > 0 && (
           <div className={cn(activeTab !== 'annual' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
                 <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20">
                   {t('annualSpending', { year: selectedYear })}
@@ -1200,7 +1196,7 @@ export function ReportsShell() {
 
           {/* ── Goals ────────────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'goals' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               <div className="h-[3px] w-full bg-gradient-to-r from-emerald-400 to-teal-500" />
               <div className="px-5 pt-5 pb-4">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabGoals')}</h2>
@@ -1453,7 +1449,7 @@ export function ReportsShell() {
 
           {/* ── Subscriptions ─────────────────────────────────────────── */}
           <div className={cn(activeTab !== 'subscriptions' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl overflow-hidden">
               <div className="h-[3px] w-full bg-gradient-to-r from-violet-500 to-indigo-500" />
               <div className="px-5 pt-5 pb-4">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('subsTitle')}</h2>
@@ -1559,7 +1555,7 @@ export function ReportsShell() {
           {/* ── Savings rate trend ───────────────────────────────────── */}
           {hasSomeData && (
           <div className={cn(activeTab !== 'annual' && 'hidden')}>
-            <div className="bg-brand-card dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+            <div className="glass-card rounded-3xl p-4 sm:p-5">
               <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/30 dark:text-white/20 mb-4">
                 {t('savingsRateByMonth', { year: selectedYear })}
               </p>

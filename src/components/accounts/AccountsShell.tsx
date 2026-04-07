@@ -144,10 +144,10 @@ function AccountCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'text-left w-full bg-white dark:bg-[#042F2E] rounded-3xl border border-black/[0.06] dark:border-white/[0.08]',
-        'overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]',
-        'transition-all duration-150 active:scale-[0.98] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_8px_20px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_2px_6px_rgba(0,0,0,0.4),0_8px_20px_rgba(0,0,0,0.3)]',
-        'hover:border-brand-primary/20 dark:hover:border-brand-primary/25',
+        'text-left w-full glass-card rounded-3xl',
+        'overflow-hidden',
+        'transition-all duration-200 active:scale-[0.98] hover:shadow-[0_8px_32px_rgba(13,148,136,0.12)]',
+        'hover:border-brand-primary/20 dark:hover:border-brand-primary/15',
       )}
     >
       <div className={cn(
@@ -251,9 +251,7 @@ function AccountDetailModal({
       {/* Panel */}
       <div className={cn(
         'relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl',
-        'bg-white dark:bg-[#042F2E]',
-        'border border-black/[0.06] dark:border-white/[0.1]',
-        'shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)]',
+        'glass-modal',
       )}>
         {/* Close button */}
         <button
@@ -427,12 +425,12 @@ export function AccountsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
-        <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-cyan-100/40 via-teal-50/20 to-transparent dark:from-[#042F2E]/20 dark:to-transparent pointer-events-none -z-10" />
+      <div className="min-h-screen bg-brand-bg dark:bg-[#0A1F1E]">
+        <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-teal-100/30 via-teal-50/10 to-transparent dark:from-teal-900/15 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
 
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#011817]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
-          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-teal-500/40 to-transparent" />
+        <header className="sticky top-0 z-20 glass-header">
+          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent" />
           <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
@@ -443,16 +441,12 @@ export function AccountsShell() {
         <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-4">
 
           {/* Total balance hero */}
-          <div className={cn(
-            'rounded-3xl p-5 text-white',
-            'bg-gradient-to-br from-[#042F2E] via-[#1a3d3b] to-[#0f2928]',
-            'shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]',
-          )}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 mb-1">{hasCredit ? t('netWorth') : t('totalBalance')}</p>
-            <p className={cn('text-3xl sm:text-4xl font-black tracking-tight tabular-nums', totalBalance < 0 ? 'text-red-300' : 'text-white')}>
+          <div className="hero-card rounded-3xl p-6">
+            <p className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300/50 mb-2 font-display">{hasCredit ? t('netWorth') : t('totalBalance')}</p>
+            <p className={cn('relative text-3xl sm:text-4xl font-black tracking-tight tabular-nums font-display', totalBalance < 0 ? 'text-red-300' : 'text-white')}>
               {formatAmount(totalBalance)}
             </p>
-            <p className="text-xs text-white/35 mt-1.5">
+            <p className="relative text-xs text-teal-300/40 mt-2">
               {summaries.length === 0
                 ? t('noAccounts')
                 : t('acrossAccounts', { count: summaries.length })}
@@ -463,7 +457,7 @@ export function AccountsShell() {
           {isLoading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-3xl bg-white dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] overflow-hidden animate-pulse shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+                <div key={i} className="rounded-3xl glass-card overflow-hidden animate-pulse">
                   <div className="px-3 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/5" />

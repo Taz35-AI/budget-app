@@ -71,7 +71,7 @@ export function RecurringDeleteDialog({ tx, occurrenceDate, onConfirm, onCancel,
                 ? opt.danger
                   ? 'border-brand-danger bg-brand-danger text-white'
                   : 'border-brand-primary bg-brand-primary text-white'
-                : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/20',
+                : 'border-brand-primary/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.03] hover:border-slate-300 dark:hover:border-white/20',
             )}
           >
             <div className={cn(

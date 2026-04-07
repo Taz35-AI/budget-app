@@ -135,7 +135,7 @@ export function TagDropdown({ allTags, category, selected, onSelect, error, comp
           />
           {/* Dropdown panel */}
           <div className={cn(
-            'bg-white dark:bg-[#042F2E] overflow-hidden',
+            'bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm overflow-hidden',
             // Mobile: fixed bottom sheet
             'fixed inset-x-0 bottom-0 z-50 rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.5)] max-h-[70dvh] flex flex-col',
             // Desktop: inline dropdown
@@ -469,7 +469,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
                   if (tpl.frequency) setValue('frequency', tpl.frequency);
                 }}
                 className={cn(
-                  'flex-shrink-0 flex items-center gap-1 rounded-2xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all active:scale-[0.95] duration-100',
+                  'flex-shrink-0 flex items-center gap-1 rounded-2xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm font-medium text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10 hover:border-brand-primary/30 transition-all active:scale-[0.95] duration-100',
                   compact ? 'h-6 px-2 text-[10px]' : 'h-7 px-2.5 text-xs',
                 )}
               >
@@ -598,7 +598,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
             autoComplete="off"
           />
           {showSuggestions && suggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] shadow-lg overflow-hidden">
+            <ul className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-brand-primary/15 dark:border-brand-primary/20 bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm shadow-lg overflow-hidden">
               {suggestions.map((t) => (
                 <li key={`${t.id}`}>
                   <button

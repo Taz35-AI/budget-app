@@ -44,11 +44,11 @@ function SettingsCard({ title, subtitle, accent, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
-      <div className={cn('h-[3px] w-full', accent)} />
+    <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#0F3332] border border-brand-primary/[0.06] dark:border-teal-700/20 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(13,148,136,0.05)]">
+      <div className={cn('h-1 w-full', accent)} />
       <div className="px-6 pt-5 pb-3">
-        <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{title}</h2>
-        {subtitle && <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{subtitle}</p>}
+        <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight font-display">{title}</h2>
+        {subtitle && <p className="text-xs text-brand-text/40 dark:text-white/35 mt-0.5">{subtitle}</p>}
       </div>
       <div className="px-6 pb-6">{children}</div>
     </div>
@@ -101,7 +101,7 @@ function AddRowBtn({ label, accentHover, onClick }: { label: string; accentHover
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-2 w-full h-10 px-3 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-sm text-slate-500 dark:text-white/40 active:scale-[0.96] transition-all duration-100',
+        'flex items-center gap-2 w-full h-10 px-3 rounded-2xl border border-dashed border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-500 dark:text-white/40 active:scale-[0.96] transition-all duration-100',
         accentHover,
       )}
     >
@@ -266,14 +266,14 @@ function TagsSection() {
         <div className="flex gap-2 items-center">
           <input value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && saveEdit()} autoFocus
-            className="flex-1 h-8 px-2.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400" />
+            className="flex-1 h-8 px-2.5 rounded-lg bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400" />
           <span className="flex items-center px-2 py-0.5 rounded-lg text-[10px] font-semibold text-white flex-shrink-0" style={{ backgroundColor: editColor }}>
             {editLabel || 'Preview'}
           </span>
         </div>
         <ColorPicker value={editColor} onChange={setEditColor} />
         {!isBuiltin && (
-          <div className="flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
+          <div className="flex rounded-lg overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
               <button key={cat} type="button" onClick={() => setEditCategory(cat)}
                 className={cn('flex-1 h-7 text-[10px] font-medium transition-all',
@@ -289,9 +289,9 @@ function TagsSection() {
         <div className="flex gap-1.5">
           <button type="button" onClick={saveEdit} className="flex-1 h-8 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{tc('save')}</button>
           {isBuiltin && (entry as typeof activeBuiltins[0]).isOverridden && (
-            <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-bold hover:bg-red-50 hover:text-red-500 active:scale-[0.96] transition-all duration-100">{tc('reset')}</button>
+            <button type="button" onClick={() => { deleteCustomTag(editId); setEditId(null); }} className="px-2.5 h-8 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-500 dark:text-white/50 text-xs font-bold hover:bg-red-50 hover:text-red-500 active:scale-[0.96] transition-all duration-100">{tc('reset')}</button>
           )}
-          <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-xs font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
+          <button type="button" onClick={() => setEditId(null)} className="px-2.5 h-8 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-600 dark:text-white/60 text-xs font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
         </div>
       </div>
     );
@@ -344,7 +344,7 @@ function TagsSection() {
                 value={searches[sec] ?? ''}
                 onChange={(e) => setSearch(sec, e.target.value)}
                 placeholder={`Search ${label.toLowerCase()}…`}
-                className="w-full h-7 pl-7 pr-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-indigo-300 dark:focus:border-indigo-500/50"
+                className="w-full h-7 pl-7 pr-2 rounded-lg bg-slate-50 dark:bg-white/5 border border-brand-primary/[0.08] dark:border-white/[0.08] text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/25 outline-none focus:border-indigo-300 dark:focus:border-indigo-500/50"
               />
             </div>
 
@@ -388,7 +388,7 @@ function TagsSection() {
           <div className="flex flex-wrap gap-1.5">
             {hiddenBuiltins.map(({ key, label, color }) => (
               <button key={key} type="button" onClick={() => unhideBuiltinTag(key)} title="Tap to restore"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-dashed border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30 hover:border-slate-300 hover:text-slate-500 dark:hover:text-white/50 transition-colors">
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-dashed border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-400 dark:text-white/30 hover:border-slate-300 hover:text-slate-500 dark:hover:text-white/50 transition-colors">
                 <div className="w-2 h-2 rounded-full opacity-50" style={{ backgroundColor: color }} />
                 {label}
               </button>
@@ -403,13 +403,13 @@ function TagsSection() {
           <div className="flex gap-2 items-center">
             <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)}
               placeholder="Tag name" autoFocus onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              className="flex-1 h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+              className="flex-1 h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
             <span className="flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex-shrink-0" style={{ backgroundColor: newColor }}>
               {newLabel || 'Preview'}
             </span>
           </div>
           <ColorPicker value={newColor} onChange={setNewColor} />
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+          <div className="flex rounded-xl overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
               <button key={cat} type="button" onClick={() => setNewCategory(cat)}
                 className={cn('flex-1 h-8 text-xs font-medium transition-all',
@@ -423,7 +423,7 @@ function TagsSection() {
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">{tc('add')}</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">{tc('cancel')}</button>
           </div>
         </div>
       ) : (
@@ -493,7 +493,7 @@ function TemplatesSection() {
       {showAdd ? (
         <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/40 dark:bg-sky-900/10">
           {/* Category */}
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+          <div className="flex rounded-xl overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['income', 'expense'] as const).map((cat) => (
               <button key={cat} type="button" onClick={() => setForm((f) => ({ ...f, category: cat }))}
                 className={cn('flex-1 h-9 text-sm font-medium transition-all',
@@ -506,7 +506,7 @@ function TemplatesSection() {
             ))}
           </div>
           {/* Type */}
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10">
+          <div className="flex rounded-xl overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['one_off', 'recurring'] as const).map((t) => (
               <button key={t} type="button" onClick={() => setForm((f) => ({ ...f, type: t }))}
                 className={cn('flex-1 h-9 text-sm font-medium transition-all',
@@ -518,13 +518,13 @@ function TemplatesSection() {
           </div>
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Template name (e.g. Monthly Rent)" autoFocus
-            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+            className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           <input type="number" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
             placeholder="Amount" min="0" step="0.01"
-            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+            className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {form.type === 'recurring' && (
             <select value={form.frequency} onChange={(e) => setForm((f) => ({ ...f, frequency: e.target.value as Frequency }))}
-              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-[#042F2E] border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white">
+              className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] backdrop-blur-sm border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white">
               {Object.entries(FREQUENCIES).map(([val, label]) => <option key={val} value={val}>{label}</option>)}
             </select>
           )}
@@ -532,7 +532,7 @@ function TemplatesSection() {
           <div className="flex flex-wrap gap-1.5">
             <button type="button" onClick={() => setForm((f) => ({ ...f, tag: '' }))}
               className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
-                !form.tag ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 dark:border-white' : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 bg-white dark:bg-white/5',
+                !form.tag ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 dark:border-white' : 'border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-500 dark:text-white/40 bg-white/70 dark:bg-white/[0.04]',
               )}>
               None
             </button>
@@ -541,7 +541,7 @@ function TemplatesSection() {
               .map(([key, { label, color }]) => (
                 <button key={key} type="button" onClick={() => setForm((f) => ({ ...f, tag: f.tag === key ? '' : key }))}
                   className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
-                    form.tag === key ? 'text-white border-transparent' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60',
+                    form.tag === key ? 'text-white border-transparent' : 'border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] text-slate-600 dark:text-white/60',
                   )}
                   style={form.tag === key ? { backgroundColor: color } : undefined}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
@@ -551,7 +551,7 @@ function TemplatesSection() {
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Save template</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
           </div>
         </div>
       ) : (
@@ -581,7 +581,7 @@ function PreferencesSection() {
             <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('firstDayOfWeek')}</p>
             <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('firstDayOfWeekDesc')}</p>
           </div>
-          <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 flex-shrink-0">
+          <div className="flex rounded-xl overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08] flex-shrink-0">
             {([{ label: t('monday'), value: 1 as const }, { label: t('sunday'), value: 0 as const }]).map(({ label, value }) => (
               <button key={value} type="button" onClick={() => setFirstDayOfWeek(value)}
                 className={cn('px-5 h-9 text-sm font-semibold transition-all',
@@ -604,7 +604,7 @@ function PreferencesSection() {
           <select
             value={dateFormat}
             onChange={(e) => setDateFormat(e.target.value as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD')}
-            className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#042F2E] text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
+            className="h-11 px-3 rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] backdrop-blur-sm text-sm text-slate-700 dark:text-white/80 outline-none focus:border-indigo-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] [&>option]:bg-white [&>option]:text-brand-text dark:[&>option]:bg-[#042F2E] dark:[&>option]:text-white"
           >
             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
             <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -739,13 +739,13 @@ function GoalsSection() {
                     {Object.entries(allTags).map(([key, { label, color }]) => (
                       <button key={key} type="button"
                         onClick={() => { updateGoal(goal.id, { linkedTagId: key, currentSaved: 0 }); setLinkingGoalId(null); }}
-                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] text-slate-600 dark:text-white/60 hover:border-emerald-400 hover:text-emerald-600 transition-colors">
                         <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                         {TAGS[key] ? tTags(key as never) : label}
                       </button>
                     ))}
                     <button type="button" onClick={() => setLinkingGoalId(null)}
-                      className="px-2.5 py-1 rounded-lg text-xs border border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/30">
+                      className="px-2.5 py-1 rounded-lg text-xs border border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-400 dark:text-white/30">
                       Cancel
                     </button>
                   </div>
@@ -767,9 +767,9 @@ function GoalsSection() {
                   <div className="flex gap-2">
                     <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                       placeholder="Amount saved so far" autoFocus
-                      className="flex-1 h-8 px-2 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
+                      className="flex-1 h-8 px-2 rounded-lg bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
                     <button type="button" onClick={() => handleUpdateSaved(goal.id)} className="px-3 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Save</button>
-                    <button type="button" onClick={() => setEditId(null)} className="px-2 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs active:scale-[0.96] transition-all duration-100">✕</button>
+                    <button type="button" onClick={() => setEditId(null)} className="px-2 h-10 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-500 dark:text-white/50 text-xs active:scale-[0.96] transition-all duration-100">✕</button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
@@ -794,19 +794,19 @@ function GoalsSection() {
         <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/40 dark:bg-emerald-900/10">
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Goal name (e.g. Holiday fund)" autoFocus
-            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+            className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           <input type="number" value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
             placeholder="Target amount" min="0"
-            className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+            className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {!form.linkedTagId && (
             <input type="number" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
               placeholder="Already saved (optional)" min="0"
-              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+              className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           )}
           <div>
             <p className="text-xs text-slate-500 dark:text-white/40 mb-1">Deadline (optional)</p>
             <input type="date" value={form.deadline} onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
-              className="w-full h-11 px-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
+              className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           </div>
           {/* Tag link picker */}
           <div>
@@ -818,7 +818,7 @@ function GoalsSection() {
                 className={cn('px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
                   !form.linkedTagId
                     ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 dark:border-white'
-                    : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 bg-white dark:bg-white/5',
+                    : 'border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-500 dark:text-white/40 bg-white/70 dark:bg-white/[0.04]',
                 )}>
                 Manual
               </button>
@@ -828,7 +828,7 @@ function GoalsSection() {
                   className={cn('flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
                     form.linkedTagId === key
                       ? 'text-white border-transparent'
-                      : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-600 dark:text-white/60',
+                      : 'border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] text-slate-600 dark:text-white/60',
                   )}
                   style={form.linkedTagId === key ? { backgroundColor: color } : undefined}>
                   <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
@@ -839,7 +839,7 @@ function GoalsSection() {
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={handleAdd} className="flex-1 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Add goal</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="px-4 h-10 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.96] transition-all duration-100">Cancel</button>
           </div>
         </div>
       ) : (
@@ -866,7 +866,7 @@ function AccountTypeSelector({ value, onChange }: { value: AccountType; onChange
             'flex-1 h-8 rounded-lg text-xs font-semibold border transition-all',
             value === type
               ? 'bg-teal-500 text-white border-teal-500'
-              : 'bg-white dark:bg-white/5 text-slate-500 dark:text-white/40 border-slate-200 dark:border-white/10 hover:border-teal-400',
+              : 'bg-white/70 dark:bg-white/[0.04] text-slate-500 dark:text-white/40 border-brand-primary/[0.08] dark:border-white/[0.08] hover:border-teal-400',
           )}
         >
           {t(`type${type.charAt(0).toUpperCase() + type.slice(1)}` as 'typeChecking')}
@@ -950,7 +950,7 @@ function AccountsSection() {
     });
   };
 
-  const inputCls = 'flex-1 min-w-0 h-11 px-2.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400 placeholder:text-slate-400 dark:placeholder:text-white/30 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]';
+  const inputCls = 'flex-1 min-w-0 h-11 px-2.5 rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] text-sm text-slate-800 dark:text-white outline-none focus:border-teal-400 placeholder:text-slate-400 dark:placeholder:text-white/30 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]';
 
   return (
     <SettingsCard
@@ -960,7 +960,7 @@ function AccountsSection() {
     >
       {isLoading && (
         <div className="flex flex-col gap-2 mb-3">
-          {[1, 2].map((i) => <div key={i} className="h-10 rounded-xl bg-slate-100 dark:bg-white/5 animate-pulse" />)}
+          {[1, 2].map((i) => <div key={i} className="h-10 rounded-xl bg-brand-primary/[0.05] dark:bg-white/[0.05] animate-pulse" />)}
         </div>
       )}
 
@@ -1119,7 +1119,7 @@ function AccountsSection() {
             >
               {createAccount.isPending ? '…' : tc('add')}
             </button>
-            <button type="button" onClick={() => { setShowAdd(false); setNewName(''); setNewType('checking'); setNewLimit(''); }} className="h-10 px-3 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 active:scale-[0.96] transition-all duration-100">
+            <button type="button" onClick={() => { setShowAdd(false); setNewName(''); setNewType('checking'); setNewLimit(''); }} className="h-10 px-3 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] text-slate-500 dark:text-white/40 text-sm font-medium hover:bg-slate-200 dark:hover:bg-white/10 active:scale-[0.96] transition-all duration-100">
               {tc('cancel')}
             </button>
           </div>
@@ -1252,14 +1252,14 @@ function HouseholdSharingSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t('inviteEmailPlaceholder')}
-            className="flex-1 h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
+            className="flex-1 h-9 px-3 rounded-xl border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
           />
           <input
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder={t('nicknamePlaceholder')}
-            className="sm:w-36 h-9 px-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
+            className="sm:w-36 h-9 px-3 rounded-xl border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-sm text-brand-text dark:text-white placeholder:text-slate-300 dark:placeholder:text-white/20 outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/40"
           />
           <button
             onClick={handleInvite}
@@ -1591,7 +1591,7 @@ function NotificationsSection() {
                   setNotificationSettings({ dailyHour: h, dailyMinute: m });
                 }
               }}
-              className="h-11 px-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-700 dark:text-white/80 outline-none focus:border-sky-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
+              className="h-11 px-3 rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] bg-white/70 dark:bg-white/[0.04] text-sm text-slate-700 dark:text-white/80 outline-none focus:border-sky-400 flex-shrink-0 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
             />
           </div>
         )}
@@ -1622,24 +1622,24 @@ export function SettingsShell() {
 
   return (
     <AppLayout>
-    <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
+    <div className="min-h-screen bg-brand-bg dark:bg-[#0A1F1E]">
       {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-brand-primary/[0.06] via-brand-primary/[0.02] to-transparent dark:from-brand-primary/[0.08] dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
+      <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-teal-100/30 via-teal-50/10 to-transparent dark:from-teal-900/15 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
 
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#011817]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05] shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.03)]">
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/40 dark:via-brand-primary/30 to-transparent" />
+      <header className="sticky top-0 z-20 glass-header">
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent" />
 
         {/* Title row */}
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
           <NavMenuButton />
           <MobileLogo />
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('title')}</h1>
+            <h1 className="text-xl font-extrabold text-brand-text dark:text-white tracking-tight font-display">{t('title')}</h1>
           </div>
           <Link
             href="/dashboard"
-            className="lg:hidden ml-auto flex items-center gap-1.5 h-10 px-4 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-800 dark:hover:text-white active:scale-[0.96] transition-all duration-100"
+            className="lg:hidden ml-auto flex items-center gap-1.5 h-10 px-4 rounded-full bg-brand-primary/[0.06] dark:bg-white/[0.06] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm font-semibold text-brand-text/60 dark:text-white/60 hover:bg-brand-primary/[0.1] dark:hover:bg-white/10 active:scale-[0.95] transition-all duration-200"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -1648,19 +1648,19 @@ export function SettingsShell() {
           </Link>
         </div>
 
-        {/* Tab bar */}
-        <div className="overflow-x-auto scrollbar-none px-4 sm:px-6 pb-2.5">
-          <div className="inline-flex gap-0.5 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5">
+        {/* Tab bar — pill style */}
+        <div className="overflow-x-auto scrollbar-none px-4 sm:px-6 pb-3">
+          <div className="inline-flex gap-1.5">
             {tabs.map(({ id, label }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => setActiveTab(id)}
                 className={cn(
-                  'flex-shrink-0 h-8 px-4 rounded-xl text-xs select-none active:scale-[0.96] transition-all duration-100 whitespace-nowrap',
+                  'flex-shrink-0 h-9 px-5 rounded-full text-xs font-display select-none active:scale-[0.95] transition-all duration-200 whitespace-nowrap',
                   activeTab === id
-                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white font-bold shadow-[0_1px_3px_rgba(0,0,0,0.1)]'
-                    : 'bg-transparent text-brand-text/50 dark:text-white/40 font-semibold',
+                    ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold shadow-[0_2px_12px_rgba(13,148,136,0.3)]'
+                    : 'bg-brand-primary/[0.05] dark:bg-white/[0.05] text-brand-text/50 dark:text-white/40 font-semibold hover:bg-brand-primary/[0.08] dark:hover:bg-white/[0.08]',
                 )}
               >
                 {label}
@@ -1677,7 +1677,7 @@ export function SettingsShell() {
           <>
             <PreferencesSection />
             {/* Language */}
-            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#0F3332] border border-brand-primary/[0.06] dark:border-teal-700/20 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(13,148,136,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('language')}</h2>
@@ -1697,10 +1697,10 @@ export function SettingsShell() {
                       key={lang}
                       onClick={() => setLanguage(lang)}
                       className={cn(
-                        'h-10 px-4 rounded-2xl text-sm font-semibold border active:scale-[0.96] transition-all duration-100',
+                        'h-10 px-5 rounded-full text-sm font-semibold font-display border active:scale-[0.95] transition-all duration-200',
                         language === lang
-                          ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
-                          : 'bg-white dark:bg-white/5 text-brand-text/55 dark:text-white/45 border-brand-primary/15 dark:border-white/10 hover:border-brand-primary/30',
+                          ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white border-transparent shadow-[0_2px_8px_rgba(13,148,136,0.25)]'
+                          : 'bg-brand-primary/[0.04] dark:bg-white/[0.04] text-brand-text/55 dark:text-white/45 border-brand-primary/10 dark:border-white/[0.06] hover:bg-brand-primary/[0.08]',
                       )}
                     >
                       {label}
@@ -1730,7 +1730,7 @@ export function SettingsShell() {
         {activeTab === 'profile' && (
           <div className="lg:col-span-2 space-y-5">
             {/* Account info */}
-            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-black/[0.06] dark:border-white/[0.08] shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#0F3332] border border-brand-primary/[0.06] dark:border-teal-700/20 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(13,148,136,0.05)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-brand-primary to-teal-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('tabProfile')}</h2>
@@ -1741,7 +1741,7 @@ export function SettingsShell() {
             </div>
 
             {/* Danger zone */}
-            <div className="rounded-3xl overflow-hidden bg-brand-card dark:bg-[#042F2E] border border-red-200 dark:border-red-900/40 shadow-[0_1px_6px_rgba(25,27,47,0.05)]">
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#0F3332] border border-red-200/60 dark:border-red-900/30 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(220,38,38,0.04)]">
               <div className="h-[3px] w-full bg-gradient-to-r from-red-500 to-rose-400" />
               <div className="px-6 pt-5 pb-3">
                 <h2 className="text-base font-extrabold text-brand-text dark:text-white tracking-tight">{t('dangerZone')}</h2>

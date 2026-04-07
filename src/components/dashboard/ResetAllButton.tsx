@@ -48,7 +48,7 @@ export function ResetAllButton() {
         <>
           <div className="fixed inset-0 z-50 native-backdrop" onClick={handleClose} />
           <div
-            className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#042F2E] rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
+            className="fixed inset-x-4 top-24 z-50 bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-3">
@@ -65,7 +65,7 @@ export function ResetAllButton() {
 
             {!confirmed ? (
               <div className="flex gap-2 mt-3">
-                <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-slate-200 dark:border-white/10">
+                <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-brand-primary/[0.08] dark:border-white/[0.08]">
                   {tc('cancel')}
                 </button>
                 <button
@@ -84,7 +84,7 @@ export function ResetAllButton() {
                   <p className="text-xs font-semibold text-red-700 dark:text-red-400">{t('confirmWarning')}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-slate-200 dark:border-white/10">
+                  <button onClick={handleClose} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-brand-primary/[0.08] dark:border-white/[0.08]">
                     {tc('cancel')}
                   </button>
                   <button

@@ -139,8 +139,10 @@ export function DayBottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          'fixed inset-x-0 top-0 z-50 rounded-b-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]',
-          'bg-white dark:bg-[#0F0F1A]',
+          'fixed inset-x-0 top-0 z-50 rounded-b-3xl',
+          'bg-white/90 dark:bg-[#0A1F1E]/95 backdrop-blur-2xl',
+          'shadow-[0_8px_40px_rgba(13,148,136,0.08),0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.5)]',
+          'border-b border-white/50 dark:border-white/[0.06]',
           'flex flex-col transition-transform duration-300 ease-out lg:hidden',
           'max-h-[92dvh]',
           isOpen ? 'translate-y-0' : '-translate-y-full',

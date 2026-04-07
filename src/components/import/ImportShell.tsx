@@ -501,7 +501,7 @@ export default function ImportShell() {
       {/* ── STEP 1: Upload ── */}
       {step === 'upload' && (
         <div
-          className="border-2 border-dashed border-brand-secondary/30 dark:border-white/15 rounded-3xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-teal-500/50 transition-colors"
+          className="border-2 border-dashed border-brand-primary/20 dark:border-white/10 rounded-3xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-brand-primary/40 hover:bg-brand-primary/[0.02] dark:hover:bg-brand-primary/[0.04] transition-all duration-200 glass-card"
           onClick={() => fileRef.current?.click()}
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}

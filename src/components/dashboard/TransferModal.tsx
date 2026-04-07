@@ -95,7 +95,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
 
       {/* Panel */}
       <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)]
-        bg-white dark:bg-[#042F2E]
+        bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl
         border border-black/[0.06] dark:border-white/[0.1]">
 
         {/* Header */}

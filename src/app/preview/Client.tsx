@@ -32,7 +32,7 @@ function PreviewForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F4FDFB] dark:bg-[#011817] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-brand-bg dark:bg-[#0A1F1E] px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-[#0D9488] flex items-center justify-center mx-auto mb-4">

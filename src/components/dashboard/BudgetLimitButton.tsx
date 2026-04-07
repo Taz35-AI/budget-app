@@ -45,7 +45,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
             ? isWarning
               ? 'bg-red-500/20 border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500/30'
               : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20'
-            : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/50 hover:bg-slate-200 dark:hover:bg-white/10',
+            : 'bg-brand-primary/[0.05] dark:bg-white/[0.05] border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-600 dark:text-white/50 hover:bg-slate-200 dark:hover:bg-white/10',
         )}
       >
         <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -64,7 +64,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
         <>
           <div className="fixed inset-0 z-50 native-backdrop" onClick={() => setOpen(false)} />
           <div
-            className="fixed inset-x-4 top-24 z-50 bg-white dark:bg-[#042F2E] rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
+            className="fixed inset-x-4 top-24 z-50 bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
@@ -105,7 +105,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
                   {tc('clear')}
                 </button>
               )}
-              <button onClick={() => setOpen(false)} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-slate-200 dark:border-white/10">
+              <button onClick={() => setOpen(false)} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-brand-primary/[0.08] dark:border-white/[0.08]">
                 {tc('cancel')}
               </button>
               <button onClick={handleSet} className="flex-1 h-10 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold active:scale-[0.97] transition-all duration-100">

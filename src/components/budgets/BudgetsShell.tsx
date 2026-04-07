@@ -91,12 +91,13 @@ export function BudgetsShell() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#011817]">
+      <div className="min-h-screen bg-brand-bg dark:bg-[#0A1F1E]">
         {/* Ambient glow */}
-        <div className="fixed top-0 inset-x-0 h-[480px] bg-gradient-to-b from-amber-100/40 via-orange-50/20 to-transparent dark:from-amber-950/15 dark:via-transparent dark:to-transparent pointer-events-none -z-10" />
+        <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-amber-100/20 via-teal-50/10 to-transparent dark:from-amber-950/10 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
 
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/90 dark:bg-[#011817]/85 backdrop-blur-2xl border-b border-slate-200/70 dark:border-white/[0.05]">
+        <header className="sticky top-0 z-20 glass-header">
+          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-accent/30 to-transparent" />
           <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
             <NavMenuButton />
             <MobileLogo />
@@ -118,14 +119,14 @@ export function BudgetsShell() {
 
         <div className="px-3 sm:px-5 py-3 sm:py-4 flex flex-col gap-5">
           {/* Month overview */}
-          <div className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 mb-3">{currentMonthLabel}</p>
-            <div className="flex items-end gap-6">
+          <div className="hero-card rounded-3xl p-6">
+            <p className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300/50 mb-3 font-display">{currentMonthLabel}</p>
+            <div className="relative flex items-end gap-6">
               <div>
-                <p className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <p className="text-3xl font-extrabold text-white tracking-tight font-display">
                   {formatAmount(totalMonthlyExpense, { compact: true })}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-white/40 mt-0.5">{t('spentThisMonth')}</p>
+                <p className="text-xs text-teal-300/40 mt-1">{t('spentThisMonth')}</p>
               </div>
               {tagBudgets.length > 0 && (() => {
                 const totalBudget = tagBudgets.reduce((s, b) => s + b.monthlyLimit, 0);
@@ -133,11 +134,11 @@ export function BudgetsShell() {
                 const over = remaining < 0;
                 return (
                   <div className="text-right">
-                    <p className={cn('text-xl font-bold', over ? 'text-red-500' : 'text-emerald-500')}>
+                    <p className={cn('text-xl font-bold font-display', over ? 'text-red-300' : 'text-emerald-300')}>
                       {formatAmount(Math.abs(remaining), { compact: true })}
-                      <span className="text-xs font-medium text-slate-400 dark:text-white/30 ml-1">{over ? t('over') : t('left')}</span>
+                      <span className="text-xs font-medium text-teal-300/40 ml-1">{over ? t('over') : t('left')}</span>
                     </p>
-                    <p className="text-xs text-slate-400 dark:text-white/30">of {formatAmount(totalBudget, { compact: true })} budgeted</p>
+                    <p className="text-xs text-teal-300/40">of {formatAmount(totalBudget, { compact: true })} budgeted</p>
                   </div>
                 );
               })()}
@@ -214,7 +215,7 @@ export function BudgetsShell() {
                 <div className="flex flex-col gap-3">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-white/30 px-1">{t('trackedCategories')}</p>
                   {budgetedTags.map((b) => (
-                    <div key={b.tagId} className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">
+                    <div key={b.tagId} className="glass-card rounded-3xl p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: b.color }} />
@@ -245,12 +246,12 @@ export function BudgetsShell() {
                           </button>
                         </div>
                       </div>
-                      <div className="h-2.5 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="progress-bar">
                         <div
-                          className="h-full rounded-full transition-all duration-500"
+                          className="progress-fill"
                           style={{
                             width: `${b.pct}%`,
-                            backgroundColor: b.over ? '#ef4444' : b.pct > 80 ? '#f59e0b' : b.color,
+                            background: b.over ? 'linear-gradient(90deg, #ef4444, #f87171)' : b.pct > 80 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : `linear-gradient(90deg, ${b.color}, ${b.color}dd)`,
                           }}
                         />
                       </div>
@@ -272,7 +273,7 @@ export function BudgetsShell() {
                   {unbudgetedSpend.map((item) => (
                     <div
                       key={item.tagId}
-                      className="bg-white dark:bg-white/[0.03] rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 flex items-center justify-between native-row shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]"
+                      className="glass-card rounded-3xl p-4 flex items-center justify-between native-row"
                     >
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />

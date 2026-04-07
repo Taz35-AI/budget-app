@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
 };
 
-const serif = { fontFamily: "'Instrument Serif', Georgia, serif" } as const;
+const serif = { fontFamily: "'Space Grotesk', Georgia, serif" } as const;
 const sans  = { fontFamily: "'DM Sans', system-ui, sans-serif" } as const;
 
 const jsonLd = {

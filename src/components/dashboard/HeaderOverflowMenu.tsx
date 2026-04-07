@@ -30,7 +30,7 @@ export function HeaderOverflowMenu({ currency, onCurrencyChange }: Props) {
     <div ref={ref} className="relative sm:hidden">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center justify-center w-9 h-9 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/50 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.90] duration-100"
+        className="flex items-center justify-center w-9 h-9 rounded-2xl bg-brand-primary/[0.05] dark:bg-white/[0.05] border border-brand-primary/[0.08] dark:border-white/[0.08] text-slate-600 dark:text-white/50 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-[0.90] duration-100"
         aria-label="More options"
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export function HeaderOverflowMenu({ currency, onCurrencyChange }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#042F2E] border border-slate-200 dark:border-white/10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden min-w-[220px]">
+        <div className="absolute right-0 top-full mt-2 z-50 bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden min-w-[220px]">
           {/* Theme row */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/[0.06] rounded-2xl active:bg-black/[0.04] dark:active:bg-white/[0.06]">
             <span className="text-sm text-slate-600 dark:text-white/60 font-medium">Theme</span>

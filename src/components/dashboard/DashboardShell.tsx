@@ -283,17 +283,12 @@ export function DashboardShell() {
     <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#0A1F1E]">
 
       {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[400px] bg-gradient-to-b from-[#D9DDF0]/40 to-transparent dark:from-[#0F3332]/20 dark:to-transparent pointer-events-none -z-10" />
+      <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-teal-100/30 via-teal-50/10 to-transparent dark:from-teal-900/15 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
 
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-20
-        bg-white/95 dark:bg-[#0A1F1E]/95
-        backdrop-blur-2xl
-        border-b border-[#D9DDF0]/70 dark:border-[#0D9488]/[0.08]
-        shadow-[0_1px_0_rgba(25,27,47,0.06),0_4px_16px_rgba(25,27,47,0.04)]
-        dark:shadow-[0_1px_0_rgba(59,122,120,0.06)]">
+      <header className="sticky top-0 z-20 glass-header">
         {/* Accent line */}
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#0D9488]/40 to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-primary/30 to-transparent" />
 
         <div className="px-4 sm:px-6 h-16 sm:h-14 flex items-center gap-3">
 
@@ -303,7 +298,7 @@ export function DashboardShell() {
 
           {/* Page title — desktop only */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            <h1 className="text-[1.35rem] text-[#042F2E] dark:text-white tracking-tight" style={{ fontFamily: '"Instrument Serif", serif' }}>{t('title')}</h1>
+            <h1 className="text-[1.35rem] text-brand-text dark:text-white tracking-tight" style={{ fontFamily: 'var(--font-space, "Space Grotesk"), sans-serif' }}>{t('title')}</h1>
           </div>
 
           {/* Controls */}
@@ -342,16 +337,16 @@ export function DashboardShell() {
           {/* Pending household invitations */}
           <InvitationsBanner />
 
-          {/* Stats bar — typographic headline style */}
+          {/* Stats bar — dark hero card */}
           <div id="tour-stats"
-            className="flex-shrink-0 bg-gradient-to-br from-white via-white to-teal-50/80 dark:from-[#0F3332] dark:via-[#0F3332] dark:to-[#0D9488]/[0.08] rounded-2xl sm:rounded-3xl border border-brand-primary/[0.09] dark:border-brand-primary/[0.10] overflow-hidden shadow-[0_2px_12px_rgba(13,148,136,0.08),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
+            className="flex-shrink-0 hero-card rounded-2xl sm:rounded-3xl overflow-hidden">
 
             {/* Desktop: single horizontal row */}
-            <div className="hidden sm:flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
+            <div className="hidden sm:flex divide-x divide-white/[0.08]">
 
               {/* Balance Today — hero, wider */}
-              <div className="flex-[1.6] px-5 py-3.5 min-w-0">
-                <div className="flex items-center justify-between mb-1.5">
+              <div className="flex-[1.6] px-5 py-4 min-w-0">
+                <div className="flex items-center justify-between mb-2">
                   {searchOpen ? (
                     /* ── Search input (desktop) ── */
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -360,21 +355,21 @@ export function DashboardShell() {
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder={t('searchPlaceholder')}
-                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none"
+                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-white placeholder:text-white/40 outline-none"
                       />
                       <button
                         onClick={() => setShowAmountFilter((v) => !v)}
                         title={t('filterByAmount')}
                         className={cn(
                           'flex-shrink-0 h-4 w-4 flex items-center justify-center rounded transition-colors',
-                          showAmountFilter ? 'text-amber-500' : 'text-brand-text/30 dark:text-white/25 hover:text-brand-primary',
+                          showAmountFilter ? 'text-amber-400' : 'text-white/30 hover:text-teal-300',
                         )}
                       >
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-brand-text/30 dark:text-white/25 hover:text-brand-danger transition-colors">
+                      <button onClick={closeSearch} className="flex-shrink-0 text-white/30 hover:text-red-400 transition-colors">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -382,12 +377,12 @@ export function DashboardShell() {
                     </div>
                   ) : (
                     <>
-                      <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18">{t('balanceToday')}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50">{t('balanceToday')}</span>
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => setSearchOpen(true)}
                           aria-label={t('searchAriaLabel')}
-                          className="w-5 h-5 flex items-center justify-center rounded-lg text-brand-text/50 dark:text-white/40 hover:text-brand-primary hover:bg-brand-primary/8 transition-colors"
+                          className="w-5 h-5 flex items-center justify-center rounded-lg text-white/40 hover:text-teal-300 hover:bg-white/10 transition-colors"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -395,7 +390,7 @@ export function DashboardShell() {
                         </button>
                         <button
                           onClick={() => calendarNavRef.current?.today()}
-                          className="flex items-center gap-1 px-2 py-0.5 rounded-lg border border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary text-[9px] font-bold transition-all hover:bg-brand-primary/15"
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-lg border border-white/15 bg-white/10 text-teal-200 text-[9px] font-bold transition-all hover:bg-white/15"
                         >
                           <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -406,7 +401,7 @@ export function DashboardShell() {
                     </>
                   )}
                 </div>
-                {/* Amount range inputs — desktop, shown when filter icon is toggled */}
+                {/* Amount range inputs — desktop */}
                 {searchOpen && showAmountFilter && (
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <input
@@ -414,56 +409,56 @@ export function DashboardShell() {
                       value={searchAmountMin}
                       onChange={(e) => setSearchAmountMin(e.target.value)}
                       placeholder={tf('minAmount')}
-                      className="w-16 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                      className="w-16 h-5 bg-transparent text-[10px] text-white placeholder:text-white/30 outline-none border-b border-white/20"
                     />
-                    <span className="text-[9px] text-brand-text/25">–</span>
+                    <span className="text-[9px] text-white/25">–</span>
                     <input
                       type="number"
                       value={searchAmountMax}
                       onChange={(e) => setSearchAmountMax(e.target.value)}
                       placeholder={tf('maxAmount')}
-                      className="w-16 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                      className="w-16 h-5 bg-transparent text-[10px] text-white placeholder:text-white/30 outline-none border-b border-white/20"
                     />
                   </div>
                 )}
                 <span className={cn(
-                  'text-[1.75rem] font-black tabular-nums leading-none tracking-tight truncate block',
-                  todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                  'text-[2rem] font-black tabular-nums leading-none tracking-tight truncate block font-display',
+                  todayBalance > 0 ? 'text-emerald-300' : todayBalance < 0 ? 'text-red-300' : 'text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
                 {searchOpen && matchingDates && (
-                  <p className="text-[9px] text-amber-500 font-semibold mt-1 leading-none">
+                  <p className="text-[9px] text-amber-400 font-semibold mt-1.5 leading-none">
                     {t('daysMatched', { count: matchingDates.size })}
                   </p>
                 )}
               </div>
 
               {/* Income */}
-              <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-positive truncate block">
+              <div className="flex-1 px-4 py-4 min-w-0">
+                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-emerald-300 truncate block font-display">
                   {formatAmount(monthIncome)}
                 </span>
               </div>
 
               {/* Expenses */}
-              <div className="flex-1 px-4 py-3.5 min-w-0 relative">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">
+              <div className="flex-1 px-4 py-4 min-w-0 relative">
+                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">
                   {t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}
                 </span>
-                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-brand-danger truncate block">
+                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-red-300 truncate block font-display">
                   {formatAmount(monthExpense)}
                 </span>
                 {budgetLimit && (
-                  <span className="text-[9px] font-semibold text-brand-text/22 dark:text-white/14 block mt-1 leading-none">
+                  <span className="text-[9px] font-semibold text-white/25 block mt-1.5 leading-none">
                     / {formatAmount(budgetLimit)} budget
                   </span>
                 )}
                 {clampedBudgetPct !== undefined && (
-                  <div className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-primary/8 dark:bg-brand-primary/10">
+                  <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/[0.06]">
                     <div
-                      className={cn('h-full transition-all duration-700', budgetDanger ? 'bg-brand-danger' : 'bg-brand-positive')}
+                      className={cn('h-full rounded-full transition-all duration-700', budgetDanger ? 'bg-red-400' : 'bg-emerald-400')}
                       style={{ width: `${clampedBudgetPct}%` }}
                     />
                   </div>
@@ -471,11 +466,11 @@ export function DashboardShell() {
               </div>
 
               {/* Net */}
-              <div className="flex-1 px-4 py-3.5 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 block mb-1.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+              <div className="flex-1 px-4 py-4 min-w-0">
+                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className={cn(
-                  'text-xl font-black tabular-nums leading-none tracking-tight truncate block',
-                  monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                  'text-xl font-black tabular-nums leading-none tracking-tight truncate block font-display',
+                  monthNet > 0 ? 'text-emerald-300' : monthNet < 0 ? 'text-red-300' : 'text-white',
                 )}>
                   {(monthNet >= 0 ? '+' : '') + formatAmount(monthNet)}
                 </span>
@@ -484,7 +479,7 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden">
-              <div className="px-3.5 pt-3.5 pb-2.5 border-b border-brand-primary/[0.08] dark:border-brand-primary/[0.06]">
+              <div className="px-3.5 pt-4 pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (mobile) ── */
@@ -494,20 +489,20 @@ export function DashboardShell() {
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder={t('searchPlaceholder')}
-                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 outline-none"
+                        className="flex-1 min-w-0 h-5 bg-transparent text-[11px] text-white placeholder:text-white/40 outline-none"
                       />
                       <button
                         onClick={() => setShowAmountFilter((v) => !v)}
                         className={cn(
                           'flex-shrink-0 h-5 w-5 flex items-center justify-center rounded transition-colors',
-                          showAmountFilter ? 'text-amber-500' : 'text-brand-text/30 dark:text-white/25',
+                          showAmountFilter ? 'text-amber-400' : 'text-white/30',
                         )}
                       >
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-brand-text/30 dark:text-white/25 hover:text-brand-danger">
+                      <button onClick={closeSearch} className="flex-shrink-0 text-white/30 hover:text-red-400">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -515,7 +510,7 @@ export function DashboardShell() {
                     </div>
                   ) : (
                     <>
-                      <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-brand-text/35 dark:text-white/25">{t('balanceToday')}</span>
+                      <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-teal-300/50">{t('balanceToday')}</span>
                       <div className="flex items-center gap-1.5">
                         {/* Search icon */}
                         <button
@@ -523,7 +518,7 @@ export function DashboardShell() {
                           aria-label={t('searchAriaLabel')}
                           className={cn(
                             'h-5 w-5 flex items-center justify-center rounded-lg transition-colors',
-                            matchingDates ? 'text-amber-500' : 'text-brand-text/50 dark:text-white/40 hover:text-brand-primary hover:bg-brand-primary/8',
+                            matchingDates ? 'text-amber-400' : 'text-white/40 hover:text-teal-300 hover:bg-white/10',
                           )}
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -536,8 +531,8 @@ export function DashboardShell() {
                           className={cn(
                             'flex items-center gap-1 h-5 px-2 rounded-lg border text-[9px] font-bold transition-all active:scale-95',
                             showMobileStats
-                              ? 'bg-brand-primary text-white border-brand-primary'
-                              : 'border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary',
+                              ? 'bg-white/20 text-white border-white/20'
+                              : 'border-white/15 bg-white/10 text-teal-200',
                           )}
                         >
                           <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -547,7 +542,7 @@ export function DashboardShell() {
                         </button>
                         <button
                           onClick={() => calendarNavRef.current?.today()}
-                          className="flex items-center gap-1 h-5 px-2 rounded-lg border border-brand-primary/20 dark:border-brand-primary/25 bg-brand-primary/8 dark:bg-brand-primary/10 text-brand-primary text-[9px] font-bold transition-all active:bg-brand-primary/20"
+                          className="flex items-center gap-1 h-5 px-2 rounded-lg border border-white/15 bg-white/10 text-teal-200 text-[9px] font-bold transition-all active:bg-white/20"
                         >
                           <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -566,49 +561,49 @@ export function DashboardShell() {
                       value={searchAmountMin}
                       onChange={(e) => setSearchAmountMin(e.target.value)}
                       placeholder={tf('minAmount')}
-                      className="w-14 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                      className="w-14 h-5 bg-transparent text-[10px] text-white placeholder:text-white/30 outline-none border-b border-white/20"
                     />
-                    <span className="text-[9px] text-brand-text/25">–</span>
+                    <span className="text-[9px] text-white/25">–</span>
                     <input
                       type="number"
                       value={searchAmountMax}
                       onChange={(e) => setSearchAmountMax(e.target.value)}
                       placeholder={tf('maxAmount')}
-                      className="w-14 h-5 bg-transparent text-[10px] text-brand-text dark:text-white placeholder:text-brand-text/25 outline-none border-b border-brand-primary/20"
+                      className="w-14 h-5 bg-transparent text-[10px] text-white placeholder:text-white/30 outline-none border-b border-white/20"
                     />
                   </div>
                 )}
                 <span className={cn(
-                  'text-[1.6rem] font-black tabular-nums leading-none tracking-tight block',
-                  todayBalance > 0 ? 'text-brand-positive' : todayBalance < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                  'text-[1.75rem] font-black tabular-nums leading-none tracking-tight block font-display',
+                  todayBalance > 0 ? 'text-emerald-300' : todayBalance < 0 ? 'text-red-300' : 'text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
                 {searchOpen && matchingDates && (
-                  <p className="text-[9px] text-amber-500 font-semibold mt-0.5 leading-none">
+                  <p className="text-[9px] text-amber-400 font-semibold mt-1 leading-none">
                     {t('daysMatched', { count: matchingDates.size })}
                   </p>
                 )}
               </div>
-              <div className="flex divide-x divide-brand-primary/[0.08] dark:divide-brand-primary/[0.06]">
+              <div className="flex divide-x divide-white/[0.08]">
                 <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                  <span className="text-[15px] font-black tabular-nums text-brand-positive truncate block">{formatAmount(monthIncome)}</span>
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                  <span className="text-[15px] font-black tabular-nums text-emerald-300 truncate block font-display">{formatAmount(monthIncome)}</span>
                 </div>
                 <div className="flex-1 px-3 py-2.5 min-w-0 relative">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                  <span className="text-[15px] font-black tabular-nums text-brand-danger truncate block">{formatAmount(monthExpense)}</span>
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                  <span className="text-[15px] font-black tabular-nums text-red-300 truncate block font-display">{formatAmount(monthExpense)}</span>
                   {clampedBudgetPct !== undefined && (
-                    <div className="absolute bottom-0 inset-x-0 h-[2px] bg-brand-primary/8">
-                      <div className={cn('h-full', budgetDanger ? 'bg-brand-danger' : 'bg-brand-positive')} style={{ width: `${clampedBudgetPct}%` }} />
+                    <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/[0.06]">
+                      <div className={cn('h-full rounded-full', budgetDanger ? 'bg-red-400' : 'bg-emerald-400')} style={{ width: `${clampedBudgetPct}%` }} />
                     </div>
                   )}
                 </div>
                 <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-brand-text/30 dark:text-white/20 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className={cn(
-                    'text-[15px] font-black tabular-nums truncate block',
-                    monthNet > 0 ? 'text-brand-positive' : monthNet < 0 ? 'text-brand-danger' : 'text-brand-text dark:text-white',
+                    'text-[15px] font-black tabular-nums truncate block font-display',
+                    monthNet > 0 ? 'text-emerald-300' : monthNet < 0 ? 'text-red-300' : 'text-white',
                   )}>
                     {(monthNet >= 0 ? '+' : '') + formatAmount(monthNet)}
                   </span>
@@ -621,7 +616,7 @@ export function DashboardShell() {
           {/* Mobile stats panel — shown instead of calendar when toggle is active */}
           {showMobileStats && (
             <div className="sm:hidden flex-1 min-h-0 overflow-y-auto rounded-3xl
-              bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]
+              glass-card
               dark:bg-[#0F3332] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
               <MonthSummary month={visibleMonth} dayTransactions={dayTransactions} formatAmount={formatAmount} />
             </div>
@@ -631,19 +626,18 @@ export function DashboardShell() {
           {/* flex-1 min-h-0 lets it fill remaining height on mobile; sm:flex-initial resets on desktop */}
           <div className={cn('flex-1 min-h-0 sm:flex-initial', showMobileStats && 'hidden sm:block')}>
           {isLoading && balances.size === 0 ? (
-            <div className="animate-pulse rounded-3xl bg-white dark:bg-[#042F2E] p-5 space-y-3 border border-[#D9DDF0]/60 dark:border-[#042F2E]/30">
-              <div className="h-5 bg-[#D9DDF0]/60 dark:bg-[#042F2E]/30 rounded-lg w-36" />
+            <div className="animate-pulse rounded-3xl glass-card p-5 space-y-3">
+              <div className="h-5 bg-brand-primary/[0.06] dark:bg-white/[0.04] rounded-lg w-36" />
               <div className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 35 }).map((_, i) => (
-                  <div key={i} className="h-[90px] sm:h-[110px] bg-[#D9DDF0]/40 dark:bg-[#042F2E]/20 rounded-xl" />
+                  <div key={i} className="h-[90px] sm:h-[110px] bg-brand-primary/[0.04] dark:bg-white/[0.03] rounded-xl" />
                 ))}
               </div>
             </div>
           ) : (
             <div className="relative h-full">
               <div className="h-full rounded-3xl overflow-hidden
-                bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]
-                dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]">
+                glass-card">
                 <CalendarView
                   balances={balances}
                   dayTransactions={dayTransactions}
@@ -689,13 +683,13 @@ export function DashboardShell() {
           {selectedDate ? (
             <>
               {/* Day panel header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#D9DDF0]/50 dark:border-[#0D9488]/[0.08] flex-shrink-0
-                bg-gradient-to-r from-white to-[#D9DDF0]/10 dark:from-[#042F2E] dark:to-[#042F2E]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-brand-primary/[0.06] dark:border-white/[0.06] flex-shrink-0
+                bg-gradient-to-r from-white/60 to-teal-50/20 dark:from-white/[0.03] dark:to-transparent">
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[#042F2E]/40 dark:text-[#D9DDF0]/30 mb-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-text/40 dark:text-white/30 mb-0.5">
                     Selected day
                   </p>
-                  <h2 className="text-base font-bold text-[#042F2E] dark:text-white tracking-tight">
+                  <h2 className="text-base font-bold text-brand-text dark:text-white tracking-tight">
                     {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-GB', {
                       weekday: 'long', day: 'numeric', month: 'long',
                     })}
@@ -703,7 +697,7 @@ export function DashboardShell() {
                 </div>
                 <button
                   onClick={handleClose}
-                  className="p-2 rounded-xl hover:bg-[#D9DDF0]/40 dark:hover:bg-[#042F2E]/40 text-[#042F2E]/40 dark:text-[#D9DDF0]/30 hover:text-[#042F2E] dark:hover:text-white transition-all"
+                  className="p-2 rounded-xl hover:bg-brand-primary/[0.06] dark:hover:bg-white/[0.06] text-brand-text/40 dark:text-white/30 hover:text-brand-text dark:hover:text-white transition-all"
                   aria-label="Close"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -754,7 +748,7 @@ export function DashboardShell() {
                                         'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
                                         desktopFormAccountId === acct.id
                                           ? 'bg-brand-primary text-white border-brand-primary'
-                                          : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                                          : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-brand-primary/[0.08] dark:border-white/10 hover:border-brand-primary/40',
                                       )}
                                     >
                                       {acct.name}
@@ -776,7 +770,7 @@ export function DashboardShell() {
                                   'h-6 px-2.5 rounded-lg text-[10px] font-semibold transition-all border',
                                   desktopFormAccountId === acct.id
                                     ? 'bg-brand-primary text-white border-brand-primary'
-                                    : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-slate-200 dark:border-white/10 hover:border-brand-primary/40',
+                                    : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-white/50 border-brand-primary/[0.08] dark:border-white/10 hover:border-brand-primary/40',
                                 )}
                               >
                                 {accountDisplayName(acct, myUserId, householdMembers)}

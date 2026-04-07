@@ -113,7 +113,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
               if (isEditing) {
                 if (tx.type === 'recurring') {
                   return (
-                    <li key={tx.id} className="rounded-2xl border border-slate-200 dark:border-white/10 p-4">
+                    <li key={tx.id} className="rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] p-4">
                       {(accounts?.length ?? 0) >= 2 && (
                         <div className="mb-3">
                           <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
@@ -123,7 +123,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                                 className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all duration-100',
                                   editAccountId === acct.id
                                     ? 'bg-brand-primary text-white border-brand-primary'
-                                    : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                                    : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
                                 )}>
                                 {acct.name}
                               </button>
@@ -159,7 +159,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
 
                 // One-off edit
                 return (
-                  <li key={tx.id} className="rounded-2xl border border-slate-200 dark:border-white/10 p-4">
+                  <li key={tx.id} className="rounded-2xl border border-brand-primary/[0.08] dark:border-white/[0.08] p-4">
                     {(accounts?.length ?? 0) >= 2 && (
                       <div className="mb-3">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-brand-text/35 dark:text-white/25 mb-1.5">Account</p>
@@ -169,7 +169,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                               className={cn('h-6 px-2.5 rounded-lg text-[10px] font-medium border transition-all duration-100',
                                 editAccountId === acct.id
                                   ? 'bg-brand-primary text-white border-brand-primary'
-                                  : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white dark:bg-[#042F2E] text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
+                                  : 'border-brand-primary/15 dark:border-brand-primary/20 bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm text-brand-text/70 dark:text-white/60 hover:bg-brand-primary/6 dark:hover:bg-brand-primary/10',
                               )}>
                               {acct.name}
                             </button>

@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-7 shadow-[0_4px_24px_rgba(13,148,136,0.08)]">
+        <div className="bg-white border border-brand-primary/[0.08] rounded-3xl p-7 shadow-[0_4px_24px_rgba(13,148,136,0.08)]">
 
           {stage === 'loading' && (
             <div className="flex items-center justify-center py-6 gap-3">

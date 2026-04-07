@@ -151,7 +151,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
     >
 
       {/* Occurrence label */}
-      <div className="rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2.5 py-1.5 flex items-center gap-3">
+      <div className="rounded-lg bg-slate-50 dark:bg-white/5 border border-brand-primary/[0.08] dark:border-white/[0.08] px-2.5 py-1.5 flex items-center gap-3">
         <div>
           <p className="text-[9px] text-slate-400 dark:text-white/35 font-medium uppercase tracking-wider">{t('editTitle')}</p>
           <p className="text-[11px] font-semibold text-slate-800 dark:text-white leading-tight">{displayDate}</p>
@@ -173,7 +173,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
               'flex items-start gap-2 p-1.5 rounded-2xl border cursor-pointer transition-all duration-100 active:bg-black/[0.03] dark:active:bg-white/[0.04]',
               editMode === opt.value
                 ? 'border-brand-primary bg-brand-primary text-white'
-                : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] hover:border-brand-primary/30 dark:hover:border-white/20',
+                : 'border-brand-primary/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.03] hover:border-brand-primary/30 dark:hover:border-white/20',
             )}
           >
             <input type="radio" value={opt.value} {...register('editMode')} className="sr-only" />
@@ -233,7 +233,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         <div className="flex flex-col gap-1">
           <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{tf('type')}</p>
           <div className={cn(
-            'flex rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 h-7',
+            'flex rounded-lg overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08] h-7',
             editMode === 'this_only' && 'pointer-events-none opacity-50',
           )}>
             {(['income', 'expense'] as const).map((cat) => (
