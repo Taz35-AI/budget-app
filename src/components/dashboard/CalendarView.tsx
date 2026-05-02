@@ -186,13 +186,12 @@ export function CalendarView({
       onTouchEnd={onTouchEnd}
     >
       {/* ── Custom toolbar: account tabs (left) + month name (right) ── */}
-      <div className="flex items-center gap-2 px-3 pt-5 pb-4 border-b border-[#D9DDF0]/40 dark:border-white/[0.06]">
+      <div className="flex items-center gap-2.5 px-3 pt-5 pb-4 border-b border-brand-primary/[0.06] dark:border-white/[0.06]">
 
-        {/* Account tabs — left, scrollable.
-            Stop touch events propagating to the outer swipe-month listener. */}
+        {/* Account tabs — premium segmented control */}
         {showTabs && (
           <div
-            className="flex gap-1 overflow-x-auto scrollbar-none flex-1 min-w-0 bg-black/[0.04] dark:bg-white/[0.06] rounded-2xl p-0.5"
+            className="flex gap-0.5 overflow-x-auto scrollbar-none flex-1 min-w-0 bg-brand-primary/[0.04] dark:bg-white/[0.06] rounded-2xl p-[3px] backdrop-blur-sm ring-1 ring-brand-primary/[0.06] dark:ring-white/[0.04]"
             onTouchStart={(e) => e.stopPropagation()}
             onTouchEnd={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
@@ -200,10 +199,10 @@ export function CalendarView({
             <button
               onClick={() => { selection(); onAccountChange?.('combined'); }}
               className={cn(
-                'flex-shrink-0 h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all duration-100 active:scale-[0.96] select-none',
+                'flex-shrink-0 h-7 px-3 rounded-xl text-[11px] font-bold transition-all duration-200 active:scale-[0.96] select-none',
                 activeAccountId === 'combined'
-                  ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
-                  : 'bg-transparent text-brand-text/50 dark:text-white/40',
+                  ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_4px_rgba(0,0,0,0.08),0_2px_8px_rgba(13,148,136,0.06),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)]'
+                  : 'bg-transparent text-brand-text/40 dark:text-white/35 hover:text-brand-text/60 dark:hover:text-white/50',
               )}
             >
               Combined
@@ -213,10 +212,10 @@ export function CalendarView({
                 key={acct.id}
                 onClick={() => { selection(); onAccountChange?.(acct.id); }}
                 className={cn(
-                  'flex-shrink-0 h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all duration-100 active:scale-[0.96] select-none',
+                  'flex-shrink-0 h-7 px-3 rounded-xl text-[11px] font-bold transition-all duration-200 active:scale-[0.96] select-none',
                   activeAccountId === acct.id
-                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
-                    : 'bg-transparent text-brand-text/50 dark:text-white/40',
+                    ? 'bg-white dark:bg-white/15 text-brand-text dark:text-white shadow-[0_1px_4px_rgba(0,0,0,0.08),0_2px_8px_rgba(13,148,136,0.06),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)]'
+                    : 'bg-transparent text-brand-text/40 dark:text-white/35 hover:text-brand-text/60 dark:hover:text-white/50',
                 )}
               >
                 {accountDisplayName(acct, myUserId, members)}
@@ -226,23 +225,23 @@ export function CalendarView({
         )}
 
         {/* Month name + desktop prev/next chevrons — right side */}
-        <div className={cn('flex items-center gap-1 flex-shrink-0', !showTabs && 'ml-auto')}>
+        <div className={cn('flex items-center gap-1.5 flex-shrink-0', !showTabs && 'ml-auto')}>
           <button
             onClick={() => calendarRef.current?.getApi().prev()}
             aria-label="Previous month"
-            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-2xl text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary active:scale-[0.90] active:bg-black/[0.06] dark:active:bg-white/[0.08] transition-all duration-100"
+            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-xl bg-brand-primary/[0.04] dark:bg-white/[0.04] text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/[0.08] dark:hover:bg-white/[0.08] hover:text-brand-primary active:scale-[0.90] transition-all duration-200 ring-1 ring-brand-primary/[0.04] dark:ring-white/[0.04]"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="text-sm font-bold text-brand-text dark:text-white tracking-tight whitespace-nowrap">
+          <span className="text-sm font-extrabold text-brand-text dark:text-white tracking-tight whitespace-nowrap font-display">
             {monthTitle}
           </span>
           <button
             onClick={() => calendarRef.current?.getApi().next()}
             aria-label="Next month"
-            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-2xl text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/8 dark:hover:bg-white/[0.06] hover:text-brand-primary active:scale-[0.90] active:bg-black/[0.06] dark:active:bg-white/[0.08] transition-all duration-100"
+            className="hidden sm:flex w-8 h-8 items-center justify-center rounded-xl bg-brand-primary/[0.04] dark:bg-white/[0.04] text-brand-text/30 dark:text-white/25 hover:bg-brand-primary/[0.08] dark:hover:bg-white/[0.08] hover:text-brand-primary active:scale-[0.90] transition-all duration-200 ring-1 ring-brand-primary/[0.04] dark:ring-white/[0.04]"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

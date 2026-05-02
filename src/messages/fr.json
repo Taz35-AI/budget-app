@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
+    "selectedDay": "Jour sélectionné",
     "balanceToday": "Solde aujourd'hui",
     "monthlyBudget": "Budget mensuel",
     "monthIncome": "Revenus {month}",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "Comment les dates apparaissent dans l'app",
     "hapticFeedback": "Retour haptique",
     "hapticFeedbackDesc": "Vibration lors des appuis et actions (iOS / Android)",
+    "biometricLock": "Verrouillage de l'app",
+    "biometricLockDesc": "Exiger Face ID ou empreinte pour ouvrir l'application",
     "quickTemplates": "Modèles rapides",
     "quickTemplatesDesc": "En un clic pour pré-remplir le formulaire de transaction avec les détails sauvegardés",
     "noTemplates": "Aucun modèle pour l'instant.",

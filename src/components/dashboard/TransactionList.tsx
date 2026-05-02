@@ -11,6 +11,7 @@ import { useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransacti
 import type { EditMode, DeleteMode } from '@/hooks/useTransactions';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
+import { TagIcon } from '@/components/TagIcon';
 import { cn } from '@/lib/utils';
 import { OnboardingTip } from './OnboardingTip';
 import { memberColor } from '@/lib/memberUtils';
@@ -313,6 +314,15 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                     'w-[3px] self-stretch rounded-full flex-shrink-0 min-h-[1.75rem]',
                     tx.category === 'income' ? 'bg-emerald-400' : 'bg-red-400',
                   )} />
+
+                  {tx.tag && allTags[tx.tag] && (
+                    <TagIcon
+                      label={allTags[tx.tag].label}
+                      iconSlug={allTags[tx.tag].iconSlug}
+                      color={allTags[tx.tag].color}
+                      size={28}
+                    />
+                  )}
 
                   {/* Household member avatar badge */}
                   {(members?.length ?? 0) > 1 && tx.created_by && (() => {

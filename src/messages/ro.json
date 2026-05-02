@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Panou",
+    "selectedDay": "Zi selectată",
     "balanceToday": "Sold Astăzi",
     "monthlyBudget": "Buget Lunar",
     "monthIncome": "Venituri {month}",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "Cum apar datele în aplicație",
     "hapticFeedback": "Feedback haptic",
     "hapticFeedbackDesc": "Vibrații la atingeri și acțiuni (iOS / Android)",
+    "biometricLock": "Blocare aplicație",
+    "biometricLockDesc": "Necesită Face ID sau amprentă pentru a deschide aplicația",
     "quickTemplates": "Șabloane rapide",
     "quickTemplatesDesc": "Completare rapidă a formularului de tranzacție",
     "noTemplates": "Niciun șablon încă.",

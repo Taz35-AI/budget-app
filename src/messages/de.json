@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "selectedDay": "Ausgewählter Tag",
     "balanceToday": "Heutiger Kontostand",
     "monthlyBudget": "Monatsbudget",
     "monthIncome": "{month} Einnahmen",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "Wie Daten in der App angezeigt werden",
     "hapticFeedback": "Haptisches Feedback",
     "hapticFeedbackDesc": "Vibration bei Tippen und Aktionen (iOS / Android)",
+    "biometricLock": "App-Sperre",
+    "biometricLockDesc": "Face ID oder Fingerabdruck zum Öffnen der App erforderlich",
     "quickTemplates": "Schnellvorlagen",
     "quickTemplatesDesc": "Ein Tipp zum Vorausfüllen des Transaktionsformulars mit gespeicherten Details",
     "noTemplates": "Noch keine Vorlagen.",

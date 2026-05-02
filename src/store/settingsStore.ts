@@ -17,6 +17,8 @@ interface SettingsState {
   firstDayOfWeek: 0 | 1;
   dateFormat: DateFormat;
   hapticsEnabled: boolean;
+  /** When true, the BiometricGate locks the UI until Face ID / fingerprint passes. Native only. */
+  biometricEnabled: boolean;
   notificationSettings: NotificationSettings;
   language: AppLanguage;
   monthlyInsights: Record<string, { advice: string; generatedAt: string }>;
@@ -41,6 +43,7 @@ interface SettingsState {
   setFirstDayOfWeek: (day: 0 | 1) => void;
   setDateFormat: (fmt: DateFormat) => void;
   setHapticsEnabled: (enabled: boolean) => void;
+  setBiometricEnabled: (enabled: boolean) => void;
   setNotificationSettings: (patch: Partial<NotificationSettings>) => void;
   setLanguage: (lang: AppLanguage) => void;
   setMonthlyInsight: (monthKey: string, advice: string) => void;
@@ -58,6 +61,7 @@ export const useSettingsStore = create<SettingsState>()(
       firstDayOfWeek: 1,
       dateFormat: 'DD/MM/YYYY',
       hapticsEnabled: true,
+      biometricEnabled: false,
       notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
       language: 'en',
       monthlyInsights: {},
@@ -136,6 +140,7 @@ export const useSettingsStore = create<SettingsState>()(
       setFirstDayOfWeek: (day) => set({ firstDayOfWeek: day }),
       setDateFormat: (fmt) => set({ dateFormat: fmt }),
       setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
+      setBiometricEnabled: (enabled) => set({ biometricEnabled: enabled }),
       setNotificationSettings: (patch) =>
         set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
       setLanguage: (lang) => set({ language: lang }),

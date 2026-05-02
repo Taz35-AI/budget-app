@@ -23,6 +23,7 @@ import { BudgetLimitButton } from './BudgetLimitButton';
 import { CurrencySelector } from './CurrencySelector';
 import { useBudgetLimit } from '@/hooks/useBudgetLimit';
 import { useSettings } from '@/hooks/useSettings';
+import { getDateLocale } from '@/lib/dateLocale';
 import { TAGS } from '@/lib/constants';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -126,7 +127,8 @@ export function DashboardShell() {
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [showMobileStats, setShowMobileStats] = useState(false);
 
-  const { firstDayOfWeek, allTags } = useSettings();
+  const { firstDayOfWeek, allTags, language } = useSettings();
+  const dateLocale = getDateLocale(language);
 
   // ── Search ──────────────────────────────────────────────────────────────────
   const [searchOpen, setSearchOpen] = useState(false);
@@ -282,8 +284,13 @@ export function DashboardShell() {
     <AppLayout>
     <div className="min-h-screen bg-[#F4FDFB] dark:bg-[#0A1F1E]">
 
-      {/* Ambient glow */}
-      <div className="fixed top-0 inset-x-0 h-[500px] bg-gradient-to-b from-teal-100/30 via-teal-50/10 to-transparent dark:from-teal-900/15 dark:via-teal-900/5 dark:to-transparent pointer-events-none -z-10" />
+      {/* Aurora ambient */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden="true">
+        <div className="aurora-orb w-[600px] h-[600px] -top-[200px] -left-[100px] bg-teal-400/25 dark:bg-teal-500/10" style={{ animation: 'aurora-1 20s ease-in-out infinite' }} />
+        <div className="aurora-orb w-[500px] h-[500px] top-[100px] -right-[200px] bg-emerald-400/20 dark:bg-emerald-500/8" style={{ animation: 'aurora-2 25s ease-in-out infinite' }} />
+        <div className="aurora-orb w-[700px] h-[400px] -bottom-[150px] left-[30%] bg-cyan-400/15 dark:bg-cyan-500/5" style={{ animation: 'aurora-3 18s ease-in-out infinite' }} />
+        <div className="absolute inset-0 bg-[#F4FDFB]/50 dark:bg-[#0A1F1E]/70" />
+      </div>
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20 glass-header">
@@ -337,16 +344,15 @@ export function DashboardShell() {
           {/* Pending household invitations */}
           <InvitationsBanner />
 
-          {/* Stats bar — dark hero card */}
-          <div id="tour-stats"
-            className="flex-shrink-0 hero-card rounded-2xl sm:rounded-3xl overflow-hidden">
+          {/* Stats — bento grid */}
+          <div id="tour-stats" className="flex-shrink-0">
 
-            {/* Desktop: single horizontal row */}
-            <div className="hidden sm:flex divide-x divide-white/[0.08]">
+            {/* Desktop: bento card grid */}
+            <div className="hidden sm:flex gap-3">
 
-              {/* Balance Today — hero, wider */}
-              <div className="flex-[1.6] px-5 py-4 min-w-0">
-                <div className="flex items-center justify-between mb-2">
+              {/* Balance Today — hero card */}
+              <div className="flex-[1.6] bento-hero rounded-xl px-3.5 py-2.5 min-w-0 animate-card-enter">
+                <div className="relative z-10 flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (desktop) ── */
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -403,7 +409,7 @@ export function DashboardShell() {
                 </div>
                 {/* Amount range inputs — desktop */}
                 {searchOpen && showAmountFilter && (
-                  <div className="flex items-center gap-1.5 mb-1.5">
+                  <div className="relative z-10 flex items-center gap-1.5 mb-1.5">
                     <input
                       type="number"
                       value={searchAmountMin}
@@ -422,43 +428,43 @@ export function DashboardShell() {
                   </div>
                 )}
                 <span className={cn(
-                  'text-[2rem] font-black tabular-nums leading-none tracking-tight truncate block font-display',
+                  'relative z-10 text-2xl font-bold tabular-nums leading-none tracking-tight truncate block font-display',
                   todayBalance > 0 ? 'text-emerald-300' : todayBalance < 0 ? 'text-red-300' : 'text-white',
                 )}>
                   {formatAmount(todayBalance)}
                 </span>
                 {searchOpen && matchingDates && (
-                  <p className="text-[9px] text-amber-400 font-semibold mt-1.5 leading-none">
+                  <p className="relative z-10 text-[9px] text-amber-400 font-semibold mt-1.5 leading-none">
                     {t('daysMatched', { count: matchingDates.size })}
                   </p>
                 )}
               </div>
 
               {/* Income */}
-              <div className="flex-1 px-4 py-4 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
-                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-emerald-300 truncate block font-display">
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 animate-card-enter" style={{ animationDelay: '80ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <span className="text-lg font-bold tabular-nums leading-none tracking-tight text-emerald-600 dark:text-emerald-400 truncate block font-display">
                   {formatAmount(monthIncome)}
                 </span>
               </div>
 
               {/* Expenses */}
-              <div className="flex-1 px-4 py-4 min-w-0 relative">
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 relative animate-card-enter" style={{ animationDelay: '160ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">
                   {t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}
                 </span>
-                <span className="text-xl font-black tabular-nums leading-none tracking-tight text-red-300 truncate block font-display">
+                <span className="text-lg font-bold tabular-nums leading-none tracking-tight text-red-600 dark:text-red-400 truncate block font-display">
                   {formatAmount(monthExpense)}
                 </span>
                 {budgetLimit && (
-                  <span className="text-[9px] font-semibold text-white/25 block mt-1.5 leading-none">
-                    / {formatAmount(budgetLimit)} budget
+                  <span className="text-[9px] font-medium text-brand-text/30 dark:text-white/30 block mt-1 leading-none">
+                    / {formatAmount(budgetLimit)}
                   </span>
                 )}
                 {clampedBudgetPct !== undefined && (
-                  <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/[0.06]">
+                  <div className="absolute bottom-0 inset-x-0 h-[2px] overflow-hidden bg-brand-primary/[0.06] dark:bg-white/[0.06]">
                     <div
-                      className={cn('h-full rounded-full transition-all duration-700', budgetDanger ? 'bg-red-400' : 'bg-emerald-400')}
+                      className={cn('h-full transition-all duration-700', budgetDanger ? 'bg-red-400' : 'bg-emerald-400')}
                       style={{ width: `${clampedBudgetPct}%` }}
                     />
                   </div>
@@ -466,11 +472,11 @@ export function DashboardShell() {
               </div>
 
               {/* Net */}
-              <div className="flex-1 px-4 py-4 min-w-0">
-                <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-teal-300/50 block mb-2">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 animate-card-enter" style={{ animationDelay: '240ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className={cn(
-                  'text-xl font-black tabular-nums leading-none tracking-tight truncate block font-display',
-                  monthNet > 0 ? 'text-emerald-300' : monthNet < 0 ? 'text-red-300' : 'text-white',
+                  'text-lg font-bold tabular-nums leading-none tracking-tight truncate block font-display',
+                  monthNet > 0 ? 'text-emerald-600 dark:text-emerald-400' : monthNet < 0 ? 'text-red-600 dark:text-red-400' : 'text-brand-text dark:text-white',
                 )}>
                   {(monthNet >= 0 ? '+' : '') + formatAmount(monthNet)}
                 </span>
@@ -478,7 +484,7 @@ export function DashboardShell() {
             </div>
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
-            <div className="sm:hidden">
+            <div className="sm:hidden hero-card rounded-2xl overflow-hidden">
               <div className="px-3.5 pt-4 pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
@@ -677,8 +683,9 @@ export function DashboardShell() {
           'hidden lg:flex flex-col w-[340px] xl:w-[400px] 2xl:w-[460px] flex-shrink-0',
           'sticky top-[56px] max-h-[calc(100vh-56px-16px)] self-start',
           'rounded-3xl overflow-hidden',
-          'bg-white border border-[#D9DDF0]/60 shadow-[0_2px_20px_rgba(25,27,47,0.08)]',
-          'dark:bg-[#042F2E] dark:border-[#0D9488]/[0.08] dark:shadow-[0_4px_30px_rgba(12,31,30,0.5)]',
+          'bg-white/80 backdrop-blur-2xl border border-white/50 dark:border-teal-400/[0.08]',
+          'shadow-[0_4px_24px_rgba(13,148,136,0.08),0_12px_40px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)]',
+          'dark:bg-[#042F2E]/80 dark:backdrop-blur-2xl dark:shadow-[0_4px_30px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(94,234,212,0.04)]',
         )}>
           {selectedDate ? (
             <>
@@ -687,10 +694,10 @@ export function DashboardShell() {
                 bg-gradient-to-r from-white/60 to-teal-50/20 dark:from-white/[0.03] dark:to-transparent">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-text/40 dark:text-white/30 mb-0.5">
-                    Selected day
+                    {t('selectedDay')}
                   </p>
                   <h2 className="text-base font-bold text-brand-text dark:text-white tracking-tight">
-                    {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-GB', {
+                    {new Date(selectedDate + 'T12:00:00').toLocaleDateString(dateLocale, {
                       weekday: 'long', day: 'numeric', month: 'long',
                     })}
                   </h2>

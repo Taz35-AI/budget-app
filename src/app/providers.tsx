@@ -6,7 +6,9 @@ import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
 import { CapacitorAuthHandler } from '@/components/CapacitorAuthHandler';
+import { BiometricGate } from '@/components/BiometricGate';
 import { HouseholdSync } from '@/components/HouseholdSync';
+import { useOfflinePersist } from '@/hooks/useOfflinePersist';
 import { Capacitor } from '@capacitor/core';
 import { Keyboard } from '@capacitor/keyboard';
 
@@ -52,6 +54,14 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 // ── Keyboard height CSS variable ───────────────────────────────────────────────
 // Sets --kb on :root so any component can use it for keyboard-aware positioning.
 // Only runs on native (Android/iOS) — no-op on web.
+
+// ── Offline cache hydrator/persister ───────────────────────────────────────────
+// Must live inside QueryClientProvider so it has access to the query client.
+
+function OfflinePersistRunner() {
+  useOfflinePersist();
+  return null;
+}
 
 function KeyboardProvider() {
   useEffect(() => {
@@ -124,7 +134,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
               <RecoveryRedirectHandler />
               <KeyboardProvider />
               <CapacitorAuthHandler />
-              {children}
+              <OfflinePersistRunner />
+              <BiometricGate>{children}</BiometricGate>
             </SettingsSyncProvider>
           </RealtimeSyncProvider>
         </I18nProvider>

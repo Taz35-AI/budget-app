@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { TransactionList } from './TransactionList';
 import { TransactionForm } from './TransactionForm';
 import { useCreateTransaction } from '@/hooks/useTransactions';
+import { useSettingsStore } from '@/store/settingsStore';
+import { getDateLocale } from '@/lib/dateLocale';
 import { cn } from '@/lib/utils';
 import type { DayTransaction, Transaction, TransactionFormValues } from '@/types';
 
@@ -36,6 +38,7 @@ export function DayPanel({
   const create = useCreateTransaction();
   const isOpen = date !== null;
   const [duplicateValues, setDuplicateValues] = useState<Partial<Transaction> | null>(null);
+  const dateLocale = getDateLocale(useSettingsStore((s) => s.language));
 
   const handleDuplicate = (tx: DayTransaction) => {
     setDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
@@ -67,18 +70,22 @@ export function DayPanel({
       <aside
         ref={panelRef}
         className={cn(
-          'fixed top-0 right-0 h-full w-full max-w-sm rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.5)] z-30',
-          'bg-white dark:bg-[#0F0F1A]',
-          'flex flex-col transition-transform duration-300 ease-out',
+          'fixed top-2 right-2 bottom-2 w-full max-w-sm rounded-3xl z-30',
+          'bg-white/85 dark:bg-[#0A1F1E]/90',
+          'backdrop-blur-2xl',
+          'shadow-[0_8px_40px_rgba(0,0,0,0.1),0_24px_80px_rgba(13,148,136,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]',
+          'dark:shadow-[0_8px_40px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(94,234,212,0.06)]',
+          'border border-white/50 dark:border-teal-400/[0.08]',
+          'flex flex-col transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)]',
           'hidden lg:flex',
-          isOpen ? 'translate-x-0' : 'translate-x-full',
+          isOpen ? 'translate-x-0 opacity-100' : 'translate-x-[105%] opacity-0',
         )}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/[0.08]">
           <h2 className="text-base font-semibold text-slate-900 dark:text-white">
             {date
-              ? new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
+              ? new Date(date + 'T12:00:00').toLocaleDateString(dateLocale, {
                   weekday: 'long',
                   day: 'numeric',
                   month: 'long',

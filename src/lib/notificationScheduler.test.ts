@@ -3,12 +3,20 @@
  *
  * We can't test the Capacitor bridge calls (those require a native device),
  * but we CAN test the pure JS logic:
- *   - Bill reminder filtering via firesOnDate
- *   - The `atHourMinute` bump-to-tomorrow behaviour
- *   - Edge cases: ended transactions, one-off transactions, missing fields
+ *   - Bill reminder construction over a 30-day window (buildBillReminders)
+ *   - reminderFireTime: eve-before vs morning-of vs skip
+ *   - Edge cases: ended transactions, one-off transactions, missing fields,
+ *     iOS pending cap, ordering
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import {
+  buildBillReminders,
+  reminderFireTime,
+  monthlyRecapTime,
+  BILL_LOOKAHEAD_DAYS,
+  MAX_BILL_NOTIFICATIONS,
+} from './notificationScheduler';
 import { firesOnDate } from '@/engine/recurringResolver';
 import type { Transaction } from '@/types';
 
@@ -30,126 +38,200 @@ function makeTx(overrides: Partial<Transaction>): Transaction {
   };
 }
 
-/** Replicates the filter in scheduleBillReminders for testability */
-function getDueTomorrow(transactions: Transaction[], tomorrow: string): Transaction[] {
-  return transactions.filter((t) => {
-    if (t.type !== 'recurring') return false;
-    if (!t.start_date || !t.frequency) return false;
-    if (t.end_date && t.end_date < tomorrow) return false;
-    return firesOnDate(t.start_date, t.frequency, tomorrow);
-  });
-}
+// ─── reminderFireTime ────────────────────────────────────────────────────────
 
-// ─── Bill reminder filter tests ───────────────────────────────────────────────
-
-describe('bill reminder filter (getDueTomorrow)', () => {
-  it('includes a monthly transaction on its due date', () => {
-    const tx = makeTx({ start_date: '2026-03-29', frequency: 'monthly' });
-    // tomorrow = 29th of the next month
-    expect(getDueTomorrow([tx], '2026-04-29')).toHaveLength(1);
-  });
-
-  it('excludes a monthly transaction on the wrong day', () => {
-    const tx = makeTx({ start_date: '2026-03-29', frequency: 'monthly' });
-    expect(getDueTomorrow([tx], '2026-04-28')).toHaveLength(0);
-  });
-
-  it('excludes transactions that ended before tomorrow', () => {
-    const tx = makeTx({ start_date: '2026-01-15', frequency: 'monthly', end_date: '2026-03-15' });
-    expect(getDueTomorrow([tx], '2026-04-15')).toHaveLength(0);
-  });
-
-  it('includes transactions whose end_date IS tomorrow (last occurrence)', () => {
-    const tx = makeTx({ start_date: '2026-01-15', frequency: 'monthly', end_date: '2026-04-15' });
-    expect(getDueTomorrow([tx], '2026-04-15')).toHaveLength(1);
-  });
-
-  it('excludes one-off transactions', () => {
-    const tx = makeTx({ type: 'one_off', date: '2026-04-15' });
-    expect(getDueTomorrow([tx], '2026-04-15')).toHaveLength(0);
-  });
-
-  it('excludes recurring transactions with missing start_date', () => {
-    const tx = makeTx({ start_date: undefined });
-    expect(getDueTomorrow([tx], '2026-04-15')).toHaveLength(0);
-  });
-
-  it('excludes recurring transactions with missing frequency', () => {
-    const tx = makeTx({ frequency: undefined });
-    expect(getDueTomorrow([tx], '2026-04-15')).toHaveLength(0);
-  });
-
-  it('includes a weekly transaction on its 7-day interval', () => {
-    const tx = makeTx({ start_date: '2026-03-24', frequency: 'weekly' });
-    // 7 days later = March 31
-    expect(getDueTomorrow([tx], '2026-03-31')).toHaveLength(1);
-    // 6 days later = not a match
-    expect(getDueTomorrow([tx], '2026-03-30')).toHaveLength(0);
-  });
-
-  it('includes a daily transaction every day after start', () => {
-    const tx = makeTx({ start_date: '2026-01-01', frequency: 'daily' });
-    expect(getDueTomorrow([tx], '2026-04-01')).toHaveLength(1);
-  });
-
-  it('handles multiple transactions, returns only those due tomorrow', () => {
-    const dueTomorrow  = makeTx({ id: 'tx-1', name: 'Netflix', start_date: '2026-03-29', frequency: 'monthly' });
-    const notDue       = makeTx({ id: 'tx-2', name: 'Spotify', start_date: '2026-03-10', frequency: 'monthly' });
-    const result = getDueTomorrow([dueTomorrow, notDue], '2026-04-29');
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe('Netflix');
-  });
-
-  it('returns empty array when no transactions are passed', () => {
-    expect(getDueTomorrow([], '2026-04-15')).toHaveLength(0);
-  });
-});
-
-// ─── billReminderTime logic ───────────────────────────────────────────────────
-
-/** Mirror of billReminderTime() from notificationScheduler for unit testing */
-function billReminderTime(now: Date): Date {
-  const eightPm = new Date(now);
-  eightPm.setHours(20, 0, 0, 0);
-  if (now < eightPm) return eightPm;
-
-  const tomorrow8am = new Date(now);
-  tomorrow8am.setDate(now.getDate() + 1);
-  tomorrow8am.setHours(8, 0, 0, 0);
-  return tomorrow8am;
-}
-
-describe('billReminderTime', () => {
-  it('returns 8pm today when it is morning', () => {
+describe('reminderFireTime', () => {
+  it('uses 8pm the evening before when there is time', () => {
     const now = new Date('2026-03-28T09:00:00');
-    const result = billReminderTime(now);
-    expect(result.getHours()).toBe(20);
-    expect(result.getDate()).toBe(28);
+    const slot = reminderFireTime('2026-03-30', now);
+    expect(slot).not.toBeNull();
+    expect(slot!.isEveBefore).toBe(true);
+    expect(slot!.fireAt.getDate()).toBe(29);
+    expect(slot!.fireAt.getHours()).toBe(20);
   });
 
-  it('returns 8pm today when it is afternoon', () => {
-    const now = new Date('2026-03-28T15:30:00');
-    const result = billReminderTime(now);
-    expect(result.getHours()).toBe(20);
-    expect(result.getDate()).toBe(28);
+  it('falls back to 8am morning-of when eve-before is past', () => {
+    const now = new Date('2026-03-28T21:00:00'); // already past 8pm
+    const slot = reminderFireTime('2026-03-29', now);
+    expect(slot).not.toBeNull();
+    expect(slot!.isEveBefore).toBe(false);
+    expect(slot!.fireAt.getDate()).toBe(29);
+    expect(slot!.fireAt.getHours()).toBe(8);
   });
 
-  it('returns 8am tomorrow when it is past 8pm', () => {
-    const now = new Date('2026-03-28T21:00:00');
-    const result = billReminderTime(now);
-    expect(result.getHours()).toBe(8);
-    expect(result.getDate()).toBe(29);
+  it('returns null when both slots are past (bill is now)', () => {
+    const now = new Date('2026-03-28T09:30:00'); // past 8am today
+    expect(reminderFireTime('2026-03-28', now)).toBeNull();
   });
 
-  it('returns 8am tomorrow on midnight edge', () => {
-    const now = new Date('2026-03-28T23:59:59');
-    const result = billReminderTime(now);
-    expect(result.getHours()).toBe(8);
-    expect(result.getDate()).toBe(29);
+  it('returns null when due date is in the past entirely', () => {
+    const now = new Date('2026-03-30T12:00:00');
+    expect(reminderFireTime('2026-03-25', now)).toBeNull();
   });
 });
 
-// ─── firesOnDate edge cases ───────────────────────────────────────────────────
+// ─── buildBillReminders ──────────────────────────────────────────────────────
+
+describe('buildBillReminders', () => {
+  it('returns empty for no transactions', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    expect(buildBillReminders([], now)).toEqual([]);
+  });
+
+  it('skips one-off transactions', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({ type: 'one_off', date: '2026-03-15' });
+    expect(buildBillReminders([tx], now)).toEqual([]);
+  });
+
+  it('skips recurring transactions missing start_date or frequency', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    expect(buildBillReminders([makeTx({ start_date: undefined })], now)).toEqual([]);
+    expect(buildBillReminders([makeTx({ frequency: undefined })], now)).toEqual([]);
+  });
+
+  it('skips ended recurrings whose end_date is before all upcoming due dates', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({
+      start_date: '2025-01-15',
+      frequency:  'monthly',
+      end_date:   '2025-12-15',
+    });
+    expect(buildBillReminders([tx], now)).toEqual([]);
+  });
+
+  it('schedules a single reminder for a monthly bill due once in the window', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({ start_date: '2026-01-15', frequency: 'monthly' });
+    const result = buildBillReminders([tx], now);
+    expect(result).toHaveLength(1);
+    expect(result[0].dueDate).toBe('2026-03-15');
+    expect(result[0].isEveBefore).toBe(true);
+    expect(result[0].fireAt.getDate()).toBe(14);
+    expect(result[0].fireAt.getHours()).toBe(20);
+  });
+
+  it('schedules multiple reminders for a weekly bill across the lookahead window', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({ start_date: '2026-03-02', frequency: 'weekly' });
+    // Due dates within 30 days of 2026-03-01: 03-02, 03-09, 03-16, 03-23, 03-30
+    const result = buildBillReminders([tx], now);
+    expect(result).toHaveLength(5);
+    expect(result.map((r) => r.dueDate)).toEqual([
+      '2026-03-02', '2026-03-09', '2026-03-16', '2026-03-23', '2026-03-30',
+    ]);
+  });
+
+  it('orders reminders by fireAt ascending', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const txs = [
+      makeTx({ id: 'a', name: 'Late',     start_date: '2026-03-25', frequency: 'monthly' }),
+      makeTx({ id: 'b', name: 'Early',    start_date: '2026-03-05', frequency: 'monthly' }),
+      makeTx({ id: 'c', name: 'Middle',   start_date: '2026-03-15', frequency: 'monthly' }),
+    ];
+    const result = buildBillReminders(txs, now);
+    expect(result.map((r) => r.tx.name)).toEqual(['Early', 'Middle', 'Late']);
+  });
+
+  it(`caps the result at MAX_BILL_NOTIFICATIONS (${MAX_BILL_NOTIFICATIONS})`, () => {
+    const now = new Date('2026-03-01T09:00:00');
+    // 60 daily bills, each generating 31 reminders → ~1800 candidates
+    const txs: Transaction[] = Array.from({ length: 60 }, (_, i) =>
+      makeTx({ id: `tx-${i}`, name: `Bill ${i}`, start_date: '2026-03-01', frequency: 'daily' }),
+    );
+    const result = buildBillReminders(txs, now);
+    expect(result).toHaveLength(MAX_BILL_NOTIFICATIONS);
+  });
+
+  it('respects BILL_LOOKAHEAD_DAYS — does not schedule beyond the window', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({ start_date: '2026-04-15', frequency: 'monthly' });
+    // 2026-04-15 is 45 days away — past 30-day lookahead
+    expect(BILL_LOOKAHEAD_DAYS).toBe(30);
+    expect(buildBillReminders([tx], now)).toEqual([]);
+  });
+
+  it('uses morning-of copy when eve-before slot is past', () => {
+    const now = new Date('2026-03-14T21:00:00'); // 9pm, eve before due
+    const tx = makeTx({ start_date: '2026-01-15', frequency: 'monthly' });
+    const result = buildBillReminders([tx], now);
+    expect(result).toHaveLength(1);
+    expect(result[0].dueDate).toBe('2026-03-15');
+    expect(result[0].isEveBefore).toBe(false);
+    expect(result[0].fireAt.getHours()).toBe(8);
+  });
+
+  it('skips occurrences whose reminder slots are entirely past', () => {
+    const now = new Date('2026-03-15T09:30:00'); // past 8am day-of
+    const tx = makeTx({ start_date: '2026-01-15', frequency: 'monthly' });
+    const result = buildBillReminders([tx], now);
+    // 2026-03-15 is past both slots; next occurrence 2026-04-15 is outside 30d window
+    expect(result).toEqual([]);
+  });
+
+  it('handles end_date that lands exactly on an upcoming due date (last occurrence)', () => {
+    const now = new Date('2026-03-01T09:00:00');
+    const tx = makeTx({
+      start_date: '2026-01-15',
+      frequency:  'monthly',
+      end_date:   '2026-03-15',
+    });
+    const result = buildBillReminders([tx], now);
+    expect(result).toHaveLength(1);
+    expect(result[0].dueDate).toBe('2026-03-15');
+  });
+});
+
+// ─── monthlyRecapTime ────────────────────────────────────────────────────────
+
+describe('monthlyRecapTime', () => {
+  it('schedules today at 9am when called early on the 1st', () => {
+    const now = new Date('2026-03-01T08:30:00');
+    const { fireAt, recapMonthName } = monthlyRecapTime(now);
+    expect(fireAt.getDate()).toBe(1);
+    expect(fireAt.getMonth()).toBe(2); // March
+    expect(fireAt.getHours()).toBe(9);
+    // Recap is for February (month immediately before the firing date)
+    expect(recapMonthName).toBe('February');
+  });
+
+  it('schedules next month when called past 9am on the 1st', () => {
+    const now = new Date('2026-03-01T09:30:00');
+    const { fireAt, recapMonthName } = monthlyRecapTime(now);
+    expect(fireAt.getDate()).toBe(1);
+    expect(fireAt.getMonth()).toBe(3); // April
+    expect(fireAt.getHours()).toBe(9);
+    expect(recapMonthName).toBe('March');
+  });
+
+  it('schedules next month when called mid-month', () => {
+    const now = new Date('2026-03-15T14:00:00');
+    const { fireAt, recapMonthName } = monthlyRecapTime(now);
+    expect(fireAt.getDate()).toBe(1);
+    expect(fireAt.getMonth()).toBe(3); // April
+    expect(recapMonthName).toBe('March');
+  });
+
+  it('rolls year over correctly when scheduling Jan recap from Dec', () => {
+    const now = new Date('2026-12-15T14:00:00');
+    const { fireAt, recapMonthName } = monthlyRecapTime(now);
+    expect(fireAt.getDate()).toBe(1);
+    expect(fireAt.getMonth()).toBe(0); // January
+    expect(fireAt.getFullYear()).toBe(2027);
+    expect(recapMonthName).toBe('December');
+  });
+
+  it('schedules February (current) recap when called Feb 1 at 8am', () => {
+    const now = new Date('2026-02-01T08:00:00');
+    const { fireAt, recapMonthName } = monthlyRecapTime(now);
+    // Today at 9am still upcoming → fires today
+    expect(fireAt.getDate()).toBe(1);
+    expect(fireAt.getMonth()).toBe(1); // February
+    expect(recapMonthName).toBe('January');
+  });
+});
+
+// ─── firesOnDate edge cases (existing behaviour, kept for safety) ────────────
 
 describe('firesOnDate', () => {
   it('returns false when target is before start', () => {
@@ -161,7 +243,6 @@ describe('firesOnDate', () => {
   });
 
   it('handles month-end clamping (Jan 31 -> Feb 28)', () => {
-    // Start Jan 31, next monthly = Feb 28 (not Feb 31)
     expect(firesOnDate('2026-01-31', 'monthly', '2026-02-28')).toBe(true);
     expect(firesOnDate('2026-01-31', 'monthly', '2026-02-27')).toBe(false);
   });

@@ -47,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Spentum uses Face ID to keep your financial data private and secure.</string>
 </dict>
 </plist>

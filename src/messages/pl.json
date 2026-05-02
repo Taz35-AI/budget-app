@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Pulpit",
+    "selectedDay": "Wybrany dzień",
     "balanceToday": "Saldo dziś",
     "monthlyBudget": "Budżet miesięczny",
     "monthIncome": "Przychody {month}",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "Jak daty wyświetlają się w aplikacji",
     "hapticFeedback": "Wibracje",
     "hapticFeedbackDesc": "Wibracje przy dotknięciach i akcjach (iOS / Android)",
+    "biometricLock": "Blokada aplikacji",
+    "biometricLockDesc": "Wymagaj Face ID lub odcisku palca do otwarcia aplikacji",
     "quickTemplates": "Szybkie szablony",
     "quickTemplatesDesc": "Jednym dotknięciem wypełnij formularz transakcji zapisanymi danymi",
     "noTemplates": "Brak szablonów.",

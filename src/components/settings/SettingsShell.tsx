@@ -23,6 +23,8 @@ import { ResetAllButton } from '@/components/dashboard/ResetAllButton';
 import { UserBadge } from '@/components/layout/UserBadge';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { TagIcon } from '@/components/TagIcon';
+import { TagIconPicker } from '@/components/TagIconPicker';
 import type { Frequency, CustomTag, RecurringTemplate, TagCategory, AccountType } from '@/types';
 import type { CreateAccountPayload, UpdateAccountPayload } from '@/hooks/useAccounts';
 
@@ -135,19 +137,22 @@ function TagsSection() {
   const [newLabel, setNewLabel] = useState('');
   const [newColor, setNewColor] = useState(PRESET_COLORS[9]);
   const [newCategory, setNewCategory] = useState<TagCategory>('expense');
+  const [newIconSlug, setNewIconSlug] = useState<string | undefined>(undefined);
   // editId is either a built-in key (e.g. 'food') or a custom tag UUID
   const [editId, setEditId] = useState<string | null>(null);
   const [editIsBuiltin, setEditIsBuiltin] = useState(false);
   const [editLabel, setEditLabel] = useState('');
   const [editColor, setEditColor] = useState('');
   const [editCategory, setEditCategory] = useState<TagCategory>('expense');
+  const [editIconSlug, setEditIconSlug] = useState<string | undefined>(undefined);
 
   const handleAdd = () => {
     if (!newLabel.trim()) return;
-    addCustomTag({ label: newLabel.trim(), color: newColor, category: newCategory });
+    addCustomTag({ label: newLabel.trim(), color: newColor, category: newCategory, iconSlug: newIconSlug });
     setNewLabel('');
     setNewColor(PRESET_COLORS[9]);
     setNewCategory('expense');
+    setNewIconSlug(undefined);
     setShowAdd(false);
   };
 
@@ -157,6 +162,7 @@ function TagsSection() {
     setEditLabel(label);
     setEditColor(color);
     setEditCategory(category);
+    setEditIconSlug(isBuiltin ? undefined : customTags.find((t) => t.id === id)?.iconSlug);
   };
 
   const saveEdit = () => {
@@ -164,7 +170,7 @@ function TagsSection() {
     if (editIsBuiltin) {
       overrideBuiltinTag(editId, { label: editLabel.trim(), color: editColor });
     } else {
-      updateCustomTag(editId, { label: editLabel.trim(), color: editColor, category: editCategory });
+      updateCustomTag(editId, { label: editLabel.trim(), color: editColor, category: editCategory, iconSlug: editIconSlug });
     }
     setEditId(null);
   };
@@ -213,8 +219,8 @@ function TagsSection() {
   };
 
   // Shared row renderer
-  const TagRow = ({ id, label, color, isBuiltin, isOverridden, category: rowCat }: {
-    id: string; label: string; color: string; isBuiltin: boolean; isOverridden?: boolean; category: TagCategory;
+  const TagRow = ({ id, label, color, isBuiltin, isOverridden, category: rowCat, iconSlug }: {
+    id: string; label: string; color: string; isBuiltin: boolean; isOverridden?: boolean; category: TagCategory; iconSlug?: string;
   }) => (
     <div
       className={cn(
@@ -224,7 +230,7 @@ function TagsSection() {
           : 'border-slate-100 dark:border-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.03]',
       )}
     >
-      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+      <TagIcon label={label} iconSlug={iconSlug} color={color} size={22} />
       <span className="flex-1 text-xs font-medium text-slate-700 dark:text-white/80 truncate">{label}</span>
       {isOverridden && <span className="text-[8px] font-bold text-indigo-400 flex-shrink-0">•</span>}
       {!isBuiltin && (
@@ -264,6 +270,7 @@ function TagsSection() {
     return (
       <div className="flex flex-col gap-2.5 p-3 rounded-2xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10 mb-2">
         <div className="flex gap-2 items-center">
+          <TagIcon label={editLabel} iconSlug={isBuiltin ? undefined : editIconSlug} color={editColor} size={26} />
           <input value={editLabel} onChange={(e) => setEditLabel(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && saveEdit()} autoFocus
             className="flex-1 h-8 px-2.5 rounded-lg bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-xs text-slate-800 dark:text-white outline-none focus:border-indigo-400" />
@@ -272,6 +279,7 @@ function TagsSection() {
           </span>
         </div>
         <ColorPicker value={editColor} onChange={setEditColor} />
+        {!isBuiltin && <TagIconPicker value={editIconSlug} onChange={setEditIconSlug} />}
         {!isBuiltin && (
           <div className="flex rounded-lg overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
@@ -359,7 +367,7 @@ function TagsSection() {
               ))}
               {filteredCustoms.map((t) => (
                 <TagRow key={t.id} id={t.id} label={t.label} color={t.color}
-                  isBuiltin={false} category={t.category ?? 'expense'} />
+                  isBuiltin={false} category={t.category ?? 'expense'} iconSlug={t.iconSlug} />
               ))}
             </div>
           </div>
@@ -401,6 +409,7 @@ function TagsSection() {
       {showAdd ? (
         <div className="flex flex-col gap-3 p-4 rounded-2xl border border-dashed border-indigo-300 dark:border-indigo-500/30 bg-indigo-50/40 dark:bg-indigo-900/10">
           <div className="flex gap-2 items-center">
+            <TagIcon label={newLabel || 'Preview'} iconSlug={newIconSlug} color={newColor} size={32} />
             <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)}
               placeholder="Tag name" autoFocus onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               className="flex-1 h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-indigo-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
@@ -409,6 +418,7 @@ function TagsSection() {
             </span>
           </div>
           <ColorPicker value={newColor} onChange={setNewColor} />
+          <TagIconPicker value={newIconSlug} onChange={setNewIconSlug} />
           <div className="flex rounded-xl overflow-hidden border border-brand-primary/[0.08] dark:border-white/[0.08]">
             {(['income', 'expense', 'both'] as TagCategory[]).map((cat) => (
               <button key={cat} type="button" onClick={() => setNewCategory(cat)}
@@ -565,8 +575,39 @@ function TemplatesSection() {
 
 function PreferencesSection() {
   const t = useTranslations('settings');
-  const { firstDayOfWeek, dateFormat, hapticsEnabled, setFirstDayOfWeek, setDateFormat, setHapticsEnabled } = useSettings();
+  const { firstDayOfWeek, dateFormat, hapticsEnabled, biometricEnabled, setFirstDayOfWeek, setDateFormat, setHapticsEnabled, setBiometricEnabled } = useSettings();
   const { impact } = useHaptics();
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricBusy, setBiometricBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    import('@/lib/biometric').then(async ({ checkBiometricAvailable }) => {
+      const status = await checkBiometricAvailable();
+      if (!cancelled) setBiometricAvailable(status.available);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function toggleBiometric() {
+    if (biometricBusy) return;
+    setBiometricBusy(true);
+    try {
+      if (biometricEnabled) {
+        // Disabling — require biometric to confirm so a thief can't just turn it off
+        const { authenticateWithBiometric } = await import('@/lib/biometric');
+        const ok = await authenticateWithBiometric('Disable app lock');
+        if (ok) setBiometricEnabled(false);
+      } else {
+        // Enabling — verify biometric works on this device first
+        const { authenticateWithBiometric } = await import('@/lib/biometric');
+        const ok = await authenticateWithBiometric('Enable app lock');
+        if (ok) setBiometricEnabled(true);
+      }
+    } finally {
+      setBiometricBusy(false);
+    }
+  }
 
   return (
     <SettingsCard
@@ -644,6 +685,36 @@ function PreferencesSection() {
             />
           </button>
         </div>
+
+        {/* Biometric app lock — native only */}
+        {biometricAvailable && (
+          <div className="native-row rounded-2xl flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-white/80">{t('biometricLock')}</p>
+              <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">{t('biometricLockDesc')}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={biometricEnabled}
+              onClick={toggleBiometric}
+              disabled={biometricBusy}
+              className={cn(
+                'relative flex-shrink-0 w-11 h-6 rounded-full transition-colors duration-200 disabled:opacity-50',
+                biometricEnabled
+                  ? 'bg-brand-primary'
+                  : 'bg-slate-200 dark:bg-white/10',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200',
+                  biometricEnabled ? 'translate-x-5' : 'translate-x-0',
+                )}
+              />
+            </button>
+          </div>
+        )}
       </div>
     </SettingsCard>
   );

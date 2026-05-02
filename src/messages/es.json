@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Panel",
+    "selectedDay": "Día seleccionado",
     "balanceToday": "Saldo hoy",
     "monthlyBudget": "Presupuesto mensual",
     "monthIncome": "Ingresos de {month}",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "Cómo aparecen las fechas en la app",
     "hapticFeedback": "Vibración táctil",
     "hapticFeedbackDesc": "Vibración en toques y acciones (iOS / Android)",
+    "biometricLock": "Bloqueo de la app",
+    "biometricLockDesc": "Requiere Face ID o huella para abrir la aplicación",
     "quickTemplates": "Plantillas rápidas",
     "quickTemplatesDesc": "Rellena el formulario con un solo toque",
     "noTemplates": "Sin plantillas todavía.",

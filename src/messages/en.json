@@ -42,6 +42,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "selectedDay": "Selected day",
     "balanceToday": "Balance Today",
     "monthlyBudget": "Monthly Budget",
     "monthIncome": "{month} Income",
@@ -278,6 +279,8 @@
     "dateFormatDesc": "How dates appear in the app",
     "hapticFeedback": "Haptic feedback",
     "hapticFeedbackDesc": "Vibration on taps and actions (iOS / Android)",
+    "biometricLock": "App lock",
+    "biometricLockDesc": "Require Face ID or fingerprint to open the app",
     "quickTemplates": "Quick Templates",
     "quickTemplatesDesc": "One-tap to pre-fill the transaction form with saved details",
     "noTemplates": "No templates yet.",

@@ -13,7 +13,8 @@
  *   2   — monthly recap
  *   3   — weekly digest
  *   4   — budget limit warning
- *   100–199 — bill-due-tomorrow reminders (one per recurring transaction)
+ *   100–199 — upcoming-bill reminders (one per (bill × occurrence) in the
+ *             next BILL_LOOKAHEAD_DAYS, capped at MAX_BILL_NOTIFICATIONS)
  */
 
 import { Capacitor } from '@capacitor/core';
@@ -27,6 +28,18 @@ const ID_MONTHLY   = 2;
 const ID_WEEKLY    = 3;
 const ID_BUDGET    = 4;
 const ID_BILL_BASE = 100;
+
+// ─── Bill reminder configuration ─────────────────────────────────────────────
+
+/** How far ahead to pre-schedule bill reminders. */
+export const BILL_LOOKAHEAD_DAYS = 30;
+
+/**
+ * Cap on simultaneously pending bill notifications.
+ * iOS allows ~64 pending local notifications per app; we reserve headroom for
+ * the 4 toggleable reminders above and any future use, keeping bills ≤ 50.
+ */
+export const MAX_BILL_NOTIFICATIONS = 50;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -102,29 +115,88 @@ export async function cancelAllScheduledNotifications() {
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
-function dateStr(offsetDays = 0): string {
-  const d = new Date();
+function dateStr(offsetDays = 0, baseDate = new Date()): string {
+  const d = new Date(baseDate);
   d.setDate(d.getDate() + offsetDays);
   return d.toISOString().split('T')[0];
 }
 
-/**
- * Returns the best time to fire a "bill due tomorrow" notification:
- *  - Before 8pm today  → fire at 8pm today   (evening reminder)
- *  - After  8pm today  → fire at 8am tomorrow (morning of bill due date)
- *    (notification body will say "due today" implicitly — acceptable tradeoff
- *     vs pushing so far in future the user misses it entirely)
- */
-function billReminderTime(): Date {
-  const now = new Date();
-  const eightPm = new Date(now);
-  eightPm.setHours(20, 0, 0, 0);
-  if (now < eightPm) return eightPm;
+// ─── Bill reminder construction (pure, testable) ─────────────────────────────
 
-  const tomorrow8am = new Date(now);
-  tomorrow8am.setDate(now.getDate() + 1);
-  tomorrow8am.setHours(8, 0, 0, 0);
-  return tomorrow8am;
+export interface BillReminder {
+  /** The recurring transaction this reminder is for. */
+  tx: Transaction;
+  /** YYYY-MM-DD — the date the bill is actually due. */
+  dueDate: string;
+  /** When the OS should fire the notification. */
+  fireAt: Date;
+  /** True → "due tomorrow" copy; false → "due today" copy. */
+  isEveBefore: boolean;
+}
+
+/**
+ * Returns the best moment to fire a reminder for a bill due on `dueDate`.
+ *
+ * Convention:
+ *  - Prefer 8pm the evening BEFORE — gives the user 24h to top up / transfer.
+ *  - If that slot is already past (e.g. bill is due tomorrow and it's after
+ *    8pm tonight), fall back to 8am the morning of.
+ *  - If both slots are past, the bill is essentially "now" — skip it.
+ */
+export function reminderFireTime(
+  dueDate: string,
+  now: Date = new Date(),
+): { fireAt: Date; isEveBefore: boolean } | null {
+  const due = new Date(dueDate + 'T00:00:00');
+
+  const eveBefore = new Date(due);
+  eveBefore.setDate(eveBefore.getDate() - 1);
+  eveBefore.setHours(20, 0, 0, 0);
+  if (eveBefore > now) return { fireAt: eveBefore, isEveBefore: true };
+
+  const morningOf = new Date(due);
+  morningOf.setHours(8, 0, 0, 0);
+  if (morningOf > now) return { fireAt: morningOf, isEveBefore: false };
+
+  return null;
+}
+
+/**
+ * Computes the set of bill reminders to schedule for the next
+ * BILL_LOOKAHEAD_DAYS. Each (recurring tx × fire date) becomes one reminder.
+ *
+ * Result is sorted by fireAt ascending and capped at MAX_BILL_NOTIFICATIONS
+ * to stay under iOS's pending-notification limit.
+ */
+export function buildBillReminders(
+  transactions: Transaction[],
+  now: Date = new Date(),
+): BillReminder[] {
+  const out: BillReminder[] = [];
+
+  for (let offset = 0; offset <= BILL_LOOKAHEAD_DAYS; offset++) {
+    const due = dateStr(offset, now);
+
+    for (const t of transactions) {
+      if (t.type !== 'recurring') continue;
+      if (!t.start_date || !t.frequency) continue;
+      if (t.end_date && t.end_date < due) continue;
+      if (!firesOnDate(t.start_date, t.frequency, due)) continue;
+
+      const slot = reminderFireTime(due, now);
+      if (!slot) continue;
+
+      out.push({
+        tx: t,
+        dueDate: due,
+        fireAt: slot.fireAt,
+        isEveBefore: slot.isEveBefore,
+      });
+    }
+  }
+
+  out.sort((a, b) => a.fireAt.getTime() - b.fireAt.getTime());
+  return out.slice(0, MAX_BILL_NOTIFICATIONS);
 }
 
 // ─── Schedulers ──────────────────────────────────────────────────────────────
@@ -154,27 +226,21 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
   if (!Capacitor.isNativePlatform()) return;
   await cancelIds(Array.from({ length: 100 }, (_, i) => ID_BILL_BASE + i));
 
-  const tomorrow = dateStr(1);
-  const dueTomorrow = transactions.filter((t) => {
-    if (t.type !== 'recurring') return false;
-    if (!t.start_date || !t.frequency) return false;
-    if (t.end_date && t.end_date < tomorrow) return false;
-    return firesOnDate(t.start_date, t.frequency, tomorrow);
-  });
-
-  if (!dueTomorrow.length) return;
+  const reminders = buildBillReminders(transactions);
+  if (!reminders.length) return;
 
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    const fireAt = billReminderTime();
     await LocalNotifications.schedule({
-      notifications: dueTomorrow.slice(0, 100).map((t, i) => ({
+      notifications: reminders.map((r, i) => ({
         id:        ID_BILL_BASE + i,
-        title:     'Bill due tomorrow',
-        body:      `Your ${t.name} payment is due tomorrow`,
+        title:     r.isEveBefore ? 'Bill due tomorrow' : 'Bill due today',
+        body:      r.isEveBefore
+          ? `Your ${r.tx.name} payment is due tomorrow`
+          : `Your ${r.tx.name} payment is due today`,
         smallIcon: 'ic_notification',
         schedule: {
-          at: fireAt,
+          at: r.fireAt,
           allowWhileIdle: true,
         },
       })),
@@ -182,22 +248,46 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
   } catch { /* web / bridge unavailable */ }
 }
 
+/**
+ * Computes when the next monthly recap notification should fire and which
+ * month's spending it summarizes.
+ *
+ * Convention:
+ *  - Recaps fire on the 1st of a month at 9am, summarizing the month that
+ *    just ended.
+ *  - If `now` is before 9am on the 1st, schedule for *today* at 9am.
+ *  - Otherwise, schedule for the 1st of next month at 9am.
+ *
+ * The recap month is always the month immediately before the firing date.
+ */
+export function monthlyRecapTime(now: Date = new Date()): { fireAt: Date; recapMonthName: string } {
+  const thisMonthFirst = new Date(now.getFullYear(), now.getMonth(), 1, 9, 0, 0);
+  const fireAt = thisMonthFirst > now
+    ? thisMonthFirst
+    : new Date(now.getFullYear(), now.getMonth() + 1, 1, 9, 0, 0);
+
+  // Last day of the month before fireAt → tells us which month is being summarized
+  const recapMonthDate = new Date(fireAt);
+  recapMonthDate.setDate(0);
+  const recapMonthName = recapMonthDate.toLocaleString('default', { month: 'long' });
+
+  return { fireAt, recapMonthName };
+}
+
 export async function scheduleMonthlyRecap() {
   if (!Capacitor.isNativePlatform()) return;
   await cancelIds([ID_MONTHLY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    const now = new Date();
-    const target = new Date(now.getFullYear(), now.getMonth() + 1, 1, 9, 0, 0);
-    const prevMonth = now.toLocaleString('default', { month: 'long' });
+    const { fireAt, recapMonthName } = monthlyRecapTime();
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_MONTHLY,
         title:     'Monthly recap ready',
-        body:      `Your ${prevMonth} spending summary is ready to review`,
+        body:      `Your ${recapMonthName} spending summary is ready to review`,
         smallIcon: 'ic_notification',
         schedule: {
-          at: target,
+          at: fireAt,
           repeats: false,
           allowWhileIdle: true,
         },

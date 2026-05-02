@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
+import Script from 'next/script';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -27,14 +28,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${inter.className}`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        {/* Prevent flash of wrong theme */}
-        <script
+        {/* Prevent flash of wrong theme — must run synchronously before body paints */}
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('budgetapp_theme');if(t!=='light')document.documentElement.classList.add('dark');}catch(e){}})()`,
           }}
         />
       </head>
-      <body className="antialiased bg-brand-bg dark:bg-[#0A1F1E] text-brand-text dark:text-teal-100">
+      <body className="antialiased text-brand-text dark:text-teal-100">
         <Providers>{children}</Providers>
       </body>
     </html>

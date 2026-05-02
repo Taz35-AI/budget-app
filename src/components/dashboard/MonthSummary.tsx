@@ -5,6 +5,7 @@ import { format, startOfMonth, endOfMonth, getDaysInMonth, addDays, subMonths } 
 import { useTranslations } from 'next-intl';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
+import { getDateLocale } from '@/lib/dateLocale';
 import { cn } from '@/lib/utils';
 import type { DayTransaction } from '@/types';
 
@@ -65,7 +66,8 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
   const tc = useTranslations('common');
   const tMonths = useTranslations('months');
   const tTags = useTranslations('tags');
-  const { allTags, goals } = useSettings();
+  const { allTags, goals, language } = useSettings();
+  const dateLocale = getDateLocale(language);
 const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const toggle = (key: string) =>
@@ -289,7 +291,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-[#042F2E] dark:text-white/90 leading-tight">{t('biggestDay')}</p>
                     <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5">
-                      {new Date(peakDay.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                      {new Date(peakDay.date + 'T12:00:00').toLocaleDateString(dateLocale, { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
                   <span className="text-sm font-bold text-red-500 dark:text-red-400 tabular-nums flex-shrink-0">
@@ -418,7 +420,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#042F2E] dark:text-white/90 truncate font-medium leading-tight">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     <p className="text-[11px] text-[#042F2E]/40 dark:text-[#D9DDF0]/35 mt-0.5 leading-tight">
-                      {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                      {new Date(date + 'T12:00:00').toLocaleDateString(dateLocale, { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
                   </div>
                   <span className={cn(

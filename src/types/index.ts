@@ -123,6 +123,7 @@ export interface CustomTag {
   label: string;
   color: string;
   category: TagCategory;  // determines which transaction types this tag appears on
+  iconSlug?: string;      // optional reference into /public/tag-icons (e.g. 'food-drink')
 }
 
 export interface RecurringTemplate {

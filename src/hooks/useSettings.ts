@@ -7,8 +7,8 @@ import { useSettingsStore } from '@/store/settingsStore';
 export function useSettings() {
   const store = useSettingsStore();
 
-  const allTags = useMemo<Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both' }>>(() => {
-    const result: Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both' }> = {};
+  const allTags = useMemo<Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both'; iconSlug?: string }>>(() => {
+    const result: Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both'; iconSlug?: string }> = {};
     for (const [key, val] of Object.entries(TAGS)) {
       if (!store.hiddenBuiltinTags.includes(key)) {
         result[key] = val;
@@ -16,7 +16,7 @@ export function useSettings() {
     }
     store.customTags.forEach((t) => {
       if (TAGS[t.id] && store.hiddenBuiltinTags.includes(t.id)) return;
-      result[t.id] = { label: t.label, color: t.color, category: t.category ?? 'both' };
+      result[t.id] = { label: t.label, color: t.color, category: t.category ?? 'both', iconSlug: t.iconSlug };
     });
     return result;
   }, [store.customTags, store.hiddenBuiltinTags]);
