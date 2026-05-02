@@ -724,7 +724,10 @@
 }
 
 /* Day frame is just a hit area — no fill, no border, no shadow. The grid
-   appearance comes from the table border-spacing + tight cell separators below. */
+   appearance comes from the table border-spacing + tight cell separators below.
+   `touch-action: manipulation` removes the ~300ms tap delay that Android
+   WebView inserts when zoom is enabled. `:active` flash gives the user
+   instant feedback that their tap landed. */
 .fc .fc-daygrid-day-frame {
   height: 88px !important;
   max-height: 88px !important;
@@ -738,6 +741,15 @@
   border: 1px solid transparent;
   box-shadow: none;
   transition: background-color 0.12s ease, border-color 0.12s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.fc .fc-daygrid-day-frame:active {
+  background-color: rgba(13, 148, 136, 0.08);
+}
+.dark .fc .fc-daygrid-day-frame:active {
+  background-color: rgba(13, 148, 136, 0.14);
 }
 
 /* Subtle hairline column/row separators using the cell itself, drawn with

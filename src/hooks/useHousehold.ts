@@ -10,7 +10,12 @@ interface HouseholdMembersData {
   householdId: string;
 }
 
-export function useHouseholdMembers() {
+interface UseHouseholdQueryOptions {
+  /** When false, the query is suspended (cached data still returned). Defaults to true. */
+  enabled?: boolean;
+}
+
+export function useHouseholdMembers(options: UseHouseholdQueryOptions = {}) {
   return useQuery<HouseholdMembersData>({
     queryKey: ['household-members'],
     queryFn: async () => {
@@ -19,6 +24,7 @@ export function useHouseholdMembers() {
       return res.json();
     },
     staleTime: 15_000,
+    enabled: options.enabled ?? true,
   });
 }
 
@@ -47,7 +53,7 @@ export function useRemoveMember() {
 
 // ─── Invites ─────────────────────────────────────────────────────────────────
 
-export function useHouseholdInvites() {
+export function useHouseholdInvites(options: UseHouseholdQueryOptions = {}) {
   return useQuery<HouseholdInvite[]>({
     queryKey: ['household-invites'],
     queryFn: async () => {
@@ -56,6 +62,7 @@ export function useHouseholdInvites() {
       const data = await res.json();
       return data.invites ?? [];
     },
+    enabled: options.enabled ?? true,
   });
 }
 

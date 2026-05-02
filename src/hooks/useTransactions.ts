@@ -1,7 +1,15 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Capacitor } from '@capacitor/core';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
+
+// Web has Supabase Realtime websockets that deliver INSERT/DELETE events
+// reliably, so a 5s safety-net poll is fine. Capacitor's Android/iOS WebView
+// often loses the websocket and we fall back entirely on polling — but 5s on
+// mobile burns battery + cellular data, so we relax to 30s. Realtime events
+// (when they do arrive) still trigger immediate invalidation.
+const POLL_INTERVAL_MS = Capacitor.isNativePlatform() ? 30_000 : 5_000;
 
 export type EditMode = 'all' | 'all_future' | 'this_only';
 export type DeleteMode = 'all' | 'all_future' | 'this_only';
@@ -24,10 +32,7 @@ export function useTransactions() {
     queryKey: QK,
     queryFn: fetchTransactions,
     staleTime: 0,
-    // Always poll. Supabase Realtime postgres_changes delivers DELETE events
-    // reliably but INSERT events are inconsistent (especially on Capacitor).
-    // 5s polling ensures all users see changes regardless of Realtime status.
-    refetchInterval: 5_000,
+    refetchInterval: POLL_INTERVAL_MS,
   });
 }
 

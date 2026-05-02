@@ -84,7 +84,15 @@ export function DashboardShell() {
   }, []);
 
   // ── Household ──────────────────────────────────────────────────────────────
-  const { data: hhData } = useHouseholdMembers();
+  // Defer household member fetch until after the critical render so the
+  // dashboard's first paint isn't waiting on a non-essential network call.
+  // Cached data still renders immediately when enabled is false.
+  const [secondaryReady, setSecondaryReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSecondaryReady(true), 600);
+    return () => clearTimeout(t);
+  }, []);
+  const { data: hhData } = useHouseholdMembers({ enabled: secondaryReady });
   const householdMembers = hhData?.members;
   const hasHousehold = (householdMembers?.length ?? 0) > 1;
 

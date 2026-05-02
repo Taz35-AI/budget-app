@@ -5,6 +5,16 @@ import type { NextRequest } from 'next/server';
 // Inactivity timeout: 7 days in seconds
 const SESSION_TIMEOUT_S = 7 * 24 * 60 * 60;
 
+// Auth-check cache window. supabase.auth.getUser() does a network round-trip
+// to /auth/v1/user on every call (~150-400ms from a mobile client). For 60s
+// after a successful check we trust an httpOnly cookie instead, cutting that
+// latency from every subsequent navigation and API call. Tradeoff: a session
+// revoked elsewhere stays "authed" in this proxy for up to 60s — accepted
+// because downstream API routes do their own row-level auth via Supabase RLS
+// and would 401 anyway.
+const AUTH_CACHE_KEY = 'spentum_auth_check';
+const AUTH_CACHE_TTL_S = 60;
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -29,23 +39,47 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Refresh session
-  const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
+  const now = Math.floor(Date.now() / 1000);
+
+  // Hot path: trust the auth-check cookie if it was set in the last 60s
+  const cachedTs = request.cookies.get(AUTH_CACHE_KEY)?.value;
+  const cacheValid = !!cachedTs && now - Number(cachedTs) < AUTH_CACHE_TTL_S;
+
+  let user: { id: string } | null = null;
+  if (cacheValid) {
+    // Synthetic user object — downstream logic only branches on truthiness
+    user = { id: 'cached' };
+  } else {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+    if (user) {
+      response.cookies.set(AUTH_CACHE_KEY, String(now), {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: AUTH_CACHE_TTL_S,
+      });
+    } else {
+      response.cookies.delete(AUTH_CACHE_KEY);
+    }
+  }
 
   // ── Session inactivity timeout ──────────────────────────────────────────────
   if (user) {
     const lastActive = request.cookies.get('spentum_last_active')?.value;
-    const now = Math.floor(Date.now() / 1000);
 
     if (lastActive && now - Number(lastActive) > SESSION_TIMEOUT_S) {
-      // Session expired due to inactivity — sign out
+      // Session expired due to inactivity — sign out (uncached path so the
+      // network signOut actually fires)
       await supabase.auth.signOut();
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       url.searchParams.set('reason', 'timeout');
       const redirectResponse = NextResponse.redirect(url);
       redirectResponse.cookies.delete('spentum_last_active');
+      redirectResponse.cookies.delete(AUTH_CACHE_KEY);
       return redirectResponse;
     }
 
