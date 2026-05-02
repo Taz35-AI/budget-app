@@ -64,7 +64,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
         <>
           <div className="fixed inset-0 z-50 native-backdrop" onClick={() => setOpen(false)} />
           <div
-            className="fixed inset-x-4 top-24 z-50 bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
+            className="fixed inset-x-4 top-24 z-50 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
