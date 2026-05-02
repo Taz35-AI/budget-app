@@ -42,14 +42,27 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const now = Math.floor(Date.now() / 1000);
 
-  // Hot path: trust the auth-check cookie if it was set in the last 60s
+  // The cache is only trustworthy when Supabase's own session cookies are
+  // still present. signOut() clears the sb-*-auth-token cookies, so this
+  // check ensures we don't keep treating a signed-out user as authed for
+  // up to 60s — they'd otherwise get redirected back to /dashboard from
+  // /login by the auth gate below.
+  const hasSupabaseSession = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith('sb-') && c.name.includes('auth-token'));
+
   const cachedTs = request.cookies.get(AUTH_CACHE_KEY)?.value;
-  const cacheValid = !!cachedTs && now - Number(cachedTs) < AUTH_CACHE_TTL_S;
+  const cacheValid =
+    hasSupabaseSession && !!cachedTs && now - Number(cachedTs) < AUTH_CACHE_TTL_S;
 
   let user: { id: string } | null = null;
   if (cacheValid) {
     // Synthetic user object — downstream logic only branches on truthiness
     user = { id: 'cached' };
+  } else if (!hasSupabaseSession) {
+    // Session cookies are gone (signed out) — bust the cache and treat as anon
+    user = null;
+    response.cookies.delete(AUTH_CACHE_KEY);
   } else {
     const { data } = await supabase.auth.getUser();
     user = data.user;
