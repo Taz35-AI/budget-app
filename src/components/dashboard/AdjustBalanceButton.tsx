@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { DashboardModal } from './DashboardModal';
 
 interface Props {
   todayBalance: number;
@@ -64,60 +65,46 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
         <span className="hidden sm:inline">{t('buttonLabel')}</span>
       </button>
 
-      {open && (
-        <>
-          <div className="fixed inset-0 z-50 native-backdrop" onClick={() => setOpen(false)} />
-          <div className="fixed inset-x-4 top-24 z-50 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md bg-white/85 dark:bg-[#0A1F1E]/92 backdrop-blur-2xl rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.08)] border border-black/[0.06] dark:border-white/[0.1] p-5"
-            onClick={(e) => e.stopPropagation()}
+      <DashboardModal
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t('title')}
+        subtitle={t('now', { amount: formatAmount(todayBalance) })}
+      >
+        <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/8 border border-slate-200 dark:border-white/12 rounded-2xl px-3 py-2.5 mb-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
+          <span className="text-slate-400 dark:text-white/40 text-sm flex-shrink-0">{symbol}</span>
+          <input
+            ref={inputRef}
+            type="number"
+            step="0.01"
+            value={value}
+            onChange={(e) => { setValue(e.target.value); setError(''); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') mutation.mutate(); if (e.key === 'Escape') setOpen(false); }}
+            className="flex-1 min-w-0 bg-transparent text-slate-800 dark:text-white text-base font-mono outline-none"
+            placeholder="0.00"
+          />
+          {hasDelta && (
+            <span className={cn('text-xs font-semibold flex-shrink-0', delta > 0 ? 'text-emerald-500' : 'text-red-500')}>
+              {delta > 0 ? '+' : ''}{formatAmount(delta)}
+            </span>
+          )}
+        </div>
+
+        {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
+
+        <div className="flex gap-2 mt-3">
+          <button onClick={() => setOpen(false)} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-brand-primary/[0.08] dark:border-white/[0.08]">
+            {tc('cancel')}
+          </button>
+          <button
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending || !hasDelta}
+            className="flex-1 h-10 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold disabled:opacity-40 active:scale-[0.97] transition-all duration-100"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">{t('title')}</p>
-                <p className="text-xs text-slate-400 dark:text-white/40">{t('now', { amount: formatAmount(todayBalance) })}</p>
-              </div>
-              <button onClick={() => setOpen(false)} className="w-7 h-7 flex items-center justify-center rounded-2xl text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white/70 hover:bg-slate-100 dark:hover:bg-white/8 active:scale-[0.90] transition-all duration-100">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/8 border border-slate-200 dark:border-white/12 rounded-2xl px-3 py-2.5 mb-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]">
-              <span className="text-slate-400 dark:text-white/40 text-sm flex-shrink-0">{symbol}</span>
-              <input
-                ref={inputRef}
-                type="number"
-                step="0.01"
-                value={value}
-                onChange={(e) => { setValue(e.target.value); setError(''); }}
-                onKeyDown={(e) => { if (e.key === 'Enter') mutation.mutate(); if (e.key === 'Escape') setOpen(false); }}
-                className="flex-1 min-w-0 bg-transparent text-slate-800 dark:text-white text-base font-mono outline-none"
-                placeholder="0.00"
-              />
-              {hasDelta && (
-                <span className={cn('text-xs font-semibold flex-shrink-0', delta > 0 ? 'text-emerald-500' : 'text-red-500')}>
-                  {delta > 0 ? '+' : ''}{formatAmount(delta)}
-                </span>
-              )}
-            </div>
-
-            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
-
-            <div className="flex gap-2 mt-3">
-              <button onClick={() => setOpen(false)} className="flex-1 h-10 rounded-2xl bg-slate-100 dark:bg-white/8 text-slate-600 dark:text-white/60 text-sm font-semibold active:scale-[0.97] transition-all duration-100 border border-brand-primary/[0.08] dark:border-white/[0.08]">
-                {tc('cancel')}
-              </button>
-              <button
-                onClick={() => mutation.mutate()}
-                disabled={mutation.isPending || !hasDelta}
-                className="flex-1 h-10 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold disabled:opacity-40 active:scale-[0.97] transition-all duration-100"
-              >
-                {mutation.isPending ? tc('loading') : tc('set')}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+            {mutation.isPending ? tc('loading') : tc('set')}
+          </button>
+        </div>
+      </DashboardModal>
     </>
   );
 }
