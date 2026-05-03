@@ -22,7 +22,8 @@
     "required": "Erforderlich",
     "mustBePositive": "Muss > 0 sein",
     "mustBeWholeNumber": "Muss eine ganze Zahl ≥ 1 sein",
-    "balanceAdjustment": "Kontostandsanpassung"
+    "balanceAdjustment": "Kontostandsanpassung",
+    "transactionsCount": "{count, plural, one {# Transaktion} other {# Transaktionen}}"
   },
   "nav": {
     "dashboard": "Dashboard",

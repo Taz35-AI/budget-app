@@ -22,7 +22,8 @@
     "required": "Wymagane",
     "mustBePositive": "Musi być > 0",
     "mustBeWholeNumber": "Musi być liczbą całkowitą ≥ 1",
-    "balanceAdjustment": "Korekta salda"
+    "balanceAdjustment": "Korekta salda",
+    "transactionsCount": "{count, plural, one {# transakcja} few {# transakcje} many {# transakcji} other {# transakcji}}"
   },
   "nav": {
     "dashboard": "Pulpit",

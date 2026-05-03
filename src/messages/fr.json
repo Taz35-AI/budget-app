@@ -22,7 +22,8 @@
     "required": "Requis",
     "mustBePositive": "Doit être > 0",
     "mustBeWholeNumber": "Doit être un entier ≥ 1",
-    "balanceAdjustment": "Ajustement du solde"
+    "balanceAdjustment": "Ajustement du solde",
+    "transactionsCount": "{count, plural, one {# transaction} other {# transactions}}"
   },
   "nav": {
     "dashboard": "Tableau de bord",

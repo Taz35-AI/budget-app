@@ -22,7 +22,8 @@
     "required": "Obligatorio",
     "mustBePositive": "Debe ser > 0",
     "mustBeWholeNumber": "Debe ser un número entero ≥ 1",
-    "balanceAdjustment": "Ajuste de saldo"
+    "balanceAdjustment": "Ajuste de saldo",
+    "transactionsCount": "{count, plural, one {# transacción} other {# transacciones}}"
   },
   "nav": {
     "dashboard": "Panel",

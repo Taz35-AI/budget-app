@@ -26,8 +26,6 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
   const isPositive = hasBalance && balance! > 0;
   const isNegative = hasBalance && balance! < 0;
   const count = transactions.length;
-  const incomeCount = transactions.filter((t) => t.category === 'income').length;
-  const expenseCount = count - incomeCount;
 
   return (
     <div
@@ -40,7 +38,7 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
       )}
     >
       {/* Day number — chip when today/selected, plain otherwise */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-1">
         <span
           className={cn(
             'inline-flex items-center justify-center font-display tabular-nums leading-none transition-colors',
@@ -55,16 +53,14 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
           {format(date, 'd')}
         </span>
 
-        {/* Income/expense indicator dots — top-right, tiny, no chip */}
+        {/* Transaction count — small numeric badge, top-right */}
         {count > 0 && (
-          <div className="flex gap-0.5 mt-1.5">
-            {incomeCount > 0 && (
-              <span className="w-1 h-1 rounded-full bg-emerald-500/80" />
-            )}
-            {expenseCount > 0 && (
-              <span className="w-1 h-1 rounded-full bg-red-500/80" />
-            )}
-          </div>
+          <span
+            aria-label={tc('transactionsCount', { count })}
+            className="inline-flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full bg-brand-primary/12 dark:bg-brand-primary/22 text-[9px] font-bold tabular-nums leading-none text-brand-primary dark:text-teal-300 ring-1 ring-brand-primary/15 dark:ring-brand-primary/30"
+          >
+            {count}
+          </span>
         )}
       </div>
 
@@ -72,7 +68,7 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
       {hasBalance && (
         <span
           className={cn(
-            'mt-auto text-[10px] font-semibold tabular-nums leading-none font-display tracking-tight',
+            'mt-auto block max-w-full truncate text-[10px] font-semibold tabular-nums leading-none font-display tracking-tight',
             isPositive && 'text-emerald-700/80 dark:text-emerald-400/85',
             isNegative && 'text-red-700/80 dark:text-red-400/85',
             !isPositive && !isNegative && 'text-brand-text/30 dark:text-white/25',
