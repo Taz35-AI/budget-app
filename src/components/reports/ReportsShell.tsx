@@ -150,8 +150,10 @@ export function ReportsShell() {
           months[mi].expense += tx.amount;
           if (tx.type === 'recurring') months[mi].recurringExpense += tx.amount;
           else months[mi].oneOffExpense += tx.amount;
-          const isUuid = tx.tag != null && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag);
-          const k = (tx.tag == null || isUuid) ? '__untagged__' : tx.tag;
+          const isOrphanedUuid = tx.tag != null
+            && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag)
+            && !allTags[tx.tag];
+          const k = (tx.tag == null || isOrphanedUuid) ? '__untagged__' : tx.tag;
           months[mi].tags[k] = (months[mi].tags[k] ?? 0) + tx.amount;
         }
       }
@@ -166,7 +168,7 @@ export function ReportsShell() {
     }
 
     return months;
-  }, [dayTransactions, balances, selectedYear]);
+  }, [dayTransactions, balances, selectedYear, allTags]);
 
   const maxMonthlyValue = useMemo(
     () => Math.max(...yearlyData.map((m) => Math.max(m.income, m.expense)), 1),
@@ -283,13 +285,15 @@ export function ReportsShell() {
       if (!date.startsWith(prefix)) continue;
       for (const tx of txs) {
         if (tx.category !== 'expense') continue;
-        const isUuid = tx.tag != null && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag);
-        const k = (tx.tag == null || isUuid) ? '__untagged__' : tx.tag;
+        const isOrphanedUuid = tx.tag != null
+          && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag)
+          && !allTags[tx.tag];
+        const k = (tx.tag == null || isOrphanedUuid) ? '__untagged__' : tx.tag;
         if (k === selectedTagKey) results.push({ tx, date });
       }
     }
     return results.sort((a, b) => b.date.localeCompare(a.date));
-  }, [selectedTagKey, dayTransactions, selectedYear, selectedMonthIdx]);
+  }, [selectedTagKey, dayTransactions, selectedYear, selectedMonthIdx, allTags]);
 
   // Tags available for re-tagging (expense + both, excluding hidden)
   const retagOptions = useMemo(() =>
@@ -452,6 +456,7 @@ export function ReportsShell() {
           <div className={cn(
             'flex items-center justify-between px-4 pb-2 pt-1',
             (activeTab === 'overview' || activeTab === 'subscriptions') && 'invisible pointer-events-none',
+            activeTab === 'annual' && 'hidden',
           )}>
             <button
               onClick={() => setSelectedMonthIdx((m) => (m > 0 ? m - 1 : 11))}
@@ -1732,7 +1737,10 @@ export function ReportsShell() {
         for (const [date, txs] of dayTransactions) {
           if (!date.startsWith(yearPrefix)) continue;
           for (const tx of txs) {
-            const txTag = tx.tag ?? '__untagged__';
+            const isOrphanedUuid = tx.tag != null
+              && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tx.tag)
+              && !allTags[tx.tag];
+            const txTag = (tx.tag == null || isOrphanedUuid) ? '__untagged__' : tx.tag;
             if (txTag === annualDrillTag && tx.category === 'expense') {
               annualDrillTxs.push({ tx, date });
             }
