@@ -50,6 +50,7 @@
     "monthExpense": "{month} Expense",
     "monthNet": "{month} Net",
     "stats": "Stats",
+    "search": "Search",
     "searchPlaceholder": "Name, tag…",
     "searchAriaLabel": "Search transactions",
     "filterByAmount": "Filter by amount",

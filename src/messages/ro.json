@@ -50,6 +50,7 @@
     "monthExpense": "Cheltuieli {month}",
     "monthNet": "Net {month}",
     "stats": "Statistici",
+    "search": "Caută",
     "searchPlaceholder": "Nume, etichetă…",
     "searchAriaLabel": "Caută tranzacții",
     "filterByAmount": "Filtrează după sumă",

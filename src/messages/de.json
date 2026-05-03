@@ -50,6 +50,7 @@
     "monthExpense": "{month} Ausgaben",
     "monthNet": "{month} Netto",
     "stats": "Statistiken",
+    "search": "Suchen",
     "searchPlaceholder": "Name, Tag…",
     "searchAriaLabel": "Transaktionen suchen",
     "filterByAmount": "Nach Betrag filtern",

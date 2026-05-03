@@ -342,7 +342,7 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                   })()}
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800 dark:text-white/90 truncate">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-white/90 break-words">{tx.name === 'Balance Adjustment' ? tc('balanceAdjustment') : tx.name}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {tx.type === 'recurring' && tx.frequency && (
                         <p className="text-xs text-slate-400 dark:text-white/40">{FREQUENCIES[tx.frequency]}</p>

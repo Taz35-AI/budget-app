@@ -359,8 +359,8 @@ export function DashboardShell() {
             <div className="hidden sm:flex gap-3">
 
               {/* Balance Today — hero card */}
-              <div className="flex-[1.6] bento-hero rounded-xl px-3.5 py-2.5 min-w-0 animate-card-enter">
-                <div className="relative z-10 flex items-center justify-between mb-1">
+              <div className="flex-[1.6] bento-hero rounded-xl px-3.5 py-2 min-w-0 animate-card-enter">
+                <div className="relative z-10 flex items-center justify-between mb-0.5">
                   {searchOpen ? (
                     /* ── Search input (desktop) ── */
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -375,15 +375,17 @@ export function DashboardShell() {
                         onClick={() => setShowAmountFilter((v) => !v)}
                         title={t('filterByAmount')}
                         className={cn(
-                          'flex-shrink-0 h-4 w-4 flex items-center justify-center rounded transition-colors',
-                          showAmountFilter ? 'text-amber-400' : 'text-white/30 hover:text-teal-300',
+                          'flex-shrink-0 h-5 w-5 flex items-center justify-center rounded-md ring-1 transition-all',
+                          showAmountFilter
+                            ? 'text-amber-300 bg-amber-400/15 ring-amber-400/40'
+                            : 'text-teal-200 bg-white/10 ring-white/20 hover:bg-white/15',
                         )}
                       >
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-white/30 hover:text-red-400 transition-colors">
+                      <button onClick={closeSearch} className="flex-shrink-0 text-white/40 hover:text-red-400 transition-colors">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -396,11 +398,17 @@ export function DashboardShell() {
                         <button
                           onClick={() => setSearchOpen(true)}
                           aria-label={t('searchAriaLabel')}
-                          className="w-5 h-5 flex items-center justify-center rounded-lg text-white/40 hover:text-teal-300 hover:bg-white/10 transition-colors"
+                          className={cn(
+                            'flex items-center gap-1 px-2 py-0.5 rounded-lg border text-[9px] font-bold transition-all',
+                            matchingDates
+                              ? 'border-amber-400/40 bg-amber-400/15 text-amber-300 hover:bg-amber-400/20'
+                              : 'border-teal-300/25 bg-teal-300/10 text-teal-200 hover:bg-teal-300/15',
+                          )}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
+                          {t('search')}
                         </button>
                         <button
                           onClick={() => calendarNavRef.current?.today()}
@@ -449,23 +457,23 @@ export function DashboardShell() {
               </div>
 
               {/* Income */}
-              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 animate-card-enter" style={{ animationDelay: '80ms' }}>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2 min-w-0 animate-card-enter" style={{ animationDelay: '80ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-0.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className="text-lg font-bold tabular-nums leading-none tracking-tight text-emerald-600 dark:text-emerald-400 truncate block font-display">
                   {formatAmount(monthIncome)}
                 </span>
               </div>
 
               {/* Expenses */}
-              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 relative animate-card-enter" style={{ animationDelay: '160ms' }}>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2 min-w-0 relative animate-card-enter" style={{ animationDelay: '160ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-0.5">
                   {t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}
                 </span>
                 <span className="text-lg font-bold tabular-nums leading-none tracking-tight text-red-600 dark:text-red-400 truncate block font-display">
                   {formatAmount(monthExpense)}
                 </span>
                 {budgetLimit && (
-                  <span className="text-[9px] font-medium text-brand-text/30 dark:text-white/30 block mt-1 leading-none">
+                  <span className="text-[9px] font-medium text-brand-text/30 dark:text-white/30 block mt-0.5 leading-none">
                     / {formatAmount(budgetLimit)}
                   </span>
                 )}
@@ -480,8 +488,8 @@ export function DashboardShell() {
               </div>
 
               {/* Net */}
-              <div className="flex-1 bento-stat rounded-xl px-3 py-2.5 min-w-0 animate-card-enter" style={{ animationDelay: '240ms' }}>
-                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+              <div className="flex-1 bento-stat rounded-xl px-3 py-2 min-w-0 animate-card-enter" style={{ animationDelay: '240ms' }}>
+                <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-text/40 dark:text-teal-300/50 block mb-0.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                 <span className={cn(
                   'text-lg font-bold tabular-nums leading-none tracking-tight truncate block font-display',
                   monthNet > 0 ? 'text-emerald-600 dark:text-emerald-400' : monthNet < 0 ? 'text-red-600 dark:text-red-400' : 'text-brand-text dark:text-white',
@@ -493,7 +501,7 @@ export function DashboardShell() {
 
             {/* Mobile: balance hero on top, 3 sub-metrics below */}
             <div className="sm:hidden hero-card rounded-2xl overflow-hidden">
-              <div className="px-3.5 pt-4 pb-3 border-b border-white/[0.08]">
+              <div className="px-3.5 pt-3 pb-2 border-b border-white/[0.08]">
                 <div className="flex items-center justify-between mb-1">
                   {searchOpen ? (
                     /* ── Search input (mobile) ── */
@@ -507,16 +515,19 @@ export function DashboardShell() {
                       />
                       <button
                         onClick={() => setShowAmountFilter((v) => !v)}
+                        title={t('filterByAmount')}
                         className={cn(
-                          'flex-shrink-0 h-5 w-5 flex items-center justify-center rounded transition-colors',
-                          showAmountFilter ? 'text-amber-400' : 'text-white/30',
+                          'flex-shrink-0 h-5 w-5 flex items-center justify-center rounded-md ring-1 transition-all',
+                          showAmountFilter
+                            ? 'text-amber-300 bg-amber-400/15 ring-amber-400/40'
+                            : 'text-teal-200 bg-white/10 ring-white/20 active:bg-white/15',
                         )}
                       >
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-white/30 hover:text-red-400">
+                      <button onClick={closeSearch} className="flex-shrink-0 text-white/40 hover:text-red-400">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -526,18 +537,21 @@ export function DashboardShell() {
                     <>
                       <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-teal-300/50">{t('balanceToday')}</span>
                       <div className="flex items-center gap-1.5">
-                        {/* Search icon */}
+                        {/* Search */}
                         <button
                           onClick={() => setSearchOpen(true)}
                           aria-label={t('searchAriaLabel')}
                           className={cn(
-                            'h-5 w-5 flex items-center justify-center rounded-lg transition-colors',
-                            matchingDates ? 'text-amber-400' : 'text-white/40 hover:text-teal-300 hover:bg-white/10',
+                            'flex items-center gap-1 h-5 px-2 rounded-lg border text-[9px] font-bold transition-all active:scale-95',
+                            matchingDates
+                              ? 'border-amber-400/40 bg-amber-400/15 text-amber-300'
+                              : 'border-teal-300/25 bg-teal-300/10 text-teal-200 active:bg-teal-300/20',
                           )}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                           </svg>
+                          {t('search')}
                         </button>
                         {/* Stats toggle */}
                         <button
@@ -600,12 +614,12 @@ export function DashboardShell() {
                 )}
               </div>
               <div className="flex divide-x divide-white/[0.08]">
-                <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <div className="flex-1 px-3 py-1.5 min-w-0">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-0.5">{t('monthIncome', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className="text-[15px] font-black tabular-nums text-emerald-300 truncate block font-display">{formatAmount(monthIncome)}</span>
                 </div>
-                <div className="flex-1 px-3 py-2.5 min-w-0 relative">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <div className="flex-1 px-3 py-1.5 min-w-0 relative">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-0.5">{t('monthExpense', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className="text-[15px] font-black tabular-nums text-red-300 truncate block font-display">{formatAmount(monthExpense)}</span>
                   {clampedBudgetPct !== undefined && (
                     <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/[0.06]">
@@ -613,8 +627,8 @@ export function DashboardShell() {
                     </div>
                   )}
                 </div>
-                <div className="flex-1 px-3 py-2.5 min-w-0">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-1">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
+                <div className="flex-1 px-3 py-1.5 min-w-0">
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.14em] text-teal-300/40 block mb-0.5">{t('monthNet', { month: shortMonths[visibleMonth.getMonth()] })}</span>
                   <span className={cn(
                     'text-[15px] font-black tabular-nums truncate block font-display',
                     monthNet > 0 ? 'text-emerald-300' : monthNet < 0 ? 'text-red-300' : 'text-white',
