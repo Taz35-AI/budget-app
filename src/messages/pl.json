@@ -257,7 +257,8 @@
     "subsCount": "{count} subskrypcji",
     "subsAnnualCost": "Koszt roczny",
     "goalDaysLeftShort": "Pozostało {days}d",
-    "goalOverdue": "Po terminie"
+    "goalOverdue": "Po terminie",
+    "insightsUnavailable": "Analizy AI są chwilowo niedostępne. Spróbuj ponownie później."
   },
   "settings": {
     "title": "Ustawienia",
@@ -436,7 +437,8 @@
     "biweekly": "Co 2 tygodnie",
     "monthly": "Co miesiąc",
     "quarterly": "Co kwartał",
-    "yearly": "Co rok"
+    "yearly": "Co rok",
+    "semiannual": "Co 6 miesięcy"
   },
   "tags": {
     "untagged": "Bez tagu",

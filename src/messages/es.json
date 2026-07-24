@@ -257,7 +257,8 @@
     "subsCount": "{count} suscripciones",
     "subsAnnualCost": "Coste anual",
     "goalDaysLeftShort": "{days}d restantes",
-    "goalOverdue": "Vencido"
+    "goalOverdue": "Vencido",
+    "insightsUnavailable": "Los análisis con IA no están disponibles temporalmente. Inténtalo más tarde."
   },
   "settings": {
     "title": "Ajustes",
@@ -436,7 +437,8 @@
     "biweekly": "Cada 2 semanas",
     "monthly": "Mensual",
     "quarterly": "Trimestral",
-    "yearly": "Anual"
+    "yearly": "Anual",
+    "semiannual": "Cada 6 meses"
   },
   "tags": {
     "untagged": "Sin etiqueta",

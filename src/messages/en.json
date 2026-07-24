@@ -257,7 +257,8 @@
     "subsCount": "{count} subscriptions",
     "subsAnnualCost": "Annual cost",
     "goalDaysLeftShort": "{days}d left",
-    "goalOverdue": "Overdue"
+    "goalOverdue": "Overdue",
+    "insightsUnavailable": "AI insights are temporarily unavailable. Please try again later."
   },
   "settings": {
     "title": "Settings",
@@ -436,7 +437,8 @@
     "biweekly": "Every 2 weeks",
     "monthly": "Monthly",
     "quarterly": "Quarterly",
-    "yearly": "Yearly"
+    "yearly": "Yearly",
+    "semiannual": "Every 6 months"
   },
   "tags": {
     "untagged": "Untagged",

@@ -257,7 +257,8 @@
     "subsCount": "{count} abonamente",
     "subsAnnualCost": "Cost anual",
     "goalDaysLeftShort": "{days}z rămase",
-    "goalOverdue": "Depășit"
+    "goalOverdue": "Depășit",
+    "insightsUnavailable": "Analizele AI sunt temporar indisponibile. Încearcă mai târziu."
   },
   "settings": {
     "title": "Setări",
@@ -436,7 +437,8 @@
     "biweekly": "La 2 săptămâni",
     "monthly": "Lunar",
     "quarterly": "Trimestrial",
-    "yearly": "Anual"
+    "yearly": "Anual",
+    "semiannual": "La 6 luni"
   },
   "tags": {
     "untagged": "Neetichetat",

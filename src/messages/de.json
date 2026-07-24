@@ -257,7 +257,8 @@
     "subsCount": "{count} Abonnements",
     "subsAnnualCost": "Jährliche Kosten",
     "goalDaysLeftShort": "{days}T übrig",
-    "goalOverdue": "Überfällig"
+    "goalOverdue": "Überfällig",
+    "insightsUnavailable": "KI-Analysen sind vorübergehend nicht verfügbar. Bitte später erneut versuchen."
   },
   "settings": {
     "title": "Einstellungen",
@@ -436,7 +437,8 @@
     "biweekly": "Alle 2 Wochen",
     "monthly": "Monatlich",
     "quarterly": "Vierteljährlich",
-    "yearly": "Jährlich"
+    "yearly": "Jährlich",
+    "semiannual": "Alle 6 Monate"
   },
   "tags": {
     "untagged": "Ohne Tag",

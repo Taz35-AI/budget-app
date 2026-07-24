@@ -35,6 +35,7 @@ import { InvitationsBanner } from './InvitationsBanner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { cn } from '@/lib/utils';
+import { sumIncomeExpense } from '@/lib/txStats';
 import type { DayTransaction, Transaction, TransactionFormValues } from '@/types';
 
 // ─── Month stats ──────────────────────────────────────────────────────────────
@@ -49,16 +50,14 @@ function useMonthStats(
     const todayBalance = balances.get(today) ?? 0;
     const start = format(startOfMonth(month), 'yyyy-MM-dd');
     const end = format(endOfMonth(month), 'yyyy-MM-dd');
-    let monthIncome = 0;
-    let monthExpense = 0;
+    const monthTxs: DayTransaction[] = [];
     dayTransactions.forEach((txs, date) => {
       if (date < start || date > end) return;
-      for (const tx of txs) {
-        if (tx.category === 'income') monthIncome += tx.amount;
-        else monthExpense += tx.amount;
-      }
+      monthTxs.push(...txs);
     });
-    return { todayBalance, monthIncome, monthExpense, monthNet: monthIncome - monthExpense };
+    // Transfer legs are excluded — see lib/txStats.
+    const { income: monthIncome, expense: monthExpense, net: monthNet } = sumIncomeExpense(monthTxs);
+    return { todayBalance, monthIncome, monthExpense, monthNet };
   }, [balances, dayTransactions, month]);
 }
 

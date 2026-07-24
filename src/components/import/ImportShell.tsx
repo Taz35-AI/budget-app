@@ -9,6 +9,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useSettingsStore } from '@/store/settingsStore';
+import { isAiEnabled } from '@/lib/aiAvailability';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -582,6 +583,7 @@ export default function ImportShell() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-brand-text/60 dark:text-white/60">{t('previewHint', { count: transactions.filter((tx) => !tx.skipped).length })}</p>
+            {isAiEnabled() && (
             <button
               onClick={handleAutoCategorise}
               disabled={categorising}
@@ -601,6 +603,7 @@ export default function ImportShell() {
                 </>
               )}
             </button>
+            )}
           </div>
           {/* Desktop: table view */}
           <div className="hidden sm:block bg-brand-card dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-3xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_4px_12px_rgba(0,0,0,0.2)]">

@@ -8,6 +8,8 @@ import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useNow } from '@/hooks/useNow';
+import { isRealCashflow } from '@/lib/txStats';
+import { isAiEnabled } from '@/lib/aiAvailability';
 import { getDateLocale } from '@/lib/dateLocale';
 import { useTransactions, useUpdateTransaction } from '@/hooks/useTransactions';
 import { format } from 'date-fns';
@@ -126,7 +128,7 @@ export function ReportsShell() {
 
   // ── Insights state ──────────────────────────────────────────────────────────
   const [insightsLoading, setInsightsLoading] = useState(false);
-  const [insightsError,   setInsightsError]   = useState(false);
+  const [insightsError,   setInsightsError]   = useState<'error' | 'unavailable' | null>(null);
 
   // ── Goals management state ──────────────────────────────────────────────────
   const [showAddGoal,    setShowAddGoal]    = useState(false);
@@ -147,6 +149,9 @@ export function ReportsShell() {
       if (Number(date.slice(0, 4)) !== selectedYear) continue;
       const mi = Number(date.slice(5, 7)) - 1;
       for (const tx of txs) {
+        // Transfer legs are internal money movement, not income or spending —
+        // counting them inflates both totals and skews the savings rate.
+        if (!isRealCashflow(tx)) continue;
         months[mi].txCount++;
         if (tx.category === 'income') {
           months[mi].income += tx.amount;
@@ -192,7 +197,7 @@ export function ReportsShell() {
   };
   const FREQ_LABEL_KEY: Record<Frequency, string> = {
     daily: 'daily', weekly: 'weekly', biweekly: 'biweekly',
-    monthly: 'monthly', quarterly: 'quarterly', semiannual: 'quarterly', annual: 'yearly',
+    monthly: 'monthly', quarterly: 'quarterly', semiannual: 'semiannual', annual: 'yearly',
   };
   const subscriptions = useMemo(() => {
     if (!txData?.transactions) return [];
@@ -359,7 +364,7 @@ export function ReportsShell() {
 
   async function generateInsights() {
     setInsightsLoading(true);
-    setInsightsError(false);
+    setInsightsError(null);
     try {
       const res = await fetch('/api/reports/insights', {
         method: 'POST',
@@ -379,11 +384,15 @@ export function ReportsShell() {
       const data = await res.json();
       if (data.advice) {
         setMonthlyInsight(monthKey, data.advice);
+      } else if (res.status === 503 || data.code === 'ai_unavailable') {
+        // Out of credit / upstream down — a temporary outage, not a failure
+        // the user can do anything about.
+        setInsightsError('unavailable');
       } else {
-        setInsightsError(true);
+        setInsightsError('error');
       }
     } catch {
-      setInsightsError(true);
+      setInsightsError('error');
     } finally {
       setInsightsLoading(false);
     }
@@ -996,7 +1005,7 @@ export function ReportsShell() {
                     <p className="text-sm font-bold text-brand-text dark:text-white leading-tight">{MONTH_FULL[selectedMonthIdx]} {selectedYear}</p>
                   </div>
                 </div>
-                {isPastMonth && (selected.income > 0 || selected.expense > 0) && (
+                {isAiEnabled() && isPastMonth && (selected.income > 0 || selected.expense > 0) && (
                   <button
                     type="button"
                     onClick={generateInsights}
@@ -1070,7 +1079,9 @@ export function ReportsShell() {
                   {/* AI advice */}
                   <div className="px-4 sm:px-5 pt-3 pb-5 border-t border-brand-primary/[0.06]">
                     {insightsError ? (
-                      <p className="text-sm text-red-500/70">{t('insightsError')}</p>
+                      <p className="text-sm text-red-500/70">
+                        {insightsError === 'unavailable' ? t('insightsUnavailable') : t('insightsError')}
+                      </p>
                     ) : savedInsight ? (
                       <>
                         <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 mb-2">{t('pdfAiInsights')}</p>

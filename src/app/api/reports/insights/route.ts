@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUserId } from '@/lib/auth';
 import { rateLimit } from '@/lib/rateLimit';
+import { hasAiCredentials, isUpstreamUnavailable } from '@/lib/aiAvailability';
 import OpenAI from 'openai';
 
 // POST /api/reports/insights
@@ -23,8 +24,11 @@ export async function POST(req: NextRequest) {
     const userId = await getAuthUserId();
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!process.env.XAI_API_KEY) {
-      return NextResponse.json({ error: 'AI insights are not configured' }, { status: 503 });
+    if (!hasAiCredentials()) {
+      return NextResponse.json(
+        { error: 'AI insights are unavailable', code: 'ai_unavailable' },
+        { status: 503 },
+      );
     }
 
     // 10 generations/hour — enough for a user reviewing every month of the
@@ -88,6 +92,15 @@ Top spending categories: ${topCatsText}`;
     const advice = message.choices[0]?.message?.content?.trim() ?? '';
     return NextResponse.json({ advice });
   } catch (error) {
+    // No credit / expired key / upstream outage is a 503, not a server bug —
+    // the client shows a "temporarily unavailable" message instead of an error.
+    if (isUpstreamUnavailable(error)) {
+      console.warn('[reports/insights] upstream unavailable:', (error as Error)?.message);
+      return NextResponse.json(
+        { error: 'AI insights are temporarily unavailable', code: 'ai_unavailable' },
+        { status: 503 },
+      );
+    }
     console.error('[reports/insights] error:', error);
     return NextResponse.json({ error: 'Failed to generate insights' }, { status: 500 });
   }

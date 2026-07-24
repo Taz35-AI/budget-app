@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext } from '@/lib/auth';
 import { rateLimit } from '@/lib/rateLimit';
+import { hasAiCredentials, isUpstreamUnavailable } from '@/lib/aiAvailability';
 import OpenAI from 'openai';
 
 /** Largest merchant list accepted in one call — keeps the prompt bounded. */
@@ -15,8 +16,11 @@ export async function POST(req: NextRequest) {
     const ctx = await getAuthContext();
     if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!process.env.XAI_API_KEY) {
-      return NextResponse.json({ error: 'AI categorisation is not configured' }, { status: 503 });
+    if (!hasAiCredentials()) {
+      return NextResponse.json(
+        { error: 'AI categorisation is unavailable', code: 'ai_unavailable' },
+        { status: 503 },
+      );
     }
 
     // 20 calls/hour — a large import batches into a handful of calls.
@@ -117,6 +121,13 @@ Example response: {"0":{"tag":"food","category":"expense"},"1":{"tag":"salary","
 
     return NextResponse.json({ categorisations: result });
   } catch (error) {
+    if (isUpstreamUnavailable(error)) {
+      console.warn('[import/categorise] upstream unavailable:', (error as Error)?.message);
+      return NextResponse.json(
+        { error: 'AI categorisation is temporarily unavailable', code: 'ai_unavailable' },
+        { status: 503 },
+      );
+    }
     console.error('[import/categorise] unexpected error:', error);
     return NextResponse.json({ error: 'Failed to categorise transactions' }, { status: 500 });
   }

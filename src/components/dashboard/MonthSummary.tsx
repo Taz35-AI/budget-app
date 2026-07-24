@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
 import { useNow } from '@/hooks/useNow';
+import { sumIncomeExpense, sumExpenseByTag } from '@/lib/txStats';
 import { getDateLocale } from '@/lib/dateLocale';
 import { cn } from '@/lib/utils';
 import type { DayTransaction } from '@/types';
@@ -92,14 +93,13 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
     });
 
     const currentDay = isCurrentMonth ? new Date().getDate() : daysInMonth;
-    const totalIncome = pastTxs.filter(t => t.category === 'income').reduce((s, t) => s + t.amount, 0);
-    const totalExpense = pastTxs.filter(t => t.category === 'expense').reduce((s, t) => s + t.amount, 0);
+    // Transfer legs are excluded from every figure below — see lib/txStats.
+    const { income: totalIncome, expense: totalExpense, count: txCount } = sumIncomeExpense(pastTxs);
     const dailyAvg = currentDay > 0 ? totalExpense / currentDay : 0;
     const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalExpense) / totalIncome) * 100) : null;
-    const txCount = pastTxs.length;
 
     // Average transaction value (expense only)
-    const expenseTxs = pastTxs.filter(t => t.category === 'expense');
+    const expenseTxs = pastTxs.filter(t => t.category === 'expense' && !t.transfer_id);
     const avgTxValue = expenseTxs.length > 0 ? totalExpense / expenseTxs.length : 0;
 
     // Biggest single day of spending
@@ -124,11 +124,10 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
     const peakDow = byDow.indexOf(Math.max(...byDow));
     const hasDowData = byDow.some(v => v > 0);
 
-    // Spending by tag
-    const tagSpend: Record<string, number> = {};
-    allMonthTxs.filter(t => t.category === 'expense' && t.tag).forEach(t => {
-      tagSpend[t.tag!] = (tagSpend[t.tag!] ?? 0) + t.amount;
-    });
+    // Spending by tag. Uses pastTxs, not allMonthTxs: the headline totals above
+    // only count what has happened so far, so including scheduled future
+    // transactions here made the tag rows add up to more than the month total.
+    const tagSpend = sumExpenseByTag(pastTxs.filter(t => t.tag != null));
     const tagBreakdown = Object.entries(tagSpend)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6);
