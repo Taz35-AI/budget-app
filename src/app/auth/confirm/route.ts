@@ -2,9 +2,12 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getRequestOrigin } from '@/lib/requestOrigin';
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // Not request.url's origin — see getRequestOrigin.
+  const origin = getRequestOrigin(request);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as 'email' | 'recovery' | null;
   const next = searchParams.get('next') ?? (type === 'recovery' ? '/reset-password' : '/dashboard');
