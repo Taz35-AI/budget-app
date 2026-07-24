@@ -131,7 +131,7 @@ export default function BlogPostPage() {
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "The emergency fund is not a savings goal. It is a firewall between you and more debt."
+                &ldquo;The emergency fund is not a savings goal. It is a firewall between you and more debt.&rdquo;
               </p>
             </div>
 
@@ -206,7 +206,7 @@ export default function BlogPostPage() {
             <h2 style={{ ...serif, fontSize: 28, fontWeight: 400, color: '#042F2E', marginBottom: 16, marginTop: 48 }}>
               Track where you stand and what is coming
             </h2>
-            <p>One of the most underrated things you can do for your finances is look at your future balance. Not just today's number, but where you will be in three, six, twelve months if you keep spending and saving the way you are now.</p>
+            <p>One of the most underrated things you can do for your finances is look at your future balance. Not just today&rsquo;s number, but where you will be in three, six, twelve months if you keep spending and saving the way you are now.</p>
             <p style={{ marginTop: 16 }}>When you can see that you are heading for trouble in four months, you have time to do something about it. When you can see that your savings will hit a target by August, you have something to stay motivated for.</p>
             <p style={{ marginTop: 16 }}>This is exactly what we built Spentum for. You log your recurring income and expenses, set up your accounts, and the app shows you your projected balance day by day, up to seven years ahead. No bank login required. Your data stays yours.</p>
 

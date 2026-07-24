@@ -24,9 +24,17 @@ export function useOfflineSync() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...item.values, account_id: item.accountId ?? null }),
         });
-        if (!res.ok) break; // server error — retry later
-        dequeue(item.queueId);
-        syncedAny = true;
+        if (res.ok) {
+          dequeue(item.queueId);
+          syncedAny = true;
+        } else if (res.status >= 400 && res.status < 500) {
+          // Permanent rejection (validation etc.) — drop it, or it poisons
+          // the queue and blocks every item behind it forever.
+          console.warn('[useOfflineSync] dropping rejected queued transaction:', item.values?.name);
+          dequeue(item.queueId);
+        } else {
+          break; // 5xx — server hiccup, retry the whole queue later
+        }
       } catch {
         break; // network still down — stop draining
       }

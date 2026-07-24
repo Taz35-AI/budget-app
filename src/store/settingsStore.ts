@@ -21,7 +21,14 @@ interface SettingsState {
   biometricEnabled: boolean;
   notificationSettings: NotificationSettings;
   language: AppLanguage;
+  /** True once the user picks a language in Settings. While false the app
+   *  follows the browser's language, so a first-time visitor doesn't land on
+   *  an English login screen when their browser is set to something else. */
+  languageChosen: boolean;
   monthlyInsights: Record<string, { advice: string; generatedAt: string }>;
+  /** 'YYYY-MM' of the month whose budget warning already fired. Persisted so
+   *  the warning doesn't repeat on every app launch. */
+  budgetWarnedMonth: string | null;
   // Actions
   _hydrate: (data: Partial<Omit<SettingsState, '_hydrate'>>) => void;
   _reset: () => void;
@@ -46,7 +53,10 @@ interface SettingsState {
   setBiometricEnabled: (enabled: boolean) => void;
   setNotificationSettings: (patch: Partial<NotificationSettings>) => void;
   setLanguage: (lang: AppLanguage) => void;
+  /** Applies a browser-detected language without marking it as the user's choice. */
+  setDetectedLanguage: (lang: AppLanguage) => void;
   setMonthlyInsight: (monthKey: string, advice: string) => void;
+  setBudgetWarnedMonth: (monthKey: string | null) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -64,7 +74,9 @@ export const useSettingsStore = create<SettingsState>()(
       biometricEnabled: false,
       notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
       language: 'en',
+      languageChosen: false,
       monthlyInsights: {},
+      budgetWarnedMonth: null,
 
       _hydrate: (data) => set((s) => ({ ...s, ...data })),
       _reset: () => set({
@@ -79,7 +91,9 @@ export const useSettingsStore = create<SettingsState>()(
         hapticsEnabled: true,
         notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
         language: 'en',
+        languageChosen: false,
         monthlyInsights: {},
+        budgetWarnedMonth: null,
       }),
 
       addCustomTag: (tag) =>
@@ -143,7 +157,8 @@ export const useSettingsStore = create<SettingsState>()(
       setBiometricEnabled: (enabled) => set({ biometricEnabled: enabled }),
       setNotificationSettings: (patch) =>
         set((s) => ({ notificationSettings: { ...s.notificationSettings, ...patch } })),
-      setLanguage: (lang) => set({ language: lang }),
+      setLanguage: (lang) => set({ language: lang, languageChosen: true }),
+      setDetectedLanguage: (lang) => set({ language: lang }),
       setMonthlyInsight: (monthKey, advice) =>
         set((s) => ({
           monthlyInsights: {
@@ -151,6 +166,7 @@ export const useSettingsStore = create<SettingsState>()(
             [monthKey]: { advice, generatedAt: new Date().toISOString() },
           },
         })),
+      setBudgetWarnedMonth: (monthKey) => set({ budgetWarnedMonth: monthKey }),
     }),
     { name: 'budgetapp_settings' },
   ),

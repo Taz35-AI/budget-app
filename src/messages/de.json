@@ -23,7 +23,9 @@
     "mustBePositive": "Muss > 0 sein",
     "mustBeWholeNumber": "Muss eine ganze Zahl ≥ 1 sein",
     "balanceAdjustment": "Kontostandsanpassung",
-    "transactionsCount": "{count, plural, one {# Transaktion} other {# Transaktionen}}"
+    "transactionsCount": "{count, plural, one {# Transaktion} other {# Transaktionen}}",
+    "clearSearch": "Suche löschen",
+    "biometricLock": "Biometrische Sperre"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -38,8 +40,34 @@
     "import": "Importieren"
   },
   "months": {
-    "short": ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
-    "long": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+    "short": [
+      "Jan",
+      "Feb",
+      "Mär",
+      "Apr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dez"
+    ],
+    "long": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ]
   },
   "dashboard": {
     "title": "Dashboard",
@@ -227,7 +255,9 @@
     "subsEnds": "Endet {date}",
     "subsOngoing": "Laufend",
     "subsCount": "{count} Abonnements",
-    "subsAnnualCost": "Jährliche Kosten"
+    "subsAnnualCost": "Jährliche Kosten",
+    "goalDaysLeftShort": "{days}T übrig",
+    "goalOverdue": "Überfällig"
   },
   "settings": {
     "title": "Einstellungen",
@@ -309,7 +339,9 @@
     "budgetWarningsLabel": "Budgetlimit-Warnungen",
     "budgetWarningsDesc": "Benachrichtigung, wenn Sie 85% Ihres monatlichen Ausgabenlimits erreichen",
     "reminderTime": "Erinnerungszeit",
-    "reminderTimeDesc": "Zu welcher Zeit die tägliche Erinnerung gesendet wird"
+    "reminderTimeDesc": "Zu welcher Zeit die tägliche Erinnerung gesendet wird",
+    "goalDaysLeft": "{days} Tage übrig",
+    "goalDeadlinePassed": "Frist abgelaufen"
   },
   "accounts": {
     "title": "Konten",
@@ -388,8 +420,15 @@
     "billDue": "Rechnung fällig",
     "monthlyRecap": "Monatliche Zusammenfassung",
     "weeklyDigest": "Wöchentliche Zusammenfassung",
-    "budgetWarnung": "Budgetwarnung",
-    "budgetAt": "{month} Budget liegt bei {percentage}%"
+    "budgetAt": "{month} Budget liegt bei {percentage}%",
+    "budgetWarning": "Budgetwarnung",
+    "dailyReminderBody": "Vergessen Sie nicht, die heutigen Ausgaben zu erfassen",
+    "billDueTomorrow": "Rechnung morgen fällig",
+    "billDueToday": "Rechnung heute fällig",
+    "billDueTomorrowBody": "Ihre Zahlung {name} ist morgen fällig",
+    "billDueTodayBody": "Ihre Zahlung {name} ist heute fällig",
+    "monthlyRecapBody": "Ihre Ausgabenübersicht für {month} ist bereit",
+    "weeklyDigestBody": "Ihre Woche in Spentum — tippen Sie für Ausgaben und anstehende Rechnungen"
   },
   "frequency": {
     "daily": "Täglich",
@@ -639,6 +678,58 @@
     "noMembers": "Noch keine weiteren Mitglieder"
   },
   "auth": {
-    "sessionTimeout": "Ihre Sitzung ist wegen Inaktivität abgelaufen. Bitte melden Sie sich erneut an."
+    "sessionTimeout": "Ihre Sitzung ist wegen Inaktivität abgelaufen. Bitte melden Sie sich erneut an.",
+    "signInTitle": "Bei Ihrem Konto anmelden",
+    "resetTitle": "Passwort zurücksetzen",
+    "createTitle": "Konto erstellen",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "or": "oder",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "emailPlaceholder": "du@beispiel.com",
+    "passwordMinPlaceholder": "Mind. 6 Zeichen",
+    "forgotPassword": "Passwort vergessen?",
+    "signIn": "Anmelden",
+    "signingIn": "Anmeldung läuft…",
+    "sendResetLink": "Link zum Zurücksetzen senden",
+    "sending": "Wird gesendet…",
+    "backToSignIn": "Zurück zur Anmeldung",
+    "checkEmail": "Prüfen Sie Ihre E-Mails",
+    "resetLinkSent": "Wir haben einen Link zum Zurücksetzen an <strong>{email}</strong> gesendet. Folgen Sie ihm, um ein neues Passwort festzulegen.",
+    "confirmLinkSent": "Wir haben einen Bestätigungslink an <strong>{email}</strong> gesendet. Klicken Sie darauf, um Ihr Konto zu aktivieren.",
+    "noAccount": "Kein Konto?",
+    "createOne": "Jetzt erstellen",
+    "alreadyHaveAccount": "Sie haben bereits ein Konto?",
+    "createAccount": "Konto erstellen",
+    "creatingAccount": "Konto wird erstellt…",
+    "agreePrefix": "Mit der Erstellung eines Kontos stimmen Sie unseren",
+    "and": "und",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "privacyPolicy": "Datenschutzerklärung",
+    "chooseNewPassword": "Wählen Sie ein neues Passwort",
+    "allDone": "Fertig",
+    "resetPassword": "Passwort zurücksetzen",
+    "verifyingLink": "Link wird überprüft…",
+    "linkExpired": "Link abgelaufen oder ungültig",
+    "linkExpiredDesc": "Fordern Sie einen neuen Link zum Zurücksetzen an und versuchen Sie es erneut.",
+    "setNewPassword": "Neues Passwort festlegen",
+    "saving": "Wird gespeichert…",
+    "passwordUpdated": "Passwort aktualisiert",
+    "takingYouToDashboard": "Sie werden zu Ihrem Dashboard weitergeleitet…",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+    "minSixCharacters": "Mindestens 6 Zeichen",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "errInvalidCredentials": "E-Mail oder Passwort ist falsch.",
+    "errEmailNotConfirmed": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse — prüfen Sie Ihren Posteingang.",
+    "errRateLimit": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "errUserExists": "Mit dieser E-Mail-Adresse existiert bereits ein Konto.",
+    "errWeakPassword": "Dieses Passwort ist zu schwach. Verwenden Sie mindestens 6 Zeichen.",
+    "errInvalidEmail": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "errNetwork": "Server nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "errGeneric": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

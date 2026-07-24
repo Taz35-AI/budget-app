@@ -41,9 +41,11 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const startDate = fromDate ? new Date(fromDate) : today;
+  // Parse YYYY-MM-DD at local noon: `new Date('YYYY-MM-DD')` is UTC midnight,
+  // which format() renders as the PREVIOUS day for users west of UTC.
+  const startDate = fromDate ? new Date(fromDate + 'T12:00:00') : today;
   const endDate = toDate
-    ? new Date(toDate)
+    ? new Date(toDate + 'T12:00:00')
     : addDays(today, SEVEN_YEARS_DAYS);
 
   // Pre-group exceptions by transaction_id for O(1) lookup
@@ -147,7 +149,8 @@ export function computeBalances(options: ComputeOptions): BalanceMap {
       });
     }
 
-    runningBalance += dayNet;
+    // Round to cents daily so float error can't accumulate over ~2500 days
+    runningBalance = Math.round((runningBalance + dayNet) * 100) / 100;
     balances.set(dateStr, runningBalance);
     if (txsToday.length > 0) {
       dayTransactions.set(dateStr, txsToday);

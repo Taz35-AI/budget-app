@@ -23,7 +23,9 @@
     "mustBePositive": "Musi być > 0",
     "mustBeWholeNumber": "Musi być liczbą całkowitą ≥ 1",
     "balanceAdjustment": "Korekta salda",
-    "transactionsCount": "{count, plural, one {# transakcja} few {# transakcje} many {# transakcji} other {# transakcji}}"
+    "transactionsCount": "{count, plural, one {# transakcja} few {# transakcje} many {# transakcji} other {# transakcji}}",
+    "clearSearch": "Wyczyść wyszukiwanie",
+    "biometricLock": "Blokada biometryczna"
   },
   "nav": {
     "dashboard": "Pulpit",
@@ -38,8 +40,34 @@
     "import": "Importuj"
   },
   "months": {
-    "short": ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"],
-    "long": ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"]
+    "short": [
+      "Sty",
+      "Lut",
+      "Mar",
+      "Kwi",
+      "Maj",
+      "Cze",
+      "Lip",
+      "Sie",
+      "Wrz",
+      "Paź",
+      "Lis",
+      "Gru"
+    ],
+    "long": [
+      "Styczeń",
+      "Luty",
+      "Marzec",
+      "Kwiecień",
+      "Maj",
+      "Czerwiec",
+      "Lipiec",
+      "Sierpień",
+      "Wrzesień",
+      "Październik",
+      "Listopad",
+      "Grudzień"
+    ]
   },
   "dashboard": {
     "title": "Pulpit",
@@ -227,7 +255,9 @@
     "subsEnds": "Do {date}",
     "subsOngoing": "W toku",
     "subsCount": "{count} subskrypcji",
-    "subsAnnualCost": "Koszt roczny"
+    "subsAnnualCost": "Koszt roczny",
+    "goalDaysLeftShort": "Pozostało {days}d",
+    "goalOverdue": "Po terminie"
   },
   "settings": {
     "title": "Ustawienia",
@@ -309,7 +339,9 @@
     "budgetWarningsLabel": "Ostrzeżenia o limicie budżetu",
     "budgetWarningsDesc": "Powiadomienie po osiągnięciu 85% miesięcznego limitu wydatków",
     "reminderTime": "Godzina przypomnienia",
-    "reminderTimeDesc": "O której godzinie wysyłać codzienne przypomnienie"
+    "reminderTimeDesc": "O której godzinie wysyłać codzienne przypomnienie",
+    "goalDaysLeft": "Pozostało {days} dni",
+    "goalDeadlinePassed": "Termin minął"
   },
   "accounts": {
     "title": "Konta",
@@ -389,7 +421,14 @@
     "monthlyRecap": "Miesięczne podsumowanie",
     "weeklyDigest": "Tygodniowy przegląd",
     "budgetWarning": "Ostrzeżenie budżetowe",
-    "budgetAt": "Budżet {month} wynosi {percentage}%"
+    "budgetAt": "Budżet {month} wynosi {percentage}%",
+    "dailyReminderBody": "Nie zapomnij zapisać dzisiejszych wydatków",
+    "billDueTomorrow": "Rachunek do zapłaty jutro",
+    "billDueToday": "Rachunek do zapłaty dzisiaj",
+    "billDueTomorrowBody": "Płatność {name} jest wymagalna jutro",
+    "billDueTodayBody": "Płatność {name} jest wymagalna dzisiaj",
+    "monthlyRecapBody": "Podsumowanie wydatków za {month} jest gotowe",
+    "weeklyDigestBody": "Twój tydzień w Spentum — dotknij, aby zobaczyć wydatki i nadchodzące rachunki"
   },
   "frequency": {
     "daily": "Codziennie",
@@ -639,6 +678,58 @@
     "noMembers": "Brak innych członków"
   },
   "auth": {
-    "sessionTimeout": "Twoja sesja wygasła z powodu braku aktywności. Zaloguj się ponownie."
+    "sessionTimeout": "Twoja sesja wygasła z powodu braku aktywności. Zaloguj się ponownie.",
+    "signInTitle": "Zaloguj się na swoje konto",
+    "resetTitle": "Zresetuj hasło",
+    "createTitle": "Utwórz konto",
+    "continueWithGoogle": "Kontynuuj z Google",
+    "or": "lub",
+    "email": "E-mail",
+    "password": "Hasło",
+    "newPassword": "Nowe hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "emailPlaceholder": "ty@przyklad.com",
+    "passwordMinPlaceholder": "Min. 6 znaków",
+    "forgotPassword": "Nie pamiętasz hasła?",
+    "signIn": "Zaloguj się",
+    "signingIn": "Logowanie…",
+    "sendResetLink": "Wyślij link resetujący",
+    "sending": "Wysyłanie…",
+    "backToSignIn": "Powrót do logowania",
+    "checkEmail": "Sprawdź swoją skrzynkę",
+    "resetLinkSent": "Wysłaliśmy link resetujący na <strong>{email}</strong>. Kliknij go, aby ustawić nowe hasło.",
+    "confirmLinkSent": "Wysłaliśmy link potwierdzający na <strong>{email}</strong>. Kliknij go, aby aktywować konto.",
+    "noAccount": "Nie masz konta?",
+    "createOne": "Utwórz je",
+    "alreadyHaveAccount": "Masz już konto?",
+    "createAccount": "Utwórz konto",
+    "creatingAccount": "Tworzenie konta…",
+    "agreePrefix": "Tworząc konto, akceptujesz nasze",
+    "and": "oraz",
+    "terms": "Regulamin",
+    "privacy": "Prywatność",
+    "privacyPolicy": "Politykę prywatności",
+    "chooseNewPassword": "Wybierz nowe hasło",
+    "allDone": "Gotowe",
+    "resetPassword": "Resetowanie hasła",
+    "verifyingLink": "Weryfikowanie linku…",
+    "linkExpired": "Link wygasł lub jest nieprawidłowy",
+    "linkExpiredDesc": "Poproś o nowy link resetujący i spróbuj ponownie.",
+    "setNewPassword": "Ustaw nowe hasło",
+    "saving": "Zapisywanie…",
+    "passwordUpdated": "Hasło zaktualizowane",
+    "takingYouToDashboard": "Przenosimy Cię do panelu…",
+    "passwordsDoNotMatch": "Hasła nie są takie same",
+    "minSixCharacters": "Minimum 6 znaków",
+    "showPassword": "Pokaż hasło",
+    "hidePassword": "Ukryj hasło",
+    "errInvalidCredentials": "Nieprawidłowy e-mail lub hasło.",
+    "errEmailNotConfirmed": "Najpierw potwierdź swój adres e-mail — sprawdź skrzynkę odbiorczą.",
+    "errRateLimit": "Zbyt wiele prób. Odczekaj chwilę i spróbuj ponownie.",
+    "errUserExists": "Konto z tym adresem e-mail już istnieje.",
+    "errWeakPassword": "To hasło jest za słabe. Użyj co najmniej 6 znaków.",
+    "errInvalidEmail": "Podaj prawidłowy adres e-mail.",
+    "errNetwork": "Nie można połączyć się z serwerem. Sprawdź połączenie i spróbuj ponownie.",
+    "errGeneric": "Coś poszło nie tak. Spróbuj ponownie."
   }
 }

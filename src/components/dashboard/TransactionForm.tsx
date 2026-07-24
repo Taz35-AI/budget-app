@@ -570,7 +570,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
           <Input
             id="amount"
             label={t('amount')}
-            type="number"
+            type="number" inputMode="decimal"
             step="0.01"
             min="0"
             placeholder={t('amountPlaceholder')}
@@ -667,7 +667,7 @@ export function TransactionForm({ defaultDate, initialValues, isDuplicate, onSub
           <Input
             id="recurrences"
             label={t('occurrences')}
-            type="number"
+            type="number" inputMode="numeric"
             min="1"
             step="1"
             placeholder={t('occurrencesPlaceholder')}

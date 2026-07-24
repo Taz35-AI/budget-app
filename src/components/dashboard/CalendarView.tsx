@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useState, useMemo } from 'react';
+import { useRef, useCallback, useEffect, useState, useMemo, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -18,6 +18,30 @@ import type { DayTransaction, BudgetAccount, HouseholdMember } from '@/types';
 export interface CalendarNavHandle {
   today: () => void;
 }
+
+// ── First-visit swipe hint ────────────────────────────────────────────────────
+// Shown once on touch devices. Backed by localStorage, so it's read as an
+// external store instead of being synced into state from an effect.
+
+const SWIPE_HINT_KEY = 'bt_swipe_hint';
+const swipeHintListeners = new Set<() => void>();
+
+function subscribeSwipeHint(onChange: () => void) {
+  swipeHintListeners.add(onChange);
+  return () => swipeHintListeners.delete(onChange);
+}
+
+function getSwipeHintSnapshot(): boolean {
+  try {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    return isTouch && localStorage.getItem(SWIPE_HINT_KEY) !== 'done';
+  } catch {
+    return false;
+  }
+}
+
+// Touch support and localStorage are unknown on the server — never show it there.
+const getSwipeHintServerSnapshot = (): boolean => false;
 
 interface Props {
   balances: Map<string, number>;
@@ -70,7 +94,14 @@ export function CalendarView({
   const lastReportedMonth = useRef<string | null>(null);
 
   const [monthTitle, setMonthTitle] = useState(() => { const n = new Date(); return `${longMonths[n.getMonth()]} ${n.getFullYear()}`; });
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  // Whether the first-visit swipe hint should show. Read through an external
+  // store rather than synced into state from an effect — it depends on
+  // localStorage and touch support, neither of which exists during SSR.
+  const showSwipeHint = useSyncExternalStore(
+    subscribeSwipeHint,
+    getSwipeHintSnapshot,
+    getSwipeHintServerSnapshot,
+  );
 
   // Week number sidebar state
   const calendarContainerRef = useRef<HTMLDivElement>(null);
@@ -119,18 +150,9 @@ export function CalendarView({
     }
   }, [calendarNavRef]);
 
-  // Show swipe hint on touch devices, first visit only
-  useEffect(() => {
-    try {
-      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      const seen = localStorage.getItem('bt_swipe_hint') === 'done';
-      if (isTouch && !seen) setShowSwipeHint(true);
-    } catch {}
-  }, []);
-
   const handleSwipeHintEnd = useCallback(() => {
-    setShowSwipeHint(false);
-    try { localStorage.setItem('bt_swipe_hint', 'done'); } catch {}
+    try { localStorage.setItem(SWIPE_HINT_KEY, 'done'); } catch {}
+    swipeHintListeners.forEach((l) => l());
   }, []);
 
   const handleDateClick = useCallback(

@@ -112,6 +112,36 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       [k: string]: unknown;
     };
 
+    // ── Validate editable fields (mirrors POST /api/transactions) ─────────
+    const VALID_CATEGORIES = ['income', 'expense'];
+    const VALID_FREQUENCIES = ['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'semiannual', 'annual'];
+    const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+    const hasAmount = updates.amount !== undefined && updates.amount !== null && updates.amount !== '';
+    const newAmount = hasAmount ? Number(updates.amount) : undefined;
+    if (hasAmount && (!Number.isFinite(newAmount!) || newAmount! < 0 || newAmount! > 999_999_999)) {
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    }
+    if (updates.category !== undefined && !VALID_CATEGORIES.includes(updates.category as string)) {
+      return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
+    }
+    if (updates.frequency !== undefined && updates.frequency !== null && updates.frequency !== '' &&
+        !VALID_FREQUENCIES.includes(updates.frequency as string)) {
+      return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
+    }
+    const newName = typeof updates.name === 'string' ? updates.name.trim().slice(0, 200) : undefined;
+    for (const [field, value] of Object.entries({
+      effectiveFrom,
+      date: updates.date,
+      start_date: updates.start_date,
+      end_date: updates.end_date,
+      newDate: updates.newDate,
+    })) {
+      if (value !== undefined && value !== null && value !== '' && !DATE_RE.test(String(value))) {
+        return NextResponse.json({ error: `Invalid date in ${field}` }, { status: 400 });
+      }
+    }
+
     const { data: original, error: fetchError } = await supabase
       .from('transactions')
       .select('*')
@@ -147,8 +177,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
       const { data, error } = await supabase
         .from('transactions')
         .update({
-          name: (updates.name as string) || original.name,
-          amount: updates.amount ? Number(updates.amount) : original.amount,
+          name: newName || original.name,
+          amount: newAmount ?? original.amount,
           category: (updates.category as string) || original.category,
           tag: 'tag' in updates ? ((updates.tag as string) || null) : original.tag,
           date: (updates.date as string) || original.date,
@@ -175,8 +205,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         const { error: pairedError } = await supabase
           .from('transactions')
           .update({
-            name: (updates.name as string) || paired.name,
-            amount: updates.amount ? Number(updates.amount) : paired.amount,
+            name: newName || paired.name,
+            amount: newAmount ?? paired.amount,
             category: pairedCategory,
             tag: 'tag' in updates ? ((updates.tag as string) || null) : paired.tag,
             date: (updates.date as string) || paired.date,
@@ -257,8 +287,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             created_by: userId,
             account_id: ('account_id' in updates ? updates.account_id : original.account_id) as string | null,
             parent_id: rootId,
-            name: (updates.name as string) || original.name,
-            amount: updates.amount ? Number(updates.amount) : original.amount,
+            name: newName || original.name,
+            amount: newAmount ?? original.amount,
             category: (updates.category as string) || original.category,
             type: 'recurring',
             tag: original.tag,
@@ -272,6 +302,12 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
         if (createError) {
           console.error('[PATCH] all_future split create error:', createError.message);
+          // Roll back the cap so the original series isn't left truncated
+          // with no replacement.
+          await supabase
+            .from('transactions')
+            .update({ end_date: original.end_date })
+            .eq('id', id);
           return NextResponse.json({ error: createError.message }, { status: 500 });
         }
 
@@ -301,8 +337,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
               created_by: userId,
               account_id: paired.account_id, // paired keeps its own account
               parent_id: pairedRootId,
-              name: (updates.name as string) || paired.name,
-              amount: updates.amount ? Number(updates.amount) : paired.amount,
+              name: newName || paired.name,
+              amount: newAmount ?? paired.amount,
               category: 'category' in updates
                 ? flipCategory(updates.category as string)
                 : paired.category,
@@ -329,8 +365,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         .insert({
           transaction_id: id,
           effective_from: effectiveFrom,
-          name: (updates.name as string) || null,
-          amount: updates.amount ? Number(updates.amount) : null,
+          name: newName || null,
+          amount: newAmount ?? null,
           end_date: (updates.end_date as string) || null,
           is_deleted: false,
         });
@@ -348,8 +384,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           .insert({
             transaction_id: paired.id as string,
             effective_from: effectiveFrom,
-            name: (updates.name as string) || null,
-            amount: updates.amount ? Number(updates.amount) : null,
+            name: newName || null,
+            amount: newAmount ?? null,
             end_date: (updates.end_date as string) || null,
             is_deleted: false,
           });
@@ -440,8 +476,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             created_by: userId,
             account_id: ('account_id' in updates ? updates.account_id : original.account_id) as string | null,
             parent_id: rootId,
-            name: (updates.name as string) || original.name,
-            amount: updates.amount ? Number(updates.amount) : original.amount,
+            name: newName || original.name,
+            amount: newAmount ?? original.amount,
             category: original.category,
             type: 'one_off',
             tag: original.tag,
@@ -453,6 +489,30 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
         if (createError) {
           console.error('[PATCH] this_only move create error:', createError.message);
+          // Roll back the exception upserts so the occurrence isn't left
+          // deleted with no replacement one-off.
+          for (const date of [effectiveFrom, nextDate]) {
+            const before = exceptions.find((e) => e.effective_from === date);
+            if (before) {
+              await supabase.from('transaction_exceptions').upsert(
+                {
+                  transaction_id: id,
+                  effective_from: date,
+                  name: before.name,
+                  amount: before.amount,
+                  end_date: before.end_date,
+                  is_deleted: before.is_deleted,
+                },
+                { onConflict: 'transaction_id,effective_from' },
+              );
+            } else {
+              await supabase
+                .from('transaction_exceptions')
+                .delete()
+                .eq('transaction_id', id)
+                .eq('effective_from', date);
+            }
+          }
           return NextResponse.json({ error: createError.message }, { status: 500 });
         }
 
@@ -506,8 +566,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
               created_by: userId,
               account_id: paired.account_id,
               parent_id: pairedRootId,
-              name: (updates.name as string) || paired.name,
-              amount: updates.amount ? Number(updates.amount) : paired.amount,
+              name: newName || paired.name,
+              amount: newAmount ?? paired.amount,
               category: paired.category, // already correct (flipped from original)
               type: 'one_off',
               tag: paired.tag,
@@ -527,8 +587,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
           {
             transaction_id: id,
             effective_from: effectiveFrom,
-            name: (updates.name as string) || null,
-            amount: updates.amount ? Number(updates.amount) : null,
+            name: newName || null,
+            amount: newAmount ?? null,
             end_date: (updates.end_date as string) || null,
             is_deleted: false,
           },
@@ -567,8 +627,8 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
             {
               transaction_id: paired.id as string,
               effective_from: effectiveFrom,
-              name: (updates.name as string) || null,
-              amount: updates.amount ? Number(updates.amount) : null,
+              name: newName || null,
+              amount: newAmount ?? null,
               end_date: (updates.end_date as string) || null,
               is_deleted: false,
             },

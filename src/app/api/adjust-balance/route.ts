@@ -20,7 +20,16 @@ export async function POST(req: NextRequest) {
 
     const { desiredBalance, currentBalance, accountId } = await req.json();
 
-    const delta = Number(desiredBalance) - Number(currentBalance);
+    const desired = Number(desiredBalance);
+    const current = Number(currentBalance);
+    if (!Number.isFinite(desired) || !Number.isFinite(current)) {
+      return NextResponse.json({ error: 'Invalid balance values' }, { status: 400 });
+    }
+
+    const delta = desired - current;
+    if (Math.abs(delta) > 999_999_999) {
+      return NextResponse.json({ error: 'Adjustment too large' }, { status: 400 });
+    }
     if (Math.abs(delta) < 0.01) {
       return NextResponse.json({ message: 'No adjustment needed' });
     }
@@ -36,7 +45,7 @@ export async function POST(req: NextRequest) {
         created_by: userId,
         account_id: accountId || null,
         name: 'Balance Adjustment',
-        amount: Math.abs(delta),
+        amount: Math.round(Math.abs(delta) * 100) / 100,
         category: delta > 0 ? 'income' : 'expense',
         type: 'one_off',
         date: today,

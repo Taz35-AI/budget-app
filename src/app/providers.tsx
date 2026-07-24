@@ -1,7 +1,15 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, createContext, useContext, useEffect } from 'react';
+import {
+  useState,
+  createContext,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo,
+  useSyncExternalStore,
+} from 'react';
 import { SettingsSyncProvider } from '@/components/SettingsSyncProvider';
 import { RealtimeSyncProvider } from '@/components/RealtimeSyncProvider';
 import { I18nProvider } from '@/providers/I18nProvider';
@@ -25,27 +33,51 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+const THEME_KEY = 'budgetapp_theme';
 
+// Subscribers in this tab; the `storage` event only fires in other tabs.
+const themeListeners = new Set<() => void>();
+
+function subscribeTheme(onChange: () => void) {
+  themeListeners.add(onChange);
+  window.addEventListener('storage', onChange);
+  return () => {
+    themeListeners.delete(onChange);
+    window.removeEventListener('storage', onChange);
+  };
+}
+
+function getThemeSnapshot(): Theme {
+  try {
+    return (localStorage.getItem(THEME_KEY) as Theme | null) ?? 'dark';
+  } catch {
+    return 'dark';
+  }
+}
+
+const getThemeServerSnapshot = (): Theme => 'dark';
+
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Read the stored theme during render instead of copying it into state from
+  // an effect — that removes the extra render pass (and the flash of the wrong
+  // theme it caused) and keeps every tab in sync.
+  const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getThemeServerSnapshot);
+
+  // Applying the class is a DOM side effect, so it belongs in an effect.
   useEffect(() => {
-    const saved = localStorage.getItem('budgetapp_theme') as Theme | null;
-    const initial = saved ?? 'dark';
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    const next: Theme = getThemeSnapshot() === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, next);
+    themeListeners.forEach((l) => l());
   }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next = prev === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('budgetapp_theme', next);
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      return next;
-    });
-  };
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

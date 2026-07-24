@@ -23,7 +23,9 @@
     "mustBePositive": "Trebuie să fie > 0",
     "mustBeWholeNumber": "Trebuie să fie un număr întreg ≥ 1",
     "balanceAdjustment": "Ajustare sold",
-    "transactionsCount": "{count, plural, one {# tranzacție} few {# tranzacții} other {# de tranzacții}}"
+    "transactionsCount": "{count, plural, one {# tranzacție} few {# tranzacții} other {# de tranzacții}}",
+    "clearSearch": "Șterge căutarea",
+    "biometricLock": "Blocare biometrică"
   },
   "nav": {
     "dashboard": "Panou",
@@ -38,8 +40,34 @@
     "import": "Import"
   },
   "months": {
-    "short": ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    "long": ["Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie", "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"]
+    "short": [
+      "Ian",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mai",
+      "Iun",
+      "Iul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "long": [
+      "Ianuarie",
+      "Februarie",
+      "Martie",
+      "Aprilie",
+      "Mai",
+      "Iunie",
+      "Iulie",
+      "August",
+      "Septembrie",
+      "Octombrie",
+      "Noiembrie",
+      "Decembrie"
+    ]
   },
   "dashboard": {
     "title": "Panou",
@@ -227,7 +255,9 @@
     "subsEnds": "Până la {date}",
     "subsOngoing": "În curs",
     "subsCount": "{count} abonamente",
-    "subsAnnualCost": "Cost anual"
+    "subsAnnualCost": "Cost anual",
+    "goalDaysLeftShort": "{days}z rămase",
+    "goalOverdue": "Depășit"
   },
   "settings": {
     "title": "Setări",
@@ -309,7 +339,9 @@
     "budgetWarningsLabel": "Avertismente buget",
     "budgetWarningsDesc": "Alertă când atingi 85% din limita lunară",
     "reminderTime": "Ora reminderului",
-    "reminderTimeDesc": "La ce oră să primești reminderul zilnic"
+    "reminderTimeDesc": "La ce oră să primești reminderul zilnic",
+    "goalDaysLeft": "{days} zile rămase",
+    "goalDeadlinePassed": "Termen depășit"
   },
   "accounts": {
     "title": "Conturi",
@@ -389,7 +421,14 @@
     "monthlyRecap": "Rezumat lunar",
     "weeklyDigest": "Rezumat săptămânal",
     "budgetWarning": "Avertisment buget",
-    "budgetAt": "Bugetul din {month} este la {percentage}%"
+    "budgetAt": "Bugetul din {month} este la {percentage}%",
+    "dailyReminderBody": "Nu uita să îți notezi cheltuielile de azi",
+    "billDueTomorrow": "Factură scadentă mâine",
+    "billDueToday": "Factură scadentă azi",
+    "billDueTomorrowBody": "Plata {name} este scadentă mâine",
+    "billDueTodayBody": "Plata {name} este scadentă azi",
+    "monthlyRecapBody": "Rezumatul cheltuielilor din {month} este gata",
+    "weeklyDigestBody": "Săptămâna ta în Spentum — atinge pentru cheltuieli și facturi viitoare"
   },
   "frequency": {
     "daily": "Zilnic",
@@ -639,6 +678,58 @@
     "noMembers": "Niciun alt membru încă"
   },
   "auth": {
-    "sessionTimeout": "Sesiunea ta a expirat din cauza inactivității. Te rugăm să te autentifici din nou."
+    "sessionTimeout": "Sesiunea ta a expirat din cauza inactivității. Te rugăm să te autentifici din nou.",
+    "signInTitle": "Conectează-te la contul tău",
+    "resetTitle": "Resetează-ți parola",
+    "createTitle": "Creează-ți contul",
+    "continueWithGoogle": "Continuă cu Google",
+    "or": "sau",
+    "email": "E-mail",
+    "password": "Parolă",
+    "newPassword": "Parolă nouă",
+    "confirmPassword": "Confirmă parola",
+    "emailPlaceholder": "tu@exemplu.com",
+    "passwordMinPlaceholder": "Min. 6 caractere",
+    "forgotPassword": "Ai uitat parola?",
+    "signIn": "Conectare",
+    "signingIn": "Se conectează…",
+    "sendResetLink": "Trimite linkul de resetare",
+    "sending": "Se trimite…",
+    "backToSignIn": "Înapoi la conectare",
+    "checkEmail": "Verifică-ți e-mailul",
+    "resetLinkSent": "Am trimis un link de resetare la <strong>{email}</strong>. Accesează-l pentru a seta o parolă nouă.",
+    "confirmLinkSent": "Am trimis un link de confirmare la <strong>{email}</strong>. Accesează-l pentru a-ți activa contul.",
+    "noAccount": "Nu ai cont?",
+    "createOne": "Creează unul",
+    "alreadyHaveAccount": "Ai deja un cont?",
+    "createAccount": "Creează cont",
+    "creatingAccount": "Se creează contul…",
+    "agreePrefix": "Prin crearea unui cont ești de acord cu",
+    "and": "și",
+    "terms": "Termenii",
+    "privacy": "Confidențialitate",
+    "privacyPolicy": "Politica de confidențialitate",
+    "chooseNewPassword": "Alege o parolă nouă",
+    "allDone": "Gata",
+    "resetPassword": "Resetare parolă",
+    "verifyingLink": "Se verifică linkul…",
+    "linkExpired": "Link expirat sau invalid",
+    "linkExpiredDesc": "Solicită un nou link de resetare și încearcă din nou.",
+    "setNewPassword": "Setează parola nouă",
+    "saving": "Se salvează…",
+    "passwordUpdated": "Parolă actualizată",
+    "takingYouToDashboard": "Te ducem la panoul tău…",
+    "passwordsDoNotMatch": "Parolele nu se potrivesc",
+    "minSixCharacters": "Minimum 6 caractere",
+    "showPassword": "Arată parola",
+    "hidePassword": "Ascunde parola",
+    "errInvalidCredentials": "E-mail sau parolă incorectă.",
+    "errEmailNotConfirmed": "Confirmă-ți mai întâi adresa de e-mail — verifică-ți inboxul.",
+    "errRateLimit": "Prea multe încercări. Așteaptă puțin și încearcă din nou.",
+    "errUserExists": "Există deja un cont cu acest e-mail.",
+    "errWeakPassword": "Parola este prea slabă. Folosește cel puțin 6 caractere.",
+    "errInvalidEmail": "Introdu o adresă de e-mail validă.",
+    "errNetwork": "Nu putem contacta serverul. Verifică-ți conexiunea și încearcă din nou.",
+    "errGeneric": "Ceva nu a mers bine. Te rugăm să încerci din nou."
   }
 }

@@ -16,6 +16,8 @@ import { useHouseholdMembers, useHouseholdInvites, useCreateInvite, useRevokeInv
 import { memberColor, groupAccountsByOwner, memberShortName } from '@/lib/memberUtils';
 import { createClient } from '@/lib/supabase/client';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useNow } from '@/hooks/useNow';
+import { getDateLocale } from '@/lib/dateLocale';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { LogoutButton } from '@/components/dashboard/LogoutButton';
@@ -83,11 +85,13 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
 
 // ─── Trash icon ───────────────────────────────────────────────────────────────
 
-function TrashBtn({ onClick }: { onClick: () => void }) {
+function TrashBtn({ onClick, label }: { onClick: () => void; label?: string }) {
+  const tc = useTranslations('common');
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-label={label ?? tc('delete')}
       className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 active:scale-[0.96] transition-all duration-100 opacity-0 group-hover:opacity-100 flex-shrink-0"
     >
       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -529,7 +533,7 @@ function TemplatesSection() {
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Template name (e.g. Monthly Rent)" autoFocus
             className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
-          <input type="number" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
+          <input type="number" inputMode="decimal" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
             placeholder="Amount" min="0" step="0.01"
             className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-sky-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {form.type === 'recurring' && (
@@ -697,6 +701,7 @@ function PreferencesSection() {
               type="button"
               role="switch"
               aria-checked={biometricEnabled}
+              aria-label={t('biometricLock')}
               onClick={toggleBiometric}
               disabled={biometricBusy}
               className={cn(
@@ -726,12 +731,16 @@ function GoalsSection() {
   const t = useTranslations('settings');
   const tTags = useTranslations('tags');
   const { goals, allTags, addGoal, updateGoal, deleteGoal } = useSettings();
+  const language = useSettingsStore((s) => s.language);
+  const dateLocale = getDateLocale(language);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: '', target: '', currentSaved: '', deadline: '', linkedTagId: '' });
   const [editId, setEditId] = useState<string | null>(null);
   const [editSaved, setEditSaved] = useState('');
   // which goal is showing the "pick a tag to link" picker
   const [linkingGoalId, setLinkingGoalId] = useState<string | null>(null);
+
+  const nowMs = useNow();
 
   const handleAdd = () => {
     const target = Number(form.target);
@@ -768,7 +777,7 @@ function GoalsSection() {
             const pct = goal.targetAmount > 0 ? Math.min(goal.currentSaved / goal.targetAmount, 1) : 0;
             const remaining = Math.max(0, goal.targetAmount - goal.currentSaved);
             const daysLeft = goal.deadline
-              ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
+              ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - nowMs) / 86_400_000))
               : null;
             const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
 
@@ -779,8 +788,10 @@ function GoalsSection() {
                     <p className="text-sm font-semibold text-slate-800 dark:text-white/90 truncate">{goal.name}</p>
                     {goal.deadline && (
                       <p className="text-xs text-slate-400 dark:text-white/35 mt-0.5">
-                        {new Date(goal.deadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        {daysLeft !== null ? (daysLeft > 0 ? ` · ${daysLeft} days left` : ' · Deadline passed') : ''}
+                        {new Date(goal.deadline + 'T12:00:00').toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {daysLeft !== null
+                          ? ` · ${daysLeft > 0 ? t('goalDaysLeft', { days: daysLeft }) : t('goalDeadlinePassed')}`
+                          : ''}
                       </p>
                     )}
                   </div>
@@ -836,7 +847,7 @@ function GoalsSection() {
                   </div>
                 ) : editId === goal.id ? (
                   <div className="flex gap-2">
-                    <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
+                    <input type="number" inputMode="decimal" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                       placeholder="Amount saved so far" autoFocus
                       className="flex-1 h-8 px-2 rounded-lg bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400" />
                     <button type="button" onClick={() => handleUpdateSaved(goal.id)} className="px-3 h-10 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold active:scale-[0.96] transition-all duration-100 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">Save</button>
@@ -866,11 +877,11 @@ function GoalsSection() {
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             placeholder="Goal name (e.g. Holiday fund)" autoFocus
             className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
-          <input type="number" value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
+          <input type="number" inputMode="decimal" value={form.target} onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
             placeholder="Target amount" min="0"
             className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           {!form.linkedTagId && (
-            <input type="number" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
+            <input type="number" inputMode="decimal" value={form.currentSaved} onChange={(e) => setForm((f) => ({ ...f, currentSaved: e.target.value }))}
               placeholder="Already saved (optional)" min="0"
               className="w-full h-11 px-3 rounded-2xl bg-white/70 dark:bg-white/[0.04] border border-brand-primary/[0.08] dark:border-white/[0.08] text-sm text-slate-800 dark:text-white placeholder:text-slate-400 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
           )}
@@ -1057,7 +1068,7 @@ function AccountsSection() {
                 <AccountTypeSelector value={editType} onChange={setEditType} />
                 {editType === 'credit' && (
                   <input
-                    type="number"
+                    type="number" inputMode="decimal"
                     min="0"
                     value={editLimit}
                     onChange={(e) => setEditLimit(e.target.value)}
@@ -1172,7 +1183,7 @@ function AccountsSection() {
           <AccountTypeSelector value={newType} onChange={setNewType} />
           {newType === 'credit' && (
             <input
-              type="number"
+              type="number" inputMode="decimal"
               min="0"
               value={newLimit}
               onChange={(e) => setNewLimit(e.target.value)}

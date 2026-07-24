@@ -176,7 +176,7 @@ export function BudgetsShell() {
                 <Input
                   id="budget-input"
                   label={t('monthlyLimit')}
-                  type="number"
+                  type="number" inputMode="decimal"
                   step="0.01"
                   min="0.01"
                   prefix={symbol}

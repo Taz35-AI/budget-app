@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -22,13 +22,14 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
 
-  useEffect(() => {
-    if (open) {
-      setValue(todayBalance.toFixed(2));
-      setError('');
-      setTimeout(() => inputRef.current?.select(), 50);
-    }
-  }, [open, todayBalance]);
+  // Seed the field when the dialog opens. Done here rather than in an effect
+  // so opening is a single state update instead of render → effect → re-render.
+  const handleOpen = () => {
+    setValue(todayBalance.toFixed(2));
+    setError('');
+    setOpen(true);
+    setTimeout(() => inputRef.current?.select(), 50);
+  };
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -56,7 +57,7 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         className="flex items-center gap-1.5 h-9 px-3 rounded-2xl bg-brand-primary/[0.06] dark:bg-white/[0.06] hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white text-sm font-medium transition-all duration-100 active:scale-[0.95] border border-slate-200 dark:border-white/20"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -75,7 +76,7 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
           <span className="text-slate-400 dark:text-white/40 text-sm flex-shrink-0">{symbol}</span>
           <input
             ref={inputRef}
-            type="number"
+            type="number" inputMode="decimal"
             step="0.01"
             value={value}
             onChange={(e) => { setValue(e.target.value); setError(''); }}

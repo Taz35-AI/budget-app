@@ -16,11 +16,14 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    let { data: accounts, error } = await supabase
+    const { data, error } = await supabase
       .from('budget_accounts')
       .select('*')
       .eq('household_id', householdId)
       .order('created_at', { ascending: true });
+
+    // Reassigned below when the household has no accounts yet.
+    let accounts = data;
 
     if (error) {
       console.error('[GET /api/accounts]', error.message);

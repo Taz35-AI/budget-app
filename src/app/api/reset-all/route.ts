@@ -15,14 +15,13 @@ export async function DELETE() {
 
     const supabase = createAdminClient();
 
-    // Delete in order (exceptions cascade from transactions, but cache/resets are independent)
-    const [txResult, resetResult, cacheResult] = await Promise.all([
+    // Delete in order (exceptions cascade from transactions, resets are independent)
+    const [txResult, resetResult] = await Promise.all([
       supabase.from('transactions').delete().eq('household_id', householdId),
       supabase.from('balance_resets').delete().eq('household_id', householdId),
-      supabase.from('daily_balance_cache').delete().eq('household_id', householdId),
     ]);
 
-    const errors = [txResult.error, resetResult.error, cacheResult.error].filter(Boolean);
+    const errors = [txResult.error, resetResult.error].filter(Boolean);
     if (errors.length > 0) {
       console.error('[DELETE /api/reset-all] errors:', errors.map((e) => e!.message));
       return NextResponse.json({ error: errors[0]!.message }, { status: 500 });
