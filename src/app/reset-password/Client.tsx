@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useHydrated } from '@/hooks/useHydrated';
 import { authErrorKey } from '@/lib/authErrors';
 
 type Stage = 'loading' | 'form' | 'success' | 'invalid';
@@ -15,6 +16,8 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const tAuth = useTranslations('auth');
   const supabase = createClient();
+  // See useHydrated: blocks the pre-hydration native submit.
+  const hydrated = useHydrated();
 
   const [stage, setStage] = useState<Stage>('loading');
   const [password, setPassword] = useState('');
@@ -84,8 +87,10 @@ export default function ResetPasswordPage() {
             </div>
           )}
 
+          {/* method="post" so a pre-hydration native submit can't put the new
+              password in the URL (and thus in logs and history). */}
           {stage === 'form' && (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-4">
               {error && (
                 <div role="alert" className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
                   {error}
@@ -122,7 +127,7 @@ export default function ResetPasswordPage() {
               </div>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || !hydrated}
                 className="h-12 rounded-2xl bg-brand-primary text-white text-sm font-bold hover:bg-[#0F766E] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-100 mt-1 shadow-[0_2px_8px_rgba(13,148,136,0.25)] active:scale-[0.97] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
               >
                 {saving ? tAuth('saving') : tAuth('setNewPassword')}

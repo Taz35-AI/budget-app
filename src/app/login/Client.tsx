@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useHydrated } from '@/hooks/useHydrated';
 import { authErrorKey } from '@/lib/authErrors';
 
 type Mode = 'login' | 'forgot' | 'forgot-sent';
@@ -23,6 +24,9 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const tAuth = useTranslations('auth');
   const supabase = createClient();
+  // Sign-in runs in JS. Until hydration completes, a tap would trigger a native
+  // form submit that just reloads the page and looks like a failed login.
+  const hydrated = useHydrated();
 
   // Read straight from the URL rather than syncing it into state via an effect.
   const isTimeout = searchParams.get('reason') === 'timeout';
@@ -132,7 +136,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleGoogle}
-                disabled={loading}
+                disabled={loading || !hydrated}
                 className="w-full h-12 rounded-full bg-white/80 dark:bg-white/[0.06] border border-white/80 dark:border-white/[0.1] text-brand-text dark:text-white text-sm font-semibold hover:bg-white dark:hover:bg-white/[0.1] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2.5 mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-[0.97] backdrop-blur-sm font-display"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
@@ -150,7 +154,15 @@ export default function LoginPage() {
               </div>
             </>
           )}
-          <form onSubmit={mode === 'login' ? handleLogin : handleForgot} className="flex flex-col gap-4">
+          {/* method="post" matters: sign-in happens in JS, but if the form is
+              submitted before React hydrates the browser falls back to a native
+              submit. With the default GET that puts the email and password in
+              the URL — and therefore into server logs and browser history. */}
+          <form
+            method="post"
+            onSubmit={mode === 'login' ? handleLogin : handleForgot}
+            className="flex flex-col gap-4"
+          >
             {isTimeout && !error && (
               <div className="px-4 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-600 dark:text-amber-400">
                 {tAuth('sessionTimeout')}
@@ -204,7 +216,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !hydrated}
               className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display"
             >
               {loading

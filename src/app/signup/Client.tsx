@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useHydrated } from '@/hooks/useHydrated';
 import { authErrorKey } from '@/lib/authErrors';
 
 export default function SignupPage() {
@@ -16,6 +17,9 @@ export default function SignupPage() {
   const [sent, setSent] = useState(false);
   const tAuth = useTranslations('auth');
   const supabase = createClient();
+  // See useHydrated: blocks the pre-hydration native submit that would
+  // otherwise reload the page instead of creating the account.
+  const hydrated = useHydrated();
 
   const handleGoogle = async () => {
     setError('');
@@ -95,7 +99,7 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={handleGoogle}
-            disabled={loading}
+            disabled={loading || !hydrated}
             className="w-full h-12 rounded-full bg-white/80 dark:bg-white/[0.06] border border-white/80 dark:border-white/[0.1] text-brand-text dark:text-white text-sm font-semibold hover:bg-white dark:hover:bg-white/[0.1] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2.5 mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-[0.97] backdrop-blur-sm font-display"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +115,9 @@ export default function SignupPage() {
             <span className="text-xs text-brand-text/30 dark:text-white/25 font-display">{tAuth('or')}</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-brand-primary/15 to-transparent" />
           </div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* method="post" so a pre-hydration native submit can't put the email
+              and password in the URL (and thus in logs and history). */}
+          <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && (
               <div role="alert" className="px-4 py-3 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-sm text-brand-danger">
                 {error}
@@ -150,7 +156,7 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !hydrated}
               className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display"
             >
               {loading ? tAuth('creatingAccount') : tAuth('createAccount')}
