@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { useHydrated } from '@/hooks/useHydrated';
+import { useUrlParam } from '@/hooks/useUrlParam';
 import { authErrorKey } from '@/lib/authErrors';
 
 type Mode = 'login' | 'forgot' | 'forgot-sent';
@@ -21,15 +22,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>('login');
   const router = useRouter();
-  const searchParams = useSearchParams();
   const tAuth = useTranslations('auth');
   const supabase = createClient();
   // Sign-in runs in JS. Until hydration completes, a tap would trigger a native
   // form submit that just reloads the page and looks like a failed login.
   const hydrated = useHydrated();
 
-  // Read straight from the URL rather than syncing it into state via an effect.
-  const isTimeout = searchParams.get('reason') === 'timeout';
+  // Read from the URL without next/navigation's useSearchParams, which would
+  // force this page to client-only rendering (see useUrlParam).
+  const isTimeout = useUrlParam('reason') === 'timeout';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,8 +218,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !hydrated}
-              className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display"
+              aria-busy={!hydrated}
+              className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display flex items-center justify-center gap-2"
             >
+              {/* Until hydration the button can't do anything, so say so rather
+                  than looking like a dead control. */}
+              {!hydrated && (
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-hidden="true" />
+              )}
               {loading
                 ? mode === 'login' ? tAuth('signingIn') : tAuth('sending')
                 : mode === 'login' ? tAuth('signIn') : tAuth('sendResetLink')}
