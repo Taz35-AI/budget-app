@@ -9,13 +9,15 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useCurrency } from '@/hooks/useCurrency';
+import { useSettingsStore } from '@/store/settingsStore';
+import { getDateLocale } from '@/lib/dateLocale';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+function formatDate(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -27,6 +29,8 @@ export function ProfileShell() {
   const supabase = createClient();
   const { data: txData } = useTransactions();
   const { formatAmount } = useCurrency();
+  const language = useSettingsStore((s) => s.language);
+  const dateLocale = getDateLocale(language);
 
   const [user, setUser] = useState<User | null>(null);
 
@@ -65,7 +69,7 @@ export function ProfileShell() {
   const initials = displayName.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
   const isGoogle = user.app_metadata?.provider === 'google' ||
     (user.identities ?? []).some((id) => id.provider === 'google');
-  const memberSince = user.created_at ? formatDate(user.created_at) : '—';
+  const memberSince = user.created_at ? formatDate(user.created_at, dateLocale) : '—';
 
   const transactions = txData?.transactions ?? [];
 

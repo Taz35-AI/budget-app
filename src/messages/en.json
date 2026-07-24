@@ -23,7 +23,9 @@
     "mustBePositive": "Must be > 0",
     "mustBeWholeNumber": "Must be a whole number ≥ 1",
     "balanceAdjustment": "Balance Adjustment",
-    "transactionsCount": "{count, plural, one {# transaction} other {# transactions}}"
+    "transactionsCount": "{count, plural, one {# transaction} other {# transactions}}",
+    "clearSearch": "Clear search",
+    "biometricLock": "Biometric lock"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -38,8 +40,34 @@
     "import": "Import"
   },
   "months": {
-    "short": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    "long": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    "short": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "long": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
   },
   "dashboard": {
     "title": "Dashboard",
@@ -227,7 +255,9 @@
     "subsEnds": "Ends {date}",
     "subsOngoing": "Ongoing",
     "subsCount": "{count} subscriptions",
-    "subsAnnualCost": "Annual cost"
+    "subsAnnualCost": "Annual cost",
+    "goalDaysLeftShort": "{days}d left",
+    "goalOverdue": "Overdue"
   },
   "settings": {
     "title": "Settings",
@@ -309,7 +339,9 @@
     "budgetWarningsLabel": "Budget limit warnings",
     "budgetWarningsDesc": "Alert when you hit 85% of your monthly spending limit",
     "reminderTime": "Reminder time",
-    "reminderTimeDesc": "What time to send the daily reminder"
+    "reminderTimeDesc": "What time to send the daily reminder",
+    "goalDaysLeft": "{days} days left",
+    "goalDeadlinePassed": "Deadline passed"
   },
   "accounts": {
     "title": "Accounts",
@@ -389,7 +421,14 @@
     "monthlyRecap": "Monthly Recap",
     "weeklyDigest": "Weekly Digest",
     "budgetWarning": "Budget Warning",
-    "budgetAt": "{month} budget is at {percentage}%"
+    "budgetAt": "{month} budget is at {percentage}%",
+    "dailyReminderBody": "Don't forget to log today's spending",
+    "billDueTomorrow": "Bill due tomorrow",
+    "billDueToday": "Bill due today",
+    "billDueTomorrowBody": "Your {name} payment is due tomorrow",
+    "billDueTodayBody": "Your {name} payment is due today",
+    "monthlyRecapBody": "Your {month} spending summary is ready to review",
+    "weeklyDigestBody": "Your week in Spentum — tap to see spending and upcoming bills"
   },
   "frequency": {
     "daily": "Daily",
@@ -639,6 +678,58 @@
     "noMembers": "No other members yet"
   },
   "auth": {
-    "sessionTimeout": "Your session expired due to inactivity. Please sign in again."
+    "sessionTimeout": "Your session expired due to inactivity. Please sign in again.",
+    "signInTitle": "Sign in to your account",
+    "resetTitle": "Reset your password",
+    "createTitle": "Create your account",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "emailPlaceholder": "you@example.com",
+    "passwordMinPlaceholder": "Min. 6 characters",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "sendResetLink": "Send reset link",
+    "sending": "Sending…",
+    "backToSignIn": "Back to sign in",
+    "checkEmail": "Check your email",
+    "resetLinkSent": "We sent a reset link to <strong>{email}</strong>. Follow it to set a new password.",
+    "confirmLinkSent": "We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "alreadyHaveAccount": "Already have an account?",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account…",
+    "agreePrefix": "By creating an account you agree to our",
+    "and": "and",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "privacyPolicy": "Privacy Policy",
+    "chooseNewPassword": "Choose a new password",
+    "allDone": "All done",
+    "resetPassword": "Reset password",
+    "verifyingLink": "Verifying link…",
+    "linkExpired": "Link expired or invalid",
+    "linkExpiredDesc": "Request a new password reset link and try again.",
+    "setNewPassword": "Set new password",
+    "saving": "Saving…",
+    "passwordUpdated": "Password updated",
+    "takingYouToDashboard": "Taking you to your dashboard…",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "minSixCharacters": "Minimum 6 characters",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "errInvalidCredentials": "Incorrect email or password.",
+    "errEmailNotConfirmed": "Please confirm your email address first — check your inbox.",
+    "errRateLimit": "Too many attempts. Please wait a moment and try again.",
+    "errUserExists": "An account with this email already exists.",
+    "errWeakPassword": "That password is too weak. Use at least 6 characters.",
+    "errInvalidEmail": "Enter a valid email address.",
+    "errNetwork": "Can't reach the server. Check your connection and try again.",
+    "errGeneric": "Something went wrong. Please try again."
   }
 }

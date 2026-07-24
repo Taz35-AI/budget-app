@@ -5,6 +5,7 @@ import { format, startOfMonth, endOfMonth, getDaysInMonth, addDays, subMonths } 
 import { useTranslations } from 'next-intl';
 import { TAGS, FREQUENCIES } from '@/lib/constants';
 import { useSettings } from '@/hooks/useSettings';
+import { useNow } from '@/hooks/useNow';
 import { getDateLocale } from '@/lib/dateLocale';
 import { cn } from '@/lib/utils';
 import type { DayTransaction } from '@/types';
@@ -68,7 +69,9 @@ export function MonthSummary({ month, dayTransactions, formatAmount }: Props) {
   const tTags = useTranslations('tags');
   const { allTags, goals, language } = useSettings();
   const dateLocale = getDateLocale(language);
-const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  const nowMs = useNow();
 
   const toggle = (key: string) =>
     setExpandedSections((s) => ({ ...s, [key]: !s[key] }));
@@ -539,7 +542,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                 const pct = goal.targetAmount > 0 ? Math.min(savedAmount / goal.targetAmount, 1) : 0;
                 const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
                 const daysLeft = goal.deadline
-                  ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
+                  ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - nowMs) / 86_400_000))
                   : null;
 
                 // Savings rate countdown (only for linked-tag goals without a deadline)
@@ -550,7 +553,7 @@ const [expandedSections, setExpandedSections] = useState<Record<string, boolean>
                     .filter(([, txs]) => txs.some((tx) => tx.category === 'expense' && tx.tag === goal.linkedTagId))
                     .map(([date]) => new Date(date).getTime())
                     .sort((a, b) => a - b);
-                  const daysSinceFirst = Math.max(1, (Date.now() - (matchingDates[0] ?? Date.now())) / 86_400_000);
+                  const daysSinceFirst = Math.max(1, (nowMs - (matchingDates[0] ?? nowMs)) / 86_400_000);
                   const dailyRate = savedAmount / daysSinceFirst;
                   if (dailyRate > 0) {
                     const daysToGoal = Math.ceil((goal.targetAmount - savedAmount) / dailyRate);

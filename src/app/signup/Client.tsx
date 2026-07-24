@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PasswordInput } from '@/components/ui/PasswordInput';
+import { authErrorKey } from '@/lib/authErrors';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -11,6 +14,7 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const tAuth = useTranslations('auth');
   const supabase = createClient();
 
   const handleGoogle = async () => {
@@ -24,7 +28,7 @@ export default function SignupPage() {
       options: { redirectTo, queryParams: { prompt: 'select_account' } },
     });
     if (error) {
-      setError(error.message);
+      setError(tAuth(authErrorKey(error)));
       setLoading(false);
     }
   };
@@ -42,7 +46,7 @@ export default function SignupPage() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(tAuth(authErrorKey(error)));
     } else {
       setSent(true);
     }
@@ -58,12 +62,15 @@ export default function SignupPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2 font-display">Check your email</h2>
+          <h2 className="text-xl font-bold text-white mb-2 font-display">{tAuth('checkEmail')}</h2>
           <p className="text-sm text-teal-300/50 mb-6">
-            We sent a confirmation link to <span className="text-white font-medium">{email}</span>. Click it to activate your account.
+            {tAuth.rich('confirmLinkSent', {
+              email,
+              strong: (chunks) => <span className="text-white font-medium">{chunks}</span>,
+            })}
           </p>
           <Link href="/login" className="text-sm text-teal-300/40 hover:text-teal-300 underline active:opacity-70 transition-all duration-200">
-            Back to sign in
+            {tAuth('backToSignIn')}
           </Link>
         </div>
       </div>
@@ -80,7 +87,7 @@ export default function SignupPage() {
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
-          <p className="text-sm text-teal-300/50 font-display">Create your account</p>
+          <p className="text-sm text-teal-300/50 font-display">{tAuth('createTitle')}</p>
         </div>
 
         {/* Card */}
@@ -97,41 +104,46 @@ export default function SignupPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Continue with Google
+            {tAuth('continueWithGoogle')}
           </button>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-brand-primary/15 to-transparent" />
-            <span className="text-xs text-brand-text/30 dark:text-white/25 font-display">or</span>
+            <span className="text-xs text-brand-text/30 dark:text-white/25 font-display">{tAuth('or')}</span>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-brand-primary/15 to-transparent" />
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && (
-              <div className="px-4 py-3 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-sm text-brand-danger">
+              <div role="alert" className="px-4 py-3 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-sm text-brand-danger">
                 {error}
               </div>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">Email</label>
+              <label htmlFor="signup-email" className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">{tAuth('email')}</label>
               <input
+                id="signup-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="you@example.com"
+                placeholder={tAuth('emailPlaceholder')}
                 className="h-12 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.04] px-4 text-sm font-medium text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/30 transition-all duration-200 backdrop-blur-sm"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">Password</label>
-              <input
-                type="password"
+              <label htmlFor="signup-password" className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">{tAuth('password')}</label>
+              <PasswordInput
+                id="signup-password"
+                name="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                placeholder="Min. 6 characters"
+                placeholder={tAuth('passwordMinPlaceholder')}
                 className="h-12 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.04] px-4 text-sm font-medium text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/30 transition-all duration-200 backdrop-blur-sm"
               />
             </div>
@@ -141,23 +153,23 @@ export default function SignupPage() {
               disabled={loading}
               className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? tAuth('creatingAccount') : tAuth('createAccount')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-teal-300/40 mt-5 font-display">
-          Already have an account?{' '}
+          {tAuth('alreadyHaveAccount')}{' '}
           <Link href="/login" className="text-teal-300 hover:text-teal-200 underline transition-colors">
-            Sign in
+            {tAuth('signIn')}
           </Link>
         </p>
 
         <p className="text-center text-xs text-teal-400/30 mt-3">
-          By creating an account you agree to our{' '}
-          <Link href="/terms" className="hover:text-teal-300 transition-colors underline">Terms</Link>
-          {' and '}
-          <Link href="/privacy" className="hover:text-teal-300 transition-colors underline">Privacy Policy</Link>
+          {tAuth('agreePrefix')}{' '}
+          <Link href="/terms" className="hover:text-teal-300 transition-colors underline">{tAuth('terms')}</Link>
+          {` ${tAuth('and')} `}
+          <Link href="/privacy" className="hover:text-teal-300 transition-colors underline">{tAuth('privacyPolicy')}</Link>
         </p>
       </div>
     </div>

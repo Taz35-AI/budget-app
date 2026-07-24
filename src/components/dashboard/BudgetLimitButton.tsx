@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { DashboardModal } from './DashboardModal';
@@ -20,12 +20,13 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (open) {
-      setValue(limit ? limit.toFixed(2) : '');
-      setTimeout(() => inputRef.current?.select(), 50);
-    }
-  }, [open, limit]);
+  // Seed the field when the dialog opens. Done here rather than in an effect
+  // so opening is a single state update instead of render → effect → re-render.
+  const handleOpen = () => {
+    setValue(limit ? limit.toFixed(2) : '');
+    setOpen(true);
+    setTimeout(() => inputRef.current?.select(), 50);
+  };
 
   const handleSet = () => {
     const parsed = parseFloat(value);
@@ -39,7 +40,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         className={cn(
           'flex items-center gap-1.5 h-9 px-3 rounded-2xl text-sm font-medium transition-all duration-100 active:scale-[0.95] border',
           limit
@@ -71,7 +72,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
           <span className="text-slate-400 dark:text-white/40 text-sm flex-shrink-0">{symbol}</span>
           <input
             ref={inputRef}
-            type="number"
+            type="number" inputMode="decimal"
             step="0.01"
             min="0"
             value={value}

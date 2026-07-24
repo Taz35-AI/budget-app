@@ -23,7 +23,9 @@
     "mustBePositive": "Doit être > 0",
     "mustBeWholeNumber": "Doit être un entier ≥ 1",
     "balanceAdjustment": "Ajustement du solde",
-    "transactionsCount": "{count, plural, one {# transaction} other {# transactions}}"
+    "transactionsCount": "{count, plural, one {# transaction} other {# transactions}}",
+    "clearSearch": "Effacer la recherche",
+    "biometricLock": "Verrouillage biométrique"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -38,8 +40,34 @@
     "import": "Importer"
   },
   "months": {
-    "short": ["Jan", "Fév", "Mar", "Avr", "Mai", "Jui", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
-    "long": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+    "short": [
+      "Jan",
+      "Fév",
+      "Mar",
+      "Avr",
+      "Mai",
+      "Jui",
+      "Jul",
+      "Aoû",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Déc"
+    ],
+    "long": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ]
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -227,7 +255,9 @@
     "subsEnds": "Fin le {date}",
     "subsOngoing": "En cours",
     "subsCount": "{count} abonnements",
-    "subsAnnualCost": "Coût annuel"
+    "subsAnnualCost": "Coût annuel",
+    "goalDaysLeftShort": "{days}j restants",
+    "goalOverdue": "En retard"
   },
   "settings": {
     "title": "Paramètres",
@@ -309,7 +339,9 @@
     "budgetWarningsLabel": "Avertissements de limite budgétaire",
     "budgetWarningsDesc": "Alerte lorsque vous atteignez 85% de votre limite de dépenses mensuelle",
     "reminderTime": "Heure du rappel",
-    "reminderTimeDesc": "À quelle heure envoyer le rappel quotidien"
+    "reminderTimeDesc": "À quelle heure envoyer le rappel quotidien",
+    "goalDaysLeft": "{days} jours restants",
+    "goalDeadlinePassed": "Échéance dépassée"
   },
   "accounts": {
     "title": "Comptes",
@@ -389,7 +421,14 @@
     "monthlyRecap": "Récapitulatif mensuel",
     "weeklyDigest": "Résumé hebdomadaire",
     "budgetWarning": "Avertissement budgétaire",
-    "budgetAt": "Le budget {month} est à {percentage}%"
+    "budgetAt": "Le budget {month} est à {percentage}%",
+    "dailyReminderBody": "N'oubliez pas d'enregistrer vos dépenses du jour",
+    "billDueTomorrow": "Facture à payer demain",
+    "billDueToday": "Facture à payer aujourd'hui",
+    "billDueTomorrowBody": "Votre paiement {name} est dû demain",
+    "billDueTodayBody": "Votre paiement {name} est dû aujourd'hui",
+    "monthlyRecapBody": "Votre résumé des dépenses de {month} est prêt",
+    "weeklyDigestBody": "Votre semaine sur Spentum — appuyez pour voir les dépenses et factures à venir"
   },
   "frequency": {
     "daily": "Quotidien",
@@ -639,6 +678,58 @@
     "noMembers": "Pas encore d'autres membres"
   },
   "auth": {
-    "sessionTimeout": "Votre session a expiré en raison d'inactivité. Veuillez vous reconnecter."
+    "sessionTimeout": "Votre session a expiré en raison d'inactivité. Veuillez vous reconnecter.",
+    "signInTitle": "Connectez-vous à votre compte",
+    "resetTitle": "Réinitialisez votre mot de passe",
+    "createTitle": "Créez votre compte",
+    "continueWithGoogle": "Continuer avec Google",
+    "or": "ou",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "emailPlaceholder": "vous@exemple.com",
+    "passwordMinPlaceholder": "Min. 6 caractères",
+    "forgotPassword": "Mot de passe oublié ?",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion…",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "sending": "Envoi…",
+    "backToSignIn": "Retour à la connexion",
+    "checkEmail": "Vérifiez vos e-mails",
+    "resetLinkSent": "Nous avons envoyé un lien de réinitialisation à <strong>{email}</strong>. Suivez-le pour définir un nouveau mot de passe.",
+    "confirmLinkSent": "Nous avons envoyé un lien de confirmation à <strong>{email}</strong>. Cliquez dessus pour activer votre compte.",
+    "noAccount": "Pas de compte ?",
+    "createOne": "Créez-en un",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "createAccount": "Créer un compte",
+    "creatingAccount": "Création du compte…",
+    "agreePrefix": "En créant un compte, vous acceptez nos",
+    "and": "et",
+    "terms": "Conditions",
+    "privacy": "Confidentialité",
+    "privacyPolicy": "Politique de confidentialité",
+    "chooseNewPassword": "Choisissez un nouveau mot de passe",
+    "allDone": "Terminé",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "verifyingLink": "Vérification du lien…",
+    "linkExpired": "Lien expiré ou invalide",
+    "linkExpiredDesc": "Demandez un nouveau lien de réinitialisation et réessayez.",
+    "setNewPassword": "Définir le nouveau mot de passe",
+    "saving": "Enregistrement…",
+    "passwordUpdated": "Mot de passe mis à jour",
+    "takingYouToDashboard": "Redirection vers votre tableau de bord…",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "minSixCharacters": "Minimum 6 caractères",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "errInvalidCredentials": "E-mail ou mot de passe incorrect.",
+    "errEmailNotConfirmed": "Confirmez d'abord votre adresse e-mail — vérifiez votre boîte de réception.",
+    "errRateLimit": "Trop de tentatives. Patientez un instant et réessayez.",
+    "errUserExists": "Un compte existe déjà avec cette adresse e-mail.",
+    "errWeakPassword": "Ce mot de passe est trop faible. Utilisez au moins 6 caractères.",
+    "errInvalidEmail": "Saisissez une adresse e-mail valide.",
+    "errNetwork": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+    "errGeneric": "Une erreur s'est produite. Veuillez réessayer."
   }
 }

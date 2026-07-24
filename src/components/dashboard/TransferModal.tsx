@@ -114,6 +114,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
           </div>
           <button
             onClick={onClose}
+            aria-label={tc('close')}
             className="p-1.5 rounded-2xl hover:bg-[#D9DDF0]/30 dark:hover:bg-white/[0.08] text-[#042F2E]/40 dark:text-white/30 hover:text-[#042F2E] dark:hover:text-white active:scale-[0.90] transition-all duration-100"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -229,7 +230,7 @@ export function TransferModal({ accounts, defaultDate, symbol, onClose, defaultT
                 {symbol}
               </span>
               <input
-                type="number"
+                type="number" inputMode="decimal"
                 min="0.01"
                 step="0.01"
                 value={amount}

@@ -113,7 +113,7 @@ export default function BlogPostPage() {
           <div style={bodyStyle}>
 
             <p>
-              If you grew up hearing "money is tight" at the dinner table, a budget sounds like a punishment before you even open it. You picture a spreadsheet telling you no. No to coffee, no to a weekend away, no to the trainers you actually wanted. The budget becomes the villain. The debt becomes the villain. And quietly, you become the villain too, for being bad with money.
+              If you grew up hearing &ldquo;money is tight&rdquo; at the dinner table, a budget sounds like a punishment before you even open it. You picture a spreadsheet telling you no. No to coffee, no to a weekend away, no to the trainers you actually wanted. The budget becomes the villain. The debt becomes the villain. And quietly, you become the villain too, for being bad with money.
             </p>
 
             <p>

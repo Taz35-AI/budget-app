@@ -132,7 +132,7 @@ export default function BlogPostPage() {
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "You cannot manage what you cannot see. Before you plan anything, spend a month just watching."
+                &ldquo;You cannot manage what you cannot see. Before you plan anything, spend a month just watching.&rdquo;
               </p>
             </div>
 
@@ -196,7 +196,7 @@ export default function BlogPostPage() {
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "Starting with 50 a month beats waiting to start with 500. The clock is the most expensive thing you can waste."
+                &ldquo;Starting with 50 a month beats waiting to start with 500. The clock is the most expensive thing you can waste.&rdquo;
               </p>
             </div>
 

@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
+import { PasswordInput } from '@/components/ui/PasswordInput';
+import { authErrorKey } from '@/lib/authErrors';
 
 type Mode = 'login' | 'forgot' | 'forgot-sent';
 
@@ -17,15 +19,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>('login');
-  const [isTimeout, setIsTimeout] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const tAuth = useTranslations('auth');
   const supabase = createClient();
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setIsTimeout(params.get('reason') === 'timeout');
-  }, []);
+  // Read straight from the URL rather than syncing it into state via an effect.
+  const isTimeout = searchParams.get('reason') === 'timeout';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(tAuth(authErrorKey(error)));
     } else {
       router.push('/dashboard');
       router.refresh();
@@ -54,7 +54,7 @@ export default function LoginPage() {
           queryParams: { prompt: 'select_account' },
         },
       });
-      if (error) { setError(error.message); setLoading(false); return; }
+      if (error) { setError(tAuth(authErrorKey(error))); setLoading(false); return; }
       if (data.url) await Browser.open({ url: data.url });
       setLoading(false);
     } else {
@@ -65,7 +65,7 @@ export default function LoginPage() {
           queryParams: { prompt: 'select_account' },
         },
       });
-      if (error) { setError(error.message); setLoading(false); }
+      if (error) { setError(tAuth(authErrorKey(error))); setLoading(false); }
     }
   };
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(tAuth(authErrorKey(error)));
     } else {
       setMode('forgot-sent');
     }
@@ -92,15 +92,18 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2 font-display">Check your email</h2>
+          <h2 className="text-xl font-bold text-white mb-2 font-display">{tAuth('checkEmail')}</h2>
           <p className="text-sm text-teal-300/50 mb-6">
-            We sent a reset link to <span className="text-white font-medium">{email}</span>. Follow it to set a new password.
+            {tAuth.rich('resetLinkSent', {
+              email,
+              strong: (chunks) => <span className="text-white font-medium">{chunks}</span>,
+            })}
           </p>
           <button
             onClick={() => { setMode('login'); setError(''); }}
             className="text-sm text-teal-300/40 hover:text-teal-300 underline active:opacity-70 transition-all duration-200"
           >
-            Back to sign in
+            {tAuth('backToSignIn')}
           </button>
         </div>
       </div>
@@ -118,7 +121,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center gap-4 mb-8">
           <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-teal-300/50 font-display">
-            {mode === 'login' ? 'Sign in to your account' : 'Reset your password'}
+            {mode === 'login' ? tAuth('signInTitle') : tAuth('resetTitle')}
           </p>
         </div>
 
@@ -138,11 +141,11 @@ export default function LoginPage() {
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                Continue with Google
+                {tAuth('continueWithGoogle')}
               </button>
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-brand-primary/15 to-transparent" />
-                <span className="text-xs text-brand-text/30 dark:text-white/25 font-display">or</span>
+                <span className="text-xs text-brand-text/30 dark:text-white/25 font-display">{tAuth('or')}</span>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-brand-primary/15 to-transparent" />
               </div>
             </>
@@ -154,19 +157,22 @@ export default function LoginPage() {
               </div>
             )}
             {error && (
-              <div className="px-4 py-3 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-sm text-brand-danger">
+              <div role="alert" className="px-4 py-3 rounded-2xl bg-brand-danger/10 border border-brand-danger/20 text-sm text-brand-danger">
                 {error}
               </div>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">Email</label>
+              <label htmlFor="login-email" className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">{tAuth('email')}</label>
               <input
+                id="login-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="you@example.com"
+                placeholder={tAuth('emailPlaceholder')}
                 className="h-12 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-white/60 dark:bg-white/[0.04] px-4 text-sm font-medium text-brand-text dark:text-white placeholder:text-brand-text/30 dark:placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary/30 transition-all duration-200 backdrop-blur-sm"
               />
             </div>
@@ -174,17 +180,19 @@ export default function LoginPage() {
             {mode === 'login' && (
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">Password</label>
+                  <label htmlFor="login-password" className="text-xs font-semibold uppercase tracking-wider text-brand-text/50 dark:text-white/40 font-display">{tAuth('password')}</label>
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError(''); }}
                     className="text-xs text-brand-text/35 dark:text-white/30 hover:text-brand-primary transition-all duration-200"
                   >
-                    Forgot password?
+                    {tAuth('forgotPassword')}
                   </button>
                 </div>
-                <input
-                  type="password"
+                <PasswordInput
+                  id="login-password"
+                  name="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -200,8 +208,8 @@ export default function LoginPage() {
               className="h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white text-sm font-semibold hover:shadow-[0_4px_20px_rgba(13,148,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 mt-1 shadow-[0_2px_12px_rgba(13,148,136,0.3)] active:scale-[0.97] font-display"
             >
               {loading
-                ? mode === 'login' ? 'Signing in...' : 'Sending...'
-                : mode === 'login' ? 'Sign in' : 'Send reset link'}
+                ? mode === 'login' ? tAuth('signingIn') : tAuth('sending')
+                : mode === 'login' ? tAuth('signIn') : tAuth('sendResetLink')}
             </button>
 
             {mode === 'forgot' && (
@@ -210,7 +218,7 @@ export default function LoginPage() {
                 onClick={() => { setMode('login'); setError(''); }}
                 className="text-sm text-brand-text/40 dark:text-white/30 hover:text-brand-primary transition-all duration-200 text-center"
               >
-                Back to sign in
+                {tAuth('backToSignIn')}
               </button>
             )}
           </form>
@@ -218,17 +226,17 @@ export default function LoginPage() {
 
         {mode === 'login' && (
           <p className="text-center text-sm text-teal-300/40 mt-5 font-display">
-            No account?{' '}
+            {tAuth('noAccount')}{' '}
             <Link href="/signup" className="text-teal-300 hover:text-teal-200 underline transition-colors">
-              Create one
+              {tAuth('createOne')}
             </Link>
           </p>
         )}
 
         <p className="text-center text-xs text-teal-400/30 mt-6">
-          <Link href="/terms" className="hover:text-teal-300 underline transition-colors">Terms</Link>
+          <Link href="/terms" className="hover:text-teal-300 underline transition-colors">{tAuth('terms')}</Link>
           {' · '}
-          <Link href="/privacy" className="hover:text-teal-300 underline transition-colors">Privacy</Link>
+          <Link href="/privacy" className="hover:text-teal-300 underline transition-colors">{tAuth('privacy')}</Link>
         </p>
       </div>
     </div>

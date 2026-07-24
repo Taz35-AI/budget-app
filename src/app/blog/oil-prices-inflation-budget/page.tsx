@@ -118,13 +118,13 @@ export default function BlogPostPage() {
               What is the Strait of Hormuz and why does it matter so much
             </h2>
             <p>The Strait of Hormuz is a channel of water roughly 33 kilometres wide at its narrowest point, sitting between the Omani coast and the southern coast of Iran. On a map it looks almost insignificant. In practice it is one of the most consequential pieces of geography on earth.</p>
-            <p style={{ marginTop: 16 }}>Around 20 percent of the world's oil supply passes through it every single day. That includes the vast majority of what comes out of Saudi Arabia, the UAE, Kuwait, Iraq and Qatar. These countries have no other viable way to get their oil to international markets. The strait is their only exit.</p>
+            <p style={{ marginTop: 16 }}>Around 20 percent of the world&rsquo;s oil supply passes through it every single day. That includes the vast majority of what comes out of Saudi Arabia, the UAE, Kuwait, Iraq and Qatar. These countries have no other viable way to get their oil to international markets. The strait is their only exit.</p>
             <p style={{ marginTop: 16 }}>Iran sits on one side of that channel and has, over decades of tension with the West and its regional neighbours, repeatedly made clear that it considers the strait a pressure point it can exploit. In periods of heightened conflict or threatened sanctions, Iranian officials have openly discussed the possibility of closing or disrupting access to the waterway. They have mined it before, attacked tankers before, and seized vessels before. None of this is hypothetical.</p>
             <p style={{ marginTop: 16 }}>When tensions rise, as they have been doing again through late 2025 and into 2026, oil markets respond immediately. Not because the strait has actually been closed, but because traders are pricing in the risk that it might be disrupted. The oil market is fundamentally a futures market. People are not just buying oil that exists today, they are making bets about what will be available in three, six, twelve months. Fear of a supply shock gets baked into the price long before anything actually happens.</p>
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "About one fifth of all the oil traded globally every day passes through a channel barely wider than a medium-sized city. That single fact explains most of why energy markets are so sensitive to Middle Eastern politics."
+                &ldquo;About one fifth of all the oil traded globally every day passes through a channel barely wider than a medium-sized city. That single fact explains most of why energy markets are so sensitive to Middle Eastern politics.&rdquo;
               </p>
             </div>
 
@@ -147,7 +147,7 @@ export default function BlogPostPage() {
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "Oil is not just what you put in a car. It is embedded in the fertiliser that grew your food, the lorry that delivered it, the plastic that wrapped it and the electricity that kept it cold. A rise in oil is a tax on almost everything."
+                &ldquo;Oil is not just what you put in a car. It is embedded in the fertiliser that grew your food, the lorry that delivered it, the plastic that wrapped it and the electricity that kept it cold. A rise in oil is a tax on almost everything.&rdquo;
               </p>
             </div>
 
@@ -195,7 +195,7 @@ export default function BlogPostPage() {
 
             <div style={{ background: 'rgba(13, 148, 136, 0.06)', border: '1px solid rgba(13, 148, 136, 0.2)', borderRadius: 12, padding: '20px 24px', margin: '32px 0' }}>
               <p style={{ margin: 0, color: '#475569', fontStyle: 'italic' }}>
-                "The headline inflation figure is an average. Your inflation figure is personal. It depends entirely on what you buy, where you live and how you travel. Most people who feel like inflation is hitting them harder than the numbers suggest are probably right."
+                &ldquo;The headline inflation figure is an average. Your inflation figure is personal. It depends entirely on what you buy, where you live and how you travel. Most people who feel like inflation is hitting them harder than the numbers suggest are probably right.&rdquo;
               </p>
             </div>
 

@@ -1,15 +1,14 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Capacitor } from '@capacitor/core';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
 
-// Web has Supabase Realtime websockets that deliver INSERT/DELETE events
-// reliably, so a 5s safety-net poll is fine. Capacitor's Android/iOS WebView
-// often loses the websocket and we fall back entirely on polling — but 5s on
-// mobile burns battery + cellular data, so we relax to 30s. Realtime events
-// (when they do arrive) still trigger immediate invalidation.
-const POLL_INTERVAL_MS = Capacitor.isNativePlatform() ? 30_000 : 5_000;
+// Polling is only a safety net: Supabase Realtime delivers changes on web, and
+// household-sync broadcasts cover native. 30s keeps that net in place without
+// refetching every transaction every few seconds in every open tab (on mobile
+// that also burns battery and cellular data). Realtime events, window focus,
+// and reconnects all still trigger an immediate refetch.
+const POLL_INTERVAL_MS = 30_000;
 
 export type EditMode = 'all' | 'all_future' | 'this_only';
 export type DeleteMode = 'all' | 'all_future' | 'this_only';
@@ -33,6 +32,8 @@ export function useTransactions() {
     queryFn: fetchTransactions,
     staleTime: 0,
     refetchInterval: POLL_INTERVAL_MS,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 }
 

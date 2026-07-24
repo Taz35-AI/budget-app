@@ -121,6 +121,43 @@ function dateStr(offsetDays = 0, baseDate = new Date()): string {
   return d.toISOString().split('T')[0];
 }
 
+// ─── Localised notification copy ─────────────────────────────────────────────
+
+/**
+ * Loads the `notifications` strings for the user's chosen app language.
+ * Dynamic imports keep the other five language bundles out of the initial
+ * chunk and avoid a static import cycle (settingsStore imports this module
+ * for DEFAULT_NOTIFICATION_SETTINGS).
+ */
+async function notifStrings(): Promise<{
+  t: (key: string, vars?: Record<string, string | number>) => string;
+  locale: string;
+}> {
+  let language = 'en';
+  let locale = 'en-GB';
+  try {
+    const { useSettingsStore } = await import('@/store/settingsStore');
+    const { getDateLocale } = await import('@/lib/dateLocale');
+    language = useSettingsStore.getState().language ?? 'en';
+    locale = getDateLocale(language as never);
+  } catch { /* store unavailable (tests/SSR) — fall back to English */ }
+
+  let dict: Record<string, string> = {};
+  try {
+    const messages = (await import(`../messages/${language}.json`)).default as {
+      notifications?: Record<string, string>;
+    };
+    dict = messages.notifications ?? {};
+  } catch { /* missing file — keys fall through as-is */ }
+
+  const t = (key: string, vars: Record<string, string | number> = {}) => {
+    let s = dict[key] ?? key;
+    for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, String(v));
+    return s;
+  };
+  return { t, locale };
+}
+
 // ─── Bill reminder construction (pure, testable) ─────────────────────────────
 
 export interface BillReminder {
@@ -206,11 +243,12 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
   await cancelIds([ID_DAILY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
+    const { t } = await notifStrings();
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_DAILY,
         title:     'Spentum',
-        body:      "Don't forget to log today's spending",
+        body:      t('dailyReminderBody'),
         smallIcon: 'ic_notification',
         schedule: {
           on: { hour, minute },
@@ -231,13 +269,14 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
 
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
+    const { t } = await notifStrings();
     await LocalNotifications.schedule({
       notifications: reminders.map((r, i) => ({
         id:        ID_BILL_BASE + i,
-        title:     r.isEveBefore ? 'Bill due tomorrow' : 'Bill due today',
+        title:     r.isEveBefore ? t('billDueTomorrow') : t('billDueToday'),
         body:      r.isEveBefore
-          ? `Your ${r.tx.name} payment is due tomorrow`
-          : `Your ${r.tx.name} payment is due today`,
+          ? t('billDueTomorrowBody', { name: r.tx.name })
+          : t('billDueTodayBody', { name: r.tx.name }),
         smallIcon: 'ic_notification',
         schedule: {
           at: r.fireAt,
@@ -260,7 +299,10 @@ export async function scheduleBillReminders(transactions: Transaction[]) {
  *
  * The recap month is always the month immediately before the firing date.
  */
-export function monthlyRecapTime(now: Date = new Date()): { fireAt: Date; recapMonthName: string } {
+export function monthlyRecapTime(
+  now: Date = new Date(),
+  locale: string = 'en-GB',
+): { fireAt: Date; recapMonthName: string } {
   const thisMonthFirst = new Date(now.getFullYear(), now.getMonth(), 1, 9, 0, 0);
   const fireAt = thisMonthFirst > now
     ? thisMonthFirst
@@ -269,7 +311,7 @@ export function monthlyRecapTime(now: Date = new Date()): { fireAt: Date; recapM
   // Last day of the month before fireAt → tells us which month is being summarized
   const recapMonthDate = new Date(fireAt);
   recapMonthDate.setDate(0);
-  const recapMonthName = recapMonthDate.toLocaleString('default', { month: 'long' });
+  const recapMonthName = recapMonthDate.toLocaleString(locale, { month: 'long' });
 
   return { fireAt, recapMonthName };
 }
@@ -279,12 +321,13 @@ export async function scheduleMonthlyRecap() {
   await cancelIds([ID_MONTHLY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
-    const { fireAt, recapMonthName } = monthlyRecapTime();
+    const { t, locale } = await notifStrings();
+    const { fireAt, recapMonthName } = monthlyRecapTime(new Date(), locale);
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_MONTHLY,
-        title:     'Monthly recap ready',
-        body:      `Your ${recapMonthName} spending summary is ready to review`,
+        title:     t('monthlyRecap'),
+        body:      t('monthlyRecapBody', { month: recapMonthName }),
         smallIcon: 'ic_notification',
         schedule: {
           at: fireAt,
@@ -301,11 +344,12 @@ export async function scheduleWeeklyDigest() {
   await cancelIds([ID_WEEKLY]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
+    const { t } = await notifStrings();
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_WEEKLY,
-        title:     'Weekly digest',
-        body:      'Your week in Spentum — tap to see spending and upcoming bills',
+        title:     t('weeklyDigest'),
+        body:      t('weeklyDigestBody'),
         smallIcon: 'ic_notification',
         schedule: {
           on: { weekday: 2, hour: 9, minute: 0 }, // Monday = 2
@@ -323,12 +367,13 @@ export async function scheduleBudgetWarning(monthName: string, pct: number) {
   await cancelIds([ID_BUDGET]);
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
+    const { t } = await notifStrings();
     const fireAt = new Date(Date.now() + 2 * 60_000); // 2 min from now
     await LocalNotifications.schedule({
       notifications: [{
         id:        ID_BUDGET,
-        title:     'Budget limit alert',
-        body:      `You've used ${Math.round(pct)}% of your ${monthName} budget`,
+        title:     t('budgetWarning'),
+        body:      t('budgetAt', { month: monthName, percentage: Math.round(pct) }),
         smallIcon: 'ic_notification',
         schedule: {
           at: fireAt,

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
+import { getDateLocale } from '@/lib/dateLocale';
 import {
   checkNotificationPermission,
   requestNotificationPermission,
@@ -24,9 +25,10 @@ interface Options {
 
 export function useLocalNotifications({ transactions, monthExpense, budgetLimit }: Options) {
   const notif = useSettingsStore((s) => s.notificationSettings);
+  const language = useSettingsStore((s) => s.language);
+  const warnedMonth = useSettingsStore((s) => s.budgetWarnedMonth);
+  const setWarnedMonth = useSettingsStore((s) => s.setBudgetWarnedMonth);
   const [permissionState, setPermissionState] = useState<NotifPermission | 'unknown'>('unknown');
-
-  const lastWarnedPct = useRef<number>(0);
 
   // Check permission on mount
   useEffect(() => {
@@ -73,20 +75,24 @@ export function useLocalNotifications({ transactions, monthExpense, budgetLimit 
     transactions,
   ]);
 
-  // Budget warning — fires once when crossing 85%, resets each month
+  // Budget warning — fires at most once per calendar month. The warned month
+  // is persisted, so restarting the app doesn't re-fire it.
   useEffect(() => {
     if (permissionState !== 'granted') return;
     if (!notif.budgetWarnings) return;
     if (!budgetLimit || budgetLimit <= 0) return;
 
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    if (warnedMonth === monthKey) return;
+
     const pct = (monthExpense / budgetLimit) * 100;
-    if (pct >= 85 && lastWarnedPct.current < 85) {
-      const monthName = new Date().toLocaleString('default', { month: 'long' });
+    if (pct >= 85) {
+      const monthName = now.toLocaleString(getDateLocale(language), { month: 'long' });
       scheduleBudgetWarning(monthName, pct);
+      setWarnedMonth(monthKey);
     }
-    if (pct < 10) lastWarnedPct.current = 0; // new month reset
-    else lastWarnedPct.current = pct;
-  }, [permissionState, notif.budgetWarnings, monthExpense, budgetLimit]);
+  }, [permissionState, notif.budgetWarnings, monthExpense, budgetLimit, warnedMonth, setWarnedMonth, language]);
 
   const requestPermission = useCallback(async () => {
     const state = await requestNotificationPermission();

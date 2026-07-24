@@ -7,6 +7,8 @@ import { useBalances } from '@/hooks/useBalances';
 import { useSettings } from '@/hooks/useSettings';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useNow } from '@/hooks/useNow';
+import { getDateLocale } from '@/lib/dateLocale';
 import { useTransactions, useUpdateTransaction } from '@/hooks/useTransactions';
 import { format } from 'date-fns';
 import type { DayTransaction, Frequency } from '@/types';
@@ -106,7 +108,9 @@ export function ReportsShell() {
   const tFreq = useTranslations('frequency');
   const tForecast = useTranslations('forecast');
   const tHeatmap = useTranslations('heatmap');
-  const { monthlyInsights, setMonthlyInsight, addCustomTag } = useSettingsStore();
+  const { monthlyInsights, setMonthlyInsight, addCustomTag, language } = useSettingsStore();
+  const dateLocale = getDateLocale(language);
+  const nowMs = useNow();
 
   const currentYear = new Date().getFullYear();
   const [selectedYear,     setSelectedYear]     = useState(currentYear);
@@ -315,12 +319,12 @@ export function ReportsShell() {
       const dateStr = d.toISOString().slice(0, 10);
       const bal = balances.get(dateStr);
       if (bal !== undefined) {
-        points.push({ date: dateStr, balance: bal, label: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) });
+        points.push({ date: dateStr, balance: bal, label: d.toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' }) });
         if (bal < 0 && !firstNegativeDate) firstNegativeDate = dateStr;
       }
     }
     return { points, firstNegativeDate };
-  }, [balances]);
+  }, [balances, dateLocale]);
 
   // ── Spending heatmap data (selected month) ─────────────────────────────────
   const heatmapData = useMemo(() => {
@@ -615,7 +619,7 @@ export function ReportsShell() {
               {forecastData.firstNegativeDate && (
                 <div className="mx-4 sm:mx-5 mb-2 px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/20">
                   <p className="text-xs font-semibold text-red-600 dark:text-red-400">
-                    {tForecast('warningNegative', { date: new Date(forecastData.firstNegativeDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) })}
+                    {tForecast('warningNegative', { date: new Date(forecastData.firstNegativeDate).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' }) })}
                   </p>
                 </div>
               )}
@@ -1072,7 +1076,7 @@ export function ReportsShell() {
                         <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-brand-text/28 dark:text-white/18 mb-2">{t('pdfAiInsights')}</p>
                         <p className="text-sm text-brand-text/75 dark:text-white/65 leading-relaxed whitespace-pre-wrap">{savedInsight.advice}</p>
                         <p className="text-[10px] text-brand-text/22 dark:text-white/16 mt-3">
-                          {t('insightsGeneratedOn', { date: new Date(savedInsight.generatedAt).toLocaleDateString() })}
+                          {t('insightsGeneratedOn', { date: new Date(savedInsight.generatedAt).toLocaleDateString(dateLocale) })}
                         </p>
                       </>
                     ) : (
@@ -1226,7 +1230,7 @@ export function ReportsShell() {
                   const pct = goal.targetAmount > 0 ? Math.min(savedAmount / goal.targetAmount, 1) : 0;
                   const remaining = Math.max(0, goal.targetAmount - savedAmount);
                   const daysLeft = goal.deadline
-                    ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - Date.now()) / 86_400_000))
+                    ? Math.max(0, Math.ceil((new Date(goal.deadline + 'T12:00:00').getTime() - nowMs) / 86_400_000))
                     : null;
                   const linkedTag = goal.linkedTagId ? allTags[goal.linkedTagId] : null;
 
@@ -1255,8 +1259,10 @@ export function ReportsShell() {
                           <p className="text-xs text-brand-text/50 dark:text-white/40 tabular-nums">{formatAmount(savedAmount)} / {formatAmount(goal.targetAmount)}</p>
                           {goal.deadline && (
                             <p className="text-[11px] text-brand-text/35 dark:text-white/30 mt-0.5">
-                              {new Date(goal.deadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                              {daysLeft !== null ? (daysLeft > 0 ? ` · ${daysLeft}d left` : ' · Overdue') : ''}
+                              {new Date(goal.deadline + 'T12:00:00').toLocaleDateString(dateLocale, { day: 'numeric', month: 'short', year: 'numeric' })}
+                              {daysLeft !== null
+                                ? ` · ${daysLeft > 0 ? t('goalDaysLeftShort', { days: daysLeft }) : t('goalOverdue')}`
+                                : ''}
                             </p>
                           )}
                         </div>
@@ -1301,7 +1307,7 @@ export function ReportsShell() {
                         </div>
                       ) : editGoalId === goal.id ? (
                         <div className="flex gap-2">
-                          <input type="number" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
+                          <input type="number" inputMode="decimal" value={editSaved} onChange={(e) => setEditSaved(e.target.value)}
                             placeholder="Amount saved so far" autoFocus
                             className="flex-1 h-9 px-2 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                           <button type="button" onClick={() => { updateGoal(goal.id, { currentSaved: Number(editSaved) || 0 }); setEditGoalId(null); }}
@@ -1347,11 +1353,11 @@ export function ReportsShell() {
                     <input value={goalForm.name} onChange={(e) => setGoalForm((f) => ({ ...f, name: e.target.value }))}
                       placeholder="Goal name (e.g. Holiday fund)" autoFocus
                       className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
-                    <input type="number" value={goalForm.target} onChange={(e) => setGoalForm((f) => ({ ...f, target: e.target.value }))}
+                    <input type="number" inputMode="decimal" value={goalForm.target} onChange={(e) => setGoalForm((f) => ({ ...f, target: e.target.value }))}
                       placeholder="Target amount" min="0"
                       className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                     {!goalForm.linkedTagId && (
-                      <input type="number" value={goalForm.currentSaved} onChange={(e) => setGoalForm((f) => ({ ...f, currentSaved: e.target.value }))}
+                      <input type="number" inputMode="decimal" value={goalForm.currentSaved} onChange={(e) => setGoalForm((f) => ({ ...f, currentSaved: e.target.value }))}
                         placeholder="Already saved (optional)" min="0"
                         className="w-full h-10 px-3 rounded-2xl bg-white dark:bg-white/5 border border-brand-primary/15 dark:border-white/10 text-sm text-brand-text dark:text-white placeholder:text-brand-text/30 outline-none focus:border-emerald-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]" />
                     )}

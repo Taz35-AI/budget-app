@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { clearBalanceCache } from '@/engine/balanceCache';
 
 export function LogoutButton() {
   const router = useRouter();
@@ -11,6 +12,9 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    // The balance memo cache is module-level, so it outlives the session —
+    // drop it so the next user never computes against the previous one's data.
+    clearBalanceCache();
     router.push('/login');
     router.refresh();
   };

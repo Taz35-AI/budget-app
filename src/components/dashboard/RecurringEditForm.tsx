@@ -222,7 +222,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
         <Input
           id="amount"
           label={tf('amount')}
-          type="number"
+          type="number" inputMode="decimal"
           step="0.01"
           min="0.01"
           error={errors.amount?.message}
@@ -279,7 +279,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
             <Input
               id="recurrences"
               label={tf('occurrences')}
-              type="number"
+              type="number" inputMode="numeric"
               min="1"
               step="1"
               placeholder={tf('occurrencesPlaceholder')}

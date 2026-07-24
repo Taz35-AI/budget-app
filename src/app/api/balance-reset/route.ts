@@ -16,13 +16,6 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const resetDate = format(new Date(), 'yyyy-MM-dd');
 
-    // Delete any future cache from today forward (will be recomputed with new baseline)
-    await supabase
-      .from('daily_balance_cache')
-      .delete()
-      .eq('household_id', householdId)
-      .gte('date', resetDate);
-
     // Insert reset marker (per-account or global)
     const insertPayload: Record<string, unknown> = {
       user_id: userId,

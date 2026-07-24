@@ -385,7 +385,7 @@ export function DashboardShell() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-white/40 hover:text-red-400 transition-colors">
+                      <button onClick={closeSearch} aria-label={tc('clearSearch')} className="flex-shrink-0 text-white/40 hover:text-red-400 transition-colors">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -427,7 +427,7 @@ export function DashboardShell() {
                 {searchOpen && showAmountFilter && (
                   <div className="relative z-10 flex items-center gap-1.5 mb-1.5">
                     <input
-                      type="number"
+                      type="number" inputMode="decimal"
                       value={searchAmountMin}
                       onChange={(e) => setSearchAmountMin(e.target.value)}
                       placeholder={tf('minAmount')}
@@ -435,7 +435,7 @@ export function DashboardShell() {
                     />
                     <span className="text-[9px] text-white/25">–</span>
                     <input
-                      type="number"
+                      type="number" inputMode="decimal"
                       value={searchAmountMax}
                       onChange={(e) => setSearchAmountMax(e.target.value)}
                       placeholder={tf('maxAmount')}
@@ -527,7 +527,7 @@ export function DashboardShell() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M11 12h2M13 16h-2" />
                         </svg>
                       </button>
-                      <button onClick={closeSearch} className="flex-shrink-0 text-white/40 hover:text-red-400">
+                      <button onClick={closeSearch} aria-label={tc('clearSearch')} className="flex-shrink-0 text-white/40 hover:text-red-400">
                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -585,7 +585,7 @@ export function DashboardShell() {
                 {searchOpen && showAmountFilter && (
                   <div className="flex items-center gap-1.5 mb-1">
                     <input
-                      type="number"
+                      type="number" inputMode="decimal"
                       value={searchAmountMin}
                       onChange={(e) => setSearchAmountMin(e.target.value)}
                       placeholder={tf('minAmount')}
@@ -593,7 +593,7 @@ export function DashboardShell() {
                     />
                     <span className="text-[9px] text-white/25">–</span>
                     <input
-                      type="number"
+                      type="number" inputMode="decimal"
                       value={searchAmountMax}
                       onChange={(e) => setSearchAmountMax(e.target.value)}
                       placeholder={tf('maxAmount')}
