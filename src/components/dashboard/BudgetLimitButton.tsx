@@ -41,6 +41,7 @@ export function BudgetLimitButton({ limit, monthExpense, formatAmount, symbol, o
     <>
       <button
         onClick={handleOpen}
+        aria-label={t('title')}
         className={cn(
           'flex items-center gap-1.5 h-9 px-3 rounded-2xl text-sm font-medium transition-all duration-100 active:scale-[0.95] border',
           limit

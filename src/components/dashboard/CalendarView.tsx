@@ -12,6 +12,8 @@ import { DayCellContent } from './DayCellContent';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
+import { useSettingsStore } from '@/store/settingsStore';
+import { getDateLocale } from '@/lib/dateLocale';
 import { accountDisplayName } from '@/lib/memberUtils';
 import type { DayTransaction, BudgetAccount, HouseholdMember } from '@/types';
 
@@ -88,6 +90,8 @@ export function CalendarView({
   const { selection } = useHaptics();
   const tMonths = useTranslations('months');
   const longMonths = tMonths.raw('long') as string[];
+  const language = useSettingsStore((s) => s.language);
+  const dateLocale = getDateLocale(language);
   const calendarRef = useRef<InstanceType<typeof FullCalendar>>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -298,6 +302,15 @@ export function CalendarView({
           firstDay={firstDayOfWeek}
           headerToolbar={false}
           height={calendarHeight}
+          // FullCalendar's own locale data isn't bundled, so its day headers
+          // stay English whatever the app language is. Render them through
+          // Intl instead — no extra locale files, and it follows the user's
+          // language setting like every other date in the app.
+          dayHeaderContent={(args) => (
+            <span className="uppercase">
+              {args.date.toLocaleDateString(dateLocale, { weekday: 'short' })}
+            </span>
+          )}
           dateClick={handleDateClick}
           validRange={{ end: maxDate }}
           dayCellContent={(args: DayCellContentArg) => {

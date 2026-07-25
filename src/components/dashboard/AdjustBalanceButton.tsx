@@ -58,6 +58,7 @@ export function AdjustBalanceButton({ todayBalance, formatAmount, symbol, accoun
     <>
       <button
         onClick={handleOpen}
+        aria-label={t('title')}
         className="flex items-center gap-1.5 h-9 px-3 rounded-2xl bg-brand-primary/[0.06] dark:bg-white/[0.06] hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white text-sm font-medium transition-all duration-100 active:scale-[0.95] border border-slate-200 dark:border-white/20"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
