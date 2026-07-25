@@ -41,6 +41,16 @@ const jsonLd = {
 
 const posts = [
   {
+    slug: 'how-to-budget-as-a-couple',
+    category: 'Money & Relationships',
+    date: 'July 25, 2026',
+    dateIso: '2026-07-25',
+    readTime: '13 min read',
+    title: 'How to Budget as a Couple Without Arguing About Money',
+    excerpt: 'Money is one of the most common things couples argue about, and it is rarely about the money itself. A practical, judgement free guide to splitting bills fairly, choosing joint or separate accounts, and building a shared budget you can both see.',
+    tags: ['Couples & Money', 'Shared Budget', 'Joint Accounts', 'Splitting Bills'],
+  },
+  {
     slug: 'budgeting-is-not-restriction-its-control',
     category: 'Mindset',
     date: 'April 5, 2026',
