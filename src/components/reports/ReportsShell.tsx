@@ -12,6 +12,7 @@ import { isRealCashflow } from '@/lib/txStats';
 import { isAiEnabled } from '@/lib/aiAvailability';
 import { getDateLocale } from '@/lib/dateLocale';
 import { useTransactions, useUpdateTransaction } from '@/hooks/useTransactions';
+import { resolveSubscriptions } from '@/lib/subscriptions';
 import { format } from 'date-fns';
 import type { DayTransaction, Frequency } from '@/types';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -191,27 +192,16 @@ export function ReportsShell() {
     ? Math.round((netMonth / selected.income) * 100) : null;
 
   // ── Subscriptions data ────────────────────────────────────────────────────
-  const MONTHLY_FACTOR: Record<Frequency, number> = {
-    daily: 30.44, weekly: 4.35, biweekly: 2.17,
-    monthly: 1, quarterly: 1 / 3, semiannual: 1 / 6, annual: 1 / 12,
-  };
   const FREQ_LABEL_KEY: Record<Frequency, string> = {
     daily: 'daily', weekly: 'weekly', biweekly: 'biweekly',
     monthly: 'monthly', quarterly: 'quarterly', semiannual: 'semiannual', annual: 'yearly',
   };
   const subscriptions = useMemo(() => {
     if (!txData?.transactions) return [];
-    const today = new Date();
-    return txData.transactions
-      .filter((tx) => tx.type === 'recurring' && tx.frequency && (!tx.end_date || new Date(tx.end_date) >= today))
-      .map((tx) => {
-        const freq = tx.frequency as Frequency;
-        const monthlyCost = tx.amount * (MONTHLY_FACTOR[freq] ?? 1);
-        const tagInfo = tx.tag ? allTags[tx.tag] : null;
-        return { ...tx, freq, monthlyCost, tagInfo };
-      })
-      .sort((a, b) => b.monthlyCost - a.monthlyCost);
-  }, [txData?.transactions, allTags]);
+    const todayStr = format(new Date(nowMs), 'yyyy-MM-dd');
+    return resolveSubscriptions(txData.transactions, txData.exceptions ?? [], todayStr)
+      .map((s) => ({ ...s, tagInfo: s.tag ? allTags[s.tag] : null }));
+  }, [txData?.transactions, txData?.exceptions, allTags, nowMs]);
 
   const subsExpenses = subscriptions.filter((s) => s.category === 'expense');
   const subsIncome   = subscriptions.filter((s) => s.category === 'income');

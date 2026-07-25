@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { NavMenuButton, MobileLogo } from '@/components/layout/NavSidebar';
 import { useTransactions } from '@/hooks/useTransactions';
+import { resolveTransactionOnDate } from '@/engine/exceptionResolver';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useSettingsStore } from '@/store/settingsStore';
 import { getDateLocale } from '@/lib/dateLocale';
@@ -72,6 +73,7 @@ export function ProfileShell() {
   const memberSince = user.created_at ? formatDate(user.created_at, dateLocale) : '—';
 
   const transactions = txData?.transactions ?? [];
+  const exceptions = txData?.exceptions ?? [];
 
   const recentTx = [...transactions]
     .sort((a, b) => {
@@ -79,7 +81,15 @@ export function ProfileShell() {
       const db = b.date ?? b.start_date ?? '';
       return db.localeCompare(da);
     })
-    .slice(0, 5);
+    .slice(0, 5)
+    .map((tx) => {
+      // Show the amount in effect on this entry's date — a recurring txn edited
+      // via "this & all future" keeps its new amount in an exception, not on the
+      // base row, so tx.amount alone would display the pre-edit figure.
+      const onDate = tx.date ?? tx.start_date ?? null;
+      const amount = onDate ? resolveTransactionOnDate(tx, exceptions, onDate).amount : tx.amount;
+      return { ...tx, amount };
+    });
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
