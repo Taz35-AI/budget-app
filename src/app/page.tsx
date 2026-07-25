@@ -166,10 +166,14 @@ const FEATURES: { icon: Icon; title: string; body: string }[] = [
 ];
 
 const CATEGORIES = [
-  'Groceries', 'Salary', 'Housing', 'Rent', 'Transport', 'Dining Out', 'Subscriptions',
-  'Utilities', 'Health', 'Travel', 'Entertainment', 'Shopping', 'Investment', 'Freelance',
-  'Gym & Fitness', 'Insurance', 'Education', 'Pets', 'Childcare', 'Savings', 'Gifts',
-  'Bonus', 'Charity', 'Taxes',
+  { f: 'groceries', l: 'Groceries' }, { f: 'salary', l: 'Salary' }, { f: 'housing', l: 'Housing' },
+  { f: 'mortgage', l: 'Mortgage' }, { f: 'transport', l: 'Transport' }, { f: 'dining-out', l: 'Dining Out' },
+  { f: 'subscriptions', l: 'Subscriptions' }, { f: 'utilities', l: 'Utilities' }, { f: 'health', l: 'Health' },
+  { f: 'travel', l: 'Travel' }, { f: 'entertainment', l: 'Entertainment' }, { f: 'shopping', l: 'Shopping' },
+  { f: 'investment', l: 'Investment' }, { f: 'freelance', l: 'Freelance' }, { f: 'gym-fitness', l: 'Gym & Fitness' },
+  { f: 'insurance', l: 'Insurance' }, { f: 'education', l: 'Education' }, { f: 'pets', l: 'Pets' },
+  { f: 'childcare', l: 'Childcare' }, { f: 'cashback', l: 'Cashback' }, { f: 'gifts', l: 'Gifts' },
+  { f: 'bonus', l: 'Bonus' }, { f: 'charity-donations', l: 'Charity' }, { f: 'taxes', l: 'Taxes' },
 ];
 
 const STATS = [
@@ -294,9 +298,9 @@ const css = `
 
 .lp-cats-wrap{background:linear-gradient(180deg,#fbfffe,#eefbf8);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);}
 .lp-cats{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:820px;margin:0 auto;}
-.lp-cat{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--ring);border-radius:100px;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--text);transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s,border-color .18s;}
+.lp-cat{display:inline-flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--ring);border-radius:100px;padding:7px 17px 7px 9px;font-size:13.5px;font-weight:600;color:var(--text);transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s,border-color .18s;}
 .lp-cat:hover{transform:translateY(-2px);border-color:var(--ringStrong);box-shadow:0 12px 24px -16px rgba(13,148,136,.5);}
-.lp-cat i{width:6px;height:6px;border-radius:50%;background:var(--primary);opacity:.55;flex:none;}
+.lp-cat img{width:24px;height:24px;flex:none;}
 
 .lp-steps-wrap{background:linear-gradient(180deg,#ffffff,#f6fdfb);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);}
 .lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative;}
@@ -518,7 +522,10 @@ export default function HomePage() {
               <p className="lp-lead">Every income and expense type is covered out of the box, with the option to add your own. Tag a transaction once and Spentum remembers it.</p>
               <div className="lp-cats">
                 {CATEGORIES.map((c) => (
-                  <span key={c} className="lp-cat"><i aria-hidden="true" />{c}</span>
+                  <span key={c.f} className="lp-cat">
+                    <Image src={`/tag-icons/${c.f}.webp`} alt="" width={24} height={24} loading="lazy" />
+                    {c.l}
+                  </span>
                 ))}
               </div>
             </section>
