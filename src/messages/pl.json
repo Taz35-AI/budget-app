@@ -160,7 +160,8 @@
     "allOccurrencesDesc": "Każde wystąpienie — przeszłe i przyszłe — zostaje zaktualizowane.",
     "allOccurrencesDeleteDesc": "Wszystkie wystąpienia usunięte trwale — w tym przeszłe.",
     "moveToDate": "Przenieś na datę",
-    "newStartDate": "Nowa data początkowa"
+    "newStartDate": "Nowa data początkowa",
+    "editQuestion": "Co chcesz zmienić?"
   },
   "monthSummary": {
     "dailyAvg": "Śr. dzienna",

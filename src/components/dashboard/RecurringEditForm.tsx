@@ -165,7 +165,7 @@ export function RecurringEditForm({ tx, occurrenceDate, onSubmit, onCancel, isLo
 
       {/* Scope selector */}
       <div className="flex flex-col gap-1">
-        <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{t('deleteQuestion')}</p>
+        <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300">{t('editQuestion')}</p>
         {SCOPE_OPTIONS.map((opt) => (
           <label
             key={opt.value}

@@ -160,7 +160,8 @@
     "allOccurrencesDesc": "Cada ocurrencia — pasada y futura — se actualiza.",
     "allOccurrencesDeleteDesc": "Todas las ocurrencias eliminadas permanentemente — incluidas las pasadas.",
     "moveToDate": "Mover a fecha",
-    "newStartDate": "Nueva fecha de inicio"
+    "newStartDate": "Nueva fecha de inicio",
+    "editQuestion": "¿Qué quieres cambiar?"
   },
   "monthSummary": {
     "dailyAvg": "Promedio diario",

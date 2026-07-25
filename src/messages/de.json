@@ -160,7 +160,8 @@
     "allOccurrencesDesc": "Jede Wiederholung — vergangen und zukünftig — wird aktualisiert.",
     "allOccurrencesDeleteDesc": "Alle Wiederholungen dauerhaft gelöscht — einschließlich vergangener.",
     "moveToDate": "Auf Datum verschieben",
-    "newStartDate": "Neues Startdatum"
+    "newStartDate": "Neues Startdatum",
+    "editQuestion": "Was möchten Sie ändern?"
   },
   "monthSummary": {
     "dailyAvg": "Tagesdurchschnitt",

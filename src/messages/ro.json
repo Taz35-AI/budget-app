@@ -160,7 +160,8 @@
     "allOccurrencesDesc": "Fiecare apariție — trecut și viitor — este actualizată.",
     "allOccurrencesDeleteDesc": "Toate aparițiile șterse permanent — inclusiv trecute.",
     "moveToDate": "Mută la dată",
-    "newStartDate": "Nouă dată de început"
+    "newStartDate": "Nouă dată de început",
+    "editQuestion": "Ce vrei să modifici?"
   },
   "monthSummary": {
     "dailyAvg": "Medie zilnică",
