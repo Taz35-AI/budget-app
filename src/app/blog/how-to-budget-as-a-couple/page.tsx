@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: DESC,
     siteName: 'Spentum',
     locale: 'en_GB',
-    images: [{ url: '/spentum.png', width: 1200, height: 400, alt: 'Spentum shared household budget app', type: 'image/png' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Spentum shared household budget app', type: 'image/png' }],
     publishedTime: '2026-07-25T00:00:00.000Z',
     authors: ['Spentum'],
   },
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'How to Budget as a Couple Without Arguing About Money',
     description: DESC,
-    images: ['/spentum.png'],
+    images: ['/og-image.png'],
   },
 };
 
@@ -84,7 +84,7 @@ const jsonLd = {
         name: 'Spentum',
         logo: { '@type': 'ImageObject', url: 'https://www.spentum.com/spentum.png' },
       },
-      image: 'https://www.spentum.com/spentum.png',
+      image: 'https://www.spentum.com/og-image.png',
       mainEntityOfPage: { '@type': 'WebPage', '@id': POST_URL },
       keywords: 'budgeting as a couple, joint vs separate accounts, splitting bills, shared budget, money and relationships, household budget',
       articleSection: 'Money & Relationships',

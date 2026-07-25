@@ -3,7 +3,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 const SITE = 'https://www.spentum.com';
-const OG_IMAGE = '/spentum.png';
+const OG_IMAGE = '/og-image.png';
 const DESCRIPTION =
   'Track expenses, forecast your balance, and share one budget with your whole household. Up to 10 accounts each, unlimited members, CSV bank import. Free during beta.';
 
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     locale: 'en_GB',
     title: 'Spentum | Shared Household Budget App',
     description: DESCRIPTION,
-    images: [{ url: OG_IMAGE, width: 1200, height: 400, alt: 'Spentum shared household budget app', type: 'image/png' }],
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: 'Spentum shared household budget app', type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
