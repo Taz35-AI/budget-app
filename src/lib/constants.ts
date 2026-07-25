@@ -30,6 +30,12 @@ export const FREQUENCIES: Record<Frequency, string> = {
 
 export const SEVEN_YEARS_DAYS = 365 * 7 + 2; // +2 for leap years
 
+// The near-term window computed synchronously so an edit updates the visible
+// calendar and 6-month forecast instantly. The remaining years are filled in a
+// Web Worker off the main thread. ~18 months comfortably covers the dashboard
+// and forecast without paying for the full 7-year horizon on every edit.
+export const EAGER_HORIZON_DAYS = 550;
+
 export const TAGS: Record<string, { label: string; color: string; category: 'income' | 'expense' | 'both' }> = {
   // ── Expense ──────────────────────────────────────────────────────────────────
   food:          { label: 'Food & Drink',   color: '#f97316', category: 'expense' },
