@@ -2,53 +2,116 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
+const SITE = 'https://www.spentum.com';
+const OG_IMAGE = '/spentum.png';
+const DESCRIPTION =
+  'Track expenses, forecast your balance, and share one budget with your whole household. Up to 10 accounts each, unlimited members, CSV bank import. Free during beta.';
+
 export const metadata: Metadata = {
-  title: 'Spentum — Shared Household Budget App',
-  description: 'Track expenses, forecast your balance, and share one budget with your whole household. Up to 10 accounts per person, unlimited household members, CSV bank import, recurring transactions, detailed reports. Free during beta.',
+  metadataBase: new URL(SITE),
+  title: 'Spentum | Shared Household Budget App',
+  description: DESCRIPTION,
+  applicationName: 'Spentum',
+  authors: [{ name: 'Spentum', url: SITE }],
+  creator: 'Spentum',
+  publisher: 'Spentum',
+  category: 'finance',
   keywords: [
-    'spentum', 'household budget app', 'shared budget', 'personal finance tracker',
-    'csv bank import', 'recurring transactions', 'family budget', 'expense tracker',
-    'balance forecast', 'budget planner', 'couples budget', 'household finance',
+    'spentum', 'household budget app', 'shared budget app', 'family budget app',
+    'personal finance tracker', 'expense tracker', 'budget planner', 'couples budget',
+    'csv bank import', 'recurring transactions', 'balance forecast', 'household finance',
+    'money management app', 'savings goals tracker', 'subscription tracker',
   ],
-  alternates: { canonical: 'https://www.spentum.com' },
+  alternates: { canonical: '/' },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   openGraph: {
     type: 'website',
-    url: 'https://www.spentum.com',
-    title: 'Spentum — Shared Household Budget App',
-    description: 'Track expenses, forecast your balance, and share one budget with your whole household. CSV import, recurring transactions, detailed reports.',
+    url: SITE,
     siteName: 'Spentum',
-    images: [{ url: 'https://www.spentum.com/spentum.png', width: 1200, height: 400 }],
+    locale: 'en_GB',
+    title: 'Spentum | Shared Household Budget App',
+    description: DESCRIPTION,
+    images: [{ url: OG_IMAGE, width: 1200, height: 400, alt: 'Spentum shared household budget app', type: 'image/png' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Spentum — Shared Household Budget App',
-    description: 'Track expenses, forecast your balance, and share one budget with your whole household.',
-    images: ['https://www.spentum.com/spentum.png'],
+    title: 'Spentum | Shared Household Budget App',
+    description: DESCRIPTION,
+    images: [OG_IMAGE],
   },
 };
+
+const FAQS = [
+  { q: 'Is Spentum really free?', a: 'Yes, free during our beta period. No card required to sign up, and no hidden upsells.' },
+  { q: 'Do you connect to my bank?', a: 'No. You never share your bank login with us. You either import CSV statements or add transactions manually, so your credentials always stay with your bank.' },
+  { q: 'How many accounts and household members can I add?', a: 'Up to 10 accounts per person and unlimited household members. Everyone sees the same shared budget and transactions in real time.' },
+  { q: 'Is there a mobile app?', a: 'Yes. Spentum runs as a Progressive Web App in any browser, and has native Android and iOS builds.' },
+  { q: 'Can I import from my bank?', a: 'Yes. Drag and drop a CSV export from any bank. Spentum auto-detects columns, deduplicates transactions, spots recurring subscriptions, and can auto-tag using AI.' },
+  { q: 'Who owns my data?', a: 'You do. Export all your transactions to CSV at any time, and delete your account with a single click.' },
+];
+
+const FEATURE_LIST = [
+  'Shared household budget with unlimited members',
+  'Up to 10 accounts per person',
+  'Bank statement CSV import with auto-tagging',
+  'Recurring transactions',
+  'Balance forecast',
+  'Detailed reports, budgets, goals and subscriptions',
+];
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      '@type': 'Organization',
+      '@id': `${SITE}/#organization`,
+      name: 'Spentum',
+      url: SITE,
+      logo: { '@type': 'ImageObject', url: `${SITE}${OG_IMAGE}`, width: 1200, height: 400 },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE}/#website`,
+      url: SITE,
+      name: 'Spentum',
+      description: DESCRIPTION,
+      publisher: { '@id': `${SITE}/#organization` },
+      inLanguage: 'en-GB',
+    },
+    {
       '@type': 'SoftwareApplication',
-      '@id': 'https://www.spentum.com/#software',
+      '@id': `${SITE}/#software`,
       name: 'Spentum',
       applicationCategory: 'FinanceApplication',
+      applicationSubCategory: 'Budgeting',
       operatingSystem: 'Web, Android, iOS',
-      url: 'https://www.spentum.com',
+      url: SITE,
       description: 'Shared household budget app with up to 10 accounts per person, unlimited household members, bank CSV import, recurring transactions, and detailed reports.',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: '47' },
+      featureList: FEATURE_LIST,
+      screenshot: `${SITE}${OG_IMAGE}`,
+      inLanguage: 'en-GB',
+      publisher: { '@id': `${SITE}/#organization` },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', availability: 'https://schema.org/InStock' },
+      aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: '47', bestRating: '5', worstRating: '1' },
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'Is Spentum free?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — Spentum is free during beta. No card required to sign up.' } },
-        { '@type': 'Question', name: 'Does Spentum connect to my bank?', acceptedAnswer: { '@type': 'Answer', text: 'No. You never give us your bank login. You import CSV statements from your bank or add transactions manually — your credentials stay with your bank.' } },
-        { '@type': 'Question', name: 'How many accounts and household members can I add?', acceptedAnswer: { '@type': 'Answer', text: 'Up to 10 accounts per person and unlimited household members. Everyone sees the same shared budget in real time.' } },
-        { '@type': 'Question', name: 'Does it work on mobile?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Spentum runs in any modern browser and has native Android and iOS apps.' } },
-      ],
+      '@id': `${SITE}/#faq`,
+      mainEntity: FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
     },
   ],
 };
@@ -94,12 +157,21 @@ const ICONS: Record<Icon, React.ReactNode> = {
 };
 
 const FEATURES: { icon: Icon; title: string; body: string }[] = [
-  { icon: 'members', title: 'Unlimited household members', body: 'Invite your partner, flatmates, or family. Everyone sees the same shared budget, transactions, and accounts — updating in real time.' },
+  { icon: 'members', title: 'Unlimited household members', body: 'Invite your partner, flatmates, or family. Everyone sees the same shared budget, transactions, and accounts, updating in real time.' },
   { icon: 'cards', title: 'Up to 10 accounts per person', body: 'Track debit cards, savings, and credit cards separately. Each account keeps its own balance, with a combined household view on top.' },
   { icon: 'import', title: 'Bank CSV import', body: 'Drop in any bank statement CSV. Spentum auto-detects columns, spots recurring subscriptions, deduplicates, and suggests tags.' },
-  { icon: 'recurring', title: 'Recurring transactions', body: 'Daily, weekly, monthly, or annual — set a recurring once and it flows into every forecast, budget, and report automatically.' },
+  { icon: 'recurring', title: 'Recurring transactions', body: 'Daily, weekly, monthly, or annual. Set a recurring once and it flows into every forecast, budget, and report automatically.' },
   { icon: 'reports', title: 'Detailed reports', body: 'Monthly overviews, annual trends, a spending heatmap, category drill-downs, and savings-rate charts. See where every pound goes.' },
   { icon: 'goals', title: 'Budgets, goals & subscriptions', body: 'Set monthly caps per category, track savings goals with progress rings, and see every subscription in one place.' },
+];
+
+const CATEGORIES = [
+  { f: 'groceries', l: 'Groceries' }, { f: 'salary', l: 'Salary' }, { f: 'housing', l: 'Housing' },
+  { f: 'transport', l: 'Transport' }, { f: 'dining-out', l: 'Dining Out' }, { f: 'subscriptions', l: 'Subscriptions' },
+  { f: 'utilities', l: 'Utilities' }, { f: 'health', l: 'Health' }, { f: 'travel', l: 'Travel' },
+  { f: 'entertainment', l: 'Entertainment' }, { f: 'shopping', l: 'Shopping' }, { f: 'investment', l: 'Investment' },
+  { f: 'gym-fitness', l: 'Gym & Fitness' }, { f: 'insurance', l: 'Insurance' }, { f: 'education', l: 'Education' },
+  { f: 'pets', l: 'Pets' },
 ];
 
 const STATS = [
@@ -110,21 +182,11 @@ const STATS = [
 ];
 
 const STEPS = [
-  { title: 'Sign up free', body: 'No card, no bank login. Just an email — it takes about fifteen seconds.' },
+  { title: 'Sign up free', body: 'No card, no bank login. Just an email, and it takes about fifteen seconds.' },
   { title: 'Add your accounts', body: 'Add them manually or import a CSV from your bank. Tag a transaction once and the tag remembers.' },
   { title: 'Invite your household', body: 'Share one link and everyone budgets from the same live view, instantly.' },
 ];
 
-const FAQS = [
-  { q: 'Is Spentum really free?', a: 'Yes — free during our beta period. No card required to sign up, and no hidden upsells.' },
-  { q: 'Do you connect to my bank?', a: 'No. You never share your bank login with us. You either import CSV statements or add transactions manually. Your credentials stay with your bank, always.' },
-  { q: 'How many accounts and household members can I add?', a: 'Up to 10 accounts per person and unlimited household members. Everyone sees the same shared budget and transactions in real time.' },
-  { q: 'Is there a mobile app?', a: 'Yes. Spentum runs as a Progressive Web App in any browser, and has native Android and iOS builds.' },
-  { q: 'Can I import from my bank?', a: 'Yes. Drag and drop a CSV export from any bank. Spentum auto-detects columns, deduplicates transactions, spots recurring subscriptions, and can auto-tag using AI.' },
-  { q: 'Who owns my data?', a: 'You do. Export all your transactions to CSV at any time, and delete your account with a single click.' },
-];
-
-// Mini calendar preview cells — [day, dot colour | null, amount label | null]
 const CAL: { d: number; dot?: string; amt?: string; today?: boolean }[] = [
   { d: 21 }, { d: 22, dot: '#F59E0B', amt: '−£42' }, { d: 23 }, { d: 24, dot: '#0D9488', amt: '+£1,900' },
   { d: 25, today: true }, { d: 26, dot: '#8b5cf6', amt: '−£13' }, { d: 27 },
@@ -147,7 +209,6 @@ const css = `
 .lp *{box-sizing:border-box;}
 .lp-display{font-family:var(--font-space),var(--font-inter),system-ui,sans-serif;}
 
-/* ── Nav ── */
 .lp-nav{position:sticky;top:0;z-index:100;background:rgba(244,253,251,0.72);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--ring);}
 .lp-nav-in{max-width:1140px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .lp-nav-links{display:flex;align-items:center;gap:4px;}
@@ -160,7 +221,6 @@ const css = `
 .lp-btn-ghost:hover{transform:translateY(-1.5px);border-color:var(--ringStrong);box-shadow:0 8px 20px rgba(13,148,136,.1);}
 .lp-btn-lg{padding:15px 30px;font-size:15.5px;border-radius:14px;}
 
-/* ── Hero ── */
 .lp-hero{position:relative;max-width:1180px;margin:0 auto;padding:88px 24px 40px;display:grid;grid-template-columns:1.04fr .96fr;gap:48px;align-items:center;}
 .lp-aurora{position:absolute;inset:-10% -20% auto;height:640px;z-index:0;pointer-events:none;filter:blur(8px);}
 .lp-blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;}
@@ -183,7 +243,6 @@ const css = `
 .lp-note{font-size:12.5px;color:var(--muted);opacity:.85;margin:18px 0 0;}
 .lp-check{color:var(--primary);font-weight:700;}
 
-/* ── Hero visual (product mockup) ── */
 .lp-visual{position:relative;z-index:1;justify-self:center;width:100%;max-width:460px;min-width:0;animation:lp-rise .9s cubic-bezier(.2,.7,.2,1) both;}
 .lp-window{position:relative;background:var(--card);border:1px solid var(--ring);border-radius:20px;box-shadow:0 2px 4px rgba(4,47,46,.04),0 30px 60px -20px rgba(13,148,136,.32),0 12px 24px -12px rgba(4,47,46,.12);overflow:hidden;}
 .lp-winbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--ring);background:linear-gradient(180deg,#fff,#f7fdfc);}
@@ -205,7 +264,6 @@ const css = `
 .lp-fore-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .lp-fore-l{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
 .lp-fore-v{font-size:12px;font-weight:700;color:var(--secondary);}
-/* floating cards */
 .lp-float{position:absolute;background:#fff;border:1px solid var(--ring);border-radius:14px;box-shadow:0 16px 30px -12px rgba(4,47,46,.24);padding:11px 13px;display:flex;align-items:center;gap:10px;}
 .lp-f1{left:-34px;bottom:34px;animation:lp-floaty 6s ease-in-out infinite;}
 .lp-f2{right:-30px;top:150px;animation:lp-floaty 6s ease-in-out infinite 1.6s;}
@@ -214,7 +272,6 @@ const css = `
 .lp-f-s{font-size:10.5px;color:var(--muted);}
 .lp-ring{position:relative;width:34px;height:34px;}
 
-/* ── Stat band ── */
 .lp-stats{max-width:1080px;margin:36px auto 0;padding:0 24px;}
 .lp-stats-in{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;background:linear-gradient(180deg,#fff,#fbfffe);border:1px solid var(--ring);border-radius:18px;padding:26px 20px;box-shadow:0 1px 2px rgba(4,47,46,.04),0 18px 40px -28px rgba(13,148,136,.3);}
 .lp-stat{text-align:center;position:relative;}
@@ -222,13 +279,11 @@ const css = `
 .lp-stat-k{font-size:clamp(22px,2.4vw,30px);font-weight:600;letter-spacing:-.5px;color:var(--secondary);}
 .lp-stat-v{font-size:12.5px;color:var(--muted);margin-top:2px;}
 
-/* ── Section shells ── */
 .lp-sec{max-width:1120px;margin:0 auto;padding:88px 24px;}
 .lp-kicker{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);text-align:center;}
 .lp-h2{font-size:clamp(28px,3.6vw,42px);font-weight:600;letter-spacing:-1px;text-align:center;margin:10px 0 12px;}
 .lp-lead{font-size:16.5px;color:var(--muted);text-align:center;max-width:560px;margin:0 auto 52px;line-height:1.55;}
 
-/* ── Features ── */
 .lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
 .lp-fcard{position:relative;background:var(--card);border:1px solid var(--ring);border-radius:18px;padding:26px 24px;transition:transform .22s cubic-bezier(.2,.7,.2,1),box-shadow .22s,border-color .22s;overflow:hidden;}
 .lp-fcard::after{content:"";position:absolute;inset:0;border-radius:18px;padding:1px;background:linear-gradient(140deg,rgba(94,234,212,.5),transparent 40%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .22s;}
@@ -239,8 +294,15 @@ const css = `
 .lp-fcard h3{font-size:16.5px;font-weight:700;margin:0 0 7px;letter-spacing:-.2px;}
 .lp-fcard p{font-size:14px;color:var(--muted);line-height:1.6;margin:0;}
 
-/* ── How it works ── */
-.lp-steps-wrap{background:linear-gradient(180deg,#fbfffe,#eefbf8);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);}
+.lp-cats-wrap{background:linear-gradient(180deg,#fbfffe,#eefbf8);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);}
+.lp-cats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:900px;margin:0 auto;}
+.lp-cat{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--ring);border-radius:13px;padding:11px 14px;transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s,border-color .18s;}
+.lp-cat:hover{transform:translateY(-3px);border-color:var(--ringStrong);box-shadow:0 14px 28px -18px rgba(13,148,136,.45);}
+.lp-cat img{width:32px;height:32px;flex:none;}
+.lp-cat span{font-size:13.5px;font-weight:600;color:var(--text);}
+.lp-cats-note{text-align:center;font-size:14px;color:var(--muted);margin:34px auto 0;max-width:520px;line-height:1.55;}
+
+.lp-steps-wrap{background:linear-gradient(180deg,#ffffff,#f6fdfb);border-top:1px solid var(--ring);border-bottom:1px solid var(--ring);}
 .lp-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative;}
 .lp-step{position:relative;padding-top:6px;}
 .lp-step-n{width:44px;height:44px;border-radius:14px;background:linear-gradient(180deg,#12b3a3,var(--primary));color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--font-space);margin-bottom:16px;box-shadow:0 8px 18px rgba(13,148,136,.3),inset 0 1px 0 rgba(255,255,255,.3);}
@@ -248,7 +310,6 @@ const css = `
 .lp-step p{font-size:14.5px;color:var(--muted);line-height:1.6;margin:0;}
 .lp-step-line{position:absolute;top:28px;left:calc(50% + 30px);right:calc(-50% + 30px);height:2px;background:linear-gradient(90deg,var(--teal200),transparent);}
 
-/* ── FAQ ── */
 .lp-faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px;}
 .lp-q{background:var(--card);border:1px solid var(--ring);border-radius:14px;padding:4px 20px;transition:border-color .18s,box-shadow .18s;}
 .lp-q[open]{border-color:var(--ringStrong);box-shadow:0 10px 30px -18px rgba(13,148,136,.4);}
@@ -262,7 +323,6 @@ const css = `
 .lp-q[open] .lp-plus::after{opacity:0;}
 .lp-q p{font-size:14.5px;color:var(--muted);line-height:1.65;margin:0;padding:0 0 18px;max-width:640px;}
 
-/* ── CTA ── */
 .lp-cta{max-width:1000px;margin:0 auto;padding:0 24px 96px;}
 .lp-cta-card{position:relative;overflow:hidden;border-radius:26px;padding:64px 40px;text-align:center;background:linear-gradient(160deg,#0F766E 0%,#0b5c55 55%,#064E48 100%);box-shadow:0 30px 60px -24px rgba(6,78,72,.6);}
 .lp-cta-card::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;top:-260px;right:-120px;background:radial-gradient(circle,rgba(94,234,212,.35),transparent 70%);}
@@ -274,13 +334,11 @@ const css = `
 .lp-btn-white:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(0,0,0,.24);}
 .lp-cta-note{font-size:13px;color:rgba(226,255,250,.7);margin-top:18px;}
 
-/* ── Footer ── */
 .lp-foot{border-top:1px solid var(--ring);}
 .lp-foot-in{max-width:1140px;margin:0 auto;padding:34px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
 .lp-foot p{font-size:13px;color:var(--muted);margin:0;}
 .lp-foot-links{display:flex;gap:8px;}
 
-/* ── Animations ── */
 @keyframes lp-rise{from{opacity:0;transform:translateY(22px) scale(.985);}to{opacity:1;transform:none;}}
 @keyframes lp-floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
 @keyframes lp-pulse{0%,100%{box-shadow:0 0 0 3px rgba(13,148,136,.18);}50%{box-shadow:0 0 0 5px rgba(13,148,136,.06);}}
@@ -291,6 +349,7 @@ const css = `
   .lp-sub{margin-inline:auto;}
   .lp-cta-row,.lp-trust{justify-content:center;}
   .lp-grid{grid-template-columns:repeat(2,1fr);}
+  .lp-cats{grid-template-columns:repeat(3,1fr);}
   .lp-steps{grid-template-columns:1fr;gap:22px;}
   .lp-step-line{display:none;}
   .lp-stats-in{grid-template-columns:repeat(2,1fr);gap:24px 14px;}
@@ -299,6 +358,7 @@ const css = `
 @media (max-width:560px){
   .lp-nav-links .lp-hide{display:none;}
   .lp-grid{grid-template-columns:1fr;}
+  .lp-cats{grid-template-columns:repeat(2,1fr);}
   .lp-stats-in{grid-template-columns:repeat(2,1fr);}
   .lp-sec{padding:64px 22px;}
   .lp-float{display:none;}
@@ -318,9 +378,9 @@ export default function HomePage() {
 
       <div className="lp">
         {/* ── Nav ── */}
-        <nav className="lp-nav">
-          <div className="lp-nav-in">
-            <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+        <header className="lp-nav">
+          <nav className="lp-nav-in" aria-label="Primary">
+            <Link href="/" aria-label="Spentum home" style={{ display: 'flex', alignItems: 'center' }}>
               <Image src="/spentum.png" alt="Spentum" width={360} height={120} style={{ height: 44, width: 'auto' }} priority />
             </Link>
             <div className="lp-nav-links">
@@ -328,187 +388,207 @@ export default function HomePage() {
               <Link href="/login" className="lp-link">Sign in</Link>
               <Link href="/signup" className="lp-btn lp-btn-primary">Get started</Link>
             </div>
-          </div>
-        </nav>
+          </nav>
+        </header>
 
-        {/* ── Hero ── */}
-        <section className="lp-hero">
-          <div className="lp-aurora" aria-hidden="true">
-            <span className="lp-blob lp-b1" /><span className="lp-blob lp-b2" /><span className="lp-blob lp-b3" />
-          </div>
-
-          <div className="lp-hero-copy">
-            <span className="lp-eyebrow"><span className="lp-dot" /> New · one budget for your whole household</span>
-            <h1 className="lp-h1 lp-display">One budget for the <span className="lp-grad">whole household.</span></h1>
-            <p className="lp-sub">
-              Track expenses, forecast your balance months ahead, and share everything with your
-              partner, flatmates, or family — up to 10 accounts each, unlimited members, all in real time.
-            </p>
-            <div className="lp-cta-row">
-              <Link href="/signup" className="lp-btn lp-btn-primary lp-btn-lg">Get started free →</Link>
-              <Link href="/login" className="lp-btn lp-btn-ghost lp-btn-lg">Sign in</Link>
+        <main>
+          {/* ── Hero ── */}
+          <section className="lp-hero" aria-labelledby="hero-h">
+            <div className="lp-aurora" aria-hidden="true">
+              <span className="lp-blob lp-b1" /><span className="lp-blob lp-b2" /><span className="lp-blob lp-b3" />
             </div>
-            <div className="lp-trust">
-              <div className="lp-avatars">
-                {AVATARS.map((a) => (
-                  <span key={a.i} className="lp-av" style={{ background: a.c }}>{a.i}</span>
-                ))}
-              </div>
-              <div className="lp-trust-txt">
-                <div className="lp-stars">★★★★★</div>
-                Rated 4.8 / 5 by early households
-              </div>
-            </div>
-            <p className="lp-note"><span className="lp-check">✓</span> Free during beta &nbsp; <span className="lp-check">✓</span> No bank login &nbsp; <span className="lp-check">✓</span> No card required</p>
-          </div>
 
-          {/* Product mockup */}
-          <div className="lp-visual">
-            <div className="lp-window">
-              <div className="lp-winbar">
-                <span className="lp-tl" style={{ background: '#ff5f57' }} />
-                <span className="lp-tl" style={{ background: '#febc2e' }} />
-                <span className="lp-tl" style={{ background: '#28c840' }} />
-                <span className="lp-winurl">spentum.com/dashboard</span>
+            <div className="lp-hero-copy">
+              <span className="lp-eyebrow"><span className="lp-dot" /> New · one budget for your whole household</span>
+              <h1 id="hero-h" className="lp-h1 lp-display">One budget for the <span className="lp-grad">whole household.</span></h1>
+              <p className="lp-sub">
+                Track expenses, forecast your balance months ahead, and share everything with your
+                partner, flatmates, or family. Up to 10 accounts each, unlimited members, all in real time.
+              </p>
+              <div className="lp-cta-row">
+                <Link href="/signup" className="lp-btn lp-btn-primary lp-btn-lg">Get started free →</Link>
+                <Link href="/login" className="lp-btn lp-btn-ghost lp-btn-lg">Sign in</Link>
               </div>
-              <div className="lp-winbody">
-                <div className="lp-bal-label">Balance today</div>
-                <div className="lp-bal-row">
-                  <div className="lp-bal lp-display">£4,820.50</div>
-                  <span className="lp-chip lp-chip-pos">▲ £255 this month</span>
-                </div>
-
-                <div className="lp-cal">
-                  {CAL.map((c) => (
-                    <div key={c.d} className={`lp-cell${c.today ? ' lp-cell-today' : ''}`}>
-                      <span className="lp-cell-d">{c.d}</span>
-                      {c.dot ? <span className="lp-cdot" style={{ background: c.dot }} /> : <span />}
-                      {c.amt
-                        ? <span className="lp-cell-amt" style={{ color: c.amt.startsWith('+') ? '#0a7d5a' : '#b45309' }}>{c.amt}</span>
-                        : <span />}
-                    </div>
+              <div className="lp-trust">
+                <div className="lp-avatars" aria-hidden="true">
+                  {AVATARS.map((a) => (
+                    <span key={a.i} className="lp-av" style={{ background: a.c }}>{a.i}</span>
                   ))}
                 </div>
-
-                <div className="lp-fore">
-                  <div className="lp-fore-top">
-                    <span className="lp-fore-l">6-month forecast</span>
-                    <span className="lp-fore-v">▲ +£6,140</span>
-                  </div>
-                  <svg viewBox="0 0 300 56" preserveAspectRatio="none" style={{ width: '100%', height: 46, display: 'block' }}>
-                    <defs>
-                      <linearGradient id="lpArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stopColor="#0D9488" stopOpacity="0.28" />
-                        <stop offset="1" stopColor="#0D9488" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0 44 L50 40 L100 42 L150 30 L200 24 L250 14 L300 8 L300 56 L0 56 Z" fill="url(#lpArea)" />
-                    <path d="M0 44 L50 40 L100 42 L150 30 L200 24 L250 14 L300 8" fill="none" stroke="#0D9488" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="300" cy="8" r="3.6" fill="#0D9488" />
-                  </svg>
+                <div className="lp-trust-txt">
+                  <div className="lp-stars" aria-hidden="true">★★★★★</div>
+                  Rated 4.8 / 5 by early households
                 </div>
               </div>
+              <p className="lp-note"><span className="lp-check">✓</span> Free during beta &nbsp; <span className="lp-check">✓</span> No bank login &nbsp; <span className="lp-check">✓</span> No card required</p>
             </div>
 
-            <div className="lp-float lp-f1" aria-hidden="true">
-              <span className="lp-f-ic" style={{ background: 'rgba(124,58,237,.12)' }}>🎬</span>
-              <span><span className="lp-f-t">Netflix</span><br /><span className="lp-f-s">−£12.99 · monthly</span></span>
-            </div>
-            <div className="lp-float lp-f2" aria-hidden="true">
-              <span className="lp-ring" aria-hidden="true">
-                <svg viewBox="0 0 36 36" width="34" height="34">
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(13,148,136,.15)" strokeWidth="4" />
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="#0D9488" strokeWidth="4" strokeLinecap="round"
-                    strokeDasharray="94.2" strokeDashoffset="30" transform="rotate(-90 18 18)" />
-                </svg>
-              </span>
-              <span><span className="lp-f-t">Holiday goal</span><br /><span className="lp-f-s">68% saved</span></span>
-            </div>
-          </div>
-        </section>
+            {/* Product mockup (decorative) */}
+            <div className="lp-visual" aria-hidden="true">
+              <div className="lp-window">
+                <div className="lp-winbar">
+                  <span className="lp-tl" style={{ background: '#ff5f57' }} />
+                  <span className="lp-tl" style={{ background: '#febc2e' }} />
+                  <span className="lp-tl" style={{ background: '#28c840' }} />
+                  <span className="lp-winurl">spentum.com/dashboard</span>
+                </div>
+                <div className="lp-winbody">
+                  <div className="lp-bal-label">Balance today</div>
+                  <div className="lp-bal-row">
+                    <div className="lp-bal lp-display">£4,820.50</div>
+                    <span className="lp-chip lp-chip-pos">▲ £255 this month</span>
+                  </div>
 
-        {/* ── Stat band ── */}
-        <div className="lp-stats">
-          <div className="lp-stats-in">
-            {STATS.map((s) => (
-              <div key={s.v} className="lp-stat">
-                <div className="lp-stat-k lp-display">{s.k}</div>
-                <div className="lp-stat-v">{s.v}</div>
+                  <div className="lp-cal">
+                    {CAL.map((c) => (
+                      <div key={c.d} className={`lp-cell${c.today ? ' lp-cell-today' : ''}`}>
+                        <span className="lp-cell-d">{c.d}</span>
+                        {c.dot ? <span className="lp-cdot" style={{ background: c.dot }} /> : <span />}
+                        {c.amt
+                          ? <span className="lp-cell-amt" style={{ color: c.amt.startsWith('+') ? '#0a7d5a' : '#b45309' }}>{c.amt}</span>
+                          : <span />}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="lp-fore">
+                    <div className="lp-fore-top">
+                      <span className="lp-fore-l">6-month forecast</span>
+                      <span className="lp-fore-v">▲ +£6,140</span>
+                    </div>
+                    <svg viewBox="0 0 300 56" preserveAspectRatio="none" style={{ width: '100%', height: 46, display: 'block' }}>
+                      <defs>
+                        <linearGradient id="lpArea" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#0D9488" stopOpacity="0.28" />
+                          <stop offset="1" stopColor="#0D9488" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0 44 L50 40 L100 42 L150 30 L200 24 L250 14 L300 8 L300 56 L0 56 Z" fill="url(#lpArea)" />
+                      <path d="M0 44 L50 40 L100 42 L150 30 L200 24 L250 14 L300 8" fill="none" stroke="#0D9488" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="300" cy="8" r="3.6" fill="#0D9488" />
+                    </svg>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* ── Features ── */}
-        <section className="lp-sec">
-          <div className="lp-kicker">Everything in one place</div>
-          <h2 className="lp-h2 lp-display">Everything a household needs</h2>
-          <p className="lp-lead">Built for real households — shared accounts, one budget, the same live view for everyone.</p>
-          <div className="lp-grid">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="lp-fcard">
-                <div className="lp-fic">{ICONS[f.icon]}</div>
-                <h3>{f.title}</h3>
-                <p>{f.body}</p>
+              <div className="lp-float lp-f1">
+                <span className="lp-f-ic" style={{ background: 'rgba(124,58,237,.12)' }}>🎬</span>
+                <span><span className="lp-f-t">Netflix</span><br /><span className="lp-f-s">−£12.99 · monthly</span></span>
               </div>
-            ))}
-          </div>
-        </section>
+              <div className="lp-float lp-f2">
+                <span className="lp-ring">
+                  <svg viewBox="0 0 36 36" width="34" height="34">
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(13,148,136,.15)" strokeWidth="4" />
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="#0D9488" strokeWidth="4" strokeLinecap="round"
+                      strokeDasharray="94.2" strokeDashoffset="30" transform="rotate(-90 18 18)" />
+                  </svg>
+                </span>
+                <span><span className="lp-f-t">Holiday goal</span><br /><span className="lp-f-s">68% saved</span></span>
+              </div>
+            </div>
+          </section>
 
-        {/* ── How it works ── */}
-        <div className="lp-steps-wrap">
-          <section className="lp-sec">
-            <div className="lp-kicker">Get going in a minute</div>
-            <h2 className="lp-h2 lp-display">Three steps. One minute.</h2>
-            <p className="lp-lead">No bank connection, no setup call. Sign up and you are budgeting together the same day.</p>
-            <div className="lp-steps">
-              {STEPS.map((s, i) => (
-                <div key={s.title} className="lp-step">
-                  {i < STEPS.length - 1 && <span className="lp-step-line" aria-hidden="true" />}
-                  <div className="lp-step-n">{i + 1}</div>
-                  <h3>{s.title}</h3>
-                  <p>{s.body}</p>
+          {/* ── Stat band ── */}
+          <div className="lp-stats">
+            <div className="lp-stats-in">
+              {STATS.map((s) => (
+                <div key={s.v} className="lp-stat">
+                  <div className="lp-stat-k lp-display">{s.k}</div>
+                  <div className="lp-stat-v">{s.v}</div>
                 </div>
               ))}
             </div>
-          </section>
-        </div>
-
-        {/* ── FAQ ── */}
-        <section className="lp-sec">
-          <div className="lp-kicker">Good to know</div>
-          <h2 className="lp-h2 lp-display">Questions, answered</h2>
-          <div className="lp-faq">
-            {FAQS.map((q) => (
-              <details key={q.q} className="lp-q">
-                <summary>{q.q}<span className="lp-plus" aria-hidden="true" /></summary>
-                <p>{q.a}</p>
-              </details>
-            ))}
           </div>
-        </section>
 
-        {/* ── CTA ── */}
-        <div className="lp-cta">
-          <div className="lp-cta-card">
-            <div className="lp-cta-in">
-              <h2 className="lp-display">Start budgeting together</h2>
-              <p>Free during beta. Your first transaction takes less than a minute — and your whole household is one link away.</p>
-              <Link href="/signup" className="lp-btn lp-btn-white lp-btn-lg">Create free account →</Link>
-              <div className="lp-cta-note">No card · No bank login · Cancel anytime</div>
+          {/* ── Features ── */}
+          <section className="lp-sec" aria-labelledby="features-h">
+            <p className="lp-kicker">Everything in one place</p>
+            <h2 id="features-h" className="lp-h2 lp-display">Everything a household needs</h2>
+            <p className="lp-lead">Built for real households: shared accounts, one budget, the same live view for everyone.</p>
+            <div className="lp-grid">
+              {FEATURES.map((f) => (
+                <article key={f.title} className="lp-fcard">
+                  <div className="lp-fic" aria-hidden="true">{ICONS[f.icon]}</div>
+                  <h3>{f.title}</h3>
+                  <p>{f.body}</p>
+                </article>
+              ))}
             </div>
+          </section>
+
+          {/* ── Category icons showcase ── */}
+          <div className="lp-cats-wrap">
+            <section className="lp-sec" aria-labelledby="categories-h">
+              <p className="lp-kicker">Organised automatically</p>
+              <h2 id="categories-h" className="lp-h2 lp-display">Every category, its own icon</h2>
+              <p className="lp-lead">More than 50 built-in income and expense categories, each with a hand-drawn icon. Tag a transaction once and Spentum remembers.</p>
+              <div className="lp-cats">
+                {CATEGORIES.map((c) => (
+                  <div key={c.f} className="lp-cat">
+                    <Image src={`/tag-icons/${c.f}.webp`} alt={`${c.l} category icon`} width={32} height={32} loading="lazy" />
+                    <span>{c.l}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="lp-cats-note">Groceries, salary, rent, subscriptions, and dozens more, ready the moment you sign up.</p>
+            </section>
           </div>
-        </div>
+
+          {/* ── How it works ── */}
+          <div className="lp-steps-wrap">
+            <section className="lp-sec" aria-labelledby="steps-h">
+              <p className="lp-kicker">Get going in a minute</p>
+              <h2 id="steps-h" className="lp-h2 lp-display">Three steps. One minute.</h2>
+              <p className="lp-lead">No bank connection, no setup call. Sign up and you are budgeting together the same day.</p>
+              <div className="lp-steps">
+                {STEPS.map((s, i) => (
+                  <div key={s.title} className="lp-step">
+                    {i < STEPS.length - 1 && <span className="lp-step-line" aria-hidden="true" />}
+                    <div className="lp-step-n" aria-hidden="true">{i + 1}</div>
+                    <h3>{s.title}</h3>
+                    <p>{s.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* ── FAQ ── */}
+          <section className="lp-sec" aria-labelledby="faq-h">
+            <p className="lp-kicker">Good to know</p>
+            <h2 id="faq-h" className="lp-h2 lp-display">Questions, answered</h2>
+            <div className="lp-faq">
+              {FAQS.map((q) => (
+                <details key={q.q} className="lp-q">
+                  <summary>{q.q}<span className="lp-plus" aria-hidden="true" /></summary>
+                  <p>{q.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          {/* ── CTA ── */}
+          <div className="lp-cta">
+            <section className="lp-cta-card" aria-labelledby="cta-h">
+              <div className="lp-cta-in">
+                <h2 id="cta-h" className="lp-display">Start budgeting together</h2>
+                <p>Free during beta. Your first transaction takes less than a minute, and your whole household is one link away.</p>
+                <Link href="/signup" className="lp-btn lp-btn-white lp-btn-lg">Create free account →</Link>
+                <div className="lp-cta-note">No card · No bank login · Cancel anytime</div>
+              </div>
+            </section>
+          </div>
+        </main>
 
         {/* ── Footer ── */}
         <footer className="lp-foot">
           <div className="lp-foot-in">
             <p>© {year} Spentum. All rights reserved.</p>
-            <div className="lp-foot-links">
+            <nav className="lp-foot-links" aria-label="Footer">
               <Link href="/privacy" className="lp-link">Privacy</Link>
               <Link href="/terms" className="lp-link">Terms</Link>
               <Link href="/blog" className="lp-link">Blog</Link>
-            </div>
+            </nav>
           </div>
         </footer>
       </div>

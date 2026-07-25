@@ -19,8 +19,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Spentum — Personal Finance Tracker',
-  description: 'Track income and expenses, forecast your balance across 7 years, and take control of your personal finances with Spentum.',
+  metadataBase: new URL('https://www.spentum.com'),
+  title: 'Spentum | Shared Household Budget App',
+  description: 'Track income and expenses, forecast your balance for years ahead, and share one budget with your whole household. Free during beta.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${inter.className}`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        {/* Prevent flash of wrong theme — must run synchronously before body paints */}
+        {/* Prevent flash of wrong theme: must run synchronously before body paints */}
         <Script
           id="theme-init"
           strategy="beforeInteractive"
