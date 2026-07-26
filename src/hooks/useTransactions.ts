@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
+import { applyOptimisticEdit, applyOptimisticDelete } from '@/lib/optimisticTransactions';
 
 // Polling is only a safety net: Supabase Realtime delivers changes on web, and
 // household-sync broadcasts cover native. 30s keeps that net in place without
@@ -126,23 +127,16 @@ export function useUpdateTransaction() {
       if (!res.ok) throw new Error(data.error ?? 'Failed to update transaction');
       return data;
     },
-    onMutate: async ({ id, values }) => {
+    onMutate: async ({ id, editMode, effectiveFrom, values }) => {
       await qc.cancelQueries({ queryKey: QK });
       const prev = qc.getQueryData<TransactionsData>(QK);
       if (prev) {
-        const existing = prev.transactions.find((t) => t.id === id);
-        // Type changes (one_off ↔ recurring) require full recalculation — skip optimistic
-        if (values.type && existing && values.type !== existing.type) {
-          return { prev };
-        }
-        qc.setQueryData<TransactionsData>(QK, {
-          ...prev,
-          transactions: prev.transactions.map((t) =>
-            t.id === id
-              ? { ...t, ...values, amount: values.amount !== undefined ? Number(values.amount) : t.amount }
-              : t,
-          ),
-        });
+        // Mirror exactly what the route handler will write, so the refetch that
+        // follows produces identical data and the balances never visibly jump.
+        // A null result means the change cannot be reproduced faithfully
+        // (date move, type switch); leave the cache alone and wait for truth.
+        const next = applyOptimisticEdit(prev, { id, editMode, effectiveFrom, values });
+        if (next) qc.setQueryData<TransactionsData>(QK, next);
       }
       return { prev };
     },
@@ -206,41 +200,10 @@ export function useDeleteTransaction() {
       await qc.cancelQueries({ queryKey: QK });
       const prev = qc.getQueryData<TransactionsData>(QK);
       if (prev) {
-        if (deleteMode === 'all') {
-          // Remove entirely
-          qc.setQueryData<TransactionsData>(QK, {
-            ...prev,
-            transactions: prev.transactions.filter((t) => t.id !== id),
-          });
-        } else if (deleteMode === 'this_only' && effectiveFrom) {
-          // Add an optimistic exception so this occurrence disappears
-          const optimisticException: TransactionException = {
-            id: `optimistic-exc-${Date.now()}`,
-            transaction_id: id,
-            effective_from: effectiveFrom,
-            is_deleted: true,
-            created_at: new Date().toISOString(),
-          };
-          qc.setQueryData<TransactionsData>(QK, {
-            ...prev,
-            exceptions: [...prev.exceptions, optimisticException],
-          });
-        } else if (deleteMode === 'all_future' && effectiveFrom) {
-          // The server inserts a deletion exception at effectiveFrom (it does NOT
-          // delete the row). Add the same exception optimistically so the UI
-          // immediately hides occurrences from that date forward without a flash.
-          const optimisticException: TransactionException = {
-            id: `optimistic-exc-${Date.now()}`,
-            transaction_id: id,
-            effective_from: effectiveFrom,
-            is_deleted: true,
-            created_at: new Date().toISOString(),
-          };
-          qc.setQueryData<TransactionsData>(QK, {
-            ...prev,
-            exceptions: [...prev.exceptions, optimisticException],
-          });
-        }
+        // Mirrors the route handler, including the restore exception that keeps
+        // a single-occurrence delete from hiding every later occurrence.
+        const next = applyOptimisticDelete(prev, { id, deleteMode, effectiveFrom });
+        if (next) qc.setQueryData<TransactionsData>(QK, next);
       }
       return { prev };
     },

@@ -57,8 +57,23 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
   const showAccountBadge = (accounts?.length ?? 0) >= 2;
   const accountMap = new Map((accounts ?? []).map((a) => [a.id, a.name]));
 
+  // Edits apply optimistically and the dialog closes at once, so a failure has
+  // no form left to report into. Surface it here instead, otherwise the cache
+  // rollback would silently snap the numbers back with no explanation.
+  const mutationError = (update.error ?? del.error) as Error | null;
+
   return (
     <div className="flex flex-col h-full">
+      {mutationError && (
+        <div
+          role="alert"
+          className="mb-2.5 rounded-2xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-950/30 px-3 py-2"
+        >
+          <p className="text-xs font-medium text-red-600 dark:text-red-400">
+            {mutationError.message}
+          </p>
+        </div>
+      )}
       {/* Balance summary */}
       <div className={cn(
         'native-card relative rounded-2xl p-2.5 mb-2.5 overflow-hidden',
@@ -138,15 +153,16 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         onCancel={clearActive}
                         isLoading={update.isPending}
                         onSubmit={({ editMode, name, amount, category, tag, frequency, end_date, newDate }) => {
-                          update.mutate(
-                            {
-                              id: tx.transaction_id,
-                              editMode: editMode as EditMode,
-                              effectiveFrom: date,
-                              values: { name, amount, category, tag, frequency, end_date, account_id: editAccountId, newDate },
-                            },
-                            { onSuccess: clearActive },
-                          );
+                          update.mutate({
+                            id: tx.transaction_id,
+                            editMode: editMode as EditMode,
+                            effectiveFrom: date,
+                            values: { name, amount, category, tag, frequency, end_date, account_id: editAccountId, newDate },
+                          });
+                          // Close straight away: the cache already reflects the
+                          // change, so waiting on the ~1s server round trip would
+                          // just hold a spinner over the correct numbers.
+                          clearActive();
                         }}
                       />
                       {update.isError && (
@@ -197,10 +213,12 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                       onCancel={clearActive}
                       isLoading={update.isPending}
                       onSubmit={(values: TransactionFormValues) => {
-                        update.mutate(
-                          { id: tx.transaction_id, editMode: 'all', values: { ...values, account_id: editAccountId } },
-                          { onSuccess: clearActive },
-                        );
+                        update.mutate({
+                          id: tx.transaction_id,
+                          editMode: 'all',
+                          values: { ...values, account_id: editAccountId },
+                        });
+                        clearActive();
                       }}
                     />
                     {update.isError && (
@@ -223,14 +241,12 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         onCancel={clearActive}
                         isLoading={del.isPending}
                         onConfirm={(deleteMode: DeleteMode) => {
-                          del.mutate(
-                            {
-                              id: tx.transaction_id,
-                              deleteMode,
-                              effectiveFrom: date,
-                            },
-                            { onSuccess: clearActive },
-                          );
+                          del.mutate({
+                            id: tx.transaction_id,
+                            deleteMode,
+                            effectiveFrom: date,
+                          });
+                          clearActive();
                         }}
                       />
                       {del.isError && (
@@ -281,12 +297,10 @@ export function TransactionList({ date, transactions, balance, formatAmount, sym
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            del.mutate(
-                              { id: tx.transaction_id, deleteMode: 'all' },
-                              { onSuccess: clearActive },
-                            )
-                          }
+                          onClick={() => {
+                            del.mutate({ id: tx.transaction_id, deleteMode: 'all' });
+                            clearActive();
+                          }}
                           disabled={del.isPending}
                           className="flex-1 h-10 rounded-2xl text-sm font-semibold text-white bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 active:scale-[0.98] transition-all shadow-[0_2px_8px_rgba(239,68,68,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
                         >
