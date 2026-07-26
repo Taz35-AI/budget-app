@@ -64,14 +64,16 @@ export function DayCellContent({ date, balance, transactions, formatAmount, isSe
         )}
       </div>
 
-      {/* Balance — bottom-left, muted */}
+      {/* Balance — bottom-left. This is the number people scan the grid for, so
+          it is set at full strength rather than dimmed: running balances were
+          previously unreadable, especially zeros and adjacent-month days. */}
       {hasBalance && (
         <span
           className={cn(
-            'mt-auto block max-w-full truncate text-[10px] font-semibold tabular-nums leading-none font-display tracking-tight',
-            isPositive && 'text-emerald-700/80 dark:text-emerald-400/85',
-            isNegative && 'text-red-700/80 dark:text-red-400/85',
-            !isPositive && !isNegative && 'text-brand-text/30 dark:text-white/25',
+            'mt-auto block max-w-full truncate text-[11px] font-bold tabular-nums leading-none font-display tracking-tight',
+            isPositive && 'text-emerald-700 dark:text-emerald-300',
+            isNegative && 'text-red-600 dark:text-red-400',
+            !isPositive && !isNegative && 'text-brand-text/65 dark:text-white/70',
           )}
         >
           {formatAmount(balance!, { compact: true })}

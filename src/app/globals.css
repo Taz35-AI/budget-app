@@ -800,8 +800,10 @@
   background: transparent !important;
 }
 
+/* Adjacent-month days stay de-emphasised, but 0.3 compounded with the muted
+   balance text made their running balances effectively unreadable. */
 .fc .fc-day-other .fc-daygrid-day-frame {
-  opacity: 0.3;
+  opacity: 0.55;
 }
 
 .calendar-wrapper {
