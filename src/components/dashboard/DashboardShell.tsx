@@ -30,6 +30,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { OnboardingTip } from './OnboardingTip';
 import { TourSpotlight } from './TourSpotlight';
+import { FirstRunPanel, DemoDataBanner, useDemoData } from './FirstRunPanel';
 import { TransferModal } from './TransferModal';
 import { InvitationsBanner } from './InvitationsBanner';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -284,6 +285,14 @@ export function DashboardShell() {
     setIsAdding(true);
   }, []);
 
+  // First-run example data. Seeded through the import endpoint so it carries a
+  // batch id and can be removed in one call.
+  const demo = useDemoData();
+  // Example rows need a concrete account; 'combined' is a view, not a target.
+  const demoAccountId = activeAccountId === 'combined'
+    ? (accounts?.[0]?.id ?? null)
+    : activeAccountId;
+
   const selectedBalance = selectedDate ? (balances.get(selectedDate) ?? 0) : 0;
   const selectedTransactions: DayTransaction[] = selectedDate ? (dayTransactions.get(selectedDate) ?? []) : [];
 
@@ -350,6 +359,9 @@ export function DashboardShell() {
 
           {/* Pending household invitations */}
           <InvitationsBanner />
+          {demo.isDemo && !isEmpty && (
+            <DemoDataBanner onClear={demo.clear} onKeep={demo.keep} busy={demo.busy} />
+          )}
 
           {/* Stats — bento grid */}
           <div id="tour-stats" className="flex-shrink-0">
@@ -684,6 +696,17 @@ export function DashboardShell() {
                   members={householdMembers}
                 />
               </div>
+              {/* First run — an empty calendar gives a new user nothing to react
+                  to, so lead with the payoff instead of asking for data first. */}
+              {isEmpty && (
+                <FirstRunPanel
+                  accountId={demoAccountId}
+                  onAddManual={handleOnboardingAdd}
+                  onSeed={demo.seed}
+                  busy={demo.busy}
+                  error={demo.error}
+                />
+              )}
               {/* Step 0 tip — tap a day */}
               {isEmpty && onboardingStep === 0 && (
                 <div className="absolute inset-x-0 top-[4.5rem] flex justify-center pointer-events-none z-10">
@@ -853,8 +876,10 @@ export function DashboardShell() {
         </aside>
       </div>
 
-      {/* Spotlight tour — steps 2-5 */}
-      {typeof onboardingStep === 'number' && onboardingStep >= 2 && (
+      {/* Spotlight tour — steps 2-5. Held back while the calendar is empty:
+          touring features over a blank grid explains controls the user has
+          nothing to use them on. It starts once there is data to look at. */}
+      {!isEmpty && typeof onboardingStep === 'number' && onboardingStep >= 2 && (
         <TourSpotlight step={onboardingStep as 2 | 3 | 4 | 5 | 6 | 7} onNext={advanceTour} onDone={finishTour} />
       )}
 
