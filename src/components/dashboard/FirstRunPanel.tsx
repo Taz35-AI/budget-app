@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
+import { addOptimisticDemoRows, removeDemoRows } from '@/lib/demoData';
+import type { DemoPayloadRow, TransactionsSnapshot } from '@/lib/demoData';
 
 /**
  * First-run experience for an empty dashboard.
@@ -22,6 +24,9 @@ import { useQueryClient } from '@tanstack/react-query';
  */
 
 const DEMO_KEY = 'bt_demo_batch';
+const TX_QUERY_KEY = ['transactions'] as const;
+/** Stand-in batch id while the import request is in flight. */
+const PENDING_BATCH = 'pending';
 
 interface DemoRow {
   name: string;
@@ -74,33 +79,50 @@ export function useDemoData() {
     try { setBatchId(localStorage.getItem(DEMO_KEY)); } catch { /* private mode */ }
   }, []);
 
+  // Both actions update the screen first and let the server catch up, the same
+  // way adding a single transaction does. Waiting for the write and then for a
+  // refetch before showing anything made each press take about a second.
+
   const seed = useCallback(async (rows: DemoRow[], accountId: string | null) => {
     setBusy(true);
     setError('');
+
+    const payload: DemoPayloadRow[] = rows.map((r) => ({
+      name: r.name,
+      amount: r.amount,
+      category: r.category,
+      tag: r.tag,
+      account_id: accountId,
+      ...(r.once
+        ? { type: 'one_off' as const, date: dayOfThisMonth(r.day) }
+        : { type: 'recurring' as const, frequency: r.frequency, start_date: dayOfThisMonth(r.day) }),
+    }));
+
+    // Show the rows now. An in-flight refetch is cancelled first, or its
+    // (example-free) result would land a moment later and wipe them again.
+    await qc.cancelQueries({ queryKey: TX_QUERY_KEY });
+    qc.setQueryData<TransactionsSnapshot>(TX_QUERY_KEY, (old) => (old ? addOptimisticDemoRows(old, payload) : old));
+    setBatchId(PENDING_BATCH);
+
     try {
       const res = await fetch('/api/import/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          transactions: rows.map((r) => ({
-            name: r.name,
-            amount: r.amount,
-            category: r.category,
-            tag: r.tag,
-            account_id: accountId,
-            ...(r.once
-              ? { type: 'one_off', date: dayOfThisMonth(r.day) }
-              : { type: 'recurring', frequency: r.frequency, start_date: dayOfThisMonth(r.day) }),
-          })),
-        }),
+        body: JSON.stringify({ transactions: payload }),
       });
       const data = await res.json();
       if (!res.ok || !data.batchId) throw new Error(data.error ?? 'failed');
       try { localStorage.setItem(DEMO_KEY, data.batchId); } catch { /* private mode */ }
       setBatchId(data.batchId);
-      await qc.invalidateQueries({ queryKey: ['transactions'] });
+      // Swap the placeholders for the saved rows in the background. Same
+      // values, so nothing on screen moves.
+      void qc.invalidateQueries({ queryKey: TX_QUERY_KEY });
       return true;
     } catch {
+      // Take the placeholders back out and resync with the server.
+      qc.setQueryData<TransactionsSnapshot>(TX_QUERY_KEY, (old) => (old ? removeDemoRows(old, null) : old));
+      void qc.invalidateQueries({ queryKey: TX_QUERY_KEY });
+      setBatchId(null);
       setError('failed');
       return false;
     } finally {
@@ -109,20 +131,30 @@ export function useDemoData() {
   }, [qc]);
 
   const clear = useCallback(async () => {
-    if (!batchId) return;
+    if (!batchId || batchId === PENDING_BATCH) return;
+    const clearing = batchId;
     setBusy(true);
     setError('');
+
+    await qc.cancelQueries({ queryKey: TX_QUERY_KEY });
+    const previous = qc.getQueryData<TransactionsSnapshot>(TX_QUERY_KEY);
+    qc.setQueryData<TransactionsSnapshot>(TX_QUERY_KEY, (old) => (old ? removeDemoRows(old, clearing) : old));
+    setBatchId(null);
+
     try {
       const res = await fetch('/api/import/undo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ batchId }),
+        body: JSON.stringify({ batchId: clearing }),
       });
       if (!res.ok) throw new Error('failed');
       try { localStorage.removeItem(DEMO_KEY); } catch { /* private mode */ }
-      setBatchId(null);
-      await qc.invalidateQueries({ queryKey: ['transactions'] });
+      void qc.invalidateQueries({ queryKey: TX_QUERY_KEY });
     } catch {
+      // The rows are still on the server: put them back on screen.
+      if (previous) qc.setQueryData<TransactionsSnapshot>(TX_QUERY_KEY, previous);
+      void qc.invalidateQueries({ queryKey: TX_QUERY_KEY });
+      setBatchId(clearing);
       setError('failed');
     } finally {
       setBusy(false);

@@ -43,6 +43,8 @@ export interface Transaction {
   start_date?: string | null;
   end_date?: string | null;
   frequency?: Frequency | null;
+  /** Set on rows created by a bulk import; lets one import be undone as a unit. */
+  import_batch_id?: string | null;
   created_at: string;
   updated_at: string;
 }
