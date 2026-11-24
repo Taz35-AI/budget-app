@@ -22,17 +22,33 @@ export async function GET() {
 
     if (txError) return NextResponse.json({ error: txError.message }, { status: 500 });
 
-    const txIds = (transactions ?? []).map((t) => t.id);
-    const { data: exceptions } = txIds.length > 0
-      ? await supabase.from('transaction_exceptions').select('*').in('transaction_id', txIds)
-      : { data: [] };
+    // Scoped by an inner join on the parent transaction, not an id list: a
+    // list of a few hundred UUIDs no longer fits in the request URL, and the
+    // failed query used to be swallowed, so larger households got a "backup"
+    // with every recurring edit and deletion silently missing. A backup that
+    // can't be complete is refused instead.
+    const { data: exceptionRows, error: excError } = await supabase
+      .from('transaction_exceptions')
+      .select('*, transactions!inner(household_id)')
+      .eq('transactions.household_id', householdId);
+
+    if (excError) {
+      console.error('[GET /api/backup] exceptions error:', excError.message);
+      return NextResponse.json({ error: excError.message }, { status: 500 });
+    }
+
+    const exceptions = (exceptionRows ?? []).map((row) => {
+      const { transactions: _parent, ...exception } = row;
+      void _parent;
+      return exception;
+    });
 
     const today = new Date().toISOString().slice(0, 10);
     const backup = {
       version: 1,
       exportedAt: new Date().toISOString(),
       transactions: transactions ?? [],
-      exceptions: exceptions ?? [],
+      exceptions,
     };
 
     return new Response(JSON.stringify(backup, null, 2), {
@@ -102,7 +118,8 @@ export async function POST(req: NextRequest) {
         !name ||
         !VALID_CATEGORIES.includes(raw.category as string) ||
         !VALID_TYPES.includes(raw.type as string) ||
-        !Number.isFinite(amount) || amount < 0 || amount > 999_999_999 ||
+        // The table requires amount > 0; one zero row would fail its whole chunk.
+        !Number.isFinite(amount) || amount <= 0 || amount > 999_999_999 ||
         (frequency && !VALID_FREQUENCIES.includes(frequency))
       ) {
         skipped += 1;
@@ -132,11 +149,20 @@ export async function POST(req: NextRequest) {
     // ── 2. Re-key ids that exist in another household ────────────────────
     const incomingIds = cleaned.map((t) => t.id);
     const foreignIds = new Set<string>();
-    for (let i = 0; i < incomingIds.length; i += 500) {
-      const { data: existing } = await supabase
+    // Chunks of 100: an id list of several hundred UUIDs overflows the request
+    // URL. This lookup is what stops a restore from overwriting another
+    // household's rows, so if it fails the restore stops rather than
+    // proceeding as though no conflicts were found.
+    const ID_CHUNK = 100;
+    for (let i = 0; i < incomingIds.length; i += ID_CHUNK) {
+      const { data: existing, error: lookupError } = await supabase
         .from('transactions')
         .select('id, household_id')
-        .in('id', incomingIds.slice(i, i + 500));
+        .in('id', incomingIds.slice(i, i + ID_CHUNK));
+      if (lookupError) {
+        console.error('[POST /api/backup] id lookup error:', lookupError.message);
+        return NextResponse.json({ error: 'Could not verify the backup against existing data. Nothing was restored.' }, { status: 500 });
+      }
       for (const row of existing ?? []) {
         if (row.household_id !== householdId) foreignIds.add(row.id);
       }

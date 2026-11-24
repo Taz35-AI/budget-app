@@ -40,7 +40,9 @@ export async function POST(req: NextRequest) {
     if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     if (!VALID_CATEGORIES.includes(body.category)) return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
     if (!VALID_TYPES.includes(body.type)) return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
-    if (isNaN(amount) || amount < 0 || amount > 999_999_999) return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    // The table requires amount > 0; reject zero here with a 400 rather than
+    // letting the insert fail with a database error.
+    if (isNaN(amount) || amount <= 0 || amount > 999_999_999) return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
     if (body.frequency && !VALID_FREQUENCIES.includes(body.frequency)) return NextResponse.json({ error: 'Invalid frequency' }, { status: 400 });
 
     const payload = {
