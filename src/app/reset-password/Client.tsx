@@ -54,7 +54,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/spentum-logo.webp" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-slate-500">
             {stage === 'form' ? tAuth('chooseNewPassword') : stage === 'success' ? tAuth('allDone') : tAuth('resetPassword')}
           </p>

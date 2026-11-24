@@ -70,7 +70,7 @@ export default function BlogPostPage() {
         {/* NAV */}
         <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(244, 253, 251, 0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(13, 148, 136, 0.12)', height: 108, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <Image src="/spentum.png" alt="Spentum" width={360} height={120} style={{ height: 108, width: 'auto' }} priority />
+            <Image src="/spentum-logo.webp" alt="Spentum" width={360} height={120} style={{ height: 108, width: 'auto' }} priority />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/blog" style={{ fontSize: 14, color: '#475569', padding: '6px 14px', borderRadius: 8, textDecoration: 'none' }}>Blog</Link>

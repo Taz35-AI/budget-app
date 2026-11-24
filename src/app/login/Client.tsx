@@ -124,7 +124,7 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm animate-fade-in-up">
         {/* Logo */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <Image src="/spentum.png" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
+          <Image src="/spentum-logo.webp" alt="Spentum" width={200} height={200} className="w-44 h-auto object-contain" priority />
           <p className="text-sm text-teal-300/50 font-display">
             {mode === 'login' ? tAuth('signInTitle') : tAuth('resetTitle')}
           </p>

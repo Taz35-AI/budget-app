@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
+import { hasSessionCookie } from '@/lib/sessionCookie';
 
 /**
  * Syncs the Zustand settings store with Supabase so settings roam across devices.
@@ -38,7 +39,13 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
     // reset the store to defaults so we don't inherit a previous account's
     // localStorage (e.g. a different user's language preference on the same
     // device).
-    fetch('/api/settings')
+    // Logged-out visitors (landing page, blog, login) have no settings to
+    // load; skipping the request saves them a guaranteed-to-fail round trip.
+    const load = hasSessionCookie()
+      ? fetch('/api/settings')
+      : Promise.reject(new Error('no session'));
+
+    load
       .then(async (r) => {
         if (!r.ok) return { ok: false as const };
         const data = await r.json();

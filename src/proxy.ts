@@ -144,6 +144,12 @@ export async function proxy(request: NextRequest) {
     pathname === '/robots.txt';
 
   if (!user && !isPublicPath) {
+    // An API client can't do anything with a redirect to the login page: fetch
+    // follows it and downloads the HTML, which then fails to parse as JSON.
+    // Tell it plainly instead.
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

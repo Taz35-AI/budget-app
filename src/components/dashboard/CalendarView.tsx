@@ -7,7 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { format, addDays, getISOWeek, getWeek } from 'date-fns';
 import type { DateClickArg } from '@fullcalendar/interaction';
-import type { DayCellContentArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
+import type { DayCellContentArg, DatesSetArg } from '@fullcalendar/core';
 import { DayCellContent } from './DayCellContent';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,13 @@ import type { DayTransaction, BudgetAccount, HouseholdMember } from '@/types';
 export interface CalendarNavHandle {
   today: () => void;
 }
+
+// FullCalendar compares options by identity. Arrays and functions created
+// inline are new on every render, so it treated its configuration as changed
+// each time the dashboard re-rendered. These never vary, so define them once.
+const CALENDAR_PLUGINS = [dayGridPlugin, interactionPlugin];
+const NO_EVENTS: never[] = [];
+const renderNoEvent = () => null;
 
 // ── First-visit swipe hint ────────────────────────────────────────────────────
 // Shown once on touch devices. Backed by localStorage, so it's read as an
@@ -200,6 +207,7 @@ export function CalendarView({
   }, [longMonths, onMonthChange]);
 
   const maxDate = format(addDays(new Date(), 365 * 7 + 2), 'yyyy-MM-dd');
+  const validRange = useMemo(() => ({ end: maxDate }), [maxDate]);
   const showTabs = (accounts?.length ?? 0) >= 2;
 
   return (
@@ -297,7 +305,7 @@ export function CalendarView({
         })}
         <FullCalendar
           ref={calendarRef}
-          plugins={[dayGridPlugin, interactionPlugin]}
+          plugins={CALENDAR_PLUGINS}
           initialView="dayGridMonth"
           firstDay={firstDayOfWeek}
           headerToolbar={false}
@@ -312,7 +320,7 @@ export function CalendarView({
             </span>
           )}
           dateClick={handleDateClick}
-          validRange={{ end: maxDate }}
+          validRange={validRange}
           dayCellContent={(args: DayCellContentArg) => {
             const dateStr = format(args.date, 'yyyy-MM-dd');
             const balance = balances.get(dateStr);
@@ -328,8 +336,8 @@ export function CalendarView({
               />
             );
           }}
-          events={[]}
-          eventContent={(_args: EventContentArg) => null}
+          events={NO_EVENTS}
+          eventContent={renderNoEvent}
           datesSet={handleDatesSet}
           dayCellClassNames={(args) => {
             const dateStr = format(args.date, 'yyyy-MM-dd');

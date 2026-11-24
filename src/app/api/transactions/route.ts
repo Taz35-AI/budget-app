@@ -11,29 +11,43 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    const { data: transactions, error: txError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('household_id', householdId)
-      .order('created_at', { ascending: false });
+    // Both queries run in parallel. Exceptions are scoped to the household
+    // through an inner join on their parent transaction rather than an
+    // `in (every transaction id)` filter: that needed the first query to
+    // finish before the second could start, and put every id in the request
+    // URL, which stops working once a household has a few thousand rows.
+    const [txResult, excResult] = await Promise.all([
+      supabase
+        .from('transactions')
+        .select('*')
+        .eq('household_id', householdId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('transaction_exceptions')
+        .select('*, transactions!inner(household_id)')
+        .eq('transactions.household_id', householdId),
+    ]);
 
+    const { data: transactions, error: txError } = txResult;
     if (txError) {
       console.error('[GET /api/transactions] Supabase error:', txError.message, txError.code);
       return NextResponse.json({ error: txError.message, code: txError.code }, { status: 500 });
     }
 
-    const txIds = transactions?.map((t) => t.id) ?? [];
-    const exceptions = txIds.length > 0
-      ? await supabase.from('transaction_exceptions').select('*').in('transaction_id', txIds)
-      : { data: [], error: null };
-
-    if (exceptions.error) {
-      console.error('[GET /api/transactions] exceptions error:', exceptions.error.message);
+    if (excResult.error) {
+      console.error('[GET /api/transactions] exceptions error:', excResult.error.message);
     }
+
+    // Drop the join column so the payload keeps its original shape.
+    const exceptions = (excResult.data ?? []).map((row) => {
+      const { transactions: _parent, ...exception } = row;
+      void _parent;
+      return exception;
+    });
 
     return NextResponse.json({
       transactions: transactions ?? [],
-      exceptions: exceptions.data ?? [],
+      exceptions,
     });
   } catch (error) {
     console.error('[GET /api/transactions] unexpected error:', error);

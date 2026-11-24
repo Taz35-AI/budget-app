@@ -379,7 +379,7 @@ export default function HomePage() {
         <header className="lp-nav">
           <nav className="lp-nav-in" aria-label="Primary">
             <Link href="/" aria-label="Spentum home" style={{ display: 'flex', alignItems: 'center' }}>
-              <Image src="/spentum.png" alt="Spentum" width={360} height={120} style={{ height: 44, width: 'auto' }} priority />
+              <Image src="/spentum-logo.webp" alt="Spentum" width={360} height={120} style={{ height: 44, width: 'auto' }} priority />
             </Link>
             <div className="lp-nav-links">
               <Link href="/blog" className="lp-link lp-hide">Blog</Link>

@@ -4,12 +4,24 @@ import { cookies } from 'next/headers';
 
 /**
  * Gets the authenticated user's ID from the session.
+ *
+ * Uses getClaims() rather than getUser(): the project signs tokens with an
+ * asymmetric key, so the JWT is verified locally against the cached JWKS
+ * instead of costing a network round trip to the Auth server on every API
+ * call. (If the project ever reverts to a symmetric secret, getClaims() falls
+ * back to the same network check getUser() did.) An expired access token is
+ * still refreshed first, exactly as before.
+ *
+ * Tradeoff: a session revoked elsewhere stays valid here until its access
+ * token expires, the same window the proxy already accepts for its own cache.
  */
 export async function getAuthUserId(): Promise<string | null> {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.id ?? null;
+    const { data, error } = await supabase.auth.getClaims();
+    if (error) return null;
+    const sub = data?.claims?.sub;
+    return typeof sub === 'string' && sub.length > 0 ? sub : null;
   } catch {
     return null;
   }

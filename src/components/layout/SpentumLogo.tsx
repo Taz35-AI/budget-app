@@ -36,7 +36,7 @@ export function SpentumLogo({ width = 200, height = 200, className, style, prior
 
   return (
     <Image
-      src="/spentum.png"
+      src="/spentum-logo.webp"
       alt="Spentum"
       width={width}
       height={height}

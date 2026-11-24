@@ -1,13 +1,19 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { useHouseholdMembers } from '@/hooks/useHousehold';
+import { sessionCookieStore } from '@/lib/sessionCookie';
 
 export function HouseholdSync() {
   const qc = useQueryClient();
-  const { data } = useHouseholdMembers();
+  // This component is mounted on every page, including public ones. Without a
+  // session the request can only fail (and retry), so don't make it. Signed-in
+  // pages that need members enable the same query themselves, and its cached
+  // result still arrives here.
+  const hasSession = useSyncExternalStore(...sessionCookieStore);
+  const { data } = useHouseholdMembers({ enabled: hasSession });
   const householdId = data?.householdId;
   const memberCount = data?.members?.length ?? 0;
 

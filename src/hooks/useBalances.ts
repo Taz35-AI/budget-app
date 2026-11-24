@@ -29,6 +29,23 @@ export interface BalancesResult {
 
 const EMPTY: BalanceMap = { balances: new Map(), dayTransactions: new Map() };
 
+// A stable id per distinct transactions payload. React Query keeps the same
+// object when a refetch returns identical data (structural sharing) and hands
+// out a new one for real changes and optimistic writes, so object identity is
+// exactly "did the data change?".
+const dataIds = new WeakMap<object, number>();
+let nextDataId = 1;
+
+function dataIdOf(data: object | undefined): number {
+  if (!data) return 0;
+  let id = dataIds.get(data);
+  if (id === undefined) {
+    id = nextDataId++;
+    dataIds.set(data, id);
+  }
+  return id;
+}
+
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
 /**
@@ -42,7 +59,7 @@ const EMPTY: BalanceMap = { balances: new Map(), dayTransactions: new Map() };
  * the swap never changes a visible number — it only extends the range.
  */
 export function useBalances(accountId: string = 'combined'): BalancesResult {
-  const { data: txData, isLoading: txLoading, error: txError, dataUpdatedAt } = useTransactions();
+  const { data: txData, isLoading: txLoading, error: txError } = useTransactions();
 
   const { data: resetDate } = useQuery<string | null>({
     queryKey: ['balance-reset', accountId],
@@ -66,9 +83,14 @@ export function useBalances(accountId: string = 'combined'): BalancesResult {
 
   // A key that changes whenever the inputs that drive a recompute change. It is
   // identical across every hook consumer of the same data, so they share one
-  // worker compute (dataUpdatedAt is bumped by both optimistic writes and
-  // refetches of the transactions query).
-  const version = `${accountId}|${dataUpdatedAt}|${effectiveResetDate ?? ''}`;
+  // worker compute.
+  //
+  // It is keyed on the identity of the data, not on when it was last fetched:
+  // the transactions query polls every 30s, and keying on the fetch time made
+  // every poll throw away the full-horizon result, fall back to the eager
+  // window, recompute seven years in the worker and re-render everything
+  // twice, even though nothing had changed.
+  const version = `${accountId}|${dataIdOf(txData)}|${effectiveResetDate ?? ''}`;
 
   // ── Eager window: synchronous, instant ────────────────────────────────────
   const eager = useMemo(() => {
