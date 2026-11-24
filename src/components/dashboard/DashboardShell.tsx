@@ -279,11 +279,24 @@ export function DashboardShell() {
   const handleDesktopDuplicate = useCallback((tx: DayTransaction) => {
     setDesktopDuplicateValues({ name: tx.name, amount: tx.amount, category: tx.category, type: tx.type, tag: tx.tag ?? undefined, frequency: tx.frequency ?? undefined });
   }, []);
+  // The first-run panel covers the calendar. Once closed it stays closed on
+  // this device, otherwise anyone with an empty account (not only brand-new
+  // users) is locked out of their own calendar on every visit.
+  const [firstRunDismissed, setFirstRunDismissed] = useState(() => {
+    try { return localStorage.getItem('bt_first_run_dismissed') === '1'; } catch { return false; }
+  });
+  const dismissFirstRun = useCallback(() => {
+    setFirstRunDismissed(true);
+    try { localStorage.setItem('bt_first_run_dismissed', '1'); } catch {}
+  }, []);
+
   const handleOnboardingAdd = useCallback(() => {
     const today = format(new Date(), 'yyyy-MM-dd');
     setSelectedDate(today);
     setIsAdding(true);
-  }, []);
+    // Choosing to add by hand means using the calendar underneath.
+    dismissFirstRun();
+  }, [dismissFirstRun]);
 
   // First-run example data. Seeded through the import endpoint so it carries a
   // batch id and can be removed in one call.
@@ -698,11 +711,12 @@ export function DashboardShell() {
               </div>
               {/* First run — an empty calendar gives a new user nothing to react
                   to, so lead with the payoff instead of asking for data first. */}
-              {isEmpty && (
+              {isEmpty && !firstRunDismissed && (
                 <FirstRunPanel
                   accountId={demoAccountId}
                   onAddManual={handleOnboardingAdd}
                   onSeed={demo.seed}
+                  onDismiss={dismissFirstRun}
                   busy={demo.busy}
                   error={demo.error}
                 />

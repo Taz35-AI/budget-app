@@ -182,12 +182,15 @@ interface Props {
   accountId: string | null;
   onAddManual: () => void;
   onSeed: (rows: DemoRow[], accountId: string | null) => Promise<boolean>;
+  /** Close the panel without choosing any of its options. */
+  onDismiss: () => void;
   busy: boolean;
   error: string;
 }
 
-export function FirstRunPanel({ accountId, onAddManual, onSeed, busy, error }: Props) {
+export function FirstRunPanel({ accountId, onAddManual, onSeed, onDismiss, busy, error }: Props) {
   const t = useTranslations('onboarding');
+  const tc = useTranslations('common');
 
   const handleDemo = () => {
     const names = [
@@ -199,7 +202,20 @@ export function FirstRunPanel({ accountId, onAddManual, onSeed, busy, error }: P
 
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-lg rounded-3xl border border-brand-primary/15 dark:border-white/10 bg-white/95 dark:bg-[#0f2b2a]/95 backdrop-blur-sm shadow-[0_20px_50px_-20px_rgba(13,148,136,0.45)] p-6 sm:p-8 text-center">
+      <div className="relative w-full max-w-lg rounded-3xl border border-brand-primary/15 dark:border-white/10 bg-white/95 dark:bg-[#0f2b2a]/95 backdrop-blur-sm shadow-[0_20px_50px_-20px_rgba(13,148,136,0.45)] p-6 sm:p-8 text-center">
+
+        {/* The panel sits on top of the calendar, so there has to be a way out
+            of it that doesn't involve picking one of the three options. */}
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label={tc('close')}
+          className="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center text-brand-text/45 dark:text-white/45 hover:text-brand-text dark:hover:text-white hover:bg-brand-primary/[0.06] dark:hover:bg-white/[0.08] transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
 
         <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-500/20 dark:to-teal-500/5 border border-brand-primary/15 flex items-center justify-center mb-4">
           <svg className="w-6 h-6 text-brand-primary dark:text-teal-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
