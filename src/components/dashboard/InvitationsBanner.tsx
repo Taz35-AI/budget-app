@@ -1,13 +1,15 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { usePendingInvites, useAcceptInvite } from '@/hooks/useHousehold';
+import { usePendingInvites, useAcceptInvite, useDeclineInvite } from '@/hooks/useHousehold';
 import { cn } from '@/lib/utils';
 
 export function InvitationsBanner() {
   const t = useTranslations('sharing');
   const { data: invites, isLoading } = usePendingInvites();
   const acceptMutation = useAcceptInvite();
+  const declineMutation = useDeclineInvite();
+  const busy = acceptMutation.isPending || declineMutation.isPending;
 
   if (isLoading || !invites?.length) return null;
 
@@ -43,13 +45,15 @@ export function InvitationsBanner() {
                     window.location.reload();
                   },
                 })}
-                disabled={acceptMutation.isPending}
+                disabled={busy}
                 className="h-8 px-3.5 rounded-2xl text-xs font-semibold bg-teal-600 dark:bg-teal-500 text-white hover:bg-teal-700 dark:hover:bg-teal-400 active:scale-[0.96] transition-all duration-100 disabled:opacity-50"
               >
                 {t('acceptInvitation')}
               </button>
               <button
-                className="h-8 px-3.5 rounded-2xl text-xs font-semibold text-slate-500 dark:text-white/50 hover:bg-slate-100 dark:hover:bg-white/8 active:scale-[0.96] transition-all duration-100"
+                onClick={() => declineMutation.mutate(inv.token)}
+                disabled={busy}
+                className="h-8 px-3.5 rounded-2xl text-xs font-semibold text-slate-500 dark:text-white/50 hover:bg-slate-100 dark:hover:bg-white/8 active:scale-[0.96] transition-all duration-100 disabled:opacity-50"
               >
                 {t('declineInvitation')}
               </button>

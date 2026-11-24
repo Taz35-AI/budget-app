@@ -130,6 +130,25 @@ export function useAcceptInvite() {
   });
 }
 
+/** Declines an invite addressed to the current user. */
+export function useDeclineInvite() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (token: string) => {
+      const res = await fetch('/api/household/invite/decline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error ?? 'Failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['pending-invites'] });
+    },
+  });
+}
+
 export function useRevokeInvite() {
   const qc = useQueryClient();
   return useMutation({

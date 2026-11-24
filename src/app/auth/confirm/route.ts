@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getRequestOrigin } from '@/lib/requestOrigin';
+import { safeNextPath } from '@/lib/safePath';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +11,8 @@ export async function GET(request: NextRequest) {
   const origin = getRequestOrigin(request);
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as 'email' | 'recovery' | null;
-  const next = searchParams.get('next') ?? (type === 'recovery' ? '/reset-password' : '/dashboard');
+  // Attacker-controllable, and appended to the origin below: see safeNextPath.
+  const next = safeNextPath(searchParams.get('next'), type === 'recovery' ? '/reset-password' : '/dashboard');
 
   if (token_hash && type) {
     const cookieStore = await cookies();

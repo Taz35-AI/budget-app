@@ -2,11 +2,13 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { safeNextPath } from '@/lib/safePath';
 
 function PreviewForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get('from') ?? '/dashboard';
+  // router.push follows absolute URLs, so only same-site paths are accepted.
+  const from = safeNextPath(searchParams.get('from'), '/dashboard');
 
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
