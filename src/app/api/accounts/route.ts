@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthContext } from '@/lib/auth';
 import { notifyHousehold } from '@/lib/household-sync';
+import { loadAccounts, LoadError } from '@/lib/dashboardData';
 
 /**
  * GET /api/accounts
@@ -16,52 +17,12 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    const { data, error } = await supabase
-      .from('budget_accounts')
-      .select('*')
-      .eq('household_id', householdId)
-      .order('created_at', { ascending: true });
-
-    // Reassigned below when the household has no accounts yet.
-    let accounts = data;
-
-    if (error) {
-      console.error('[GET /api/accounts]', error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    // Auto-create a default account if the household has none
-    if (!accounts || accounts.length === 0) {
-      const { data: created, error: createErr } = await supabase
-        .from('budget_accounts')
-        .insert({ user_id: userId, household_id: householdId, name: 'Main Account' })
-        .select()
-        .single();
-
-      if (createErr) {
-        console.error('[GET /api/accounts] auto-create error:', createErr.message);
-        return NextResponse.json({ error: createErr.message }, { status: 500 });
-      }
-
-      accounts = [created];
-
-      // Backfill any existing transactions that have no account_id
-      await supabase
-        .from('transactions')
-        .update({ account_id: created.id })
-        .eq('household_id', householdId)
-        .is('account_id', null);
-
-      // Backfill balance_resets too
-      await supabase
-        .from('balance_resets')
-        .update({ account_id: created.id })
-        .eq('household_id', householdId)
-        .is('account_id', null);
-    }
-
+    const accounts = await loadAccounts(supabase, userId, householdId);
     return NextResponse.json({ accounts });
   } catch (err) {
+    if (err instanceof LoadError) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
     console.error('[GET /api/accounts] unexpected:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthContext, clearHouseholdCache } from '@/lib/auth';
 import { notifyHousehold } from '@/lib/household-sync';
+import { loadMembers, LoadError } from '@/lib/dashboardData';
 
 /**
  * GET /api/household/members
@@ -14,34 +15,11 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    const { data: rows, error } = await supabase
-      .from('household_members')
-      .select('user_id, household_id, role, display_name, joined_at')
-      .eq('household_id', ctx.householdId);
-
-    if (error) {
-      console.error('[GET /api/household/members]', error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    // Enrich each member with email and display name from auth
-    const members = await Promise.all(
-      (rows ?? []).map(async (row) => {
-        try {
-          const { data: { user } } = await supabase.auth.admin.getUserById(row.user_id);
-          return {
-            ...row,
-            email: user?.email ?? null,
-            auth_display_name: user?.user_metadata?.display_name ?? user?.user_metadata?.full_name ?? null,
-          };
-        } catch {
-          return { ...row, email: null, auth_display_name: null };
-        }
-      }),
-    );
-
-    return NextResponse.json({ members, householdId: ctx.householdId });
+    return NextResponse.json(await loadMembers(supabase, ctx.householdId));
   } catch (err) {
+    if (err instanceof LoadError) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
     console.error('[GET /api/household/members] unexpected:', err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

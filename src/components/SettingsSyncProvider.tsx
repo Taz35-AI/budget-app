@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { hasSessionCookie } from '@/lib/sessionCookie';
+import { takeBootstrapSlice } from '@/lib/bootstrap';
 
 /**
  * Syncs the Zustand settings store with Supabase so settings roam across devices.
@@ -41,16 +42,20 @@ export function SettingsSyncProvider({ children }: { children: React.ReactNode }
     // device).
     // Logged-out visitors (landing page, blog, login) have no settings to
     // load; skipping the request saves them a guaranteed-to-fail round trip.
-    const load = hasSessionCookie()
-      ? fetch('/api/settings')
-      : Promise.reject(new Error('no session'));
+    //
+    // On app pages the settings arrive with the page's bootstrap request; this
+    // only makes its own request when there is no bootstrap to join.
+    const loadSettings = async () => {
+      if (!hasSessionCookie()) throw new Error('no session');
+      const boot = await takeBootstrapSlice('settings', { start: false });
+      if (boot) return { ok: true as const, data: boot.settings };
+      const r = await fetch('/api/settings');
+      if (!r.ok) return { ok: false as const };
+      const data = await r.json();
+      return { ok: true as const, data };
+    };
 
-    load
-      .then(async (r) => {
-        if (!r.ok) return { ok: false as const };
-        const data = await r.json();
-        return { ok: true as const, data };
-      })
+    loadSettings()
       .then((result) => {
         if (result.ok) {
           if (result.data) {

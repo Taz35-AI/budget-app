@@ -2,10 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { BudgetAccount } from '@/types';
+import { takeBootstrapSlice } from '@/lib/bootstrap';
 
 const QK = ['accounts'] as const;
 
 async function fetchAccounts(): Promise<BudgetAccount[]> {
+  const boot = await takeBootstrapSlice('accounts', { start: true });
+  if (boot) return boot;
+
   const res = await fetch('/api/accounts');
   if (!res.ok) throw new Error('Failed to fetch accounts');
   const data = await res.json();

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthContext } from '@/lib/auth';
 import { notifyHousehold } from '@/lib/household-sync';
+import { loadTransactions, LoadError } from '@/lib/dashboardData';
 
 export async function GET() {
   try {
@@ -11,45 +12,11 @@ export async function GET() {
 
     const supabase = createAdminClient();
 
-    // Both queries run in parallel. Exceptions are scoped to the household
-    // through an inner join on their parent transaction rather than an
-    // `in (every transaction id)` filter: that needed the first query to
-    // finish before the second could start, and put every id in the request
-    // URL, which stops working once a household has a few thousand rows.
-    const [txResult, excResult] = await Promise.all([
-      supabase
-        .from('transactions')
-        .select('*')
-        .eq('household_id', householdId)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('transaction_exceptions')
-        .select('*, transactions!inner(household_id)')
-        .eq('transactions.household_id', householdId),
-    ]);
-
-    const { data: transactions, error: txError } = txResult;
-    if (txError) {
-      console.error('[GET /api/transactions] Supabase error:', txError.message, txError.code);
-      return NextResponse.json({ error: txError.message, code: txError.code }, { status: 500 });
-    }
-
-    if (excResult.error) {
-      console.error('[GET /api/transactions] exceptions error:', excResult.error.message);
-    }
-
-    // Drop the join column so the payload keeps its original shape.
-    const exceptions = (excResult.data ?? []).map((row) => {
-      const { transactions: _parent, ...exception } = row;
-      void _parent;
-      return exception;
-    });
-
-    return NextResponse.json({
-      transactions: transactions ?? [],
-      exceptions,
-    });
+    return NextResponse.json(await loadTransactions(supabase, householdId));
   } catch (error) {
+    if (error instanceof LoadError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: 500 });
+    }
     console.error('[GET /api/transactions] unexpected error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }

@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { HouseholdMember, HouseholdInvite } from '@/types';
+import { takeBootstrapSlice } from '@/lib/bootstrap';
 
 // ─── Members ─────────────────────────────────────────────────────────────────
 
@@ -19,6 +20,11 @@ export function useHouseholdMembers(options: UseHouseholdQueryOptions = {}) {
   return useQuery<HouseholdMembersData>({
     queryKey: ['household-members'],
     queryFn: async () => {
+      // Joins a bootstrap already under way; never starts one (this query is
+      // mounted on every page, including ones that don't need the rest).
+      const boot = await takeBootstrapSlice('members', { start: false });
+      if (boot) return boot;
+
       const res = await fetch('/api/household/members');
       if (!res.ok) throw new Error('Failed to fetch household members');
       return res.json();
@@ -91,6 +97,9 @@ export function usePendingInvites() {
   return useQuery<(HouseholdInvite & { inviter_name?: string })[]>({
     queryKey: ['pending-invites'],
     queryFn: async () => {
+      const boot = await takeBootstrapSlice('pendingInvites', { start: false });
+      if (boot) return boot;
+
       const res = await fetch('/api/household/invite/pending');
       if (!res.ok) return [];
       const data = await res.json();

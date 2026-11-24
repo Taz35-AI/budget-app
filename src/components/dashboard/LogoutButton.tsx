@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { clearBalanceCache } from '@/engine/balanceCache';
+import { resetBootstrap } from '@/lib/bootstrap';
 
 export function LogoutButton() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export function LogoutButton() {
     // The balance memo cache is module-level, so it outlives the session —
     // drop it so the next user never computes against the previous one's data.
     clearBalanceCache();
+    // Same for the first-load bootstrap: the next sign-in on this tab needs
+    // its own, and must never be handed slices fetched for this user.
+    resetBootstrap();
     router.push('/login');
     router.refresh();
   };

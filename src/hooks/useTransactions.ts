@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Transaction, TransactionException, TransactionFormValues } from '@/types';
 import { applyOptimisticEdit, applyOptimisticDelete } from '@/lib/optimisticTransactions';
+import { takeBootstrapSlice } from '@/lib/bootstrap';
 
 // Polling is only a safety net: Supabase Realtime delivers changes on web, and
 // household-sync broadcasts cover native. 30s keeps that net in place without
@@ -22,6 +23,10 @@ export interface TransactionsData {
 const QK = ['transactions'] as const;
 
 async function fetchTransactions(): Promise<TransactionsData> {
+  // First load shares one request with accounts, settings and household data.
+  const boot = await takeBootstrapSlice('transactions', { start: true });
+  if (boot) return boot;
+
   const res = await fetch('/api/transactions');
   if (!res.ok) throw new Error('Failed to fetch transactions');
   return res.json();

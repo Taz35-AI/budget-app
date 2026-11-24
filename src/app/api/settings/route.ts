@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUserId } from '@/lib/auth';
+import { loadSettings, LoadError } from '@/lib/dashboardData';
 
 export async function GET() {
   const userId = await getAuthUserId();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from('user_settings')
-    .select('settings')
-    .eq('user_id', userId)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    // PGRST116 = no rows found (first-time user)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    return NextResponse.json(await loadSettings(createAdminClient(), userId));
+  } catch (error) {
+    if (error instanceof LoadError) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    throw error;
   }
-
-  return NextResponse.json(data?.settings ?? null);
 }
 
 /** Postgres jsonb can hold far more, but a settings blob this big is a bug. */
